@@ -1,0 +1,23 @@
+﻿<img src="http://adtones.xyz/images/adtoneslogo.png" style="width:100px;" alt="" border="0">
+
+Dear System Admin,
+
+There's a new campaign in adtones. You'll be able to find new campaign in your campaign page.
+
+Campaign Name: {0}
+
+The following  user has registered to use the Campaign Manager
+
+First Name: {1}
+Last Name: {2}
+Organization: {3}
+Email: {4}
+
+The registration was completed at {5}
+
+To approve the registration please go to
+<a href="{6}"><button style="background-color: #1e90ff;border-color: #1e90ff;color: #FFFFFF;display: inline-block;padding: 6px 12px;margin-bottom: 0;font-size: 14px;font-weight: 400;line-height: 1.42857143;text-align: center;white-space: nowrap;vertical-align: middle;-ms-touch-action: manipulation;touch-action: manipulation;cursor: pointer;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;background-image: none;border: 1px solid transparent;border-radius: 4px;">View registration</button></a>
+
+Sincerely,
+Adtones Team
+   

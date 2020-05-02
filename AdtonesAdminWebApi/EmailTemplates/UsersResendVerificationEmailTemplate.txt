@@ -1,0 +1,9 @@
+﻿<img src="http://adtones.xyz/images/adtoneslogo.png" style="width:100px;" alt="" border="0">
+
+{0} is your Adtones activation code.
+The code will expire in 24 hours.
+
+If you have any problems with the verification process please contact us.
+All the best
+The Adtones Support Team
+support@adtones.com

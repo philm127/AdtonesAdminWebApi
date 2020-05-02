@@ -1,0 +1,7 @@
+﻿We have noticed that you have changed your email address from {0} to {1}.So if you not changed the email adddress then
+
+Please contact us adtones at registation@adtones.com
+
+Thank you!
+
+adtones Team

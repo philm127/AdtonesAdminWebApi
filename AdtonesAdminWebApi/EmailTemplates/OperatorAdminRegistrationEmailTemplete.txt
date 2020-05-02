@@ -1,0 +1,14 @@
+﻿<img src="http://adtones.xyz/images/adtoneslogo.png" style="width:100px;" alt="" border="0">
+
+Hello {0} {1},
+
+LogIn of your account is just a click away. You can proceed you will need to go to the following link. You can LogIn using below credential:
+{2}
+
+Email : {3}
+Password : {4}
+
+If you have any problems with the LogIn process then please contact us at support@adtones.com
+
+Thanks,
+adtones Team

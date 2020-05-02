@@ -1,0 +1,14 @@
+﻿<img src="http://adtones.xyz/images/adtoneslogo.png" style="width:100px;" alt="" border="0">
+
+Dear Admin,
+
+There's a new advert in adtones. You'll be able to find new advert in your advert page.
+
+Advert Name: {0}
+
+Please review the advert details and approve or reject advert.
+{1}
+
+Sincerely,
+Adtones Team
+   

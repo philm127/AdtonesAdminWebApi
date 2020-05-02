@@ -1,0 +1,77 @@
+﻿<body style="background-color: #D3D3D3; width: 100%">
+<table width="100%" border="0" cellpadding="2" cellspacing="2">
+	<tr align="center">
+		<td>			
+             <img src='{0}' alt='adtone' style="height: 45px;"></img>          
+		</td>
+	</tr>
+    <tr>
+        <td>
+            Dear Adtones,
+
+        </td>
+    </tr>
+    <tr>
+        <td>
+            The following user has registered to use the Campaign Manager
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table  cellspacing="0" cellpadding="5">
+                <tr>
+                    <td>First Name</td>
+                    <td>{1}</td>
+
+                </tr>
+                <tr>
+                    <td>Last Name</td>
+                    <td>
+                        {2}
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>Organization</td>
+                    <td>
+                        {3}
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>
+                        {4}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            The registration was completed  at {5}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            To approve the registration please go to
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a style="display: inline-block;padding: 6px 12px;margin-bottom: 0;font-size: 14px;font-weight: 400;line-height: 1.42857143;text-align: center;white-space: nowrap;vertical-align: middle;-ms-touch-action: manipulation;touch-action: manipulation;cursor: pointer;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;background-image: none;border: 1px solid transparent;border-radius: 4px;background-color: #1e90ff;border-color: #1e90ff;color: #FFFFFF;border-radius: 3px; padding: 10px 10px;font-size: 13px;line-height: 1.3333333;border-radius: 6px;font-weight: bold;" href='{6}'>View registration </a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Thanks
+        </td>
+
+    </tr>
+    <tr>
+        <td>
+            Registration
+        </td>
+    </tr>
+</table>
+</body>

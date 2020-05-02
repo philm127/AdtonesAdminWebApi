@@ -1,0 +1,8 @@
+﻿<img src="http://adtones.xyz/images/adtoneslogo.png" style="width:100px;" alt="" border="0">
+
+Dear User,
+
+{0}
+
+Sincerely,
+Adtones Team

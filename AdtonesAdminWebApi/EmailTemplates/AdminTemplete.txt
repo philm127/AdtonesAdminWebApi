@@ -1,0 +1,6 @@
+﻿Below user  details that  tried to register our sites.
+
+Email : {0}
+First name : {1}
+Last name : {2}
+

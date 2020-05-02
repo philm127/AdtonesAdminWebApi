@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DAL\**" />
+    <Compile Remove="EmailTemplates\**" />
+    <Compile Remove="Invoice\**" />
+    <Content Remove="DAL\**" />
+    <Content Remove="EmailTemplates\**" />
+    <Content Remove="Invoice\**" />
+    <EmbeddedResource Remove="DAL\**" />
+    <EmbeddedResource Remove="EmailTemplates\**" />
+    <EmbeddedResource Remove="Invoice\**" />
+    <None Remove="DAL\**" />
+    <None Remove="EmailTemplates\**" />
+    <None Remove="Invoice\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="BusinessServices\CountryTaxService.cs" />
+    <Compile Remove="BusinessServices\ExpressoPromotionalUserService.cs" />
+    <Compile Remove="BusinessServices\SafaricomPromotionalUserService.cs" />
+    <Compile Remove="Controllers\AreaController.cs" />
+    <Compile Remove="Controllers\WeatherForecastController.cs" />
+    <Compile Remove="Services\ExpressoOperators.cs" />
+    <Compile Remove="Services\PromotionalUserStatus.cs" />
+    <Compile Remove="Model\UsersModel.cs" />
+    <Compile Remove="WeatherForecast.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="DAL\ConnectionStringService.cs" />
+    <Compile Include="DAL\Interfaces\IConnectionStringService.cs" />
+    <Compile Include="DAL\Interfaces\ISharedSelectListsDAL.cs" />
+    <Compile Include="DAL\SharedSelectListsDAL.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.95.0" />
+    <PackageReference Include="Dapper" Version="2.0.35" />
+    <PackageReference Include="Dapper.SqlBuilder" Version="2.0.35" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="1.1.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
+    <PackageReference Include="RestSharp" Version="106.10.1" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Handlers\" />
+    <Folder Include="Logging\" />
+  </ItemGroup>
+
+
+</Project>
