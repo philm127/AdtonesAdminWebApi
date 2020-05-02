@@ -10,11 +10,15 @@ using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.Enums;
 using AdtonesAdminWebApi.DAL.Interfaces;
+using System.Security.Claims;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
     public class SharedSelectListsService : ISharedSelectListsService
     {
+        public string RoleName { get; set; }
+        public int CurrentUserId { get; set; }
+
         private readonly IConfiguration _configuration;
         private readonly ISharedSelectListsDAL _sharedDal;
         ReturnResult result = new ReturnResult();
@@ -30,7 +34,6 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> GetCountryList()
         {
-            var l = new SharedSelectListViewModel();
             try
             {
                 var select_query = @"SELECT Id AS Value,Name AS Text FROM Country";
@@ -80,6 +83,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> GetCurrencyList(int currencyId=0)
         {
+            var str = RoleName;
             StringBuilder sb = new StringBuilder("SELECT CurrencyId AS Value,CurrencyCode AS Text FROM Currencies");
             if (currencyId > 0)
                 sb.Append(" WHERE CurrencyId = @currencyId");

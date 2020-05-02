@@ -9,6 +9,8 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
     public interface ISharedSelectListsService
     {
+        string RoleName { get; set; }
+        public int CurrentUserId { get; set; }
         Task<ReturnResult> GetCountryList();
         ReturnResult GetUserRole();
         ReturnResult GetUserStatus();

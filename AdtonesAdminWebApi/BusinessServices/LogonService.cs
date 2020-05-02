@@ -119,11 +119,13 @@ namespace AdtonesAdminWebApi.BusinessServices
                     {
                         var jwt = new AuthService(_configuration);
                         user.Token = jwt.GenerateSecurityToken(user);
+                        user.PasswordHash = string.Empty;
                     }
                     else
                     {
                         result.result = 0;
                         result.error = "The user name and/or password provided is incorrect.";
+                        user = null;
                     }
                 }
             }

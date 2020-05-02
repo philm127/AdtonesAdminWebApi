@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using AdtonesAdminWebApi.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
+using System.Linq;
 
 namespace AdtonesAdminWebApi.Controllers
 {
@@ -61,6 +63,8 @@ namespace AdtonesAdminWebApi.Controllers
         [Route("v1/GetCurrencyList")]
         public async Task<ReturnResult> GetCurrencyList([FromBodyAttribute]IdCollectionViewModel some)
         {
+            _sharedList.CurrentUserId = int.Parse(User.Claims.FirstOrDefault(m => m.Type.Equals("userId"))?.Value);
+            _sharedList.RoleName = User.FindFirst(ClaimTypes.Role)?.Value;
             return await _sharedList.GetCurrencyList(some.currencyId);
         }
 

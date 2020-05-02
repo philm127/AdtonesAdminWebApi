@@ -22,8 +22,6 @@ namespace AdtonesAdminWebApi.Services
 
         public string GenerateSecurityToken(User userModel)
         {
-            string jwtToken = string.Empty;
-
             // Read the secret key and the expiration from the configuration 
             var secretKey = Convert.FromBase64String(_configuration["JwtConfig:secret"]);
             var expiryTimeSpan = Convert.ToInt32(_configuration["JwtConfig:expirationInMinutes"]);
@@ -33,9 +31,9 @@ namespace AdtonesAdminWebApi.Services
                 Issuer = null,
                 Audience = null,
                 Subject = new ClaimsIdentity(new List<Claim> {
-                        new Claim("userId",userModel.UserId.ToString()),
-                        new Claim("roleId",userModel.RoleId.ToString()),
-                        new Claim("role",userModel.Role)
+                        new Claim("UserId",userModel.UserId.ToString()),
+                        new Claim("RoleId",userModel.RoleId.ToString()),
+                        new Claim("Role",userModel.Role)
                     }),
                 Expires = DateTime.UtcNow.AddMinutes(expiryTimeSpan),
                 IssuedAt = DateTime.UtcNow,
