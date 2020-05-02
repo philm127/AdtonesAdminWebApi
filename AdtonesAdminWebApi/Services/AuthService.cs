@@ -12,16 +12,13 @@ namespace AdtonesAdminWebApi.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly string _secret;
-        private readonly string _expDate;
         private readonly IConfiguration _configuration;
 
         public AuthService(IConfiguration config)
         {
-            // _secret = config.GetSection("JwtConfig").GetSection("secret").Value;
-            // _expDate = config.GetSection("JwtConfig").GetSection("expirationInMinutes").Value;
             _configuration = config;
         }
+
 
         public string GenerateSecurityToken(User userModel)
         {
@@ -30,8 +27,6 @@ namespace AdtonesAdminWebApi.Services
             // Read the secret key and the expiration from the configuration 
             var secretKey = Convert.FromBase64String(_configuration["JwtConfig:secret"]);
             var expiryTimeSpan = Convert.ToInt32(_configuration["JwtConfig:expirationInMinutes"]);
-
-            // IdentityUser user = new IdentityUser(userModel.Email);
 
             var securityTokenDescription = new SecurityTokenDescriptor()
             {
@@ -52,25 +47,7 @@ namespace AdtonesAdminWebApi.Services
             // Generate token using JwtSecurityTokenHandler.
             var jwtHandler = new JwtSecurityTokenHandler();
             var jwToken = jwtHandler.CreateJwtSecurityToken(securityTokenDescription);
-            jwtToken = jwtHandler.WriteToken(jwToken);
-
-            return jwtToken;
-
-            //var tokenHandler = new JwtSecurityTokenHandler();
-            //var key = Encoding.ASCII.GetBytes(_secret);
-            //var tokenDescriptor = new SecurityTokenDescriptor
-            //{
-            //    Subject = new ClaimsIdentity(new[]
-            //    {
-            //        new Claim(ClaimTypes.Email, email)
-            //    }),
-            //    Expires = DateTime.UtcNow.AddMinutes(double.Parse(_expDate)),
-            //    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            //};
-
-            //var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            //return tokenHandler.WriteToken(token);
+            return jwtHandler.WriteToken(jwToken);
         }
     }
 }

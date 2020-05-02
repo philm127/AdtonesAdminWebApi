@@ -45,7 +45,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ICountryService, CountryService>();
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IUserPaymentService, UserPaymentService>();
-            
+
             // Use DAL 
             services.AddScoped<ISharedSelectListsDAL, SharedSelectListsDAL>();
             services.AddScoped<IConnectionStringService, ConnectionStringService>();
@@ -56,9 +56,6 @@ namespace AdtonesAdminWebApi
             // Client Specific Services
             services.AddScoped<IExpresso, Expresso>();
             services.AddScoped<ISafaricom, Safaricom>();
-
-
-
 
             /////
             ///// Authentication
@@ -84,40 +81,6 @@ namespace AdtonesAdminWebApi
                     ValidateAudience = false
                 };
             });
-            // services.AddTokenAuthentication(Configuration);
-            //var appSettingsSection = Configuration.GetSection("AuthSettings");
-            //services.Configure<AuthSettings>(appSettingsSection);
-
-            //// configure jwt authentication
-            //var appSettings = appSettingsSection.Get<AuthSettings>();
-            //var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-            //services.AddAuthentication(x =>
-            //{
-            //    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //})
-
-            //.AddJwtBearer(x =>
-            //{
-            //    //x.RequireHttpsMetadata = false;
-            //    //x.SaveToken = true;
-            //    //x.TokenValidationParameters = new TokenValidationParameters
-            //    //{
-            //    //    ValidateIssuerSigningKey = true,
-            //    //    IssuerSigningKey = new SymmetricSecurityKey(key),
-            //    //    ValidateIssuer = false,
-            //    //    ValidateAudience = false
-            //    //};
-            //    x.RequireHttpsMetadata = false;
-            //    x.SaveToken = true;
-            //    x.TokenValidationParameters = new TokenValidationParameters
-            //    {
-            //        ValidateIssuerSigningKey = true,
-            //        IssuerSigningKey = new SymmetricSecurityKey(key),
-            //        ValidateIssuer = false,
-            //        ValidateAudience = false
-            //    };
-            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -134,7 +97,7 @@ namespace AdtonesAdminWebApi
 
             app.UseAuthentication();
 
-            // app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

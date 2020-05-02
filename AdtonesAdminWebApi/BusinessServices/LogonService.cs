@@ -30,9 +30,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         ReturnResult result = new ReturnResult();
 
 
-        public LogonService(IConfiguration configuration, IOptions<AuthSettings> appSettings, 
-             IWebHostEnvironment env) //IErrorLogging logger,
-
+        public LogonService(IConfiguration configuration, IOptions<AuthSettings> appSettings, IWebHostEnvironment env)
         {
             _configuration = configuration;
             _appSettings = appSettings.Value;
@@ -96,8 +94,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                         result.error = "Your account is  suspended by adtones administrator so please contact adtones admin.";
                         usererror = -1;
                     }
-
-
                 }
                 else
                 {
@@ -121,24 +117,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     if (ValidatePassword(user, userForm))
                     {
-
                         var jwt = new AuthService(_configuration);
-
                         user.Token = jwt.GenerateSecurityToken(user);
-                        // authentication successful so generate jwt token
-                        //var tokenHandler = new JwtSecurityTokenHandler();
-                        //var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-                        //var tokenDescriptor = new SecurityTokenDescriptor
-                        //{
-                        //    Subject = new ClaimsIdentity(new Claim[]
-                        //    {
-                        //        new Claim(ClaimTypes.Name, user.UserId.ToString())
-                        //    }),
-                        //    Expires = DateTime.UtcNow.AddDays(7),
-                        //    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                        //};
-                        //user.Token = tokenHandler.CreateToken(tokenDescriptor);
-
                     }
                     else
                     {
