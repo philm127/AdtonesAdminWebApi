@@ -363,28 +363,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        
-
-        
-        //private bool CheckIfLabelExists(ProfileMatchLabelFormModel label)
-        //{
-        //    bool profileLabelExist = false;
-        //    using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-        //    {
-        //        profileLabelExist = connection.ExecuteScalar<bool>(@"SELECT COUNT(1) FROM ProfileMatchLabels 
-        //                                                            WHERE LOWER(ProfileLabel) = @profilename
-        //                                                            AND ProfileMatchInformationId=@profileId",
-        //                                                            new
-        //                                                            {
-        //                                                                profilename = label.ProfileLabel.Trim().ToLower(),
-        //                                                                profileId = label.ProfileMatchInformationId
-        //                                                            });
-        //    }
-        //    return profileLabelExist;
-
-        //}
-
-
         private bool CheckIfProfileExists(ProfileMatchInformationFormModel model)
         {
             bool profileLabelExist = false;

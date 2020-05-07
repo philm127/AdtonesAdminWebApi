@@ -25,7 +25,7 @@ namespace AdtonesAdminWebApi.Controllers
 
 
         [AllowAnonymous]
-        [Route("v1/Login")]
+        [HttpPost("v1/Login")]
         public async Task<ReturnResult> Login(User userForm)
         {
             var tst = await _userService.Login(userForm);
@@ -34,7 +34,7 @@ namespace AdtonesAdminWebApi.Controllers
 
 
         [AllowAnonymous]
-        [Route("v1/ForgotPassword")]
+        [HttpPost("v1/ForgotPassword")]
         public async Task<ReturnResult> ForgotPassword(IdCollectionViewModel model)
         {
             var tst = await _userService.ForgotPassword(model);

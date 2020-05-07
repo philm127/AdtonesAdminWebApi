@@ -34,7 +34,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    result.body = await connection.QueryAsync<AdvertiserUserResult>(InvoiceResultQuery());
+                    result.body = await connection.QueryAsync<InvoiceResult>(InvoiceResultQuery());
 
                 }
             }

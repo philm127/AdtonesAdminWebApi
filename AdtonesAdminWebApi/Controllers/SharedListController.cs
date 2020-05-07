@@ -28,48 +28,72 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [Route("v1/GetCountryList")]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List SharedSelectListViewModel</returns>
+        [HttpGet("v1/GetCountryList")]
         public async Task<ReturnResult> GetCountryList()
         {
             return await _sharedList.GetCountryList();
         }
 
 
-        [Route("v1/GetRoleList")]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List SharedSelectListViewModel</returns>
+        [HttpGet("v1/GetRoleList")]
         public ReturnResult GetRoleList()
         {
             return  _sharedList.GetUserRole();
         }
 
 
-        [Route("v1/GetUserStatusList")]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List SharedSelectListViewModel</returns>
+        [HttpGet("v1/GetUserStatusList")]
         public ReturnResult GetUserStatusList()
         {
             return _sharedList.GetUserStatus();
         }
 
-        [Route("v1/GetOperatorList")]
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="some"></param>
+        /// <returns>body contains List SharedSelectListViewModel</returns>
+        [HttpGet("v1/GetOperatorList")]
         public async Task<ReturnResult> GetOperatorList([FromBodyAttribute] IdCollectionViewModel some)
         {
             return await _sharedList.GetOperatorList(some.countryId);
         }
 
+
         /// <summary>
         /// Uses the IdCollectionViewModel to get id from a model rather than the url
         /// </summary>
         /// <param name="some">some contains currencyId among other simple Id's</param>
-        /// <returns>An IEnumerable collection to populate drop down list. 
-        /// This is a list of currencies or a single one</returns>
-        [Route("v1/GetCurrencyList")]
+        /// <returns>body contains List SharedSelectListViewModel
+        /// or a single one if id entered</returns>
+        [HttpGet("v1/GetCurrencyList")]
         public async Task<ReturnResult> GetCurrencyList([FromBodyAttribute]IdCollectionViewModel some)
         {
-            _sharedList.CurrentUserId = int.Parse(User.Claims.FirstOrDefault(m => m.Type.Equals("userId"))?.Value);
+            _sharedList.CurrentUserId = int.Parse(User.FindFirst("userId")?.Value);
             _sharedList.RoleName = User.FindFirst(ClaimTypes.Role)?.Value;
             return await _sharedList.GetCurrencyList(some.currencyId);
         }
 
 
-        [Route("v1/GetUserById")]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="some"></param>
+        /// <returns>body contains User model</returns>
+        [HttpGet("v1/GetUserById")]
         public async Task<ReturnResult> GetUserById(IdCollectionViewModel some)
         {
             return await _sharedList.GetUserById(some.userId);

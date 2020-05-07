@@ -26,56 +26,60 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [Route("v1/GetInvoiceData")]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("v1/GetInvoiceData")]
         public async Task<ReturnResult> GetInvoiceData()
         {
             return await _invoiceService.LoadDataTable();
         }
 
 
-        [Route("v1/SendInvoice")]
+        [HttpPost("v1/SendInvoice")]
         public async Task<ReturnResult> SendInvoice(IdCollectionViewModel model)
         {
             return await _invoiceService.SendInvoice(model);
         }
 
 
-        [Route("v1/GetOutstandingInvoiceData")]
+        [HttpGet("v1/GetOutstandingInvoiceData")]
         public async Task<ReturnResult> GetOutstandingInvoiceData()
         {
             return await _paymentService.LoadDataTable();
         }
 
 
-        [Route("v1/FillCampaignDropdown")]
+        [HttpGet("v1/FillCampaignDropdown")]
         public async Task<ReturnResult> FillCampaignDropdown()
         {
             return await _paymentService.FillCampaignDropdown();
         }
 
 
-        [Route("v1/FillUserPaymentDropdown")]
+        [HttpGet("v1/FillUserPaymentDropdown")]
         public async Task<ReturnResult> FillUserPaymentDropdown()
         {
             return await _paymentService.FillUserPaymentDropdown();
         }
 
 
-        [Route("v1/GetOutstandingBalance")]
+        [HttpGet("v1/GetOutstandingBalance")]
         public async Task<ReturnResult> GetOutstandingBalance(IdCollectionViewModel model)
         {
             return await _paymentService.GetOutstandingBalance(model);
         }
 
 
-        [Route("v1/GetInvoiceDetails")]
+        [HttpGet("v1/GetInvoiceDetails")]
         public async Task<ReturnResult> GetInvoiceDetails(IdCollectionViewModel model)
         {
             return await _paymentService.GetInvoiceDetails(model);
         }
 
         
-        [Route("v1/ReceivePayment")]
+        [HttpPost("v1/ReceivePayment")]
         public async Task<ReturnResult> ReceivePayment(UserCreditPaymentFormModel model)
         {
             return await _paymentService.ReceivePayment(model);

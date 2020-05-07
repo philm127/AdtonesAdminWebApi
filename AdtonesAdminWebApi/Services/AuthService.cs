@@ -26,6 +26,9 @@ namespace AdtonesAdminWebApi.Services
             var secretKey = Convert.FromBase64String(_configuration["JwtConfig:secret"]);
             var expiryTimeSpan = Convert.ToInt32(_configuration["JwtConfig:expirationInMinutes"]);
 
+            // When picking up claim names are returned in JWT as camel case so hunting for values later
+            // remember that UserId will be userId. Exception is Role as is a ClaimType,don't know why UserId or RoleId, maybe Role
+            // normally used Roleid.
             var securityTokenDescription = new SecurityTokenDescriptor()
             {
                 Issuer = null,

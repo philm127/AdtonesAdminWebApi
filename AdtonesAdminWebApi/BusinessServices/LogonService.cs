@@ -29,6 +29,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         private IWebHostEnvironment _env;
         ReturnResult result = new ReturnResult();
 
+        private const int PASSWORD_HISTORY_LIMIT = 8;
 
         public LogonService(IConfiguration configuration, IOptions<AuthSettings> appSettings, IWebHostEnvironment env)
         {
@@ -44,7 +45,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 int usererror = 0;
-                
+
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
@@ -141,6 +142,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logging.LogError();
                 result.result = 0;
             }
+            user.PasswordHash = null;
             result.body = user;
             return result;
         }
@@ -270,6 +272,65 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        /// <summary>
+        /// updates the UpdatePasswordHistory table as User cannot use same password for last 8 changes
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int> UpdatePasswordHistory(int userId, string password)
+        {
+            int res = 0;
+            try
+            {
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await connection.OpenAsync();
+                    res = await connection.ExecuteAsync(@"INSERT INTO UpdatePasswordHistory(UserId,PasswordHash,DateCreated)
+                                                                        VALUES(@Userid,@PasswordHash,GETDATE())",
+                                                                        new { UserId = userId, PasswordHash = password });
+                }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "LogonService",
+                    ProcedureName = "UpdatePasswordHistory"
+                };
+                _logging.LogError();
+                res = 0;
+            }
+            return res;
+        }
+
+
+        /// <summary>
+        /// We have a new ule where Password cannot be reused I think 8 is the limit, therefore checks if
+        /// Password is within the last 8 used.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
+        public async Task<bool> IsPreviousPassword(int userId, string newPassword)
+        {
+            IEnumerable<string> userPasswordHistory;
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                userPasswordHistory = await connection.QueryAsync<string>(@"SELECT TOP (@top) PasswordHash 
+                                                                                FROM UserPasswordHistories  
+                                                                                WHERE UserId=@userId ORDER BY CreatedDate DESC",
+                                                                          new { userId = userId, top = PASSWORD_HISTORY_LIMIT });
+            }
+
+            if (userPasswordHistory.Cast<string>().Contains(newPassword))
+                return true;
+            else
+                return false;
+        }
+
+
+
         private bool ValidatePassword(User user,User userForm)
         {
             try
@@ -291,5 +352,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 return false;
             }
         }
+    
+    
+    
     }
 }

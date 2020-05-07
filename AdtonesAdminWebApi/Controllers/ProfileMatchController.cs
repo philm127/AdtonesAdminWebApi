@@ -23,42 +23,42 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [Route("v1/GetProfileMatchData")]
+        [HttpGet("v1/GetProfileMatchData")]
         public async Task<ReturnResult> GetProfileMatchData()
         {
             return await _profileService.LoadDataTable();
         }
 
 
-        [Route("v1/GetProfileMatchInfoById")]
+        [HttpGet("v1/GetProfileMatchInfoById")]
         public async Task<ReturnResult> GetProfileMatchInfoById(IdCollectionViewModel model)
         {
             return await _profileService.GetProfileInfo(model);
         }
 
 
-        [Route("v1/UpdateProfileMatchInfo")]
+        [HttpPut("v1/UpdateProfileMatchInfo")]
         public async Task<ReturnResult> UpdateProfileMatchInfo(ProfileMatchInformationFormModel model)
         {
             return await _profileService.UpdateProfileInfo(model);
         }
 
 
-        [Route("v1/AddProfileMatchInfo")]
+        [HttpPost("v1/AddProfileMatchInfo")]
         public async Task<ReturnResult> AddProfileMatchInfo(ProfileMatchInformationFormModel model)
         {
             return await _profileService.AddProfileInfo(model);
         }
 
 
-        [Route("v1/DeleteProfileMatchLabel")]
+        [HttpDelete("v1/DeleteProfileMatchLabel")]
         public async Task<ReturnResult> DeleteProfileMatchLabel(IdCollectionViewModel model)
         {
             return await _profileService.DeleteProfileLabel(model);
         }
 
 
-        [Route("v1/GetProfileTypeList")]
+        [HttpGet("v1/GetProfileTypeList")]
         public ReturnResult GetProfileTypeList()
         {
             return  _profileService.FillProfileType();

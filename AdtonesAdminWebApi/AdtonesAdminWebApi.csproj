@@ -8,15 +8,19 @@
     <Compile Remove="DAL\**" />
     <Compile Remove="EmailTemplates\**" />
     <Compile Remove="Invoice\**" />
+    <Compile Remove="PromotionalUserCSV\**" />
     <Content Remove="DAL\**" />
     <Content Remove="EmailTemplates\**" />
     <Content Remove="Invoice\**" />
+    <Content Remove="PromotionalUserCSV\**" />
     <EmbeddedResource Remove="DAL\**" />
     <EmbeddedResource Remove="EmailTemplates\**" />
     <EmbeddedResource Remove="Invoice\**" />
+    <EmbeddedResource Remove="PromotionalUserCSV\**" />
     <None Remove="DAL\**" />
     <None Remove="EmailTemplates\**" />
     <None Remove="Invoice\**" />
+    <None Remove="PromotionalUserCSV\**" />
   </ItemGroup>
 
   <ItemGroup>

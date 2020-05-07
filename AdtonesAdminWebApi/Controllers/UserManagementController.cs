@@ -17,86 +17,97 @@ namespace AdtonesAdminWebApi.Controllers
     {
         private readonly IUserManagementService _userService;
         private readonly IPromotionalUsersService _promotionalService;
+        private readonly IUserDashboardService _dashboardService;
 
-        public UserManagementController(IUserManagementService userService,IPromotionalUsersService promotionalService)
+        public UserManagementController(IUserManagementService userService,IPromotionalUsersService promotionalService,
+                                            IUserDashboardService dashboardService)
         {
             _userService = userService;
             _promotionalService = promotionalService;
+            _dashboardService = dashboardService;
         }
 
 
-        [Route("v1/GetUserResultTest")]
-        public async Task<IEnumerable<AdvertiserUserResult>> GetUserResultTest()
+        [HttpGet("v1/GetUserResultTest")]
+        public async Task<IEnumerable<AdvertiserDashboardResult>> GetUserResultTest()
         {
-            var res = await _userService.LoadDataTable();
-            IEnumerable<AdvertiserUserResult> nv;
-            nv = (IEnumerable<AdvertiserUserResult>)res.body;
+            var res = await _dashboardService.LoadAdvertiserDataTable();
+            IEnumerable<AdvertiserDashboardResult> nv;
+            nv = (IEnumerable<AdvertiserDashboardResult>)res.body;
             return nv;
 
         }
 
 
         [HttpGet("v1/GetUserResult")]
-        public async Task<ReturnResult> GetUserResult()
+        public async Task<ReturnResult> GetAdvertiserTable()
         {
-            return await _userService.LoadDataTable();
+            return await _dashboardService.LoadAdvertiserDataTable();
         }
 
 
-        [Route("v1/GetCompanyDetails")]
+        [HttpGet("v1/GetCompanyDetails")]
         public async Task<ReturnResult> GetCompanyDetails([FromBodyAttribute]User users)
         {
             return await _userService.GetCompanyForm(users.UserId);
         }
 
 
-        [Route("v1/UpdateCompanyDetails")]
+        [HttpPut("v1/UpdateCompanyDetails")]
         public async Task<ReturnResult> UpdateCompanyDetails([FromBodyAttribute]CompanyDetails company)
         {
             return await _userService.UpdateCompanyDetails(company);
         }
 
 
-        [Route("v1/GetContactDetails")]
+        [HttpGet("v1/GetContactDetails")]
         public async Task<ReturnResult> GetContactDetails([FromBodyAttribute]User users)
         {
             return await _userService.GetContactForm(users.UserId);
         }
 
 
-        [Route("v1/UpdateContactDetails")]
+        [HttpPut("v1/UpdateContactDetails")]
         public async Task<ReturnResult> UpdateContactDetails([FromBodyAttribute]Contacts contact)
         {
             return await _userService.UpdateContactForm(contact);
         }
 
 
-        [Route("v1/GetUserProfile")]
+        [HttpGet("v1/GetUserProfile")]
         public async Task<ReturnResult> GetUserProfile([FromBodyAttribute]User users)
         {
             return await _userService.GetProfileForm(users.UserId);
         }
 
 
-        [Route("v1/UpdateUserProfile")]
+        [HttpPut("v1/UpdateUserProfile")]
         public async Task<ReturnResult> UpdateUserProfile([FromBodyAttribute]User users)
         {
             return await _userService.UpdateProfileForm(users);
         }
 
 
-        [Route("v1/ApproveORSuspendUser")]
-        public async Task<ReturnResult> ApproveORSuspendUser([FromBodyAttribute] AdvertiserUserResult users)
+        [HttpPost("v1/AddOperatorUser")]
+        public async Task<ReturnResult> AddOperatorUser([FromBodyAttribute] OperatorAdminFormModel model)
+        {
+            return await _userService.AddOperatorAdminUser(model);
+        }
+
+
+        [HttpPut("v1/ApproveORSuspendUser")]
+        public async Task<ReturnResult> ApproveORSuspendUser([FromBodyAttribute] AdvertiserDashboardResult users)
         {
             return await _userService.ApproveORSuspendUser(users);
         }
 
 
-        [Route("v1/UploadPromotionalUser")]
+        [HttpPost("v1/UploadPromotionalUser")]
         public async Task<ReturnResult> UploadPromotionalUser([FromBodyAttribute] PromotionalUserFormModel model)
         {
             return await _promotionalService.SavePromotionalUser(model);
         }
+
 
     }
 }

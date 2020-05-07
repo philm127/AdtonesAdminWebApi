@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.ViewModels
 {
-    public class AdvertiserUserResult
+    
+    public class UserDashboardData
     {
         public int UserId { get; set; }
         public int RoleId { get; set; }
@@ -16,16 +17,32 @@ namespace AdtonesAdminWebApi.ViewModels
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public int Activated { get; set; }
+        public string fstatus => $"{(UserStatus)Activated}";
+        public System.DateTime DateCreated { get; set; }
+        public string Role => $"{(UserRole)RoleId}";
+    }
+    
+    public class AdvertiserDashboardResult : UserDashboardData
+    {
+        
         public int NoOfactivecampaign { get; set; }
         public int NoOfunapprovedadverts { get; set; }
         public double Creditlimit { get; set; }
         public double Outstandinginvoice { get; set; }
-        public int Activated { get; set; }
-        public string fstatus => $"{(UserStatus)Activated}";
-        public System.DateTime DateCreated { get; set; }
+        
         public int TicketCount { get; set; }
-        public string Role => $"{(UserRole)RoleId}";
+        
+    }
 
 
+    public class OperatorDashboardResult : UserDashboardData
+    {
+        public string Organisation { get; set; }
+
+        public int CountryId { get; set; }
+        public string CountryName { get; set; }
+        public int OperatorId { get; set; }
+        public string OperatorName { get; set; }
     }
 }

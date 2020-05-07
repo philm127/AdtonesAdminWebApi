@@ -37,7 +37,7 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [Route("v1/AddCredit")]
+        [HttpPost("v1/AddCredit")]
         public async Task<ReturnResult> AddCredit(UserCreditFormModel _creditmodel)
         {
             var tst = await _userService.AddCredit(_creditmodel);
@@ -45,7 +45,7 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [Route("v1/GetCreditDetails")]
+        [HttpGet("v1/GetCreditDetails")]
         public async Task<ReturnResult> GetCreditDetails(IdCollectionViewModel model)
         {
             var tst = await _userService.GetCreditDetails(model);
@@ -53,7 +53,7 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [Route("v1/UpdateCredit")]
+        [HttpPut("v1/UpdateCredit")]
         public async Task<ReturnResult> UpdateCredit(UsersCreditFormModel model)
         {
             var tst = await _userService.UpdateCredit(model);
