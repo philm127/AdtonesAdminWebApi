@@ -92,7 +92,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                                                                                                     c.Name,p.ProfileType
                                                                                                     FROM ProfileMatchInformations p
                                                                                                     LEFT JOIN Country c ON p.CountryId=c.Id
-                                                                                                    WHERE p.Id=@id", new { id = model.id });
+                                                                                                    WHERE p.Id=@id", new { model.id });
                 }
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
@@ -100,7 +100,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     await connection.OpenAsync();
                     label = await connection.QueryAsync<ProfileMatchLabelFormModel>(@"SELECT Id,ProfileLabel,ProfileMatchInformationId,CreatedDate
                                                                                                     FROM ProfileMatchLabels
-                                                                                                    WHERE ProfileMatchInformationId=@id", new { id = prof.Id });
+                                                                                                    WHERE ProfileMatchInformationId=@id", new { prof.Id });
                 }
 
                 prof.profileMatchLabelFormModels = label.ToList();
@@ -201,6 +201,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             if ((model.profileMatchLabelFormModels != null || model.profileMatchLabelFormModels.Count() > 0))
             {
+                int profileId = 0;
                 try
                 {
                     if (CheckIfProfileExists(model))
@@ -210,7 +211,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         return result;
                     }
 
-                    int profileId = 0;
+                    
                     string insert_query = @"INSERT INTO ProfileMatchInformations(ProfileName,IsActive,CountryId,CreatedDate,UpdatedDate,
                                                                                                             ProfileType)
                                                             VALUES(@ProfileName,@IsActive,@CountryId,GETDATE(),GETDATE(),@ProfileType);
@@ -256,6 +257,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     result.result = 0;
                     result.error = "ProfileInfo was NOT added successfully";
                 }
+                result.body = profileId;
                 return result;
             }
             else

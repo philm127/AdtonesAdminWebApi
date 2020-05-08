@@ -330,7 +330,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-
         private bool ValidatePassword(User user,User userForm)
         {
             try
@@ -352,7 +351,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                 return false;
             }
         }
-    
     
     
     }

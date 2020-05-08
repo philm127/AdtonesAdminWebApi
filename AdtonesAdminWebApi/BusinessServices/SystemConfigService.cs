@@ -12,30 +12,32 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
-    public class OperatorConfigService : IOperatorConfigService
+    public class SystemConfigService : ISystemConfigService
     {
         private readonly IConfiguration _configuration;
-
+        
         ReturnResult result = new ReturnResult();
 
-        public OperatorConfigService(IConfiguration configuration)
+
+        public SystemConfigService(IConfiguration configuration, IUserManagementService userService)
 
         {
             _configuration = configuration;
         }
 
 
-        public async Task<ReturnResult> LoadOperatorConfigurationDataTable()
+        public async Task<ReturnResult> LoadSystemConfigurationDataTable()
         {
-            var select_query = @"SELECT OperatorConfigurationId,con.OperatorId,Days,con.IsActive,AddedDate,op.OperatorName
-                                FROM dbo.OperatorConfigurations AS con INNER JOIN Operators AS op ON op.OperatorId=con.OperatorId";
+            var select_query = @"SELECT SystemConfigId,SystemConfigKey,SystemConfigValue,CreatedDateTime,
+                                                        ISNULL(SystemConfigType,'-') AS SystemConfigType
+                                                        FROM SystemConfig";
 
             try
             {
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    result.body = await connection.QueryAsync<OperatorConfigurationResult>(select_query);
+                    result.body = await connection.QueryAsync<SystemConfigResult>(select_query);
                 }
             }
             catch (Exception ex)
@@ -44,8 +46,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "LoadOperatorConfigurationDataTable"
+                    PageName = "SystemConfigService",
+                    ProcedureName = "LoadSystemConfigurationDataTable"
                 };
                 _logging.LogError();
                 result.result = 0;
@@ -54,19 +56,19 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetOperatorConfig(IdCollectionViewModel model)
+        public async Task<ReturnResult> GetSystemConfig(IdCollectionViewModel model)
         {
-            var select_query = @"SELECT OperatorConfigurationId,con.OperatorId,Days,con.IsActive,AddedDate,op.OperatorName
-                                FROM dbo.OperatorConfigurations AS con 
-                                INNER JOIN Operators AS op ON op.OperatorId=con.OperatorId
-                                WHERE OperatorConfigurationId=@Id";
+            var select_query = @"SELECT SystemConfigId,SystemConfigKey,SystemConfigValue,CreatedDateTime,
+                                    ISNULL(SystemConfigType,'-') AS SystemConfigType
+                                    FROM SystemConfig
+                                    WHERE SystemConfigId=@Id";
 
             try
             {
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<OperatorConfigurationResult>(select_query, new { Id = model.id });
+                    result.body = await connection.QueryFirstOrDefaultAsync<SystemConfigResult>(select_query, new { Id = model.id });
                 }
             }
             catch (Exception ex)
@@ -75,7 +77,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
+                    PageName = "SystemConfigService",
                     ProcedureName = "GetOperatorConfig"
                 };
                 _logging.LogError();
@@ -85,10 +87,10 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> AddOperatorConfig(OperatorConfigurationResult model)
+        public async Task<ReturnResult> AddSystemConfig(SystemConfigResult model)
         {
-            var insert_query = @"INSERT INTO OperatorConfigurations(Days,IsActive,AddedDate,UpdatedDate)
-                                        VALUES(@Days,true,GETDATE(),GETDATE());
+            var insert_query = @"INSERT INTO SystemConfig(SystemConfigKey, SystemConfigValue, SystemConfigType,CreatedDateTime,UpdatedDateTime)
+                                        VALUES(@SystemConfigKey, @SystemConfigValue, @SystemConfigType,GETDATE(),GETDATE());
                                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
             try
@@ -105,8 +107,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "AddOperatorConfig"
+                    PageName = "SystemConfigService",
+                    ProcedureName = "AddSystemConfig"
                 };
                 _logging.LogError();
                 result.result = 0;
@@ -115,10 +117,10 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> UpdateOperatorConfig(OperatorConfigurationResult model)
+        public async Task<ReturnResult> UpdateSystemConfig(SystemConfigResult model)
         {
-            var update_query = @"UPDATE OperatorConfigurations SET Days = @Days,IsActive = @IsActive 
-                                            WHERE OperatorConfigurationId = @OperatorConfigurationId)";
+            var update_query = @"UPDATE SystemConfig SET SystemConfigKey = @SystemConfigKey, SystemConfigValue, SystemConfigType,UpdatedDateTime=GETDATE()
+                                            WHERE SystemConfigId = @SystemConfigId)";
 
             try
             {
@@ -134,7 +136,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
+                    PageName = "SystemConfigService",
                     ProcedureName = "UpdateOperatorConfig"
                 };
                 _logging.LogError();

@@ -27,7 +27,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> LoadDataTable()
+        public async Task<ReturnResult> LoadPaymentDataTable()
         {
             try
             {

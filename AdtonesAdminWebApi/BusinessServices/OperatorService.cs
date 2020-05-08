@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
-    public class OperatorService
+    public class OperatorService : IOperatorService
     {
         private readonly IConfiguration _configuration;
         private readonly IUserManagementService _userService;
@@ -238,17 +238,18 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetOperatorMaxAdvert(int id)
+        public async Task<ReturnResult> GetOperatorMaxAdvert(IdCollectionViewModel model)
         {
             var select_query = @"SELECT OperatorMaxAdvertId,KeyName,KeyValue,op.OperatorName
-                                 FROM OperatorMaxAdverts AS maxad INNER JOIN Operators AS op ON op.OperatorId=maxad.OperatorId";
+                                 FROM OperatorMaxAdverts AS maxad INNER JOIN Operators AS op ON op.OperatorId=maxad.OperatorId
+                                  WHERE OperatorMaxAdvertId=@Id";
 
             try
             {
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<OperatorMaxAdvertsFormModel>(select_query);
+                    result.body = await connection.QueryFirstOrDefaultAsync<OperatorMaxAdvertsFormModel>(select_query, new { Id = model.id});
                 }
             }
             catch (Exception ex)
@@ -295,125 +296,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                 result.result = 0;
             }
             result.body = "Operator " + operatorMaxAdvertsFormModel.OperatorName + " updated successfully.";
-            return result;
-        }
-
-
-        public async Task<ReturnResult> LoadOperatorConfigurationDataTable()
-        {
-            var select_query = @"SELECT OperatorConfigurationId,con.OperatorId,Days,con.IsActive,AddedDate,op.OperatorName
-                                FROM dbo.OperatorConfigurations AS con INNER JOIN Operators AS op ON op.OperatorId=con.OperatorId";
-
-            try
-            {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryAsync<OperatorConfigurationResult>(select_query);
-                }
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "LoadOperatorConfigurationDataTable"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> GetOperatorConfig(IdCollectionViewModel model)
-        {
-            var select_query = @"SELECT OperatorConfigurationId,con.OperatorId,Days,con.IsActive,AddedDate,op.OperatorName
-                                FROM dbo.OperatorConfigurations AS con 
-                                INNER JOIN Operators AS op ON op.OperatorId=con.OperatorId
-                                WHERE OperatorConfigurationId=@Id";
-
-            try
-            {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<OperatorConfigurationResult>(select_query, new { Id = model.id });
-                }
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "GetOperatorConfig"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> AddOperatorConfig(OperatorConfigurationResult model)
-        {
-            var insert_query = @"INSERT INTO OperatorConfigurations(OperatorId,Days,IsActive,AddedDate,UpdatedDate)
-                                        VALUES(@OperatorId,@Days,true,GETDATE(),GETDATE());
-                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-            try
-            {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    var x = await connection.ExecuteScalarAsync<int>(insert_query, model);
-                }
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "AddOperatorConfig"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> UpdateOperatorConfig(OperatorConfigurationResult model)
-        {
-            var update_query = @"UPDATE OperatorConfigurations SET Days = @Days,IsActive = @IsActive 
-                                            WHERE OperatorConfigurationId = @OperatorConfigurationId)";
-
-            try
-            {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    var x = await connection.ExecuteScalarAsync<int>(update_query, model);
-                }
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "UpdateOperatorConfig"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
             return result;
         }
 

@@ -31,7 +31,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// Populate the datatable
         /// </summary>
         /// <returns></returns>
-        public async Task<ReturnResult> LoadDataTable()
+        public async Task<ReturnResult> LoadInvoiceDataTable()
         {
             try
             {
@@ -123,7 +123,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             return result;
         }
 
-
+        /// TODO: Sort out standardised email servive
         private void sendemailtoclient(string to, string fname, string lname, string subject, int formatId, string[] mailTo, string[] mailCC,
                                         string[] mailBcc, string[] attachment, bool isBodyHTML, string completedDatetime,
                                         string paymentMethod, DateTime? dueDate, string InvoiceNumber)

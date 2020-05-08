@@ -8,7 +8,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
     public interface IInvoiceService
     {
-        Task<ReturnResult> LoadDataTable();
+        Task<ReturnResult> LoadInvoiceDataTable();
         Task<ReturnResult> SendInvoice(IdCollectionViewModel model);
     }
 }

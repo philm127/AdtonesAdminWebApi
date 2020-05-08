@@ -9,5 +9,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     public interface IUserDashboardService
     {
         Task<ReturnResult> LoadAdvertiserDataTable();
+        Task<ReturnResult> LoadOperatorDataTable();
     }
 }

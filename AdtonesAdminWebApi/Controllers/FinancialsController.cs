@@ -29,14 +29,19 @@ namespace AdtonesAdminWebApi.Controllers
         /// <summary>
         /// 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>body contains List InvoiceResult</returns>
         [HttpGet("v1/GetInvoiceData")]
         public async Task<ReturnResult> GetInvoiceData()
         {
-            return await _invoiceService.LoadDataTable();
+            return await _invoiceService.LoadInvoiceDataTable();
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>Inly returns result 1 or 0</returns>
         [HttpPost("v1/SendInvoice")]
         public async Task<ReturnResult> SendInvoice(IdCollectionViewModel model)
         {
@@ -47,7 +52,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetOutstandingInvoiceData")]
         public async Task<ReturnResult> GetOutstandingInvoiceData()
         {
-            return await _paymentService.LoadDataTable();
+            return await _paymentService.LoadPaymentDataTable();
         }
 
 

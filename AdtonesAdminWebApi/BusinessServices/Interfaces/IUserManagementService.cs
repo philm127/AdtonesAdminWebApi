@@ -9,6 +9,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
     public interface IUserManagementService
     {
+        Task<ReturnResult> GetUserDetail(int userId);
         Task<ReturnResult> GetContactForm(int userId);
         Task<ReturnResult> GetProfileForm(int userId);
         Task<ReturnResult> GetCompanyForm(int userId);
@@ -20,5 +21,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> AddCompanyDetails(CompanyDetails company);
         Task<ReturnResult> AddUser(User user);
         Task<ReturnResult> AddOperatorAdminUser(OperatorAdminFormModel model);
+        Task<ReturnResult> UpdateOperatorAdminUser(OperatorAdminFormModel model);
+        Task<ReturnResult> GetOperatorAdmin(IdCollectionViewModel model);
     }
 }

@@ -8,7 +8,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
     public interface IUserPaymentService
     {
-        Task<ReturnResult> LoadDataTable();
+        Task<ReturnResult> LoadPaymentDataTable();
         Task<ReturnResult> FillCampaignDropdown();
         Task<ReturnResult> FillUserPaymentDropdown();
         Task<ReturnResult> GetOutstandingBalance(IdCollectionViewModel model);

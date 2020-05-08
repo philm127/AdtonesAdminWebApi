@@ -47,6 +47,9 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IUserPaymentService, UserPaymentService>();
             services.AddScoped<IUserDashboardService, UserDashboardService>();
             services.AddScoped<IOperatorConfigService, OperatorConfigService>();
+            services.AddScoped<IOperatorService, OperatorService>();
+            services.AddScoped<ISystemConfigService, SystemConfigService>();
+            services.AddScoped<IRewardsService, RewardsService>();
 
             // Use DAL 
             services.AddScoped<ISharedSelectListsDAL, SharedSelectListsDAL>();
