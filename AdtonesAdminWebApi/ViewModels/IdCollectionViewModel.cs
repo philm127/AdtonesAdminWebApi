@@ -17,5 +17,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int countryId { get; set; } = 0;
         public int billingId { get; set; }
         public string Email { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public int status { get; set; } = 0;
     }
 }
