@@ -1,5 +1,4 @@
-﻿
-using AdtonesAdminWebApi.Model;
+﻿using AdtonesAdminWebApi.Model;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -10,11 +9,6 @@ using Dapper;
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.ViewModels;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
 using System.IO;
 using System.Net.Mail;
 using Microsoft.AspNetCore.Hosting;
@@ -27,6 +21,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         private readonly AuthSettings _appSettings;
         private IWebHostEnvironment _env;
+
         ReturnResult result = new ReturnResult();
 
         private const int PASSWORD_HISTORY_LIMIT = 8;
@@ -46,16 +41,14 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 int usererror = 0;
 
+                var login_query = @"SELECT UserId,RoleId,Email,FirstName,LastName,PasswordHash,Activated,
+                                    OperatorId, Organisation, DateCreated, VerificationStatus
+                                    FROM Users WHERE LOWER(Email)=@email AND Activated !=3; ";
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    user = await connection.QueryFirstOrDefaultAsync<User>(@"SELECT UserId,RoleId,Email,FirstName,PasswordHash,Activated,
-                                                                                        LastName,Outstandingdays,Organisation,DateCreated,
-                                                                                        VerificationStatus
-                                                                                        FROM Users WHERE LOWER(Email) = @email 
-                                                                                        AND Activated !=3 ",
-                                                                                            new { email = userForm.Email.ToLower() });
+                    user = await connection.QueryFirstOrDefaultAsync<User>(login_query,new { email = userForm.Email.ToLower() });
                 }
                 if (user != null)
                 {
@@ -148,7 +141,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> ForgotPassword(IdCollectionViewModel model)
+        public async Task<ReturnResult> ForgotPassword(string emailAddress)
         {
             User user = new User();
             try
@@ -161,10 +154,10 @@ namespace AdtonesAdminWebApi.BusinessServices
                                                                                         VerificationStatus
                                                                                         FROM Users WHERE LOWER(Email) = @email 
                                                                                         AND RoleId IN (1,4,5,6)",
-                                                                                            new { email = model.Email.ToLower() });
+                                                                                            new { email = emailAddress.ToLower() });
                 }
                 /// TODO: Remove once testing done
-                // user.Email = "philm127@gmail.com";
+                // emailAddress = "philm127@gmail.com";
                 if (user == null)
                 {
                     result.result = 0;

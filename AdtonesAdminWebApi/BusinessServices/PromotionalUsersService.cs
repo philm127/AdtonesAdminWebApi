@@ -4,18 +4,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Configuration;
-using Dapper;
-using Microsoft.Data.SqlClient;
 using ClosedXML.Excel;
 using AdtonesAdminWebApi.OperatorSpecific;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Services;
+using AdtonesAdminWebApi.DAL.Queries;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -24,87 +20,74 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IWebHostEnvironment _webHostEnvironment;
         public IConnectionStringService _connService { get; }
         private readonly IConfiguration _configuration;
-        private readonly IExpresso _operatorExpresso;
-        private readonly ISafaricom _operatorSafaricom;
+        private readonly IExpressoProcessPromoUser _operatorExpresso;
+        private readonly ISafaricomProcessPromoUser _operatorSafaricom;
+        private readonly IProvisionServerDAL _provisionServer;
+        private readonly IProvisionServerQuery  _provisionQuery;
 
         ReturnResult result = new ReturnResult();
         private const string DestinationTableName = "dbo.PromotionalUsers";
 
-        public PromotionalUsersService(IWebHostEnvironment webHostEnvironment, IConnectionStringService connService,
-                                        IConfiguration configuration, IExpresso operatorExpresso, ISafaricom operatorSafaricom)
+        public PromotionalUsersService(IWebHostEnvironment webHostEnvironment, IConnectionStringService connService, IProvisionServerDAL provisionServer,
+                                        IConfiguration configuration, IExpressoProcessPromoUser operatorExpresso, ISafaricomProcessPromoUser operatorSafaricom,
+                                        IProvisionServerQuery provisionQuery)
         {
             _webHostEnvironment = webHostEnvironment;
+            _provisionServer = provisionServer;
             _connService = connService;
             _configuration = configuration;
             _operatorExpresso = operatorExpresso;
             _operatorSafaricom = operatorSafaricom;
+            _provisionQuery = provisionQuery;
         }
 
 
         public async Task<ReturnResult> SavePromotionalUser(PromotionalUserFormModel model)
         {
-            string operatorName;
 
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    operatorName = await connection.QueryFirstOrDefaultAsync<string>(@"SELECT OperatorName FROM Operators WHERE 
-                                                                                          OperatorId=@id", new { id = model.OperatorId });
-                }
-
-                var operatorConnectionString = await _connService.GetSingleConnectionString(OperatorId: model.OperatorId);
+                /// TODO: How to do this for testing?
+                var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
 
                 if (!string.IsNullOrEmpty(operatorConnectionString))
                 {
-                    using (var db = new SqlConnection(_configuration.GetConnectionString(operatorConnectionString)))
+                    var batchIDExist = await _provisionServer.GetPromoUserBatchIdCheckForExisting(_provisionQuery.CheckIfBatchExists, operatorConnectionString);
+                    if (batchIDExist)
                     {
-                        var batchIDExist = await db.ExecuteScalarAsync<bool>(@"SELECT COUNT(1) FROM PromotionalUsers WHERE 
-                                                                                          BatchId=@id", new { id = model.BatchID });
-
-                        if (batchIDExist)
-                        {
-                            result.result = 0;
-                            result.body = "Batch Id Exist to " + operatorName + " Operator.";
-                            return result;
-                        }
+                        result.result = 0;
+                        result.body = "A Batch Id Exists For the Operator ";
+                        return result;
                     }
 
                     string countryCode = string.Empty;
-                    if (model.OperatorId == (int)OperatorTableId.Expresso)
+                    if (model.OperatorId == (int)Enums.OperatorTableId.Expresso)
                         countryCode = "221";
-                    else if (model.OperatorId == (int)OperatorTableId.Safaricom)
+                    else if (model.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                         countryCode = "254";
 
                     HashSet<string> promoMsisdns = ImportExcel(countryCode, model.Files);
-                    var existingUsers = new HashSet<string>();
+                    
+                    var existingUserList = await _provisionServer.GetMsisdnCheckForExisting(_provisionQuery.CheckExistingMSISDN, _configuration.GetConnectionString("operatorConnectionString"));
 
-                    using (var db = new SqlConnection(_configuration.GetConnectionString("operatorConnectionString")))
-                    {
-                        await db.OpenAsync();
-                        var existingUserList = await db.QueryAsync<string>(@"SELECT DISTINCT(msisdn) FROM
-                                                                                    (SELECT DISTINCT(msisdn) AS msisdn FROM PromotionalUsers
-                                                                                    UNION ALL
-                                                                                    SELECT DISTINCT(msisdn) AS msisdn FROM UserProfile) t");
-                        existingUsers = new HashSet<string>(existingUserList);
-                    }
+                    var existingUsers = new HashSet<string>();
+                    existingUsers = new HashSet<string>(existingUserList);
 
                     promoMsisdns.ExceptWith(existingUsers);
 
-                    if (model.OperatorId == (int)OperatorTableId.Expresso)
+                    if (model.OperatorId == (int)Enums.OperatorTableId.Expresso)
                     {
                         var res = await _operatorExpresso.ProcPromotionalUser(promoMsisdns, DestinationTableName,
                                                                                                 operatorConnectionString, model);
                     }
-                    else if (model.OperatorId == (int)OperatorTableId.Safaricom)
+                    else if (model.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                     {
                         var res = await _operatorSafaricom.ProcPromotionalUser(promoMsisdns, DestinationTableName,
                                                                                                 operatorConnectionString, model);
                     }
                     else
                     {
-                        result.error = operatorName + " operator implementation is under process.";
+                        result.error = " Operator implementation is under process.";
                         result.result = 0;
                         return result;
                     }
@@ -112,7 +95,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 else
                 {
-                    result.error = operatorName + " operator implementation is under process.";
+                    result.error = " Operator implementation is under process.";
                     result.result = 0;
                     return result;
                 }

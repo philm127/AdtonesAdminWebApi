@@ -1,14 +1,11 @@
-﻿
-using AdtonesAdminWebApi.BusinessServices.Interfaces;
+﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices
@@ -17,10 +14,10 @@ namespace AdtonesAdminWebApi.BusinessServices
     {
         private readonly IConfiguration _configuration;
         ReturnResult result = new ReturnResult();
-        private readonly ISaveFiles _saveFile;
+        private readonly ISaveGetFiles _saveFile;
 
 
-        public CountryService(IConfiguration configuration, ISaveFiles saveFile)
+        public CountryService(IConfiguration configuration, ISaveGetFiles saveFile)
 
         {
             _configuration = configuration;
@@ -102,6 +99,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         result.error = "Please upload pdf file only.";
                         return result;
                     }
+
                     /// TODO: Need to sort file saving out
                     string directoryName = "/TermAndCondition/";
                     // Put this to return either the filename or filepath from service

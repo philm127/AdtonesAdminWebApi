@@ -24,65 +24,59 @@ namespace AdtonesAdminWebApi.DAL
             _configuration = configuration;
         }
 
+
+        /// TODO: When not test set test to false. have this here so don't send shit to real servers.
         /// <summary>
-        /// Gets first connection string value based on either Countryt or Operator
+        /// Gets first connection string value by Operator. I have removed all CountryId as stupid
         /// </summary>
-        /// <param name="CountryID">used as a named and default parameter</param>
         /// <param name="OperatorId">used as a named and default parameter</param>
         /// <returns>string value of a ConnectionString</returns>
-        public async Task<string> GetSingleConnectionString(int CountryID = 0, int OperatorId = 0)
+        public async Task<string> GetSingleConnectionString(int Id = 0)
         {
-            StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings WHERE ");
-            int Id = 0;
-
-            if (CountryID > 0)
+            var test = true;
+            if (test)
+                return _configuration.GetConnectionString("TestProvoConnection");
+            else
             {
-                sb.Append("CountryId=@Id");
-                Id = CountryID;
-            }
-            else if (OperatorId > 0)
-            {
-                sb.Append("OperatorId=@Id");
-                Id = OperatorId;
-            }
+                StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings WHERE OperatorId=@Id");
 
 
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                await connection.OpenAsync();
-                return await connection.QueryFirstOrDefaultAsync<string>(sb.ToString(), new { Id = Id });
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await connection.OpenAsync();
+                    return await connection.QueryFirstOrDefaultAsync<string>(sb.ToString(), new { Id = Id });
+                }
             }
         }
 
+
+        /// TODO: When not test set test to false. have this here so don't send shit to real servers.
         /// <summary>
         /// Gets a list of strings by either operator or country
         /// </summary>
-        /// <param name="CountryID">used as a named and default parameter</param>
-        /// <param name="OperatorId">used as a named and default parameter</param>
+        /// <param name="Id">uses OperatorId</param>
         /// <returns>IEnumerable List of strings</returns>
-        public async Task<IEnumerable<string>> GetConnectionStrings(int CountryID = 0, int OperatorId = 0)
+        public async Task<IEnumerable<string>> GetConnectionStrings(int Id=0)
         {
-            StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings");
-            int Id = 0;
-
-            if (CountryID > 0)
+            var test = true;
+            if (test)
             {
-                sb.Append(" WHERE CountryId=@Id");
-                Id = CountryID;
+                List<string> str = null;
+                str.Add(_configuration.GetConnectionString("TestProvoConnection"));
+                return str;
             }
-            else if (OperatorId > 0)
+            else
             {
-                sb.Append(" WHERE OperatorId=@Id");
-                Id = OperatorId;
-            }
+                StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings WHERE OperatorId=@Id");
 
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                await connection.OpenAsync();
-                if(Id>0)
-                    return await connection.QueryAsync<string>(sb.ToString(), new { Id = Id });
-                else
-                    return await connection.QueryAsync<string>(sb.ToString());
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await connection.OpenAsync();
+                    if (Id > 0)
+                        return await connection.QueryAsync<string>(sb.ToString(), new { Id = Id });
+                    else
+                        return await connection.QueryAsync<string>(sb.ToString());
+                }
             }
         }
 

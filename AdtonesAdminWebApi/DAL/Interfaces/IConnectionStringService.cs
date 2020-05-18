@@ -7,7 +7,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface IConnectionStringService
     {
-        Task<string> GetSingleConnectionString(int CountryID = 0, int OperatorId = 0);
-        Task<IEnumerable<string>> GetConnectionStrings(int CountryID = 0, int OperatorId = 0);
+        Task<string> GetSingleConnectionString(int Id);
+        Task<IEnumerable<string>> GetConnectionStrings(int Id=0);
     }
 }

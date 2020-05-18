@@ -10,25 +10,29 @@ using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.Enums;
 using AdtonesAdminWebApi.DAL.Interfaces;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using AdtonesAdminWebApi.DAL.Shared;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
     public class SharedSelectListsService : ISharedSelectListsService
     {
-        public string RoleName { get; set; }
-        public int CurrentUserId { get; set; }
-
+        private readonly IHttpContextAccessor _httpAccessor;
         private readonly IConfiguration _configuration;
         private readonly ISharedSelectListsDAL _sharedDal;
+        private readonly ISharedListQuery _commandText;
+
         ReturnResult result = new ReturnResult();
         
 
-        public SharedSelectListsService(IConfiguration configuration, ISharedSelectListsDAL sharedDal)
+        public SharedSelectListsService(IConfiguration configuration, ISharedSelectListsDAL sharedDal, IHttpContextAccessor httpAccessor, 
+                                        ISharedListQuery commandText)
 
         {
             _configuration = configuration;
             _sharedDal = sharedDal;
+            _httpAccessor = httpAccessor;
+            _commandText = commandText;
         }
 
 
@@ -83,14 +87,19 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> GetCurrencyList(int currencyId=0)
         {
-            var str = RoleName;
-            StringBuilder sb = new StringBuilder("SELECT CurrencyId AS Value,CurrencyCode AS Text FROM Currencies");
-            if (currencyId > 0)
-                sb.Append(" WHERE CurrencyId = @currencyId");
+            var tst = _httpAccessor.GetUserIdFromJWT();
+            var str = _httpAccessor.GetRoleFromJWT();
+            var ytr = _httpAccessor.GetRoleIdFromJWT();
+            var cvb = _httpAccessor.GetOperatorFromJWT();
+
+            var sb = new StringBuilder(_commandText.GetCurrencyList);
+            
+            if (currencyId > 0) 
+                sb.Append(" WHERE CurrencyId = @Id");
 
             try
             {
-                result.body = await _sharedDal.GetSelectList(sb.ToString());
+                result.body = await _sharedDal.TESTGetSelectListById(sb.ToString(), currencyId);
             }
             catch (Exception ex)
             {
@@ -110,8 +119,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> GetUserById(int userId)
         {
-            string query = @"SELECT UserId,OperatorId,Email,FirstName,LastName,DateCreated,Organisation,Activated,RoleId,OrganisationTypeId,
-                            AdtoneServerUserId FROM Users WHERE UserId=@UserId";
+            string query = @"SELECT UserId,OperatorId,Email,FirstName,LastName,DateCreated,Organisation,
+                                        Activated,RoleId,OrganisationTypeId,AdtoneServerUserId 
+                                        FROM Users WHERE UserId=@UserId";
 
             try
             {

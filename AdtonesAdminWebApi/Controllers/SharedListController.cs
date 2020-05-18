@@ -14,17 +14,15 @@ using System.Linq;
 namespace AdtonesAdminWebApi.Controllers
 {
     [Route("api/[controller]")]
-    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]//(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     public class SharedListController : ControllerBase
     {
         private readonly ISharedSelectListsService _sharedList;
-        private readonly ILogger<SharedListController> _logger;
 
-        public SharedListController(ISharedSelectListsService sharedList, ILogger<SharedListController> logger)
+        public SharedListController(ISharedSelectListsService sharedList)
         {
             _sharedList = sharedList;
-            _logger = logger;
         }
 
 
@@ -82,8 +80,8 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetCurrencyList")]
         public async Task<ReturnResult> GetCurrencyList([FromBodyAttribute]IdCollectionViewModel some)
         {
-            _sharedList.CurrentUserId = int.Parse(User.FindFirst("userId")?.Value);
-            _sharedList.RoleName = User.FindFirst(ClaimTypes.Role)?.Value;
+            //_sharedList.CurrentUserId = int.Parse(User.FindFirst("userId")?.Value);
+            // _sharedList.RoleName = User.FindFirst(ClaimTypes.Role)?.Value;
             return await _sharedList.GetCurrencyList(some.currencyId);
         }
 

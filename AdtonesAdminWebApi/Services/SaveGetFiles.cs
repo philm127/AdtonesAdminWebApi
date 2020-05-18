@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.Services
 {
-    public interface ISaveFiles
+    public interface ISaveGetFiles
     {
         Task<string> SaveFileToSite(string dir, IFormFile data, string nameOrPath = null);
         bool DeleteFileByPath(string filepath);
@@ -16,11 +15,11 @@ namespace AdtonesAdminWebApi.Services
     }
 
 
-    public class SaveFiles : ISaveFiles
+    public class SaveGetFiles : ISaveGetFiles
     {
         private readonly IWebHostEnvironment env;
 
-        public SaveFiles(IWebHostEnvironment _env)
+        public SaveGetFiles(IWebHostEnvironment _env)
         {
             env = _env;
         }
@@ -32,6 +31,11 @@ namespace AdtonesAdminWebApi.Services
             {
                 var otherpath = env.ContentRootPath;
                 var fileName = DateTime.Now.Ticks + System.IO.Path.GetFileName(data.FileName);
+                var directoryName = Path.Combine(otherpath, dir);
+
+                if (!Directory.Exists(directoryName))
+                    Directory.CreateDirectory(directoryName);
+
                 var filePath = Path.Combine(otherpath + dir, data.FileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
@@ -114,7 +118,23 @@ namespace AdtonesAdminWebApi.Services
                 return false;
             }
         }
-    
-    
+
+
+        //public (string fileType, byte[] archiveData, string archiveName) FetechFiles(string filepath,string filetype)
+        //{
+        //    var otherpath = env.ContentRootPath;
+        //    var fileName = Path.GetFileName(filepath);
+        //    var mimeType = "application/pdf";
+        //    long fileBytes = filepath.Length;
+
+        //    //return new FileContentResult(fileBytes, mimeType)
+        //    //{
+        //    //    FileDownloadName = fileName
+        //    //};
+
+        //}
+
+
+
     }
 }

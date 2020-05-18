@@ -45,4 +45,11 @@ namespace AdtonesAdminWebApi.ViewModels
         public int OperatorId { get; set; }
         public string OperatorName { get; set; }
     }
+
+    public class SubscriberDashboardResult : UserDashboardData
+    {
+        public int CountryId { get; set; }
+        public int OperatorId { get; set; }
+        public string MSISDN { get; set; }
+    }
 }

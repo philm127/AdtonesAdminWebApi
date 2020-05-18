@@ -102,7 +102,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetOperator(IdCollectionViewModel model)
+        public async Task<ReturnResult> GetOperator(int id)
         {
             var select_query = @"SELECT op.OperatorId,OperatorName,co.Name AS CountryName,cu.CurrencyCode,AdtoneServerOperatorId,
 	                                IsActive,EmailCost,SmsCost,op.CurrencyId
@@ -114,7 +114,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     await connection.OpenAsync();
                     result.body = await connection.QueryFirstOrDefaultAsync<OperatorFormModel>(select_query,
-                                                                                        new { Id = model.id });
+                                                                                        new { Id = id });
                 }
             }
             catch (Exception ex)
@@ -238,7 +238,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetOperatorMaxAdvert(IdCollectionViewModel model)
+        public async Task<ReturnResult> GetOperatorMaxAdvert(int id)
         {
             var select_query = @"SELECT OperatorMaxAdvertId,KeyName,KeyValue,op.OperatorName
                                  FROM OperatorMaxAdverts AS maxad INNER JOIN Operators AS op ON op.OperatorId=maxad.OperatorId
@@ -249,7 +249,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<OperatorMaxAdvertsFormModel>(select_query, new { Id = model.id});
+                    result.body = await connection.QueryFirstOrDefaultAsync<OperatorMaxAdvertsFormModel>(select_query, new { Id = id});
                 }
             }
             catch (Exception ex)

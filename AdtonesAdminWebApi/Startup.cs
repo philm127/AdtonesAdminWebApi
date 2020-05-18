@@ -15,6 +15,7 @@ using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.OperatorSpecific;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Shared;
+using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.DAL;
 
 namespace AdtonesAdminWebApi
@@ -34,6 +35,7 @@ namespace AdtonesAdminWebApi
             services.AddSingleton<IConfiguration>(Configuration);
 
             services.AddControllers().AddNewtonsoftJson();
+            services.AddHttpContextAccessor();
 
             // Business Services
             services.AddScoped<ISharedSelectListsService, SharedSelectListsService>();
@@ -50,17 +52,39 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IOperatorService, OperatorService>();
             services.AddScoped<ISystemConfigService, SystemConfigService>();
             services.AddScoped<IRewardsService, RewardsService>();
+            services.AddScoped<ITicketService, TicketService>();
+            services.AddScoped<IAdvertService, AdvertService>();
 
-            // Use DAL 
-            services.AddScoped<ISharedSelectListsDAL, SharedSelectListsDAL>();
+
+            // Use DAL. 
             services.AddScoped<IConnectionStringService, ConnectionStringService>();
+            services.AddScoped<ISharedSelectListsDAL, SharedSelectListsDAL>();
+            services.AddScoped<ITicketDAL, TicketDAL>();
+            services.AddScoped<IAdvertDAL, AdvertDAL>();
+            services.AddScoped<IAreaDAL, AreaDAL>();
+            services.AddScoped<ICheckExistsDAL, CheckExistsDAL>();
+            services.AddScoped<IUserDashboardDAL, UserDashboardDAL>();
+            services.AddScoped<IProvisionServerDAL, ProvisionServerDAL>();
+
+
+            // DAL Query Execution.
+            services.AddTransient<IExecutionCommand, ExecutionCommand>();
+            
+            // DAL Queries.
+            services.AddTransient<ISharedListQuery, SharedListQuery>();
+            services.AddTransient<ITicketQuery, TicketQuery>();
+            services.AddTransient<IUserDashboardQuery, UserDashboardQuery>();
+            services.AddTransient<IAdvertQuery, AdvertQuery>();
+            services.AddTransient<IAreaQuery, AreaQuery>();
+            services.AddTransient<ICheckExistsQuery, CheckExistsQuery>();
+            services.AddTransient<IProvisionServerQuery, ProvisionServerQuery>();
 
             // Special Services
-            services.AddScoped<ISaveFiles, SaveFiles>();
+            services.AddScoped<ISaveGetFiles, SaveGetFiles>();
 
             // Client Specific Services
-            services.AddScoped<IExpresso, Expresso>();
-            services.AddScoped<ISafaricom, Safaricom>();
+            services.AddScoped<IExpressoProcessPromoUser, ExpressoProcessPromoUser>();
+            services.AddScoped<ISafaricomProcessPromoUser, SafaricomProcessPromoUser>();
 
             /////
             ///// Authentication
@@ -73,6 +97,7 @@ namespace AdtonesAdminWebApi
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(x =>
             {

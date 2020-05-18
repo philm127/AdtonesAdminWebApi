@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.OperatorSpecific
 {
-    public class Safaricom : ISafaricom
+    public class SafaricomProcessPromoUser : ISafaricomProcessPromoUser
     {
         private const int ProvisionBatchSize = 1500;
         ReturnResult result = new ReturnResult();
@@ -27,7 +27,7 @@ namespace AdtonesAdminWebApi.OperatorSpecific
                                         row["MSISDN"] = isdn;
                                         row["WeeklyPlay"] = 0;
                                         row["DailyPlay"] = 0;
-                                        row["Status"] = (int)PromotionalUserStatus.Active;
+                                        row["Status"] = (int)Enums.PromotionalUserStatus.Active;
                                         row["BatchID"] = model.BatchID;
                                         row["DeliveryServerConnectionString"] = model.DeliveryServerConnectionString;
                                         row["DeliveryServerIpAddress"] = model.DeliveryServerIpAddress;

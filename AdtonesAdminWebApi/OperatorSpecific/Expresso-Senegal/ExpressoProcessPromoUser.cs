@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.OperatorSpecific
 {
-    public class Expresso : IExpresso
+    public class ExpressoProcessPromoUser : IExpressoProcessPromoUser
     {
         private const int ProvisionBatchSize = 1500;
         ReturnResult result = new ReturnResult();
@@ -77,8 +77,8 @@ namespace AdtonesAdminWebApi.OperatorSpecific
                                         row["WeeklyPlay"] = 0;
                                         row["DailyPlay"] = 0;
                                         row["Status"] = ExpressoOperator.IsSuccess(pr)
-                                            ? (int)PromotionalUserStatus.Active
-                                            : (int)PromotionalUserStatus.Fail;
+                                            ? (int)Enums.PromotionalUserStatus.Active
+                                            : (int)Enums.PromotionalUserStatus.Fail;
                                         row["BatchID"] = model.BatchID;
                                         row["DeliveryServerConnectionString"] = model.DeliveryServerConnectionString;
                                         row["DeliveryServerIpAddress"] = model.DeliveryServerIpAddress;

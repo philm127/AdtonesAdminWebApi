@@ -11,8 +11,8 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> LoadPaymentDataTable();
         Task<ReturnResult> FillCampaignDropdown();
         Task<ReturnResult> FillUserPaymentDropdown();
-        Task<ReturnResult> GetOutstandingBalance(IdCollectionViewModel model);
-        Task<ReturnResult> GetInvoiceDetails(IdCollectionViewModel model);
+        Task<ReturnResult> GetOutstandingBalance(int id);
+        Task<ReturnResult> GetInvoiceDetails(int id);
         Task<ReturnResult> ReceivePayment(UserCreditPaymentFormModel model);
     }
 }

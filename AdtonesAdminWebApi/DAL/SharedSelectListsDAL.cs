@@ -14,36 +14,41 @@ namespace AdtonesAdminWebApi.DAL.Shared
     public class SharedSelectListsDAL : ISharedSelectListsDAL
     {
         private readonly IConfiguration _configuration;
+        private readonly string _connStr;
+        private readonly ISharedListQuery _commandText;
+        private readonly IExecutionCommand _executers;
 
-
-        public SharedSelectListsDAL(IConfiguration configuration)
+        public SharedSelectListsDAL(IConfiguration configuration, ISharedListQuery commandText, IExecutionCommand executers)
 
         {
             _configuration = configuration;
+            _connStr = _configuration.GetConnectionString("DefaultConnection");
+            _commandText = commandText;
+            _executers = executers;
         }
 
 
-        public async Task<IEnumerable<SharedSelectListViewModel>> TESTGetSelectList<T>(string sql,dynamic model, int id = 0)
-        {
-            Type typeParameterType = typeof(T);
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(sql);
-            if (id != 0)
-                builder.AddParameters(new { Id = id });
+        //public async Task<IEnumerable<SharedSelectListViewModel>> TESTGetSelectList<T>(string sql,dynamic model, int id = 0)
+        //{
+        //    Type typeParameterType = typeof(T);
+        //    var builder = new SqlBuilder();
+        //    var select = builder.AddTemplate(sql);
+        //    if (id != 0)
+        //        builder.AddParameters(new { Id = id });
 
-            try
-            {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    connection.Open();
-                    return await connection.QueryAsync<SharedSelectListViewModel>(select.RawSql, select.Parameters);
-                }
-            }
-            catch
-            {
-                throw;
-            }
-        }
+        //    try
+        //    {
+        //        using (var connection = new SqlConnection(_connStr))
+        //        {
+        //            connection.Open();
+        //            return await connection.QueryAsync<SharedSelectListViewModel>(select.RawSql, select.Parameters);
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        throw;
+        //    }
+        //}
 
 
         public async Task<IEnumerable<SharedSelectListViewModel>> GetSelectList(string sql, int id = 0)
@@ -55,7 +60,7 @@ namespace AdtonesAdminWebApi.DAL.Shared
 
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                using (var connection = new SqlConnection(_connStr))
                 {
                     connection.Open();
                     return await connection.QueryAsync<SharedSelectListViewModel>(select.RawSql, select.Parameters);
@@ -68,11 +73,49 @@ namespace AdtonesAdminWebApi.DAL.Shared
         }
 
 
+        public async Task<IEnumerable<SharedSelectListViewModel>> TESTGetSelectList(string command)
+        {
+
+            try
+            {
+                var query = await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.Query<SharedSelectListViewModel>(command));
+                return query;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<SharedSelectListViewModel>> TESTGetSelectListById(string command, int id = 0)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(command);
+
+            if (id != 0)
+                builder.AddParameters(new { Id = id });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                        conn => conn.Query<SharedSelectListViewModel>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+
+
         public async Task<User> GetUserById(string sql, int id)
         {
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                using (var connection = new SqlConnection(_connStr))
                 {
                     connection.Open();
                     return await connection.QueryFirstOrDefaultAsync<User>(sql, new { UserId = id });
@@ -84,6 +127,26 @@ namespace AdtonesAdminWebApi.DAL.Shared
             }
         }
 
+    }
 
+    public interface ISharedListQuery
+    {
+        string GetCurrencyList { get; }
+        string GetCurrencyListById { get; }
+        string GetProductById { get; }
+        string AddProduct { get; }
+        string UpdateProduct { get; }
+        string RemoveProduct { get; }
+    }
+
+
+    public class SharedListQuery : ISharedListQuery
+    {
+        public string GetCurrencyList => "SELECT CurrencyId AS Value,CurrencyCode AS Text FROM Currencies";
+        public string GetCurrencyListById => "SELECT CurrencyId AS Value,CurrencyCode AS Text FROM Currencies WHERE CurrencyId=@Id";
+        public string GetProductById => "Select * from Product where Id= @Id";
+        public string AddProduct => "Insert into  [Dapper].[dbo].[Product] ([Name], Cost, CreatedDate) values (@Name, @Cost, @CreatedDate)";
+        public string UpdateProduct => "Update [Dapper].[dbo].[Product] set Name = @Name, Cost = @Cost, CreatedDate = GETDATE() where Id =@Id";
+        public string RemoveProduct => "Delete from [Dapper].[dbo].[Product] where Id= @Id";
     }
 }

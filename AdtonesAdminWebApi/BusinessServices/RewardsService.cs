@@ -1,13 +1,10 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
-using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices
@@ -56,7 +53,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetReward(IdCollectionViewModel model)
+        public async Task<ReturnResult> GetReward(int id)
         {
             var select_query = @"SELECT RewardId,RewardName,CONVERT(DECIMAL(18,2),replace(RewardValue, ',', '')) AS RewardValue,
                                                     r.AddedDate,r.UpdatedDate,r.OperatorId,op.OperatorName
@@ -68,7 +65,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<RewardResult>(select_query, new { Id = model.id });
+                    result.body = await connection.QueryFirstOrDefaultAsync<RewardResult>(select_query, new { Id = id });
                 }
             }
             catch (Exception ex)

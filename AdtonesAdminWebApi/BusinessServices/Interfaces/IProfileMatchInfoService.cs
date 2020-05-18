@@ -10,9 +10,9 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     {
         ReturnResult FillProfileType();
         Task<ReturnResult> LoadDataTable();
-        Task<ReturnResult> GetProfileInfo(IdCollectionViewModel model);
+        Task<ReturnResult> GetProfileInfo(int id);
         Task<ReturnResult> UpdateProfileInfo(ProfileMatchInformationFormModel model);
         Task<ReturnResult> AddProfileInfo(ProfileMatchInformationFormModel model);
-        Task<ReturnResult> DeleteProfileLabel(IdCollectionViewModel model);
+        Task<ReturnResult> DeleteProfileLabel(int id);
     }
 }

@@ -36,7 +36,8 @@ namespace AdtonesAdminWebApi.Services
                 Subject = new ClaimsIdentity(new List<Claim> {
                         new Claim("UserId",userModel.UserId.ToString()),
                         new Claim("RoleId",userModel.RoleId.ToString()),
-                        new Claim("Role",userModel.Role)
+                        new Claim("Role",userModel.Role),
+                        new Claim("Operator",userModel.OperatorId.ToString())
                     }),
                 Expires = DateTime.UtcNow.AddMinutes(expiryTimeSpan),
                 IssuedAt = DateTime.UtcNow,
@@ -50,5 +51,7 @@ namespace AdtonesAdminWebApi.Services
             var jwToken = jwtHandler.CreateJwtSecurityToken(securityTokenDescription);
             return jwtHandler.WriteToken(jwToken);
         }
+    
+    
     }
 }

@@ -10,7 +10,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     public interface ILogonService
     {
         Task<ReturnResult> Login(User userForm);
-        Task<ReturnResult> ForgotPassword(IdCollectionViewModel model);
+        Task<ReturnResult> ForgotPassword(string emailAddress);
         Task<int> UpdatePasswordHistory(int userId, string password);
         Task<bool> IsPreviousPassword(int userId, string newPassword);
     }

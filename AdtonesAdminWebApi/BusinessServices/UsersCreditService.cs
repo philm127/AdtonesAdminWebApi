@@ -295,7 +295,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         #endregion
 
-        #region Not sure about wait on design decisiones
+        #region Not sure about wait on design decisiones TODO:
 
 
         //public async Task<ReturnResult> UserCreditpayment(IdCollectionViewModel model)

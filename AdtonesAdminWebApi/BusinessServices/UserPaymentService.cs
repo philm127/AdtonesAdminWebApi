@@ -103,11 +103,11 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetOutstandingBalance(IdCollectionViewModel model)
+        public async Task<ReturnResult> GetOutstandingBalance(int id)
         {
             try
             {
-                decimal outstanding = await OutstandingBalance(model.id);
+                decimal outstanding = await OutstandingBalance(id);
                 if (outstanding == -1)
                     result.result = 0;
                 else
@@ -129,11 +129,16 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetInvoiceDetails(IdCollectionViewModel model)
+        /// <summary>
+        /// Is actually a list of outstanding invoices against a campaign
+        /// </summary>
+        /// <param name="id">Campaign ProfileId</param>
+        /// <returns></returns>
+        public async Task<ReturnResult> GetInvoiceDetails(int id)
         {
             try
             {
-                decimal outstanding = await OutstandingBalance(model.id);
+                decimal outstanding = await OutstandingBalance(id);
                 if (outstanding == -1)
                     result.result = 0;
 
@@ -142,7 +147,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     var select_query = (@"SELECT Id AS Value,InvoiceNumber AS Text FROM Billing WHERE PaymentMethod=1
                                             AND CampaignProfileId=@Id ORDER BY Id DEC");
 
-                    result.body = await _sharedDal.GetSelectList(select_query,model.id);
+                    result.body = await _sharedDal.GetSelectList(select_query,id);
                 }
             }
             catch (Exception ex)
@@ -214,7 +219,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 upCredit.AvailableCredit += receivedamount;
 
-                var update_query = @"UPDATE UsersCredit SET AvailableCredit=@AvailableCredit WHERE UserId=@UserId;";
+                var update_query = @"UPDATE UsersCredit SET AvailableCredit=@AvailableCredit,UpdatedDate=GETDATE() WHERE UserId=@UserId;";
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {

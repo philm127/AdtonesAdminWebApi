@@ -9,7 +9,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     public interface ISystemConfigService
     {
         Task<ReturnResult> LoadSystemConfigurationDataTable();
-        Task<ReturnResult> GetSystemConfig(IdCollectionViewModel model);
+        Task<ReturnResult> GetSystemConfig(int id);
         Task<ReturnResult> AddSystemConfig(SystemConfigResult model);
         Task<ReturnResult> UpdateSystemConfig(SystemConfigResult model);
     }

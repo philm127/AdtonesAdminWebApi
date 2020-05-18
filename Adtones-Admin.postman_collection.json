@@ -1,0 +1,2136 @@
+{
+	"info": {
+		"_postman_id": "1f18da08-e050-4342-b239-37a2f8605473",
+		"name": "Adtones-Admin",
+		"description": "Collection to test the Area/Admin of the new Adtones API created in .Net Core 3.1.1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Usermanagement",
+			"item": [
+				{
+					"name": "PromotionalUser",
+					"item": [
+						{
+							"name": "UploadPromotionalUser",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "CountryId",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "BatchID",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "OperatorId",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "Files",
+											"type": "file",
+											"src": "/C:/Users/philm/OneDrive/Documents/msisdntest.xlsx"
+										}
+									],
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}usermanagement/{{VNo}}UploadPromotionalUser",
+									"host": [
+										"{{url}}usermanagement"
+									],
+									"path": [
+										"{{VNo}}UploadPromotionalUser"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Get Company Details",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"userid\":137}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}usermanagement/{{VNo}}GetCompanyDetails",
+							"host": [
+								"{{url}}usermanagement"
+							],
+							"path": [
+								"{{VNo}}GetCompanyDetails"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateCompanyDetails",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 9,\r\n    \"userId\": 137,\r\n    \"companyName\": \"WIND\",\r\n    \"address\": \"6995 riverside\",\r\n    \"additionalAddress\": \"10 Downing Street\",\r\n    \"town\": \"Nairobi\",\r\n    \"postCode\": \"25558\",\r\n    \"countryId\": 10,\r\n    \"adtoneServerCompanyDetailId\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}usermanagement/{{VNo}}UpdateCompanyDetails",
+							"host": [
+								"{{url}}usermanagement"
+							],
+							"path": [
+								"{{VNo}}UpdateCompanyDetails"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateContactDetails",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 73,\r\n    \"userId\": 137,\r\n    \"mobileNumber\": \"254708704119\",\r\n    \"fixedLine\": \"999999\",\r\n    \"email\": \"Angela@adtones.co.ke\",\r\n    \"phoneNumber\": null,\r\n    \"homeaddress\": \"10 Rillington pl.\",\r\n    \"countryId\": 10,\r\n    \"currencyId\": 7,\r\n    \"adtoneServerContactId\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}usermanagement/{{VNo}}UpdateContactDetails",
+							"host": [
+								"{{url}}usermanagement"
+							],
+							"path": [
+								"{{VNo}}UpdateContactDetails"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateUserProfile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": 137,\r\n    \"operatorId\": 0,\r\n    \"email\": \"Angela@adtones.co.ke\",\r\n    \"firstName\": \"Wind\",\r\n    \"lastName\": \"Test\",\r\n    \"fullName\": \"Wind test\",\r\n    \"dateCreated\": \"2020-02-10T06:19:40.25\",\r\n    \"organisation\": \"WIND\",\r\n    \"activated\": 0,\r\n    \"fstatus\": \"Pending\",\r\n    \"roleId\": 3,\r\n    \"role\": \"Advertiser\",\r\n    \"outstandingdays\": 0,\r\n    \"organisationTypeId\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}usermanagement/{{VNo}}UpdateUserProfile",
+							"host": [
+								"{{url}}usermanagement"
+							],
+							"path": [
+								"{{VNo}}UpdateUserProfile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ApproveORSuspendUser",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": 137,\r\n    \"operatorId\": 0,\r\n    \"email\": \"Angela@adtones.co.ke\",\r\n    \"firstName\": \"Wind\",\r\n    \"lastName\": \"Test\",\r\n    \"fullName\": \"Wind test\",\r\n    \"dateCreated\": \"2020-02-10T06:19:40.25\",\r\n    \"organisation\": \"WIND\",\r\n    \"activated\": 1,\r\n    \"fstatus\": \"Pending\",\r\n    \"roleId\": 3,\r\n    \"role\": \"Advertiser\",\r\n    \"outstandingdays\": 0,\r\n    \"organisationTypeId\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}usermanagement/{{VNo}}ApproveORSuspendUser",
+							"host": [
+								"{{url}}usermanagement"
+							],
+							"path": [
+								"{{VNo}}ApproveORSuspendUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetContactDetails",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"userid\":137}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}usermanagement/{{VNo}}GetContactDetails",
+							"host": [
+								"{{url}}usermanagement"
+							],
+							"path": [
+								"{{VNo}}GetContactDetails"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserProfile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"userid\":137}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}usermanagement/{{VNo}}GetUserProfile",
+							"host": [
+								"{{url}}usermanagement"
+							],
+							"path": [
+								"{{VNo}}GetUserProfile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAdvertiserTable",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}usermanagement/{{VNo}}GetAdvertiserTable",
+							"host": [
+								"{{url}}usermanagement"
+							],
+							"path": [
+								"{{VNo}}GetAdvertiserTable"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Shared Lists",
+			"item": [
+				{
+					"name": "GetCurrencyList",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIxOSIsIlJvbGVJZCI6IjEiLCJSb2xlIjoiQWRtaW4iLCJPcGVyYXRvciI6IjAiLCJuYmYiOjE1ODk0NzgwMTksImV4cCI6MTU4OTU2NDQxOSwiaWF0IjoxNTg5NDc4MDE5fQ.iAB6M-BJhqcNp9t-StD1B15zQcSIlfJUq2ksfXo1B4g",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"currencyId\":1}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}sharedlist/{{VNo}}GetCurrencyList",
+							"host": [
+								"{{url}}sharedlist"
+							],
+							"path": [
+								"{{VNo}}GetCurrencyList"
+							]
+						},
+						"description": "Uses a class"
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"userId\":19}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}sharedlist/{{VNo}}GetUserById",
+							"host": [
+								"{{url}}sharedlist"
+							],
+							"path": [
+								"{{VNo}}GetUserById"
+							]
+						},
+						"description": "Uses a class"
+					},
+					"response": []
+				},
+				{
+					"name": "GetOperatorList",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"countryId\":0}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}sharedlist/{{VNo}}GetOperatorList",
+							"host": [
+								"{{url}}sharedlist"
+							],
+							"path": [
+								"{{VNo}}GetOperatorList"
+							]
+						},
+						"description": "Uses a class"
+					},
+					"response": []
+				},
+				{
+					"name": "GetCountryList",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}sharedlist/{{VNo}}GetCountryList",
+							"host": [
+								"{{url}}sharedlist"
+							],
+							"path": [
+								"{{VNo}}GetCountryList"
+							]
+						},
+						"description": "Uses a class"
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserStatusList",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}sharedlist/{{VNo}}GetUserStatusList",
+							"host": [
+								"{{url}}sharedlist"
+							],
+							"path": [
+								"{{VNo}}GetUserStatusList"
+							]
+						},
+						"description": "Uses a class"
+					},
+					"response": []
+				},
+				{
+					"name": "GetRoleList",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}sharedlist/{{VNo}}GetRoleList",
+							"host": [
+								"{{url}}sharedlist"
+							],
+							"path": [
+								"{{VNo}}GetRoleList"
+							]
+						},
+						"description": "Uses a class"
+					},
+					"response": []
+				}
+			],
+			"description": "Typically drop down lists that can occur in multiple places",
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "LogonController",
+			"item": [
+				{
+					"name": "Login",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Email\": \"admin\",\r\n    \"userId\": 137,\r\n    \"PasswordHash\": \"Pa55w0rd\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Login/{{VNo}}Login",
+							"host": [
+								"{{url}}Login"
+							],
+							"path": [
+								"{{VNo}}Login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgotpassword",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Id",
+									"value": "5",
+									"type": "text"
+								},
+								{
+									"key": "File",
+									"type": "file",
+									"src": "/C:/Users/philm/OneDrive/Documents/msisdntest.xlsx"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:44300/weatherforecast",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "44300",
+							"path": [
+								"weatherforecast"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Country",
+			"item": [
+				{
+					"name": "Area",
+					"item": [
+						{
+							"name": "GetAreaData",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}Country/{{VNo}}GetAreaData",
+									"host": [
+										"{{url}}Country"
+									],
+									"path": [
+										"{{VNo}}GetAreaData"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetAreaById",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"id\":1}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}Country/{{VNo}}GetAreaById",
+									"host": [
+										"{{url}}Country"
+									],
+									"path": [
+										"{{VNo}}GetAreaById"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UpdateArea",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n        \"areaId\": 1,\r\n        \"areaName\": \"Area51\",\r\n        \"countryId\": 10,\r\n        \"countryName\": \"Kenya\",\r\n        \"isActive\": true\r\n    }"
+								},
+								"url": {
+									"raw": "{{url}}Country/{{VNo}}UpdateArea",
+									"host": [
+										"{{url}}Country"
+									],
+									"path": [
+										"{{VNo}}UpdateArea"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AddArea",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n        \"areaName\": \"Area99\",\r\n        \"countryId\": 9,\r\n        \"isActive\": true\r\n    }"
+								},
+								"url": {
+									"raw": "{{url}}Country/{{VNo}}AddArea",
+									"host": [
+										"{{url}}Country"
+									],
+									"path": [
+										"{{VNo}}AddArea"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "GetCountryData",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}UsersCredit/{{VNo}}GetCreditData",
+							"host": [
+								"{{url}}UsersCredit"
+							],
+							"path": [
+								"{{VNo}}GetCreditData"
+							]
+						},
+						"description": "List of users that can have credit added"
+					},
+					"response": []
+				},
+				{
+					"name": "GetCountry",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"countryId\":31}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Country/{{VNo}}GetCountry",
+							"host": [
+								"{{url}}Country"
+							],
+							"path": [
+								"{{VNo}}GetCountry"
+							]
+						},
+						"description": "List of users that can have credit added"
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateCountry",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "Id",
+									"value": "31",
+									"type": "text"
+								},
+								{
+									"key": "TaxPercentage",
+									"value": "33.33",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "ShortName",
+									"value": "Shorty",
+									"type": "text"
+								},
+								{
+									"key": "CountryCode",
+									"value": "999",
+									"type": "text"
+								},
+								{
+									"key": "Name",
+									"value": "SomeMadeUp",
+									"type": "text"
+								},
+								{
+									"key": "Status",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "TermAndConditionFileName",
+									"value": "TermAndConditionFileName",
+									"type": "text"
+								},
+								{
+									"key": "UserId",
+									"value": "137",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Country/{{VNo}}UpdateCountry",
+							"host": [
+								"{{url}}Country"
+							],
+							"path": [
+								"{{VNo}}UpdateCountry"
+							]
+						},
+						"description": "List of users that can have credit added"
+					},
+					"response": []
+				},
+				{
+					"name": "AddCountry",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/philm/OneDrive/Documents/Banpais_mistake.pdf"
+								},
+								{
+									"key": "Name",
+									"value": "NewOne",
+									"type": "text"
+								},
+								{
+									"key": "ShortName",
+									"value": "NO",
+									"type": "text"
+								},
+								{
+									"key": "UserId",
+									"value": "137",
+									"type": "text"
+								},
+								{
+									"key": "CountryCode",
+									"value": "911",
+									"type": "text"
+								},
+								{
+									"key": "TaxPercentage",
+									"value": "75.0",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}Country/{{VNo}}AddCountry",
+							"host": [
+								"{{url}}Country"
+							],
+							"path": [
+								"{{VNo}}AddCountry"
+							]
+						},
+						"description": "List of users that can have credit added"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Financials",
+			"item": [
+				{
+					"name": "Invoices",
+					"item": [
+						{
+							"name": "InvoiceData",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": ""
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SendInvoice",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"id\":1,\"userId\":21,\"billingId\":1}"
+								},
+								"url": {
+									"raw": "{{url}}Financials/{{VNo}}SendInvoice",
+									"host": [
+										"{{url}}Financials"
+									],
+									"path": [
+										"{{VNo}}SendInvoice"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "PaymentData",
+					"item": [
+						{
+							"name": "PaymentDataTable",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}Financials/{{VNo}}GetOutstandingInvoiceData",
+									"host": [
+										"{{url}}Financials"
+									],
+									"path": [
+										"{{VNo}}GetOutstandingInvoiceData"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FillCampaignDropdown",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}Financials/{{VNo}}FillCampaignDropdown",
+									"host": [
+										"{{url}}Financials"
+									],
+									"path": [
+										"{{VNo}}FillCampaignDropdown"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "FillUserPaymentDropdown",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}Financials/{{VNo}}FillUserPaymentDropdown",
+									"host": [
+										"{{url}}Financials"
+									],
+									"path": [
+										"{{VNo}}FillUserPaymentDropdown"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetOutstandingBalance",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"id\":1}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}Financials/{{VNo}}GetOutstandingBalance",
+									"host": [
+										"{{url}}Financials"
+									],
+									"path": [
+										"{{VNo}}GetOutstandingBalance"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetInvoiceDropdown",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"id\":1}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}Financials/{{VNo}}GetInvoiceDropdown",
+									"host": [
+										"{{url}}Financials"
+									],
+									"path": [
+										"{{VNo}}GetInvoiceDropdown"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ReceivePayment",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"UserId\":1,\n\t\"BillingId\":1,\n\t\"Amount\":10.99,\n\t\"Description\":\"Paid\",\n\t\"CampaignProfileId\":1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}Financials/{{VNo}}ReceivePayment",
+									"host": [
+										"{{url}}Financials"
+									],
+									"path": [
+										"{{VNo}}ReceivePayment"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "UsersCredit",
+					"item": [
+						{
+							"name": "GetAddCreditUsersList",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}Financials/{{VNo}}GetAddCreditUsersList",
+									"host": [
+										"{{url}}Financials"
+									],
+									"path": [
+										"{{VNo}}GetAddCreditUsersList"
+									]
+								},
+								"description": "List of users that can have credit added"
+							},
+							"response": []
+						},
+						{
+							"name": "GetCreditDetails",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"id\":1}"
+								},
+								"url": {
+									"raw": "{{url}}Financials/{{VNo}}GetCreditDetails",
+									"host": [
+										"{{url}}Financials"
+									],
+									"path": [
+										"{{VNo}}GetCreditDetails"
+									]
+								},
+								"description": "List of users that can have credit added"
+							},
+							"response": []
+						},
+						{
+							"name": "GetCreditData",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}Financials/{{VNo}}GetCreditData",
+									"host": [
+										"{{url}}Financials"
+									],
+									"path": [
+										"{{VNo}}GetCreditData"
+									]
+								},
+								"description": "List of users that can have credit added"
+							},
+							"response": []
+						},
+						{
+							"name": "AddCredit",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n        \"availableCredit\": 9025473.0,\r\n        \"id\": 1,\r\n        \"userId\": 21,\r\n        \"currencyId\": 7,\r\n        \"assignCredit\": 9910000000.0\r\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}Financials/{{VNo}}AddCredit",
+									"host": [
+										"{{url}}Financials"
+									],
+									"path": [
+										"{{VNo}}AddCredit"
+									]
+								},
+								"description": "List of users that can have credit added"
+							},
+							"response": []
+						},
+						{
+							"name": "UpdateCredit",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n        \"availableCredit\": 9025473.0,\r\n        \"id\": 1,\r\n        \"userId\": 21,\r\n        \"currencyId\": 7,\r\n        \"assignCredit\":100.0\r\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}Financials/{{VNo}}UpdateCredit",
+									"host": [
+										"{{url}}Financials"
+									],
+									"path": [
+										"{{VNo}}UpdateCredit"
+									]
+								},
+								"description": "List of users that can have credit added"
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "ProfileMatch",
+			"item": [
+				{
+					"name": "GetProfileMatchData",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}ProfileMatch/{{VNo}}GetProfileMatchData",
+							"host": [
+								"{{url}}ProfileMatch"
+							],
+							"path": [
+								"{{VNo}}GetProfileMatchData"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetProfileMatchInfoById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"id\":84}"
+						},
+						"url": {
+							"raw": "{{url}}ProfileMatch/{{VNo}}GetProfileMatchInfoById",
+							"host": [
+								"{{url}}ProfileMatch"
+							],
+							"path": [
+								"{{VNo}}GetProfileMatchInfoById"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteProfileMatchLabel",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"id\":257}"
+						},
+						"url": {
+							"raw": "{{url}}ProfileMatch/{{VNo}}DeleteProfileMatchLabel",
+							"host": [
+								"{{url}}ProfileMatch"
+							],
+							"path": [
+								"{{VNo}}DeleteProfileMatchLabel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateProfileMatchInfo",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"id\": 84,\r\n        \"profileName\": \"TestUpdate2\",\r\n        \"isActive\": true,\r\n        \"countryId\": 0,\r\n        \"countryName\": null,\r\n        \"profileType\": \"Geographic\",\r\n        \"createdDate\": null,\r\n        \"updatedDate\": null,\r\n        \"profileMatchLabelFormModels\": [\r\n            {\r\n                \"id\": 0,\r\n                \"profileMatchInformationId\": 0,\r\n                \"profileLabel\": \"InsertLabel1\",\r\n                \"createdDate\": null,\r\n                \"updatedDate\": null\r\n            }\r\n        ]\r\n    }"
+						},
+						"url": {
+							"raw": "{{url}}ProfileMatch/{{VNo}}UpdateProfileMatchInfo",
+							"host": [
+								"{{url}}ProfileMatch"
+							],
+							"path": [
+								"{{VNo}}UpdateProfileMatchInfo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddProfileMatchInfo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"id\": 0,\r\n        \"profileName\": \"InsertTest1\",\r\n        \"isActive\": true,\r\n        \"countryId\": 9,\r\n        \"countryName\": null,\r\n        \"profileType\": \"Geographic\",\r\n        \"createdDate\": null,\r\n        \"updatedDate\": null,\r\n        \"profileMatchLabelFormModels\": [\r\n            {\r\n                \"id\": 0,\r\n                \"profileMatchInformationId\": 0,\r\n                \"profileLabel\": \"InsertLabel1\",\r\n                \"createdDate\": null,\r\n                \"updatedDate\": null\r\n            }\r\n        ]\r\n    }"
+						},
+						"url": {
+							"raw": "{{url}}ProfileMatch/{{VNo}}AddProfileMatchInfo",
+							"host": [
+								"{{url}}ProfileMatch"
+							],
+							"path": [
+								"{{VNo}}AddProfileMatchInfo"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Tickets",
+			"item": [
+				{
+					"name": "GetTicketList",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}ticket/{{VNo}}GetTicketList",
+							"host": [
+								"{{url}}ticket"
+							],
+							"path": [
+								"{{VNo}}GetTicketList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetTicketDetails",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"id\":2}"
+						},
+						"url": {
+							"raw": "{{url}}ticket/{{VNo}}GetTicketDetails",
+							"host": [
+								"{{url}}ticket"
+							],
+							"path": [
+								"{{VNo}}GetTicketDetails"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CloseTicket",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"id\":2}"
+						},
+						"url": {
+							"raw": "{{url}}ticket/{{VNo}}GetTicketDetails",
+							"host": [
+								"{{url}}ticket"
+							],
+							"path": [
+								"{{VNo}}GetTicketDetails"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Campaigns&Adverts",
+			"item": [
+				{
+					"name": "Advert",
+					"item": [
+						{
+							"name": "GetAdvertsDT",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}campaign/{{VNo}}GetAdvertList",
+									"host": [
+										"{{url}}campaign"
+									],
+									"path": [
+										"{{VNo}}GetAdvertList"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetAdvertsCategoryDT",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}campaign/{{VNo}}GetAdvertCategoryList",
+									"host": [
+										"{{url}}campaign"
+									],
+									"path": [
+										"{{VNo}}GetAdvertCategoryList"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Operator",
+			"item": [
+				{
+					"name": "LoadOperatorConfigData",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}Operator/{{VNo}}LoadOperatorConfigurationDataTable",
+							"host": [
+								"{{url}}Operator"
+							],
+							"path": [
+								"{{VNo}}LoadOperatorConfigurationDataTable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetOperatorConfig",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"id\":1}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Operator/{{VNo}}GetOperatorConfig",
+							"host": [
+								"{{url}}Operator"
+							],
+							"path": [
+								"{{VNo}}GetOperatorConfig"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddOperatorConfig",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"OperatorId\":1,\n\t\"Days\":1\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Operator/{{VNo}}AddOperatorConfig",
+							"host": [
+								"{{url}}Operator"
+							],
+							"path": [
+								"{{VNo}}AddOperatorConfig"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateOperatorConfig",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"Days\":2\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Operator/{{VNo}}UpdateOperatorConfig",
+							"host": [
+								"{{url}}Operator"
+							],
+							"path": [
+								"{{VNo}}UpdateOperatorConfig"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoadOperatorData",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}Operator/{{VNo}}LoadOperatorDataTable",
+							"host": [
+								"{{url}}Operator"
+							],
+							"path": [
+								"{{VNo}}LoadOperatorDataTable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetOperator",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"id\":1}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Operator/{{VNo}}GetOperator",
+							"host": [
+								"{{url}}Operator"
+							],
+							"path": [
+								"{{VNo}}GetOperator"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddOperator",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"OperatorName\":\"safari\",\n\t\"CountryId\":1,\n\t\"EmailCost\":1.99,\n\t\"SmsCost\":1.99,\n\t\"CurrencyId\":1\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Operator/{{VNo}}AddOperatorConfig",
+							"host": [
+								"{{url}}Operator"
+							],
+							"path": [
+								"{{VNo}}AddOperatorConfig"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateOperator",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"OperatorId\":1,\n\t\"EmailCost\":1.99,\n\t\"SmsCost\":1.99,\n\t\"IsActive\":true\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Operator/{{VNo}}UpdateOperator",
+							"host": [
+								"{{url}}Operator"
+							],
+							"path": [
+								"{{VNo}}UpdateOperator"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoadOperatorMaxAdvertDataTable",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}Operator/{{VNo}}LoadOperatorMaxAdvertDataTable",
+							"host": [
+								"{{url}}Operator"
+							],
+							"path": [
+								"{{VNo}}LoadOperatorMaxAdvertDataTable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetOperatorMaxAdvert",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"id\":1}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Operator/{{VNo}}GetOperatorMaxAdvert",
+							"host": [
+								"{{url}}Operator"
+							],
+							"path": [
+								"{{VNo}}GetOperatorMaxAdvert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddOperatorMaxAdverts",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"KeyName\":\"YYY\",\n\t\"KeyValue\":1,\n\t\"OperatorId\":1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Operator/{{VNo}}AddOperatorMaxAdverts",
+							"host": [
+								"{{url}}Operator"
+							],
+							"path": [
+								"{{VNo}}AddOperatorMaxAdverts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateOperatorMaxAdverts",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"KeyName\":\"YYY\",\n\t\"KeyValue\":1,\n\t\"OperatorId\":1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Operator/{{VNo}}UpdateOperatorMaxAdverts",
+							"host": [
+								"{{url}}Operator"
+							],
+							"path": [
+								"{{VNo}}UpdateOperatorMaxAdverts"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Rewards",
+			"item": [
+				{
+					"name": "AddReward",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"OperatorId\":1,\n\t\"RewardName\":\"Reward1\",\n\t\"RewardValue\":12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Rewards/{{VNo}}AddReward",
+							"host": [
+								"{{url}}Rewards"
+							],
+							"path": [
+								"{{VNo}}AddReward"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateReward",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"RewardId\":1,\n\t\"RewardValue\":12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Rewards/{{VNo}}UpdateReward",
+							"host": [
+								"{{url}}Rewards"
+							],
+							"path": [
+								"{{VNo}}UpdateReward"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoadRewardsDataTable",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Rewards/{{VNo}}LoadRewardsDataTable",
+							"host": [
+								"{{url}}Rewards"
+							],
+							"path": [
+								"{{VNo}}LoadRewardsDataTable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetReward",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"id\":1}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}Rewards/{{VNo}}GetReward",
+							"host": [
+								"{{url}}Rewards"
+							],
+							"path": [
+								"{{VNo}}GetReward"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "SystemConfig",
+			"item": [
+				{
+					"name": "AddSystemConfig",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"SystemConfigKey\":\"Foo\", \n\t\"SystemConfigValue\",\"Bar\",\n\t\"SystemConfigType\":\"Jeep\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}SystemConfig/{{VNo}}AddSystemConfig",
+							"host": [
+								"{{url}}SystemConfig"
+							],
+							"path": [
+								"{{VNo}}AddSystemConfig"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateSystemConfig",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"SystemConfigKey\":\"Bar\", \n\t\"SystemConfigValue\":\"Foo\", \n\t\"SystemConfigType\":\"Audi\",\n    \"SystemConfigId\":1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}SystemConfig/{{VNo}}UpdateSystemConfig",
+							"host": [
+								"{{url}}SystemConfig"
+							],
+							"path": [
+								"{{VNo}}UpdateSystemConfig"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoadSystemConfigurationDataTable",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}SystemConfig/{{VNo}}LoadSystemConfigurationDataTable",
+							"host": [
+								"{{url}}SystemConfig"
+							],
+							"path": [
+								"{{VNo}}LoadSystemConfigurationDataTable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetSystemConfiguration",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"id\":1}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}SystemConfig/{{VNo}}GetSystemConfig",
+							"host": [
+								"{{url}}SystemConfig"
+							],
+							"path": [
+								"{{VNo}}GetSystemConfig"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIxOSIsIlJvbGVJZCI6IjEiLCJSb2xlIjoiQWRtaW4iLCJPcGVyYXRvciI6IjAiLCJuYmYiOjE1ODk0NzkwMTEsImV4cCI6MTYwNTAzMTAxMSwiaWF0IjoxNTg5NDc5MDExfQ.nOTcJ0PQIyjTk4WcrnzkK5AkqgXsTRSBouRPlC27mbo",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "f59192d1-c981-4ca0-9551-ede19d25dd1f",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "499a1418-2a17-4c8c-83e7-0ace8be0fe36",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "9bdd2088-6652-49f0-80dc-a8edd548119f",
+			"key": "url",
+			"value": "https://localhost:44314/api/",
+			"type": "string"
+		},
+		{
+			"id": "d2d68b4d-2817-4dbe-aac4-106cadc5ebb3",
+			"key": "VNo",
+			"value": "v1/",
+			"type": "string"
+		},
+		{
+			"id": "0dabc15b-1771-4266-8362-a514c2d45413",
+			"key": "Jwt",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluIiwibmJmIjoxNTg3Njc1MjY0LCJleHAiOjE1ODc3NjE2NjQsImlhdCI6MTU4NzY3NTI2NH0.Nn4zwHp4LslgtTe3PpccuxLNBT_dQ4FcWtj09V9uVvQ",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

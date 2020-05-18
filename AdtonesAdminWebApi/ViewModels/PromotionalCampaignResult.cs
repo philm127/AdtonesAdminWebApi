@@ -9,7 +9,7 @@ namespace AdtonesAdminWebApi.ViewModels
     public class PromotionalCampaignResult
     {
         public int ID { get; set; }
-        public int? OperatorID { get; set; }
+        public int OperatorID { get; set; }
         public int? CountryID { get; set; }
         public string CampaignName { get; set; }
         public string OperatorName { get; set; }

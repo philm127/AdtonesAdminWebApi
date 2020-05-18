@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.OperatorSpecific
 {
-    public interface ISafaricom
+    public interface IExpressoProcessPromoUser
     {
         Task<ReturnResult> ProcPromotionalUser(HashSet<string> promoMsisdns, string DestinationTableName,
                                                             string operatorConnectionString, PromotionalUserFormModel model);

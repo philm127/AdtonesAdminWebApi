@@ -1,26 +1,33 @@
 ﻿
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
+using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
     public class CampaignService : ICampaignService
     {
         private readonly IConfiguration _configuration;
+        public IConnectionStringService _connService { get; }
+        private readonly ISaveFiles _saveFile;
         ReturnResult result = new ReturnResult();
 
 
-        public CampaignService(IConfiguration configuration)
+        public CampaignService(IConfiguration configuration, IConnectionStringService connService, ISaveFiles saveFile)
 
         {
             _configuration = configuration;
+            _connService = connService;
+            _saveFile = saveFile;
         }
 
 
@@ -74,6 +81,33 @@ namespace AdtonesAdminWebApi.BusinessServices
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "CampaignService",
                     ProcedureName = "LoadPromoCampaignDataTable"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> LoadCampaignCreditDataTable()
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await connection.OpenAsync();
+                    result.body = await connection.QueryAsync<CampaignCreditResult>(GetCampaignCreditResultSet());
+
+                }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CampaignService",
+                    ProcedureName = "LoadCampaignCreditDataTable"
                 };
                 _logging.LogError();
                 result.result = 0;
@@ -154,271 +188,210 @@ namespace AdtonesAdminWebApi.BusinessServices
         public async Task<ReturnResult> AddPromotionalCampaign(PromotionalCampaignResult model)
         {
 
-                    if (model.Files != null)
+            if (model.Files != null)
+            {
+                /// TODO: How to do this for testing?
+                var operatorConnectionString = await _connService.GetSingleConnectionString(OperatorId: model.OperatorID);
+
+                if (!string.IsNullOrEmpty(operatorConnectionString))
+                {
+                    bool exists = false;
+                    using (var connection = new SqlConnection(_configuration.GetConnectionString("operatorConnectionString")))
                     {
-                        /// TODO: How to do this for a) completion, b) for testing        
-                        string operatorName = _operatorRepository.GetById(model.OperatorId).OperatorName.ToString();
+                        exists = await connection.ExecuteScalarAsync<bool>(@"SELECT COUNT(1) FROM PromotionalCamappaigns WHERE BatchID=@batch;",
+                                                                      new { batch = model.BatchID });
+                    }
 
-                        var operatorConnectionString = ConnectionString.GetSingleConnectionStringByOperatorId(model.OperatorId);
+                    if (exists)
+                    {
+                        result.error = "BatchID exists for this operator.";
+                        result.result = 0;
+                        return result;
+                    }
+                    else
+                    {
+                        var mediaFile = model.Files;
+                        string fileName = string.Empty;
 
-                        
-                        if (!string.IsNullOrEmpty(operatorConnectionString))
+                        string extension = Path.GetExtension(mediaFile.FileName);
+                        var onlyFileName = Path.GetFileNameWithoutExtension(mediaFile.FileName);
+
+                        string outputFormat = "wav";
+                        var audioFormatExtension = "." + outputFormat;
+
+                        if (extension != audioFormatExtension)
                         {
-                            EFMVCDataContex db = new EFMVCDataContex(operatorConnectionString);
-                            var isBatchIDExist = _promotionalCampaignRepository.GetMany(top => top.BatchID.Equals(model.BatchID)).ToList();
-                            if (isBatchIDExist.Count() > 0)
+                            // Put this to return either the filename or filepath from service
+                            string tempDirectoryName = "/PromotionalMedia/Temp/";
+                            string nameOrPath = "path";
+                            string tempPath = await _saveFile.SaveFileToSite(tempDirectoryName, mediaFile, nameOrPath);
+
+                            var convert = new ConvertSaveMediaFile();
+                            var success = convert.ConvertAndSaveMediaFile(tempPath, extension, model.OperatorID.ToString(), fileName, outputFormat);
+                            model.AdvertLocation = string.Format("/PromotionalMedia/{0}/{1}",
+                                                          model.OperatorID.ToString(), fileName + "." + outputFormat);
+                        }
+                        else
+                        {
+                            string directoryName = "/PromotionalMedia/";
+                            directoryName = Path.Combine(directoryName, model.OperatorID.ToString());
+                            string path = Path.Combine(directoryName, fileName + extension);
+                            string mpath = await _saveFile.SaveFileToSite(path, mediaFile, "path");
+
+                            string archiveDirectoryName = "/PromotionalMedia/Archive/";
+
+                            string archivePath = Path.Combine(archiveDirectoryName, fileName + extension);
+                            string apath = await _saveFile.SaveFileToSite(archivePath, mediaFile, "path");
+
+                            model.AdvertLocation = string.Format("/PromotionalMedia/{0}/{1}", model.OperatorID.ToString(),
+                                                                    fileName + extension);
+                        }
+                    }
+                    if (model.OperatorID == (int)Enums.OperatorTableId.Expresso)
+                    {
+
+
+                    }
+                    else if (model.OperatorID == (int)Enums.OperatorTableId.Safaricom)
+                    {
+                        #region Media
+                        if (mediaFile.ContentLength != 0)
+                        {
+                            var firstAudioName = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Second.ToString();
+                            string fileName = firstAudioName;
+
+                            string extension = Path.GetExtension(mediaFile.FileName);
+                            var onlyFileName = Path.GetFileNameWithoutExtension(mediaFile.FileName);
+                            string outputFormat = model.OperatorId == 1 ? "wav" : model.OperatorId == 2 ? "mp3" : "wav";
+                            var audioFormatExtension = "." + outputFormat;
+
+                            if (extension != audioFormatExtension)
                             {
-                                FillCountry(model.CountryId, model.OperatorId);
-                                TempData["Error"] = "BatchID exists to " + operatorName + " operator.";
-                                return View(model);
+                                string tempDirectoryName = Server.MapPath("~/PromotionalMedia/Temp/");
+                                if (!Directory.Exists(tempDirectoryName))
+                                    Directory.CreateDirectory(tempDirectoryName);
+                                string tempPath = Path.Combine(tempDirectoryName, fileName + extension);
+                                mediaFile.SaveAs(tempPath);
+
+                                SaveConvertedFile(tempPath, extension, model.OperatorId.ToString(), fileName, outputFormat);
+
+                                model.AdvertLocation = string.Format("/PromotionalMedia/{0}/{1}", model.OperatorId.ToString(),
+                                                                    fileName + "." + outputFormat);
                             }
                             else
                             {
-                                if (model.OperatorId == (int)OperatorTableId.Expresso)
+                                string directoryName = Server.MapPath("~/PromotionalMedia/");
+                                directoryName = Path.Combine(directoryName, model.OperatorId.ToString());
+
+                                if (!Directory.Exists(directoryName))
+                                    Directory.CreateDirectory(directoryName);
+
+                                string path = Path.Combine(directoryName, fileName + extension);
+                                mediaFile.SaveAs(path);
+
+                                string archiveDirectoryName = Server.MapPath("~/PromotionalMedia/Archive/");
+
+                                if (!Directory.Exists(archiveDirectoryName))
+                                    Directory.CreateDirectory(archiveDirectoryName);
+
+                                string archivePath = Path.Combine(archiveDirectoryName, fileName + extension);
+                                mediaFile.SaveAs(archivePath);
+
+                                model.AdvertLocation = string.Format("/PromotionalMedia/{0}/{1}", model.OperatorId.ToString(),
+                                                                        fileName + extension);
+                            }
+
+                            //Add Promotional Campaign Data on DB Server
+                            CreateOrUpdatePromotionalCampaignCommand promotionalCampaignCommand =
+                                Mapper.Map<PromotionalCampaignFormModel, CreateOrUpdatePromotionalCampaignCommand>(model);
+                            ICommandResult promotionalCampaignResult = _commandBus.Submit(promotionalCampaignCommand);
+                            if (promotionalCampaignResult.Success)
+                            {
+                                int promotionalCampaignId = promotionalCampaignResult.Id;
+                                string adName = "";
+                                if (model.AdvertLocation == null || model.AdvertLocation == "")
                                 {
-                                    #region Media
-                                    if (mediaFile.ContentLength != 0)
-                                    {
-                                        var firstAudioName = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Second.ToString();
-                                        string fileName = firstAudioName;
-
-                                        string extension = Path.GetExtension(mediaFile.FileName);
-                                        var onlyFileName = Path.GetFileNameWithoutExtension(mediaFile.FileName);
-                                        //string outputFormat = model.OperatorId == 1 ? "wav" : model.OperatorId == 2 ? "mp3" : "wav";
-                                        string outputFormat = "wav";
-                                        var audioFormatExtension = "." + outputFormat;
-
-                                        if (extension != audioFormatExtension)
-                                        {
-                                            string tempDirectoryName = Server.MapPath("~/PromotionalMedia/Temp/");
-                                            string tempPath = Path.Combine(tempDirectoryName, fileName + extension);
-                                            mediaFile.SaveAs(tempPath);
-
-                                            SaveConvertedFile(tempPath, extension, model.OperatorId.ToString(), fileName, outputFormat);
-
-                                            model.AdvertLocation = string.Format("/PromotionalMedia/{0}/{1}", model.OperatorId.ToString(),
-                                                                                fileName + "." + outputFormat);
-                                        }
-                                        else
-                                        {
-                                            string directoryName = Server.MapPath("~/PromotionalMedia/");
-                                            directoryName = Path.Combine(directoryName, model.OperatorId.ToString());
-
-                                            if (!Directory.Exists(directoryName))
-                                                Directory.CreateDirectory(directoryName);
-
-                                            string path = Path.Combine(directoryName, fileName + extension);
-                                            mediaFile.SaveAs(path);
-
-                                            string archiveDirectoryName = Server.MapPath("~/PromotionalMedia/Archive/");
-
-                                            if (!Directory.Exists(archiveDirectoryName))
-                                                Directory.CreateDirectory(archiveDirectoryName);
-
-                                            string archivePath = Path.Combine(archiveDirectoryName, fileName + extension);
-                                            mediaFile.SaveAs(archivePath);
-
-                                            model.AdvertLocation = string.Format("/PromotionalMedia/{0}/{1}", model.OperatorId.ToString(),
-                                                                                    fileName + extension);
-                                        }
-
-                                        //Add Promotional Campaign Data on DB Server
-                                        CreateOrUpdatePromotionalCampaignCommand promotionalCampaignCommand =
-                                            Mapper.Map<PromotionalCampaignFormModel, CreateOrUpdatePromotionalCampaignCommand>(model);
-                                        ICommandResult promotionalCampaignResult = _commandBus.Submit(promotionalCampaignCommand);
-                                        if (promotionalCampaignResult.Success)
-                                        {
-                                            int promotionalCampaignId = promotionalCampaignResult.Id;
-                                            string adName = "";
-                                            if (model.AdvertLocation == null || model.AdvertLocation == "")
-                                            {
-                                                adName = "";
-                                            }
-                                            else
-                                            {
-                                                if (model.OperatorId == (int)OperatorTableId.Expresso)
-                                                {
-                                                    var operatorFTPDetails = _operatorFTPDetailsRepository.Get(top => top.OperatorId == model.OperatorId);
-
-                                                    //Transfer Advert File From Operator Server to Linux Server
-                                                    var returnValue = CopyAdToOpeartorServer(model.AdvertLocation, model.OperatorId, operatorFTPDetails);
-                                                    if (returnValue == "Success")
-                                                    {
-                                                        if (operatorFTPDetails != null) adName = operatorFTPDetails.FtpRoot + "/" + model.AdvertLocation.Split('/')[3];
-
-                                                        //Get and Update Promotional Campaign Data on DB Server
-                                                        var promotionalCampaignData = db.PromotionalCampaigns.Where(top => top.AdtoneServerPromotionalCampaignId == promotionalCampaignId && top.BatchID == model.BatchID && top.CampaignName.ToLower().Equals(model.CampaignName.ToLower())).FirstOrDefault();
-                                                        if (promotionalCampaignData != null)
-                                                        {
-                                                            promotionalCampaignData.AdvertLocation = adName;
-                                                            db.SaveChanges();
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            //Add Promotional Advert Data on DB Server
-                                            PromotionalAdvertFormModel promotionalAdvertModel = new PromotionalAdvertFormModel();
-                                            promotionalAdvertModel.ID = model.ID;
-                                            promotionalAdvertModel.CampaignID = promotionalCampaignId;
-                                            promotionalAdvertModel.OperatorID = model.OperatorId;
-                                            promotionalAdvertModel.AdvertName = model.AdvertName;
-                                            promotionalAdvertModel.AdvertLocation = model.AdvertLocation;
-
-                                            CreateOrUpdatePromotionalAdvertCommand promotionalAdvertCommand =
-                                                Mapper.Map<PromotionalAdvertFormModel, CreateOrUpdatePromotionalAdvertCommand>(promotionalAdvertModel);
-                                            ICommandResult promotionalAdvertResult = _commandBus.Submit(promotionalAdvertCommand);
-                                            if (promotionalAdvertResult.Success)
-                                            {
-                                                int promotionalAdvertId = promotionalAdvertResult.Id;
-                                                //Get and Update Promotional Advert Data on DB Server
-                                                var promotionalAdvertData = db.PromotionalAdverts.Where(top => top.AdtoneServerPromotionalAdvertId == promotionalAdvertId).FirstOrDefault();
-                                                if (promotionalAdvertData != null)
-                                                {
-                                                    promotionalAdvertData.AdvertLocation = adName;
-                                                    db.SaveChanges();
-                                                }
-                                            }
-
-                                            await OnCampaignCreated(model.BatchID);
-                                        }
-                                    }
-                                    #endregion
-
-                                    TempData["success"] = "Campaign and Advert added successfully for operator " + operatorName + ".";
-                                    return RedirectToAction("Index");
-                                }
-                                else if (model.OperatorId == (int)OperatorTableId.Safaricom)
-                                {
-                                    #region Media
-                                    if (mediaFile.ContentLength != 0)
-                                    {
-                                        var firstAudioName = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Second.ToString();
-                                        string fileName = firstAudioName;
-
-                                        string extension = Path.GetExtension(mediaFile.FileName);
-                                        var onlyFileName = Path.GetFileNameWithoutExtension(mediaFile.FileName);
-                                        string outputFormat = model.OperatorId == 1 ? "wav" : model.OperatorId == 2 ? "mp3" : "wav";
-                                        var audioFormatExtension = "." + outputFormat;
-
-                                        if (extension != audioFormatExtension)
-                                        {
-                                            string tempDirectoryName = Server.MapPath("~/PromotionalMedia/Temp/");
-                                            if (!Directory.Exists(tempDirectoryName))
-                                                Directory.CreateDirectory(tempDirectoryName);
-                                            string tempPath = Path.Combine(tempDirectoryName, fileName + extension);
-                                            mediaFile.SaveAs(tempPath);
-
-                                            SaveConvertedFile(tempPath, extension, model.OperatorId.ToString(), fileName, outputFormat);
-
-                                            model.AdvertLocation = string.Format("/PromotionalMedia/{0}/{1}", model.OperatorId.ToString(),
-                                                                                fileName + "." + outputFormat);
-                                        }
-                                        else
-                                        {
-                                            string directoryName = Server.MapPath("~/PromotionalMedia/");
-                                            directoryName = Path.Combine(directoryName, model.OperatorId.ToString());
-
-                                            if (!Directory.Exists(directoryName))
-                                                Directory.CreateDirectory(directoryName);
-
-                                            string path = Path.Combine(directoryName, fileName + extension);
-                                            mediaFile.SaveAs(path);
-
-                                            string archiveDirectoryName = Server.MapPath("~/PromotionalMedia/Archive/");
-
-                                            if (!Directory.Exists(archiveDirectoryName))
-                                                Directory.CreateDirectory(archiveDirectoryName);
-
-                                            string archivePath = Path.Combine(archiveDirectoryName, fileName + extension);
-                                            mediaFile.SaveAs(archivePath);
-
-                                            model.AdvertLocation = string.Format("/PromotionalMedia/{0}/{1}", model.OperatorId.ToString(),
-                                                                                    fileName + extension);
-                                        }
-
-                                        //Add Promotional Campaign Data on DB Server
-                                        CreateOrUpdatePromotionalCampaignCommand promotionalCampaignCommand =
-                                            Mapper.Map<PromotionalCampaignFormModel, CreateOrUpdatePromotionalCampaignCommand>(model);
-                                        ICommandResult promotionalCampaignResult = _commandBus.Submit(promotionalCampaignCommand);
-                                        if (promotionalCampaignResult.Success)
-                                        {
-                                            int promotionalCampaignId = promotionalCampaignResult.Id;
-                                            string adName = "";
-                                            if (model.AdvertLocation == null || model.AdvertLocation == "")
-                                            {
-                                                adName = "";
-                                            }
-                                            else
-                                            {
-                                                if (model.OperatorId == (int)OperatorTableId.Safaricom)
-                                                {
-                                                    var operatorFTPDetails = _operatorFTPDetailsRepository.Get(top => top.OperatorId == model.OperatorId);
-
-                                                    //Transfer Advert File From Operator Server to Linux Server
-                                                    var returnValue = CopyAdToOpeartorServer(model.AdvertLocation, model.OperatorId, operatorFTPDetails);
-                                                    if (returnValue == "Success")
-                                                    {
-                                                        if (operatorFTPDetails != null) adName = operatorFTPDetails.FtpRoot + "/" + model.AdvertLocation.Split('/')[3];
-
-                                                        //Get and Update Promotional Campaign Data on DB Server
-                                                        var promotionalCampaignData = db.PromotionalCampaigns.Where(top => top.AdtoneServerPromotionalCampaignId == promotionalCampaignId && top.BatchID == model.BatchID && top.CampaignName.ToLower().Equals(model.CampaignName.ToLower())).FirstOrDefault();
-                                                        if (promotionalCampaignData != null)
-                                                        {
-                                                            promotionalCampaignData.AdvertLocation = adName;
-                                                            db.SaveChanges();
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            //Add Promotional Advert Data on DB Server
-                                            PromotionalAdvertFormModel promotionalAdvertModel = new PromotionalAdvertFormModel();
-                                            promotionalAdvertModel.ID = model.ID;
-                                            promotionalAdvertModel.CampaignID = promotionalCampaignId;
-                                            promotionalAdvertModel.OperatorID = model.OperatorId;
-                                            promotionalAdvertModel.AdvertName = model.AdvertName;
-                                            promotionalAdvertModel.AdvertLocation = model.AdvertLocation;
-
-                                            CreateOrUpdatePromotionalAdvertCommand promotionalAdvertCommand =
-                                                Mapper.Map<PromotionalAdvertFormModel, CreateOrUpdatePromotionalAdvertCommand>(promotionalAdvertModel);
-                                            ICommandResult promotionalAdvertResult = _commandBus.Submit(promotionalAdvertCommand);
-                                            if (promotionalAdvertResult.Success)
-                                            {
-                                                int promotionalAdvertId = promotionalAdvertResult.Id;
-                                                //Get and Update Promotional Advert Data on DB Server
-                                                var promotionalAdvertData = db.PromotionalAdverts.Where(top => top.AdtoneServerPromotionalAdvertId == promotionalAdvertId).FirstOrDefault();
-                                                if (promotionalAdvertData != null)
-                                                {
-                                                    promotionalAdvertData.AdvertLocation = adName;
-                                                    db.SaveChanges();
-                                                }
-                                            }
-
-                                            await OnCampaignCreated(model.BatchID);
-                                        }
-                                    }
-                                    #endregion
-
-                                    TempData["success"] = "Campaign and Advert added successfully for operator " + operatorName + ".";
-                                    return RedirectToAction("Index");
+                                    adName = "";
                                 }
                                 else
                                 {
-                                    TempData["Error"] = operatorName + " operator implementation is under process.";
+                                    if (model.OperatorId == (int)OperatorTableId.Safaricom)
+                                    {
+                                        var operatorFTPDetails = _operatorFTPDetailsRepository.Get(top => top.OperatorId == model.OperatorId);
+
+                                        //Transfer Advert File From Operator Server to Linux Server
+                                        var returnValue = CopyAdToOpeartorServer(model.AdvertLocation, model.OperatorId, operatorFTPDetails);
+                                        if (returnValue == "Success")
+                                        {
+                                            if (operatorFTPDetails != null) adName = operatorFTPDetails.FtpRoot + "/" + model.AdvertLocation.Split('/')[3];
+
+                                            //Get and Update Promotional Campaign Data on DB Server
+                                            var promotionalCampaignData = db.PromotionalCampaigns.Where(top => top.AdtoneServerPromotionalCampaignId == promotionalCampaignId && top.BatchID == model.BatchID && top.CampaignName.ToLower().Equals(model.CampaignName.ToLower())).FirstOrDefault();
+                                            if (promotionalCampaignData != null)
+                                            {
+                                                promotionalCampaignData.AdvertLocation = adName;
+                                                db.SaveChanges();
+                                            }
+                                        }
+                                    }
                                 }
+
+                                //Add Promotional Advert Data on DB Server
+                                PromotionalAdvertFormModel promotionalAdvertModel = new PromotionalAdvertFormModel();
+                                promotionalAdvertModel.ID = model.ID;
+                                promotionalAdvertModel.CampaignID = promotionalCampaignId;
+                                promotionalAdvertModel.OperatorID = model.OperatorID;
+                                promotionalAdvertModel.AdvertName = model.AdvertName;
+                                promotionalAdvertModel.AdvertLocation = model.AdvertLocation;
+
+                                CreateOrUpdatePromotionalAdvertCommand promotionalAdvertCommand =
+                                    Mapper.Map<PromotionalAdvertFormModel, CreateOrUpdatePromotionalAdvertCommand>(promotionalAdvertModel);
+                                ICommandResult promotionalAdvertResult = _commandBus.Submit(promotionalAdvertCommand);
+                                if (promotionalAdvertResult.Success)
+                                {
+                                    int promotionalAdvertId = promotionalAdvertResult.Id;
+                                    //Get and Update Promotional Advert Data on DB Server
+                                    var promotionalAdvertData = db.PromotionalAdverts.Where(top => top.AdtoneServerPromotionalAdvertId == promotionalAdvertId).FirstOrDefault();
+                                    if (promotionalAdvertData != null)
+                                    {
+                                        promotionalAdvertData.AdvertLocation = adName;
+                                        db.SaveChanges();
+                                    }
+                                }
+
+                                await OnCampaignCreated(model.BatchID);
                             }
                         }
-                        else TempData["Error"] = operatorName + " operator implementation is under process.";
-                    }
+                        #endregion
 
+                        result.body = "Campaign and Advert added successfully for operator. ";
+                    }
+                    else
+                    {
+                        result.error = " Operator implementation is under process.";
+                        result.result = 0;
+                        return result;
+                    }
+                }
+            }
+            result.error = " Operator implementation is under process.";
+            result.result = 0;
+            return result;
         }
+
+
+        
+
 
 
 
         #region Longer SQL Query
 
 
+        /// <summary>
+        /// TODO: Really need to clean this up is terrible.
+        /// </summary>
+        /// <returns></returns>
         private string GetCampaignResultSet()
         {
             return @"SELECT u.Email,CONCAT(u.FirstName, ' ',u.LastName) AS FullName,
@@ -468,7 +441,18 @@ namespace AdtonesAdminWebApi.BusinessServices
                         CASE WHEN promo.Status=1 THEN 'Play' ELSE 'Stop' END AS rStatus
                         FROM PromotionalCampaigns AS promo 
                         LEFT JOIN PromotionalAdverts AS pa ON pa.CampaignID=promo.ID
-                        LEFT JOIN Operators AS op ON op.OperatorId=promo.OperatorID;";
+                        LEFT JOIN Operators AS op ON op.OperatorId=promo.OperatorID
+                        ORDER BY promo.ID DESC;";
+        }
+
+
+        private string GetCampaignCreditResultSet()
+        {
+            return @"SELECT CampaignCreditPeriodId,ccp.UserId,CONCAT(usr.FirstName,' ',usr.LastName) AS UserName,ccp.CampaignProfileId,
+                    camp.CampaignName,CreditPeriod,ccp.CreatedDate
+                    FROM CampaignCreditPeriods AS ccp LEFT JOIN Users AS usr ON ccp.UserId=usr.UserId
+                    LEFT JOIN CampaignProfile AS camp ON camp.CampaignProfileId=ccp.CampaignProfileId
+                    ORDER BY CreatedDate DESC;";
         }
 
 

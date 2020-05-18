@@ -1,5 +1,4 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
-
 using AdtonesAdminWebApi.Enums;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
@@ -79,7 +78,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// </summary>
         /// <param name="model">The model.id uses the ProfileMatchInformations Id</param>
         /// <returns></returns>
-        public async Task<ReturnResult> GetProfileInfo(IdCollectionViewModel model)
+        public async Task<ReturnResult> GetProfileInfo(int id)
         {
             try
             {
@@ -92,7 +91,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                                                                                                     c.Name,p.ProfileType
                                                                                                     FROM ProfileMatchInformations p
                                                                                                     LEFT JOIN Country c ON p.CountryId=c.Id
-                                                                                                    WHERE p.Id=@id", new { model.id });
+                                                                                                    WHERE p.Id=@id", new { id });
                 }
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
@@ -274,14 +273,14 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// </summary>
         /// <param name="model">Uses the IdCollectionViewModel id as the Id</param>
         /// <returns></returns>
-        public async Task<ReturnResult> DeleteProfileLabel(IdCollectionViewModel model)
+        public async Task<ReturnResult> DeleteProfileLabel(int id)
         {
             try
             {
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    await connection.ExecuteAsync("DELETE FROM ProfileMatchLabels WHERE Id=@id", new { id = model.id });
+                    await connection.ExecuteAsync("DELETE FROM ProfileMatchLabels WHERE Id=@id", new { id = id });
                 }
             }
             catch (Exception ex)

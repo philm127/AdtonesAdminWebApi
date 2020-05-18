@@ -56,7 +56,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetSystemConfig(IdCollectionViewModel model)
+        public async Task<ReturnResult> GetSystemConfig(int id)
         {
             var select_query = @"SELECT SystemConfigId,SystemConfigKey,SystemConfigValue,CreatedDateTime,
                                     ISNULL(SystemConfigType,'-') AS SystemConfigType
@@ -68,7 +68,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<SystemConfigResult>(select_query, new { Id = model.id });
+                    result.body = await connection.QueryFirstOrDefaultAsync<SystemConfigResult>(select_query, new { Id = id });
                 }
             }
             catch (Exception ex)
@@ -119,8 +119,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> UpdateSystemConfig(SystemConfigResult model)
         {
-            var update_query = @"UPDATE SystemConfig SET SystemConfigKey = @SystemConfigKey, SystemConfigValue, SystemConfigType,UpdatedDateTime=GETDATE()
-                                            WHERE SystemConfigId = @SystemConfigId)";
+            var update_query = @"UPDATE SystemConfig SET SystemConfigKey = @SystemConfigKey, @SystemConfigValue=SystemConfigValue, 
+                                                                       @SystemConfigType=SystemConfigType,UpdatedDateTime=GETDATE()
+                                                                       WHERE SystemConfigId = @SystemConfigId)";
 
             try
             {

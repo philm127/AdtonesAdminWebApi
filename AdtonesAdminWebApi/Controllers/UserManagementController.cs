@@ -2,15 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using AdtonesAdminWebApi.ViewModels;
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
-using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using AdtonesAdminWebApi.Model;
-using System.IO;
 using Microsoft.AspNetCore.Authorization;
 
 namespace AdtonesAdminWebApi.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserManagementController : ControllerBase
@@ -35,14 +33,20 @@ namespace AdtonesAdminWebApi.Controllers
             IEnumerable<AdvertiserDashboardResult> nv;
             nv = (IEnumerable<AdvertiserDashboardResult>)res.body;
             return nv;
-
         }
 
 
-        [HttpGet("v1/GetUserResult")]
+        [HttpGet("v1/GetAdvertiserTable")]
         public async Task<ReturnResult> GetAdvertiserTable()
         {
             return await _dashboardService.LoadAdvertiserDataTable();
+        }
+
+
+        [HttpGet("v1/GetSubscriberTable")]
+        public async Task<ReturnResult> GetSubscriberTable()
+        {
+            return await _dashboardService.LoadSubscriberDataTable();
         }
 
 

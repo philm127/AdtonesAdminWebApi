@@ -54,7 +54,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetOperatorConfig(IdCollectionViewModel model)
+        public async Task<ReturnResult> GetOperatorConfig(int id)
         {
             var select_query = @"SELECT OperatorConfigurationId,con.OperatorId,Days,con.IsActive,AddedDate,op.OperatorName
                                 FROM dbo.OperatorConfigurations AS con 
@@ -66,7 +66,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<OperatorConfigurationResult>(select_query, new { Id = model.id });
+                    result.body = await connection.QueryFirstOrDefaultAsync<OperatorConfigurationResult>(select_query, new { Id = id });
                 }
             }
             catch (Exception ex)
@@ -85,10 +85,11 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+
         public async Task<ReturnResult> AddOperatorConfig(OperatorConfigurationResult model)
         {
-            var insert_query = @"INSERT INTO OperatorConfigurations(Days,IsActive,AddedDate,UpdatedDate)
-                                        VALUES(@Days,true,GETDATE(),GETDATE());
+            var insert_query = @"INSERT INTO OperatorConfigurations(OperatorId,Days,IsActive,AddedDate,UpdatedDate)
+                                        VALUES(@OperatorId,@Days,true,GETDATE(),GETDATE());
                                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
             try

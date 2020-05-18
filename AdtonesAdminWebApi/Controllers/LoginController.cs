@@ -24,8 +24,13 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userForm"></param>
+        /// <returns>body contains User</returns>
         [AllowAnonymous]
-        [HttpPost("v1/Login")]
+        [HttpGet("v1/Login")]
         public async Task<ReturnResult> Login(User userForm)
         {
             var tst = await _userService.Login(userForm);
@@ -33,11 +38,16 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>body contains User</returns>
         [AllowAnonymous]
         [HttpPost("v1/ForgotPassword")]
         public async Task<ReturnResult> ForgotPassword(IdCollectionViewModel model)
         {
-            var tst = await _userService.ForgotPassword(model);
+            var tst = await _userService.ForgotPassword(model.Email);
             return tst;
         }
     }

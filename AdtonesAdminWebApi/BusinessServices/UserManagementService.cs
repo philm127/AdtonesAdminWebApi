@@ -169,9 +169,9 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     await connection.OpenAsync();
                     result.body = await connection.QueryFirstOrDefaultAsync<User>(@"SELECT UserId,RoleId,Email,FirstName,Activated,
-                                                                                        LastName,Outstandingdays,Organisation,DateCreated 
-                                                                                        FROM Users WHERE UserId = @userid ",
-                                                                                            new { userid = userId });
+                                                                                LastName,Outstandingdays,Organisation,DateCreated 
+                                                                                FROM Users WHERE UserId = @userid ",
+                                                                                    new { userid = userId });
                     return result;
                 }
             }
@@ -627,12 +627,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 var select_query = @"SELECT u.UserId,FirstName,LastName,Email,Organisation,u.OperatorId,o.CountryId,
-                        c.Name AS CountryName,o.OperatorName,u.Activated,u.DateCreated,con.MobileNumber,con.PhoneNumber,
-                        con.Address,con.Id
-                        FROM Users AS u LEFT JOIN Operators AS o ON u.OperatorId=o.OperatorId
-                        LEFT JOIN Country AS c ON o.CountryId=c.Id
-                        LEFT JOIN Contacts AS con ON con.UserId=u.UserId
-                        WHERE u.UserId=@userId";
+                                    c.Name AS CountryName,o.OperatorName,u.Activated,u.DateCreated,con.MobileNumber,
+                                    con.PhoneNumber, con.Address,con.Id
+                                    FROM Users AS u LEFT JOIN Operators AS o ON u.OperatorId=o.OperatorId
+                                    LEFT JOIN Country AS c ON o.CountryId=c.Id
+                                    LEFT JOIN Contacts AS con ON con.UserId=u.UserId
+                                    WHERE u.UserId=@userId";
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {

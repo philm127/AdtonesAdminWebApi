@@ -1,26 +1,34 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
+using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
-using Dapper;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
     public class AreaService : IAreaService
     {
-        private readonly IConfiguration _configuration;
+        IHttpContextAccessor _httpAccessor;
+        private readonly IAreaDAL _areaDAL;
+        private readonly IAreaQuery _commandText;
+        private readonly ICheckExistsDAL _checkExistsDAL;
+        private readonly ICheckExistsQuery _checkExistsQuery;
+
         ReturnResult result = new ReturnResult();
 
 
-        public AreaService(IConfiguration configuration)
+        public AreaService(IAreaDAL areaDAL, IAreaQuery commandText, IHttpContextAccessor httpAccessor, ICheckExistsDAL checkExistsDAL,
+                            ICheckExistsQuery checkExistsQuery)
 
         {
-            _configuration = configuration;
+            _areaDAL = areaDAL;
+            _commandText = commandText;
+            _httpAccessor = httpAccessor;
+            _checkExistsQuery = checkExistsQuery;
+            _checkExistsDAL = checkExistsDAL;
         }
 
 
@@ -30,15 +38,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryAsync<AreaResult>(@"SELECT a.AreaId, a.AreaName,a.CountryId,c.Name as CountryName 
-                                                                                    FROM Areas AS a INNER JOIN Country AS c
-                                                                                    ON a.CountryId=c.Id
-                                                                                    WHERE a.IsActive=1
-                                                                                    ORDER BY a.AreaId DESC");
-                }
+                result.body = await _areaDAL.LoadAreaResultSet(_commandText.LoadAreaDataTable);
             }
             catch (Exception ex)
             {
@@ -61,7 +61,8 @@ namespace AdtonesAdminWebApi.BusinessServices
             areamodel.IsActive = true;
             try
             {
-                if (CheckAreaExists(areamodel))
+                bool exists = await _checkExistsDAL.CheckAreaExists(_checkExistsQuery.CheckAreaExists, areamodel);
+                if (exists)
                 {
                     result.result = 0;
                     result.error = areamodel.AreaName + " Record Exists.";
@@ -83,19 +84,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-                string query = @"INSERT INTO Areas(AreaName,IsActive,CountryId) 
-                                VALUES(@AreaName,@IsActive,@CountryId)";
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    var cnt = await connection.ExecuteAsync(query, areamodel);
-
-                    if (cnt != 1)
-                    {
-                        result.result = 0;
-                        result.error = areamodel.AreaName + " Record was not inserted.";
-                        return result;
-                    }
-                }
+                var cnt = _areaDAL.AddArea(_commandText.AddArea, areamodel);
                 return result;
             }
             catch (Exception ex)
@@ -119,15 +108,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<AreaResult>(@"SELECT a.AreaId, a.AreaName,a.CountryId,c.Name as CountryName,a.IsActive 
-                                                                                    FROM Areas AS a INNER JOIN Country AS c
-                                                                                    ON a.CountryId=c.Id
-                                                                                    WHERE a.AreaId = @areaid",
-                                                                                    new { areaid = id });
-                }
+                result.body = await _areaDAL.GetAreaById(_commandText.GetAreaById, id);
             }
             catch (Exception ex)
             {
@@ -147,28 +128,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> UpdateArea(AreaResult areamodel)
         {
-                if (CheckAreaExists(areamodel))
-                {
-                    result.result = 0;
-                    result.error = areamodel.AreaName + " Record Exists.";
-                    return result;
-                }
-                areamodel.IsActive = true;
-
             try
             {
-                string query = @"UPDATE Areas SET AreaName=@AreaName,IsActive=@IsActive,CountryId=@CountryId WHERE AreaId=@AreaId";
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    var cnt = await connection.ExecuteAsync(query, areamodel);
-
-                    if (cnt != 1)
-                    {
-                        result.result = 0;
-                        result.error = areamodel.AreaName + " Record failed to update.";
-                        return result;
-                    }
-                }
+                var cnt = await _areaDAL.UpdateArea(_commandText.UpdateArea, areamodel);
                 return result;
             }
             catch (Exception ex)
@@ -192,12 +154,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.ExecuteAsync(@"DELETE FROM Areas WHERE a.AreaId = @areaid",
-                                                                                    new { areaid = id });
-                }
+                var x = await _areaDAL.DeleteAreaById(_commandText.DeleteArea, id);
             }
             catch (Exception ex)
             {
@@ -215,31 +172,5 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        private bool CheckAreaExists(AreaResult areamodel)
-        {
-            try
-            {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    return connection.ExecuteScalar<bool>(@"SELECT COUNT(1) FROM Areas WHERE LOWER(AreaName) = @areaname
-                                                                  AND CountryId=@countryId",
-                                                                  new { areaname = areamodel.AreaName.Trim().ToLower(), countryId = areamodel.CountryId });
-                }
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AreaService",
-                    ProcedureName = "CheckAreaExists"
-                };
-                _logging.LogError();
-                return false;
-            }
-        }
-
-        
     }
 }

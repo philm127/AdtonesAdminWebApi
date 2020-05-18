@@ -1,5 +1,4 @@
-﻿
-using AdtonesAdminWebApi.BusinessServices.Interfaces;
+﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.Services.Mailer;
 using AdtonesAdminWebApi.ViewModels;
@@ -7,9 +6,7 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices
