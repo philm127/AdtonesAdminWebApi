@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AdtonesAdminWebApi.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserManagementController : ControllerBase
@@ -64,10 +64,10 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [HttpGet("v1/GetContactDetails")]
-        public async Task<ReturnResult> GetContactDetails([FromBodyAttribute]User users)
+        [HttpGet("v1/GetContactDetails/{id}")]
+        public async Task<ReturnResult> GetContactDetails(int id)
         {
-            return await _userService.GetContactForm(users.UserId);
+            return await _userService.GetContactForm(id);
         }
 
 
@@ -78,10 +78,15 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [HttpGet("v1/GetUserProfile")]
-        public async Task<ReturnResult> GetUserProfile([FromBodyAttribute]User users)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="users"></param>
+        /// <returns>body contains User</returns>
+        [HttpGet("v1/GetUserProfile/{id}")]
+        public async Task<ReturnResult> GetUserProfile(int id)
         {
-            return await _userService.GetProfileForm(users.UserId);
+            return await _userService.GetProfileForm(id);
         }
 
 

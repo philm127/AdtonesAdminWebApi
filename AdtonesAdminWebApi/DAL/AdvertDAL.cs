@@ -65,7 +65,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             try
             {
-                return  await _executers.ExecuteCommand(_connStr,
+                return await _executers.ExecuteCommand(_connStr,
                                     conn => conn.Query<AdvertCategoryResult>(command));
             }
             catch
@@ -87,7 +87,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 builder.AddParameters(new { AdvertId = model.AdvertId });
-                builder.AddParameters(new { UpdatedBy = model.up });
+                builder.AddParameters(new { UpdatedBy = model.UpdatedBy });
                 builder.AddParameters(new { AdvertId = model.AdvertId });
 
                 return await _executers.ExecuteCommand(_connStr,
@@ -100,38 +100,38 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-            //Model.Advert advert = _advertRepository.GetById(command.AdvertId);
-            var advertDetail = _advertRepository.GetById(command.AdvertId);
-            advertDetail.Status = command.Status;
-            advertDetail.UpdatedBy = command.UpdatedBy;
-            _advertRepository.Update(advertDetail);
-            var ConnString = ConnectionString.GetConnectionStringByCountryId(advertDetail.CountryId);
-            if (ConnString != null && ConnString.Count() > 0)
-            {
-                foreach (var item in ConnString)
-                {
-                    EFMVCDataContex db = new EFMVCDataContex(item);
-                    var externalServerUserId = OperatorServer.GetUserIdFromOperatorServer(db, (int)command.UpdatedBy);
-                    var advertData = db.Adverts.Where(s => s.AdtoneServerAdvertId == command.AdvertId).FirstOrDefault();
-                    if (advertData != null)
-                    {
-                        advertData.Status = command.Status;
-                        if (externalServerUserId != 0)
-                        {
-                            advertData.UpdatedBy = command.UpdatedBy;
-                        }
-                        else
-                        {
-                            advertData.UpdatedBy = null;
-                        }
+//        //Model.Advert advert = _advertRepository.GetById(command.AdvertId);
+//        var advertDetail = _advertRepository.GetById(command.AdvertId);
+//        advertDetail.Status = command.Status;
+//            advertDetail.UpdatedBy = command.UpdatedBy;
+//            _advertRepository.Update(advertDetail);
+//            var ConnString = ConnectionString.GetConnectionStringByCountryId(advertDetail.CountryId);
+//            if (ConnString != null && ConnString.Count() > 0)
+//            {
+//                foreach (var item in ConnString)
+//                {
+//                    EFMVCDataContex db = new EFMVCDataContex(item);
+//        var externalServerUserId = OperatorServer.GetUserIdFromOperatorServer(db, (int)command.UpdatedBy);
+//        var advertData = db.Adverts.Where(s => s.AdtoneServerAdvertId == command.AdvertId).FirstOrDefault();
+//                    if (advertData != null)
+//                    {
+//                        advertData.Status = command.Status;
+//                        if (externalServerUserId != 0)
+//                        {
+//                            advertData.UpdatedBy = command.UpdatedBy;
+//                        }
+//                        else
+//                        {
+//                            advertData.UpdatedBy = null;
+//                        }
 
-                        db.SaveChanges();
-                    }
-                }
-            }
-            unitOfWork.Commit();
-            return new CommandResult(true);
-        }
+//db.SaveChanges();
+//                    }
+//                }
+//            }
+//            unitOfWork.Commit();
+//            return new CommandResult(true);
+        //}
 
 
 

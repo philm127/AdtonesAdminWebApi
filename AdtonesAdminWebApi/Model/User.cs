@@ -14,7 +14,7 @@ namespace AdtonesAdminWebApi.Model
 
         public int OperatorId { get; set; }
 
-        public string Email { get; set; }
+        public string email { get; set; }
 
         public string FirstName { get; set; }
 

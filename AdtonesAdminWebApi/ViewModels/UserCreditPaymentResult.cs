@@ -10,7 +10,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int Id { get; set; }
         public int UserId { get; set; }
         public string Email { get; set; }
-        public string Name { get; set; }
+        public string FullName { get; set; }
 
         public string Organisation { get; set; }
         public string InvoiceNumber { get; set; }
@@ -25,9 +25,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public decimal OutstandingAmount { get; set; }
         public decimal Amount { get; set; }
 
-
-        public DateTime CreatedDateSort { get; set; }
-        public string CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
         public int Status { get; set; }
 
     }

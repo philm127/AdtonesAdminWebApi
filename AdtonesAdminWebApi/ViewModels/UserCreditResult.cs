@@ -11,7 +11,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int UserId { get; set; }
 
         public string Email { get; set; }
-        public string Name { get; set; }
+        public string FullName { get; set; }
 
         public string Organisation { get; set; }
         public decimal Credit { get; set; }
@@ -19,7 +19,6 @@ namespace AdtonesAdminWebApi.ViewModels
         public decimal TotalUsed { get; set; }
         public decimal TotalPaid { get; set; }
         public decimal RemainingAmount { get; set; }
-        public DateTime? CreatedDateSort { get; set; }
-        public string CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
     }
 }

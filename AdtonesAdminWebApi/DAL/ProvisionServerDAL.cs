@@ -48,45 +48,45 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> ChangeAdvertStatus(string query, UserAdvertResult command)
-        {
+        //public async Task<int> ChangeAdvertStatus(string query, UserAdvertResult command)
+        //{
 
-            var sb = new StringBuilder();
-            sb.Append(query);
-            sb.Append("AdtoneServerAdvertId=@AdvertId;");
+        //    var sb = new StringBuilder();
+        //    sb.Append(query);
+        //    sb.Append("AdtoneServerAdvertId=@AdvertId;");
 
-            //Model.Advert advert = _advertRepository.GetById(command.AdvertId);
-            var advertDetail = _advertRepository.GetById(command.AdvertId);
-            advertDetail.Status = command.Status;
-            advertDetail.UpdatedBy = command.UpdatedBy;
-            _advertRepository.Update(advertDetail);
-            var ConnString = ConnectionString.GetConnectionStringByCountryId(advertDetail.CountryId);
-            if (ConnString != null && ConnString.Count() > 0)
-            {
-                foreach (var item in ConnString)
-                {
-                    EFMVCDataContex db = new EFMVCDataContex(item);
-                    var externalServerUserId = OperatorServer.GetUserIdFromOperatorServer(db, (int)command.UpdatedBy);
-                    var advertData = db.Adverts.Where(s => s.AdtoneServerAdvertId == command.AdvertId).FirstOrDefault();
-                    if (advertData != null)
-                    {
-                        advertData.Status = command.Status;
-                        if (externalServerUserId != 0)
-                        {
-                            advertData.UpdatedBy = command.UpdatedBy;
-                        }
-                        else
-                        {
-                            advertData.UpdatedBy = null;
-                        }
+        //    //Model.Advert advert = _advertRepository.GetById(command.AdvertId);
+        //    var advertDetail = _advertRepository.GetById(command.AdvertId);
+        //    advertDetail.Status = command.Status;
+        //    advertDetail.UpdatedBy = command.UpdatedBy;
+        //    _advertRepository.Update(advertDetail);
+        //    var ConnString = ConnectionString.GetConnectionStringByCountryId(advertDetail.CountryId);
+        //    if (ConnString != null && ConnString.Count() > 0)
+        //    {
+        //        foreach (var item in ConnString)
+        //        {
+        //            EFMVCDataContex db = new EFMVCDataContex(item);
+        //            var externalServerUserId = OperatorServer.GetUserIdFromOperatorServer(db, (int)command.UpdatedBy);
+        //            var advertData = db.Adverts.Where(s => s.AdtoneServerAdvertId == command.AdvertId).FirstOrDefault();
+        //            if (advertData != null)
+        //            {
+        //                advertData.Status = command.Status;
+        //                if (externalServerUserId != 0)
+        //                {
+        //                    advertData.UpdatedBy = command.UpdatedBy;
+        //                }
+        //                else
+        //                {
+        //                    advertData.UpdatedBy = null;
+        //                }
 
-                        db.SaveChanges();
-                    }
-                }
-            }
-            unitOfWork.Commit();
-            return new CommandResult(true);
-        }
+        //                db.SaveChanges();
+        //            }
+        //        }
+        //    }
+        //    unitOfWork.Commit();
+        //    return new CommandResult(true);
+        //}
 
 
     }

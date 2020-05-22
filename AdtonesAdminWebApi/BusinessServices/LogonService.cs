@@ -48,7 +48,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    user = await connection.QueryFirstOrDefaultAsync<User>(login_query,new { email = userForm.Email.ToLower() });
+                    user = await connection.QueryFirstOrDefaultAsync<User>(login_query,new { email = userForm.email.ToLower() });
                 }
                 if (user != null)
                 {
@@ -190,7 +190,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                 // Send an email with this link
-                string email = EncryptionHelper.EncryptSingleValue(user.Email);
+                string email = EncryptionHelper.EncryptSingleValue(user.email);
 
                 string url = string.Format("{0}?activationCode={1}", _configuration.GetValue<string>(
                                 "AppSettings:AdminResetPassword"), email);
@@ -210,7 +210,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 emailContent = string.Format(emailContent, url);
 
                 MailMessage mail = new MailMessage();
-                mail.To.Add(user.Email);
+                mail.To.Add(user.email);
                 //mail.To.Add("xxx@gmail.com");
                 var whatever = _configuration.GetValue<string>("AppSettings:SiteEmailAddress");
                 mail.From = new MailAddress("support@adtones.com");// _configuration.GetValue<string>("SiteEmailAddress"));

@@ -23,7 +23,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                    FROM
                                                         (SELECT item.UserId, item.RoleId, item.Email, item.DateCreated, item.Activated,
                                                         item.FirstName,item.LastName
-                                                        FROM Users item Where item.VerificationStatus = 1 AND (item.RoleId = 3 OR item.RoleId = 4) item
+                                                        FROM Users item Where item.VerificationStatus = 1 AND (item.RoleId = 3 OR item.RoleId = 4)) item
                                                     LEFT JOIN
                                                         (SELECT a.[UserId], b.[AssignCredit], a.[Id] 
                                                         FROM

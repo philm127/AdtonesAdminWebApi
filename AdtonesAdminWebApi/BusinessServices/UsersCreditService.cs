@@ -277,7 +277,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         #region Long SQL Queries
         private string UserResultQuery()
         {
-            return @"SELECT u.Id,u.UserId,usrs.Email,usrs.Name,usrs.Organisation,u.CreatedDate AS CreatedDateSort,
+            return @"SELECT u.Id,u.UserId,usrs.Email,usrs.FullName,usrs.Organisation,u.CreatedDate,
              u.AssignCredit AS Credit,u.AvailableCredit,ISNULL(bil.FundAmount,0) AS TotalUsed,ISNULL(pay.Amount,0) AS TotalPaid,
              (ISNULL(bil.FundAmount,0) - ISNULL(pay.Amount,0)) AS RemainingAmount
              FROM UsersCredit AS u
@@ -288,7 +288,7 @@ namespace AdtonesAdminWebApi.BusinessServices
              (SELECT UserId,SUM(Amount) AS Amount from UsersCreditPayment GROUP BY UserId) pay
              ON u.UserId=pay.UserId
              LEFT JOIN
-             (SELECT UserId,Email,CONCAT(FirstName,' ',LastName) AS Name,Organisation FROM Users) usrs
+             (SELECT UserId,Email,CONCAT(FirstName,' ',LastName) AS FullName,Organisation FROM Users) usrs
              ON usrs.UserId=u.UserId
              ORDER BY u.Id DESC;";
         }

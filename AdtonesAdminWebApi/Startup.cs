@@ -123,11 +123,14 @@ namespace AdtonesAdminWebApi
 
             app.UseHttpsRedirection();
 
+
             app.UseRouting();
 
             app.UseAuthentication();
 
             app.UseAuthorization();
+            // REST Headers
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             app.UseEndpoints(endpoints =>
             {

@@ -14,7 +14,7 @@ using System.Linq;
 namespace AdtonesAdminWebApi.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]//(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize]
     [ApiController]
     public class SharedListController : ControllerBase
     {
