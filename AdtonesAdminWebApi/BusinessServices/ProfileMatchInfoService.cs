@@ -52,7 +52,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                         await connection.OpenAsync();
                         result.body = await connection.QueryAsync<ProfileMatchInformationFormModel>(@"SELECT prof.Id,prof.ProfileName,
-                                                                                        prof.ProfileType,prof.CountryId, c.Name,prof.IsActive 
+                                                                                        prof.ProfileType,prof.CountryId, c.Name AS CountryName,prof.IsActive 
                                                                                         FROM ProfileMatchInformations AS prof 
                                                                                         LEFT JOIN Country AS c ON prof.CountryId=c.Id");
                 }

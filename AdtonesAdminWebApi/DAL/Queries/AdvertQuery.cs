@@ -15,7 +15,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
     public class AdvertQuery : IAdvertQuery
     {
         public string GetAdvertResultSet => @"SELECT ad.AdvertId,ad.UserId,ad.ClientId,ad.AdvertName,ad.Brand,ad.MediaFileLocation,ISNULL(cl.Name,'-') AS ClientName,
-                                                CONCAT(usr.FirstName,' ',usr.LastName) AS UserName, usr.Email,ad.CreatedDateTime,ad.Script,ad.Status,
+                                                CONCAT(usr.FirstName,' ',usr.LastName) AS UserName, usr.Email,ad.CreatedDateTime AS CreatedDate,ad.Script,ad.Status,
                                                 CASE WHEN ad.ScriptFileLocation IS NULL THEN ad.ScriptFileLocation 
                                                     ELSE @siteAddress + ad.ScriptFileLocation END AS ScriptFileLocation
                                                 FROM Advert AS ad LEFT JOIN Client AS cl ON ad.ClientId=cl.Id

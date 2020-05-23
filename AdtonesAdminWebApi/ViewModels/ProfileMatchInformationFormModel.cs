@@ -11,7 +11,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string ProfileName { get; set; }
 
         public bool IsActive { get; set; }
-
+        public string Active => IsActive ? "True" : "False";
         public int CountryId { get; set; }
         public string CountryName { get; set; }
         public string ProfileType { get; set; }
