@@ -31,8 +31,10 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
-                    result.body = await connection.QueryAsync<CountryResult>(@"SELECT Id,Name,ShortName,CountryCode,CreatedDate,Status,TaxPercentage 
-                                                                             FROM Country ORDER BY Id DESC");
+                    result.body = await connection.QueryAsync<CountryResult>(@"SELECT c.Id,c.Name,c.ShortName,c.CountryCode,c.CreatedDate,c.Status,
+                                                                                    ISNULL(t.TaxPercantage,0) AS TaxPercentage 
+                                                                                    FROM Country AS c LEFT JOIN CountryTax AS t ON c.Id = t.CountryId
+                                                                                    ORDER BY c.Id DESC");
                 }
 
             }
@@ -79,7 +81,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> AddCountry(CountryFormModel countrymodel)
+        public async Task<ReturnResult> AddCountry(CountryResult countrymodel)
         {
             try
             {
@@ -134,7 +136,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> UpdateCountry(CountryFormModel countrymodel)
+        public async Task<ReturnResult> UpdateCountry(CountryResult countrymodel)
         {
             var TermAndConditionFileName = countrymodel.file;
             try
@@ -186,7 +188,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        private bool CheckIfCountryExists(CountryFormModel label)
+        private bool CheckIfCountryExists(CountryResult label)
         {
             bool countryExist = false;
             using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))

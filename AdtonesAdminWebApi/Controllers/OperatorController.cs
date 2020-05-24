@@ -13,7 +13,7 @@ namespace AdtonesAdminWebApi.Controllers
     {
         private readonly IOperatorConfigService _operatorConfigService;
         private readonly IOperatorService _operatorService;
-
+        
 
         public OperatorController(IOperatorConfigService operatorConfigService, IOperatorService operatorService)
         {
@@ -73,13 +73,12 @@ namespace AdtonesAdminWebApi.Controllers
 
         #region Operator Service
 
-
         /// <summary>
         /// 
         /// </summary>
-        /// <returns>body contains List OperatorResult</returns>
-        [HttpPost("v1/LoadOperatorDataTable")]
-        public async Task<ReturnResult> LoadOperatorDataTable()
+        /// <returns>body contains OperatorResultModel</returns>
+        [HttpGet("v1/GetOperators")]
+        public async Task<ReturnResult> GetOperators()
         {
             return await _operatorService.LoadOperatorDataTable();
         }

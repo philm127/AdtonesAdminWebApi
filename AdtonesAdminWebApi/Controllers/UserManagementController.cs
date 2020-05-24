@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AdtonesAdminWebApi.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserManagementController : ControllerBase
@@ -40,6 +40,17 @@ namespace AdtonesAdminWebApi.Controllers
         public async Task<ReturnResult> GetAdvertiserTable()
         {
             return await _dashboardService.LoadAdvertiserDataTable();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List OperatorResult</returns>
+        [HttpGet("v1/LoadOperatorDataTable")]
+        public async Task<ReturnResult> LoadOperatorDataTable()
+        {
+            return await _dashboardService.LoadOperatorDataTable();
         }
 
 

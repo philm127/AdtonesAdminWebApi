@@ -8,7 +8,7 @@ namespace AdtonesAdminWebApi.ViewModels
     public class OperatorResult
     {
         public int OperatorId { get; set; }
-        public string Name { get; set; }
+        public string OperatorName { get; set; }
 
         public int? CountryId { get; set; }
         public string CountryName { get; set; }
@@ -18,4 +18,5 @@ namespace AdtonesAdminWebApi.ViewModels
         public decimal SmsCost { get; set; }
         public string Currency { get; set; }
     }
+
 }

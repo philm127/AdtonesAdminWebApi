@@ -49,7 +49,9 @@ namespace AdtonesAdminWebApi.ViewModels
     public class SubscriberDashboardResult : UserDashboardData
     {
         public int CountryId { get; set; }
+        public string CountryName { get; set; }
         public int OperatorId { get; set; }
+        public string OperatorName { get; set; }
         public string MSISDN { get; set; }
     }
 }

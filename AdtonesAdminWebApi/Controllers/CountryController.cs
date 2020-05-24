@@ -56,7 +56,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// <param name="countrymodel"></param>
         /// <returns>body contains number 1 on success</returns>
         [HttpPost("v1/AddCountry")]
-        public async Task<ReturnResult> AddCountry([FromForm] CountryFormModel countrymodel)
+        public async Task<ReturnResult> AddCountry([FromForm] CountryResult countrymodel)
         {
             return await _countryService.AddCountry(countrymodel);
         }
@@ -68,7 +68,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// <param name="countrymodel"></param>
         /// <returns>body contains number 1 on success</returns>
         [HttpPut("v1/UpdateCountry")]
-        public async Task<ReturnResult> UpdateCountry([FromForm]CountryFormModel countrymodel)
+        public async Task<ReturnResult> UpdateCountry([FromForm]CountryResult countrymodel)
         {
             return await _countryService.UpdateCountry(countrymodel);
         }

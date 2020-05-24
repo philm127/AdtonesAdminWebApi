@@ -9,8 +9,8 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     public interface ICountryService
     {
         Task<ReturnResult> LoadDataTable();
-        Task<ReturnResult> AddCountry(CountryFormModel countrymodel);
-        Task<ReturnResult> UpdateCountry(CountryFormModel countrymodel);
+        Task<ReturnResult> AddCountry(CountryResult countrymodel);
+        Task<ReturnResult> UpdateCountry(CountryResult countrymodel);
         Task<ReturnResult>GetCountry(IdCollectionViewModel countrymodel);
     }
 }

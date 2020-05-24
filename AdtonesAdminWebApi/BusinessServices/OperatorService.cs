@@ -29,8 +29,8 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> LoadOperatorDataTable()
         {
-            var select_query = @"SELECT OperatorId,OperatorName,ISNULL(co.CountryName, '-') AS CountryName,op.IsActive,
-                                EmailCost,SmaCost,cu.CurrencyCode
+            var select_query = @"SELECT OperatorId,OperatorName,ISNULL(co.Name, '-') AS CountryName,op.IsActive,
+                                EmailCost,SmsCost,cu.CurrencyCode AS Currency
                                 FROM Operators AS op LEFT JOIN Country co ON op.CountryId=co.Id
                                 LEFT JOIN Currencies cu ON cu.CurrencyId = op.CurrencyId";
 
