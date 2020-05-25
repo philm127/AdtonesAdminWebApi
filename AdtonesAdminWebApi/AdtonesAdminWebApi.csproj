@@ -30,6 +30,7 @@
     <Compile Remove="BusinessServices\Interfaces\ICampaignService.cs" />
     <Compile Remove="BusinessServices\SafaricomPromotionalUserService.cs" />
     <Compile Remove="Controllers\AreaController.cs" />
+    <Compile Remove="Controllers\RewardController.cs" />
     <Compile Remove="Controllers\WeatherForecastController.cs" />
     <Compile Remove="OperatorSpecific\ExpressoPromotionalCampaign.cs" />
     <Compile Remove="Services\AuthenticationExtension.cs" />

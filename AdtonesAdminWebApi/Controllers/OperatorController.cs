@@ -62,7 +62,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains nothing</returns>
-        [HttpPost("v1/UpdateOperatorConfig")]
+        [HttpPut("v1/UpdateOperatorConfig")]
         public async Task<ReturnResult> UpdateOperatorConfig(OperatorConfigurationResult model)
         {
             return await _operatorConfigService.UpdateOperatorConfig(model);
@@ -123,7 +123,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains List OperatorMaxAdvertsFormModel</returns>
-        [HttpPost("v1/LoadOperatorMaxAdvertDataTable")]
+        [HttpGet("v1/LoadOperatorMaxAdvertDataTable")]
         public async Task<ReturnResult> LoadOperatorMaxAdvertDataTable()
         {
             return await _operatorService.LoadOperatorMaxAdvertDataTable();

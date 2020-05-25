@@ -10,7 +10,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int OperatorConfigurationId { get; set; }
         public int Days { get; set; }
         public bool IsActive { get; set; }
-        public string Addeddate { get; set; }
+        public DateTime CreatedDate { get; set; }
         public int OperatorId { get; set; }
         public string OperatorName { get; set; }
     }

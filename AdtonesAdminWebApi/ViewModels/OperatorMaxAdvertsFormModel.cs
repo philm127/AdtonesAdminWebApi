@@ -13,9 +13,7 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public string KeyValue { get; set; }
 
-        public DateTime Addeddate { get; set; }
-
-        public Nullable<DateTime> Updateddate { get; set; }
+        public DateTime CreatedDate { get; set; }
 
         public int OperatorId { get; set; }
         public string OperatorName { get; set; }

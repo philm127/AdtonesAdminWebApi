@@ -166,7 +166,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> LoadOperatorMaxAdvertDataTable()
         {
-            var select_query = @"SELECT OperatorMaxAdvertId,KeyName,KeyValue,Addeddate,maxad.OperatorId,op.OperatorName
+            var select_query = @"SELECT OperatorMaxAdvertId,KeyName,KeyValue,Addeddate AS CreatedDate,maxad.OperatorId,op.OperatorName
                                  FROM OperatorMaxAdverts AS maxad INNER JOIN Operators AS op ON op.OperatorId=maxad.OperatorId";
 
             try

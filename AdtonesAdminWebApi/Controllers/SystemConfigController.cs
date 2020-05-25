@@ -12,10 +12,12 @@ namespace AdtonesAdminWebApi.Controllers
     public class SystemConfigController : ControllerBase
     {
         private ISystemConfigService _configService;
+        private IRewardsService _rewardService;
 
-        public SystemConfigController(ISystemConfigService configService)
+        public SystemConfigController(ISystemConfigService configService, IRewardsService rewardService)
         {
             _configService = configService;
+            _rewardService = rewardService;
         }
 
 
@@ -65,5 +67,61 @@ namespace AdtonesAdminWebApi.Controllers
         {
             return await _configService.UpdateSystemConfig(model);
         }
+
+
+        #region Rewards
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>body contains List RewardResult</returns>
+        [HttpGet("v1/LoadRewardsDataTable")]
+        public async Task<ReturnResult> LoadRewardsDataTable()
+        {
+            return await _rewardService.LoadRewardsDataTable();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>body contains RewardResult</returns>
+        [HttpGet("v1/GetReward")]
+        public async Task<ReturnResult> GetReward(IdCollectionViewModel model)
+        {
+            return await _rewardService.GetReward(model.id);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>body contains RewardResult</returns>
+        [HttpPost("v1/AddReward")]
+        public async Task<ReturnResult> AddReward(RewardResult model)
+        {
+            return await _rewardService.AddReward(model);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>body contains nothing</returns>
+        [HttpPut("v1/UpdateReward")]
+        public async Task<ReturnResult> UpdateReward(RewardResult model)
+        {
+            return await _rewardService.UpdateReward(model);
+        }
+
+
+
+        #endregion
     }
 }

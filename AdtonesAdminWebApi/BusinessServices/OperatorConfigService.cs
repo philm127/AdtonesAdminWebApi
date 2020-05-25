@@ -27,7 +27,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> LoadOperatorConfigurationDataTable()
         {
-            var select_query = @"SELECT OperatorConfigurationId,con.OperatorId,Days,con.IsActive,AddedDate,op.OperatorName
+            var select_query = @"SELECT OperatorConfigurationId,con.OperatorId,Days,con.IsActive,AddedDate AS CreatedDate,op.OperatorName
                                 FROM dbo.OperatorConfigurations AS con INNER JOIN Operators AS op ON op.OperatorId=con.OperatorId";
 
             try
