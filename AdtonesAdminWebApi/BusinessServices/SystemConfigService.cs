@@ -28,7 +28,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> LoadSystemConfigurationDataTable()
         {
-            var select_query = @"SELECT SystemConfigId,SystemConfigKey,SystemConfigValue,CreatedDateTime,
+            var select_query = @"SELECT SystemConfigId,SystemConfigKey,SystemConfigValue,CreatedDateTime AS CreatedDate,
                                                         ISNULL(SystemConfigType,'-') AS SystemConfigType
                                                         FROM SystemConfig";
 
@@ -58,7 +58,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> GetSystemConfig(int id)
         {
-            var select_query = @"SELECT SystemConfigId,SystemConfigKey,SystemConfigValue,CreatedDateTime,
+            var select_query = @"SELECT SystemConfigId,SystemConfigKey,SystemConfigValue,CreatedDate,
                                     ISNULL(SystemConfigType,'-') AS SystemConfigType
                                     FROM SystemConfig
                                     WHERE SystemConfigId=@Id";

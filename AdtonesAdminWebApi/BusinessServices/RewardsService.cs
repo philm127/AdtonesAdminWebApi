@@ -25,7 +25,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         public async Task<ReturnResult> LoadRewardsDataTable()
         {
             var select_query = @"SELECT RewardId,RewardName,CONVERT(DECIMAL(18,2),replace(RewardValue, ',', '')) AS RewardValue,
-                                                    r.AddedDate,r.UpdatedDate,r.OperatorId,op.OperatorName
+                                                    r.AddedDate AS CreatedDate,r.OperatorId,op.OperatorName
                                                       FROM Rewards AS r LEFT JOIN Operators AS op ON r.OperatorId=op.OperatorId
                                                       ORDER BY r.AddedDate DESC";
 
@@ -56,7 +56,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         public async Task<ReturnResult> GetReward(int id)
         {
             var select_query = @"SELECT RewardId,RewardName,CONVERT(DECIMAL(18,2),replace(RewardValue, ',', '')) AS RewardValue,
-                                                    r.AddedDate,r.UpdatedDate,r.OperatorId,op.OperatorName
+                                                    r.AddedDate,r.UpdatedDate AS CreatedDate,r.OperatorId,op.OperatorName
                                                       FROM Rewards AS r LEFT JOIN Operators AS op ON r.OperatorId=op.OperatorId
                                                        WHERE RewardId=@Id";
 

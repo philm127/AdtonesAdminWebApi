@@ -19,7 +19,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string AdvertName { get; set; }
         public string AdvertLocation { get; set; }
         public int Status { get; set; }
-        public string rStatus { get; set; }
+        public string rStatus => Status == 1 ? "Play" : "Stop";
         public IFormFile Files { get; set; }
     }
 }

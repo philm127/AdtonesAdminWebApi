@@ -54,6 +54,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IRewardsService, RewardsService>();
             services.AddScoped<ITicketService, TicketService>();
             services.AddScoped<IAdvertService, AdvertService>();
+            services.AddScoped<ICampaignService, CampaignService>();
 
 
             // Use DAL. 
@@ -62,6 +63,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ITicketDAL, TicketDAL>();
             services.AddScoped<IAdvertDAL, AdvertDAL>();
             services.AddScoped<IAreaDAL, AreaDAL>();
+            services.AddScoped<ICampaignDAL, CampaignDAL>();
             services.AddScoped<ICheckExistsDAL, CheckExistsDAL>();
             services.AddScoped<IUserDashboardDAL, UserDashboardDAL>();
             services.AddScoped<IProvisionServerDAL, ProvisionServerDAL>();
@@ -75,6 +77,7 @@ namespace AdtonesAdminWebApi
             services.AddTransient<ITicketQuery, TicketQuery>();
             services.AddTransient<IUserDashboardQuery, UserDashboardQuery>();
             services.AddTransient<IAdvertQuery, AdvertQuery>();
+            services.AddTransient<ICampaignQuery, CampaignQuery>();
             services.AddTransient<IAreaQuery, AreaQuery>();
             services.AddTransient<ICheckExistsQuery, CheckExistsQuery>();
             services.AddTransient<IProvisionServerQuery, ProvisionServerQuery>();

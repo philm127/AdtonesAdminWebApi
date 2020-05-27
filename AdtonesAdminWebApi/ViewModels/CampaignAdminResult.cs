@@ -20,10 +20,11 @@ namespace AdtonesAdminWebApi.ViewModels
         public decimal TotalBudget { get; set; }
         public int finaltotalplays { get; set; }
         public decimal FundsAvailable { get; set; }
-        public decimal totalaveragebid { get; set; }
-        public decimal totalspend { get; set; }
+        public decimal AvgBidValue { get; set; }
+        public decimal TotalSpend { get; set; }
         public int Status { get; set; }
-        public DateTime CreatedDateTime { get; set; }
+        public string rStatus => $"{(Enums.CampaignStatus)Status}";
+        public DateTime CreatedDate { get; set; }
 
         public int TicketCount { get; set; }
         public bool IsAdminApproval { get; set; }

@@ -14,7 +14,7 @@ namespace AdtonesAdminWebApi.Enums
         Archive = 5,
         // Waitingforadapproval = 6,
         InProgress = 7,
-        CampaignPausedDueToInsufficientFunds = 8,
+        InsufficientFunds = 8,
         // Waitingforadminapproval = 9
         waitingforapproval = 6,
     }

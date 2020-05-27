@@ -20,10 +20,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string SystemConfigType { get; set; }
 
 
-        public DateTime CreatedDateTimeSort { get; set; }
-        public string CreatedDateTime { get; set; }
-
-        public DateTime UpdatedDateTime { get; set; }
+        public DateTime CreatedDate { get; set; }
 
     }
 }

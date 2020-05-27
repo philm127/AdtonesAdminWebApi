@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdtonesAdminWebApi.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,15 +39,15 @@ namespace AdtonesAdminWebApi.ViewModels
         public string QuestionSubject { get; set; }
 
         public int Status { get; set; }
-        public string fStatus { get; set; }
-        
+        public string fstatus => $"{(QuestionStatus)Status}";
+
         public DateTime? LastResponseDatetime { get; set; }
 
         public DateTime? LastResponseDateTimeByUser { get; set; }
 
         public int? PaymentMethodId { get; set; }
+        public string PaymentMethod { get; set; }
 
-        public int? fPaymentMethodId { get; set; }
 
         public int UpdatedBy { get; set; }
     }
