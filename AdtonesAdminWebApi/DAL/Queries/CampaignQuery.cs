@@ -14,7 +14,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
     public class CampaignQuery : ICampaignQuery
     {
-        public string GetCampaignResultSet => @"SELECT camp.CampaignProfileId,camp.UserId,u.Email,CONCAT(u.FirstName,'',u.LastName) AS UserName
+        public string GetCampaignResultSet => @"SELECT camp.CampaignProfileId,camp.UserId,u.Email,CONCAT(u.FirstName,'',u.LastName) AS UserName,op.OperatorName
                                                 ,camp.ClientId, ISNULL(cl.Name,'-') AS ClientName,CampaignName,TotalBudget,camp.CreatedDateTime AS CreatedDate
                                                 ,camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,camp.TotalBudget,
                                                 CASE WHEN bill.Id>0 THEN camp.Status ELSE 8 END AS Status,play.AvgBidValue,play.TotalSpend,
@@ -38,7 +38,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
 			                                                WHERE LOWER(Status)='played' AND PlayLengthTicks>6000
 			                                                GROUP BY CampaignProfileId
 		                                                ) AS play
-                                                ON camp.CampaignProfileId=play.CampaignProfileId;";
+                                                ON camp.CampaignProfileId=play.CampaignProfileId
+                                                LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId;";
 
 
         public string GetPromoCampaignResultSet =>  @"SELECT promo.ID,promo.OperatorID,op.OperatorName,promo.CampaignName,promo.BatchID,MaxDaily,MaxWeekly,

@@ -8,7 +8,7 @@ namespace AdtonesAdminWebApi.ViewModels
     public class AdvertCategoryResult
     {
         public int AdvertCategoryId { get; set; }
-        public string Name { get; set; }
+        public string CategoryName { get; set; }
 
         public int? CountryId { get; set; }
         public string CountryName { get; set; }

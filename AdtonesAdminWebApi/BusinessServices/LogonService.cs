@@ -13,6 +13,10 @@ using System.IO;
 using System.Net.Mail;
 using Microsoft.AspNetCore.Hosting;
 using AdtonesAdminWebApi.Services;
+using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.DAL.Queries;
+using Microsoft.AspNetCore.Http;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -20,17 +24,25 @@ namespace AdtonesAdminWebApi.BusinessServices
     {
         private readonly IConfiguration _configuration;
         private readonly AuthSettings _appSettings;
+        private ILoginQuery _commandText;
+        private readonly IHttpContextAccessor _httpAccessor;
         private IWebHostEnvironment _env;
+        private readonly ILoginDAL _loginDAL;
 
         ReturnResult result = new ReturnResult();
 
         private const int PASSWORD_HISTORY_LIMIT = 8;
 
-        public LogonService(IConfiguration configuration, IOptions<AuthSettings> appSettings, IWebHostEnvironment env)
+        public LogonService(IConfiguration configuration, IOptions<AuthSettings> appSettings, IWebHostEnvironment env,
+                                ILoginDAL loginDAL, ILoginQuery commandText, IHttpContextAccessor httpAccessor)
         {
             _configuration = configuration;
             _appSettings = appSettings.Value;
             _env = env;
+            _loginDAL = loginDAL;
+            _commandText = commandText;
+            _httpAccessor = httpAccessor;
+
         }
 
 
@@ -38,26 +50,44 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             User user = new User();
             try
-            {
-                int usererror = 0;
+            {                
+                    user = await _loginDAL.GetLoginUser(_commandText.LoginUser, userForm);
 
-                var login_query = @"SELECT UserId,RoleId,Email,FirstName,LastName,PasswordHash,Activated,
-                                    OperatorId, Organisation, DateCreated, VerificationStatus
-                                    FROM Users WHERE LOWER(Email)=@email AND Activated !=3; ";
-
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    user = await connection.QueryFirstOrDefaultAsync<User>(login_query,new { email = userForm.email.ToLower() });
-                }
                 if (user != null)
                 {
+                    if (PasswordExpiredAttribute(user))
+                    {
+                        result.result = 0;
+                        result.error = "Your Password has expired please reset it";
+                        return result;
+                    }
+
                     if (user.VerificationStatus == false)
                     {
                         // ModelState.AddModelError("", "Please verify your email account.");
                         result.result = 0;
                         result.error = "Please verify your email account.";
-                        usererror = -1;
+                        return result;
+                    }
+                    // 4 is user has been blocked for too many incorrect login attempts.
+                    else if (user.Activated == 4)
+                    {
+                        DateTime date1 = user.LockOutTime.Value;
+                        DateTime date2 = DateTime.Now;
+                        TimeSpan ts = date2 - date1;
+                        if ((int)ts.Minutes < 15)
+                        {
+                            int remainingminutes = 15 - ts.Minutes;
+                            result.result = 0;
+                            result.error = "Your account is locked, Kindly try again after " + remainingminutes + " minute(s)";
+                            return result;
+                        }
+                        else
+                        {
+                            user.Activated = (int)Enums.UserStatus.Approved;
+                            user.LockOutTime = null;
+                            var x = await _loginDAL.UpdateUserLockout(_commandText.UpdateLockout, userForm);
+                        }
                     }
                     else if (user.Activated == 0)
                     {
@@ -65,28 +95,37 @@ namespace AdtonesAdminWebApi.BusinessServices
                         {
                             result.result = 0;
                             result.error = "Your account has been InActive by adtones administrator.so, Please contact adtones admin.";
-                            usererror = -1;
+                            return result;
                         }
                         else
                         {
                             result.result = 0;
-                            result.error = "Your account is not approved by adtones administrator so please contact adtones admin.";
-                            usererror = -1;
+                            result.error = "Your account is not approved by Adtones so please contact Adtones Admin.";
+                            return result;
                         }
-                    }
-                    else if (user.Activated == 1)
-                    {
-                        //if (user.OperatorId == (int)OperatorTableId.Safaricom)
-                        //{
-                        //    ModelState.AddModelError("", "The user name or password provided is incorrect.");
-                        //    usererror = -1;
-                        //}
                     }
                     else if (user.Activated == 2)
                     {
                         result.result = 0;
-                        result.error = "Your account is  suspended by adtones administrator so please contact adtones admin.";
-                        usererror = -1;
+                        result.error = "Your account has been suspended by Adtones, please contact Adtones admin.";
+                        return result;
+                    }
+                    else if (user.Activated == 3)
+                    {
+                        result.result = 0;
+                        result.error = "Your account has been deleted by adtones administrator so please contact adtones admin.";
+                       return result;
+                    }
+                    if (ValidatePassword(user, userForm))
+                    {
+                        var jwt = new AuthService(_configuration);
+                        user.Token = jwt.GenerateSecurityToken(user);
+                    }
+                    else
+                    {
+                        result.result = 0;
+                        result.error = "The user name and/or password provided is incorrect.";
+                        user = null;
                     }
                 }
                 else
@@ -95,31 +134,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     {
                         result.result = 0;
                         result.error = "The user name or password provided is incorrect.";
-                        usererror = -1;
-                    }
-                    else
-                    {
-                        if (user.Activated == 3)
-                        {
-                            result.result = 0;
-                            result.error = "Your account has been deleted by adtones administrator so please contact adtones admin.";
-                            usererror = -1;
-                        }
-                    }
-                }
-                if (usererror == 0)
-                {
-                    if (ValidatePassword(user, userForm))
-                    {
-                        var jwt = new AuthService(_configuration);
-                        user.Token = jwt.GenerateSecurityToken(user);
-                        user.PasswordHash = string.Empty;
-                    }
-                    else
-                    {
-                        result.result = 0;
-                        result.error = "The user name and/or password provided is incorrect.";
-                        user = null;
+                        return result;
                     }
                 }
             }
@@ -190,7 +205,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                 // Send an email with this link
-                string email = EncryptionHelper.EncryptSingleValue(user.email);
+                string email = EncryptionHelper.EncryptSingleValue(user.Email);
 
                 string url = string.Format("{0}?activationCode={1}", _configuration.GetValue<string>(
                                 "AppSettings:AdminResetPassword"), email);
@@ -210,7 +225,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 emailContent = string.Format(emailContent, url);
 
                 MailMessage mail = new MailMessage();
-                mail.To.Add(user.email);
+                mail.To.Add(user.Email);
                 //mail.To.Add("xxx@gmail.com");
                 var whatever = _configuration.GetValue<string>("AppSettings:SiteEmailAddress");
                 mail.From = new MailAddress("support@adtones.com");// _configuration.GetValue<string>("SiteEmailAddress"));
@@ -323,6 +338,21 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        private bool PasswordExpiredAttribute(User user)
+        {
+
+                int PasswordExpiresInDays = int.Parse(_configuration.GetSection("AppSettings").GetSection("PasswordExpiresInDays").Value);
+
+                TimeSpan ts = DateTime.Today - user.LastPasswordChangedDate;
+
+                if (ts.TotalDays > PasswordExpiresInDays)
+                    return true;
+                else
+                    return false;
+
+        }
+
+
         private bool ValidatePassword(User user,User userForm)
         {
             try
@@ -344,7 +374,68 @@ namespace AdtonesAdminWebApi.BusinessServices
                 return false;
             }
         }
-    
-    
+
+
+        private async Task<ReturnResult> InvalidLoginAttemps(User user)
+        {
+            result.result = 0;
+            try
+            {
+                user.cntAttemps++;
+                if (user.cntAttemps == 1 || user.cntAttemps == 2 || user.cntAttemps == 3)
+                    result.error = $"Invalid login attempt(s) {{user.cntAttemps}}, attempts remaining  {{Convert.ToInt32(5 - user.cntAttemps).ToString()}}";
+                else if (user.cntAttemps == 4)
+                {
+                    result.error = $"Invalid login attempt(s) {{user.cntAttemps}}. Last attempt remaining.";
+                }
+                if (user.cntAttemps == 5)
+                {
+                    var x = await BlockUser(user);
+
+                    user.cntAttemps = 0;
+                    result.error = "Your account is locked, Kindly try again after 15 minutes";
+                }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "LogonService",
+                    ProcedureName = "InvalidLoginAttempts"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            result.body = user;
+            return result;
+        }
+
+
+        public async Task<int> BlockUser(User user)
+        {
+            try
+            {
+                user.Activated = (int)Enums.UserStatus.Blocked;
+                user.LockOutTime = DateTime.Now;
+                return await _loginDAL.UpdateUserLockout(_commandText.UpdateLockout, user);
+
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "LogonService",
+                    ProcedureName = "BlockUser"
+                };
+                _logging.LogError();
+                return 0;
+            }
+        }
+
+
     }
 }

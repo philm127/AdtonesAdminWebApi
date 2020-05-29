@@ -30,6 +30,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public bool IsAdminApproval { get; set; }
         public int CountryId { get; set; }
         public int OperatorId { get; set; }
+        public string OperatorName { get; set; }
 
     }
 }

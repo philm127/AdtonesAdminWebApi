@@ -23,7 +23,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public DateTime? CreatedDate { get; set; }
 
         public int Status { get; set; }
-        public string fstatus => $"{(Enums.AdvertStatus)Status}";
+        public string rStatus => $"{(Enums.AdvertStatus)Status}";
         public string RejectionReason { get; set; }
         public int UpdatedBy { get; set; }
 

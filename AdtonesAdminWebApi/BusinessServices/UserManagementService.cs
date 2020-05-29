@@ -441,7 +441,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 /// TODO: Check what other user types have as defaults.
                 var command = new User();
 
-                command.email = model.email;
+                command.Email = model.Email;
                 command.FirstName = model.FirstName;
                 command.LastName = model.LastName;
                 command.PasswordHash = Md5Encrypt.Md5EncryptPassword(model.PasswordHash);
@@ -492,7 +492,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     command1.UserId = registeredId;
                     command1.MobileNumber = model.MobileNumber;
                     command1.FixedLine = null;
-                    command1.Email = model.email;
+                    command1.Email = model.Email;
                     command1.PhoneNumber = model.PhoneNumber;
                     command1.Address = model.Address;
                     command1.CountryId = model.CountryId;
@@ -587,7 +587,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     Id = model.Id,
                     MobileNumber = model.MobileNumber,
                     FixedLine = model.FixedLine,
-                    Email = model.email,
+                    Email = model.Email,
                     PhoneNumber = model.PhoneNumber,
                     Address = model.Address,
                     CountryId = model.CountryId,
@@ -679,7 +679,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     exists = await connection.ExecuteScalarAsync<bool>(@"SELECT COUNT(1) FROM Users WHERE LOWER(Email) = @email;",
-                                                                  new { email = model.email.ToLower() });
+                                                                  new { email = model.Email.ToLower() });
                 }
             }
             return exists;

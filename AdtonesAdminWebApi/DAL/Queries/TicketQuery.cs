@@ -17,7 +17,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
     {
         public string GetLoadTicketDatatable => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,q.ClientId,PaymentMethodId,ISNULL(pay.Name,'-') AS PaymentMethod,
                                                     ISNULL(CONCAT(u.FirstName,' ',u.LastName), '-') AS UserName,
-                                                    ISNULL(u.Email, '-') AS Email,QNumber,
+                                                    ISNULL(u.Email, '-') AS Email,ISNULL(QNumber,'-') AS QNumber,
                                                     ISNULL(cl.Name,'-') AS ClientName,q.CampaignProfileId,camp.CampaignName,q.CreatedDate,
                                                     Title,q.Status,LastResponseDateTime,LastResponseDateTimeByUser,
                                                     ISNULL(u.Organisation,'-') AS Organisation

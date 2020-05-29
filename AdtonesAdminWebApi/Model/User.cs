@@ -14,7 +14,7 @@ namespace AdtonesAdminWebApi.Model
 
         public int OperatorId { get; set; }
 
-        public string email { get; set; }
+        public string Email { get; set; }
 
         public string FirstName { get; set; }
 
@@ -28,7 +28,7 @@ namespace AdtonesAdminWebApi.Model
         public string Organisation { get; set; }
         public Nullable<System.DateTime> LastLoginTime { get; set; }
         public int Activated { get; set; }
-        public string fstatus => $"{(UserStatus)Activated}";
+        public string rStatus => $"{(UserStatus)Activated}";
         public int RoleId { get; set; }
         public string Role => $"{(UserRole)RoleId}";
         public bool VerificationStatus { get; set; }
@@ -49,6 +49,8 @@ namespace AdtonesAdminWebApi.Model
         public bool IsSessionFlag { get; set; }
         public Nullable<System.DateTime> LockOutTime { get; set; }
         public DateTime LastPasswordChangedDate { get; set; }
+        // How many times user has tried to login.
+        public int cntAttemps { get; set; }
 
     }
 }

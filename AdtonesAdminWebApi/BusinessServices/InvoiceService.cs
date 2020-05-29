@@ -180,10 +180,10 @@ namespace AdtonesAdminWebApi.BusinessServices
         private string GetInvoiceResultSet()
         {
             string select_query = @"SELECT bil.Id,bil.InvoiceNumber,bil.PONumber,bil.ClientId,ISNULL(cl.Name,'-') AS ClientName,
-                    ucp.CampaignProfileId as CampaignId,camp.CampaignName,bil.PaymentDate AS InvoiceDate,
-                    ucp.Amount as InvoiceTotal,(Case WHEN bil.Status=3 THEN 'Fail' ELSE 'Paid' END) as status,bil.SettledDate,
-                    (CASE WHEN bil.PaymentMethodId=1 THEN 'Cheque' ELSE pay.Description END) AS MethodOfPayment,
-                    bil.PaymentMethodId,bil.Status as fstatus,ucp.UserId,CONCAT(usr.FirstName,' ',usr.LastName) as UserName,
+                    ucp.CampaignProfileId as CampaignId,camp.CampaignName,bil.PaymentDate AS CreatedDate,
+                    ucp.Amount as InvoiceTotal,(Case WHEN bil.Status=3 THEN 'Fail' ELSE 'Paid' END) as rStatus,bil.SettledDate,
+                    (CASE WHEN bil.PaymentMethodId=1 THEN 'Cheque' ELSE pay.Description END) AS PaymentMethod,
+                    bil.PaymentMethodId,bil.Status as Status,ucp.UserId,CONCAT(usr.FirstName,' ',usr.LastName) as FullName,
                     usr.Email,ucp.Id AS UsersCreditPaymentID, ISNULL(usr.Organisation, '-') AS Organisation
                     FROM UsersCreditPayment AS ucp 
                     LEFT JOIN Billing AS bil ON ucp.BillingId=bil.Id 

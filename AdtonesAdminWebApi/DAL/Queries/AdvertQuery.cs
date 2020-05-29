@@ -25,7 +25,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public string GetAdvertDetail => GetAdvertResultSet + " Where ad.AdvertId=@Id";
         
 
-        public string GetAdvertCategoryDataTable => @"SELECT AdvertCategoryId,ac.Name,ac.CountryId, ISNULL(c.Name,'-') AS CountryName, ac.CreatedDate
+        public string GetAdvertCategoryDataTable => @"SELECT AdvertCategoryId,ac.Name AS CategoryName,ac.CountryId, ISNULL(c.Name,'-') AS CountryName, ac.CreatedDate
                                                         FROM AdvertCategories AS ac INNER JOIN Country AS c ON c.Id = ac.CountryId;";
 
 

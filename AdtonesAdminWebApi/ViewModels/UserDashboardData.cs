@@ -18,7 +18,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Activated { get; set; }
-        public string fstatus => $"{(UserStatus)Activated}";
+        public string rStatus => $"{(UserStatus)Activated}";
         public System.DateTime DateCreated { get; set; }
         public string Role => $"{(UserRole)RoleId}";
     }

@@ -10,7 +10,8 @@ namespace AdtonesAdminWebApi.Enums
         Pending = 0,
         Approved = 1,
         Suspended = 2,
-        Deleted = 3
+        Deleted = 3,
+        Blocked = 4
     }
 
 }

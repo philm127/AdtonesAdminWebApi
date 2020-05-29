@@ -67,6 +67,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ICheckExistsDAL, CheckExistsDAL>();
             services.AddScoped<IUserDashboardDAL, UserDashboardDAL>();
             services.AddScoped<IProvisionServerDAL, ProvisionServerDAL>();
+            services.AddScoped<ILoginDAL, LoginDAL>();
 
 
             // DAL Query Execution.
@@ -81,6 +82,7 @@ namespace AdtonesAdminWebApi
             services.AddTransient<IAreaQuery, AreaQuery>();
             services.AddTransient<ICheckExistsQuery, CheckExistsQuery>();
             services.AddTransient<IProvisionServerQuery, ProvisionServerQuery>();
+            services.AddTransient<ILoginQuery, LoginQuery>();
 
             // Special Services
             services.AddScoped<ISaveGetFiles, SaveGetFiles>();
@@ -124,12 +126,12 @@ namespace AdtonesAdminWebApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
 
             app.UseRouting();
 
-            app.UseAuthentication();
+            // app.UseAuthentication();
 
             app.UseAuthorization();
             // REST Headers

@@ -39,7 +39,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string QuestionSubject { get; set; }
 
         public int Status { get; set; }
-        public string fstatus => $"{(QuestionStatus)Status}";
+        public string rStatus => $"{(QuestionStatus)Status}";
 
         public DateTime? LastResponseDatetime { get; set; }
 
