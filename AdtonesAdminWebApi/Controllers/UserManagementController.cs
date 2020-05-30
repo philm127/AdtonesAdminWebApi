@@ -118,7 +118,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPut("v1/ApproveORSuspendUser")]
         public async Task<ReturnResult> ApproveORSuspendUser([FromBodyAttribute] AdvertiserDashboardResult users)
         {
-            return await _userService.ApproveORSuspendUser(users);
+            return await _userService.UpdateUserStatus(users);
         }
 
 

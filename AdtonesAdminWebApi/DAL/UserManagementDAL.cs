@@ -1,83 +1,90 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.Services;
+using AdtonesAdminWebApi.ViewModels;
+using Dapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL
 {
-    
-    public class CountryModel
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        //public bool Active { get; set; }
-    }
+
     public class UserManagementDAL : IUserManagementDAL
     {
-        private readonly IBaseTestDAL _configuration;
+        private readonly IConfiguration _configuration;
+        private readonly string _connStr;
+        private readonly IExecutionCommand _executers;
+        private readonly IHttpContextAccessor _httpAccessor;
+        private readonly IConnectionStringService _connService;
 
-        public UserManagementDAL(IBaseTestDAL config)
+        public UserManagementDAL(IConfiguration configuration, IExecutionCommand executers, IHttpContextAccessor httpAccessor,
+                                   IConnectionStringService connService)
         {
-            _configuration = config;
+            _configuration = configuration;
+            _connStr = _configuration.GetConnectionString("DefaultConnection");
+            _executers = executers;
+            _httpAccessor = httpAccessor;
+            _connService = connService;
         }
 
-        public List<CountryModel> GetList()
+
+        public async Task<int> UpdateUserStatus(string command, AdvertiserDashboardResult model)
         {
-            var listCountryModel = new List<CountryModel>();
+            int x = 0;
+            int operatorId = 0;
+
+            var sb1 = new StringBuilder();
+            sb1.Append(command);
+            sb1.Append("UserId=@userId");
+            
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(sb1.ToString());
+            builder.AddParameters(new { userId = model.UserId });
+            builder.AddParameters(new { Activated = model.Activated });
 
             try
             {
-                var x = "SELECT Id,Name FROM Country";
-                SqlDataReader rdr = _configuration.GetAll(x);
-                    while (rdr.Read())
-                {
-                    listCountryModel.Add(new CountryModel
-                    {
-                        Id = Convert.ToInt32(rdr[0]),
-                        Name = rdr[1].ToString(),
-                        // Active = Convert.ToBoolean(rdr[2])
-                    });
-                }
-                
+                x = await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                throw;
             }
-            return listCountryModel;
+
+            operatorId = _httpAccessor.GetOperatorFromJWT();
+
+            if (operatorId != 0)
+            {
+                var operatorConnectionString = await _connService.GetSingleConnectionString(operatorId);
+
+                var sb2 = new StringBuilder();
+                sb2.Append(command);
+                sb2.Append("AdtoneServerUserId=@userId");
+                var build = new SqlBuilder();
+                var sel = build.AddTemplate(sb2.ToString());
+                build.AddParameters(new { userId = model.UserId });
+                build.AddParameters(new { Activated = model.Activated });
+
+                try
+                {
+                    x = await _executers.ExecuteCommand(operatorConnectionString,
+                                 conn => conn.ExecuteScalar<int>(sel.RawSql, sel.Parameters));
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+            return x;
+
         }
 
 
-        //public List<CountryModel> GetList()
-        //{
-        //    var listCountryModel = new List<CountryModel>();
-
-        //    try
-        //    {
-        //        using (SqlConnection con = new SqlConnection(configuration.GetConnectionString("DefaultConnection")))
-        //        {
-        //            SqlCommand cmd = new SqlCommand("SELECT Id,Name FROM Country", con);
-        //            // cmd.CommandType = CommandType.StoredProcedure;
-        //            con.Open();
-        //            SqlDataReader rdr = cmd.ExecuteReader();
-        //            while (rdr.Read())
-        //            {
-        //                listCountryModel.Add(new CountryModel
-        //                {
-        //                    Id = Convert.ToInt32(rdr[0]),
-        //                    Name = rdr[1].ToString(),
-        //                    // Active = Convert.ToBoolean(rdr[2])
-        //                });
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //    return listCountryModel;
-        //}
 
     }
 }

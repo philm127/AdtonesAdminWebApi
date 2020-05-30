@@ -16,7 +16,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> UpdateContactForm(Contacts contact);
         Task<ReturnResult> UpdateProfileForm(User profile);
         Task<ReturnResult> UpdateCompanyDetails(CompanyDetails company);
-        Task<ReturnResult> ApproveORSuspendUser(AdvertiserDashboardResult result);
+        Task<ReturnResult> UpdateUserStatus(AdvertiserDashboardResult result);
         Task<ReturnResult> AddContactInformation(Contacts contact);
         Task<ReturnResult> AddCompanyDetails(CompanyDetails company);
         Task<ReturnResult> AddUser(User user);

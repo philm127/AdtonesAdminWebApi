@@ -3,8 +3,6 @@ using AdtonesAdminWebApi.BusinessServices;
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,10 +30,13 @@ namespace AdtonesAdminWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddSingleton<IConfiguration>(Configuration);
 
             services.AddControllers().AddNewtonsoftJson();
             services.AddHttpContextAccessor();
+
+            #region Business Services
 
             // Business Services
             services.AddScoped<ISharedSelectListsService, SharedSelectListsService>();
@@ -56,6 +57,9 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IAdvertService, AdvertService>();
             services.AddScoped<ICampaignService, CampaignService>();
 
+            #endregion
+
+            #region DAL Access
 
             // Use DAL. 
             services.AddScoped<IConnectionStringService, ConnectionStringService>();
@@ -68,11 +72,16 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IUserDashboardDAL, UserDashboardDAL>();
             services.AddScoped<IProvisionServerDAL, ProvisionServerDAL>();
             services.AddScoped<ILoginDAL, LoginDAL>();
+            services.AddScoped<IUserManagementDAL, UserManagementDAL>();
+
+            #endregion
 
 
             // DAL Query Execution.
             services.AddTransient<IExecutionCommand, ExecutionCommand>();
-            
+
+            #region SQL Queries
+
             // DAL Queries.
             services.AddTransient<ISharedListQuery, SharedListQuery>();
             services.AddTransient<ITicketQuery, TicketQuery>();
@@ -83,6 +92,10 @@ namespace AdtonesAdminWebApi
             services.AddTransient<ICheckExistsQuery, CheckExistsQuery>();
             services.AddTransient<IProvisionServerQuery, ProvisionServerQuery>();
             services.AddTransient<ILoginQuery, LoginQuery>();
+            services.AddTransient<IUserManagementQuery, UserManagementQuery>();
+
+            #endregion
+
 
             // Special Services
             services.AddScoped<ISaveGetFiles, SaveGetFiles>();
@@ -91,9 +104,11 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IExpressoProcessPromoUser, ExpressoProcessPromoUser>();
             services.AddScoped<ISafaricomProcessPromoUser, SafaricomProcessPromoUser>();
 
-            /////
+
+            #region Authentication
+
             ///// Authentication
-            /////
+
             services.AddScoped<ILogonService, LogonService>();
             services.AddScoped<IAuthService, AuthService>();
 
@@ -116,6 +131,9 @@ namespace AdtonesAdminWebApi
                     ValidateAudience = false
                 };
             });
+
+            #endregion
+        
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -131,11 +149,13 @@ namespace AdtonesAdminWebApi
 
             app.UseRouting();
 
-            // app.UseAuthentication();
+            app.UseAuthentication();
 
             app.UseAuthorization();
             // REST Headers
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseCors(
+                options => options.SetIsOriginAllowed(x => _ = true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()
+            );
 
             app.UseEndpoints(endpoints =>
             {

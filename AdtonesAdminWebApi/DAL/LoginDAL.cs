@@ -67,6 +67,7 @@ namespace AdtonesAdminWebApi.DAL
             {
                 throw;
             }
+            
             if (userModel.OperatorId != 0)
             {
                 var operatorConnectionString = await _connService.GetSingleConnectionString(userModel.OperatorId);

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.Enums;
 
 namespace AdtonesAdminWebApi.DAL
 {
@@ -23,12 +24,17 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<AdvertiserDashboardResult>> GetAdvertiserDashboard(string command)
+        public async Task<IEnumerable<AdvertiserDashboardResult>> GetAdvertiserDashboard(string command,int operatorId=0)
         {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(command);
+            if(operatorId > 0)
+                builder.AddParameters(new { operatorId = operatorId });
+
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<AdvertiserDashboardResult>(command));
+                                    conn => conn.Query<AdvertiserDashboardResult>(select.RawSql, select.Parameters));
             }
             catch
             {

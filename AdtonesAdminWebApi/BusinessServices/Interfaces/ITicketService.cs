@@ -10,5 +10,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     {
         Task<ReturnResult> GetTicketDetails(int id = 0);
         Task<ReturnResult> CloseTicket(int id);
+        Task<ReturnResult> ArchiveTicket(int id);
+        // Task<ReturnResult> GetOperatorTicketList();
     }
 }

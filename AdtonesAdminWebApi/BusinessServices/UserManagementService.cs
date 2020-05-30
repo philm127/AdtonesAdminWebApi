@@ -11,6 +11,8 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using AdtonesAdminWebApi.Services;
 using System.Text;
+using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.DAL.Queries;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -18,15 +20,19 @@ namespace AdtonesAdminWebApi.BusinessServices
     {
         private readonly IConfiguration _configuration;
         private readonly ILogonService _logonService;
+        private readonly IUserManagementDAL _userDAL;
+        private readonly IUserManagementQuery _commandText;
         ReturnResult result = new ReturnResult();
 
         
 
 
-        public UserManagementService(IConfiguration configuration, ILogonService logonService)
+        public UserManagementService(IConfiguration configuration, ILogonService logonService, IUserManagementDAL userDAL, IUserManagementQuery commandText)
         {
             _configuration = configuration;
             _logonService = logonService;
+            _userDAL = userDAL;
+            _commandText = commandText;
         }
 
 
@@ -363,16 +369,12 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> ApproveORSuspendUser(AdvertiserDashboardResult user)
+        public async Task<ReturnResult> UpdateUserStatus(AdvertiserDashboardResult user)
         {
-            var update_query = @"UPDATE Users SET Activated=@Activated WHERE UserId = @UserId";
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.ExecuteAsync(update_query, user);
-                }
+                result.body = await _userDAL.UpdateUserStatus(_commandText.UpdateUserStatus, user);
+
             }
             catch (Exception ex)
             {
@@ -381,7 +383,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "UserManagementService",
-                    ProcedureName = "ApproveORSuspendUser"
+                    ProcedureName = "UpdateUserStatus"
                 };
                 _logging.LogError();
                 result.result = 0;

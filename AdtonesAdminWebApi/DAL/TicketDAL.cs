@@ -3,6 +3,7 @@ using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL
@@ -26,6 +27,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(command);
+            builder.AddParameters(new { Id =id });
             try
             {
                 builder.AddParameters(new { Id = id });
@@ -42,10 +44,13 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<HelpAdminResult>> GetTicketList(string command)
         {
+            var sb = new StringBuilder();
+            sb.Append(command);
+            sb.Append(" ORDER BY q.Id DESC;");
             try
             {
                 return  await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<HelpAdminResult>(command));
+                                    conn => conn.Query<HelpAdminResult>(sb.ToString()));
             }
             catch
             {
@@ -54,7 +59,29 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> CloseTicket(string command, HelpAdminResult model)
+        public async Task<IEnumerable<HelpAdminResult>> GetOperatorTicketList(string command,int operatorId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(command);
+            builder.AddParameters(new { operatorId = operatorId });
+            builder.AddParameters(new { opadrev = (int)Enums.QuestionSubjectStatus.OperatorAdreview });
+            builder.AddParameters(new { cred = (int)Enums.QuestionSubjectStatus.OperatorCreditRequest });
+            builder.AddParameters(new { aderr = (int)Enums.QuestionSubjectStatus.AdvertError });
+            builder.AddParameters(new { adreview = (int)Enums.QuestionSubjectStatus.Adreview });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.Query<HelpAdminResult>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> UpdateTicketStatus(string command, HelpAdminResult model)
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(command);

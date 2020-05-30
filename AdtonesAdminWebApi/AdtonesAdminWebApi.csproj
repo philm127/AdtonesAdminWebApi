@@ -41,6 +41,7 @@
 
   <ItemGroup>
     <Compile Include="DAL\Interfaces\ILoginDAL.cs" />
+    <Compile Include="DAL\Interfaces\IUserManagementDAL.cs" />
     <Compile Include="DAL\LoginDAL.cs" />
     <Compile Include="DAL\CampaignDAL.cs" />
     <Compile Include="DAL\AreaDAL.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="DAL\Interfaces\ISharedSelectListsDAL.cs" />
     <Compile Include="DAL\Interfaces\IUserDashboardDAL.cs" />
     <Compile Include="DAL\Queries\CampaignQuery.cs" />
+    <Compile Include="DAL\Queries\UserManagementQuery.cs" />
     <Compile Include="DAL\Queries\LoginQuery.cs" />
     <Compile Include="DAL\Queries\ProvisionServerQuery.cs" />
     <Compile Include="DAL\Queries\CheckExistsQuery.cs" />
@@ -69,6 +71,7 @@
     <Compile Include="DAL\AdvertDAL.cs" />
     <Compile Include="DAL\TicketDAL.cs" />
     <Compile Include="DAL\UserDashboardDAL.cs" />
+    <Compile Include="DAL\UserManagementDAL.cs" />
   </ItemGroup>
 
   <ItemGroup>

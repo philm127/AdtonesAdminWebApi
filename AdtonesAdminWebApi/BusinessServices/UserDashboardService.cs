@@ -35,9 +35,42 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> LoadAdvertiserDataTable()
         {
+            var roleName = _httpAccessor.GetRoleFromJWT();
+
+            if (roleName.ToLower() == "OperatorAdmin".ToLower())
+                return await LoadOperatorAdvertiserDataTable();
+
+
             try
             {
                 result.body = await _dashboardDal.GetAdvertiserDashboard(_commandText.AdvertiserResultQuery);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "UserDashboardService",
+                    ProcedureName = "LoadAdvertiserDataTable"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> LoadOperatorAdvertiserDataTable(int operatorId = 0)
+        {
+            if (operatorId == 0)
+            {
+                operatorId = _httpAccessor.GetOperatorFromJWT();
+            }
+
+            try
+            {
+                result.body = await _dashboardDal.GetAdvertiserDashboard(_commandText.OperatorAdvertiserResultQuery, operatorId);
             }
             catch (Exception ex)
             {

@@ -45,10 +45,21 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains int No. records Updated</returns>
-        [HttpPut("v1/CloseTicket")]
-        public async Task<ReturnResult> CloseTicket(IdCollectionViewModel model)
+        [HttpPut("v1/CloseTicket/{id}")]
+        public async Task<ReturnResult> CloseTicket(int id)
         {
-            return await _ticketService.CloseTicket(model.id);
+            return await _ticketService.CloseTicket(id);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains int No. records Updated</returns>
+        [HttpPut("v1/ArchiveTicket/{id}")]
+        public async Task<ReturnResult> ArchiveTicket(int id)
+        {
+            return await _ticketService.ArchiveTicket(id);
         }
 
     }

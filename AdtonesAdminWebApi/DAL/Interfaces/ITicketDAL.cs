@@ -11,6 +11,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     {
         Task<IEnumerable<HelpAdminResult>> GetTicketList(string command);
         Task<HelpAdminResult> GetTicketDetails(string command, int id = 0);
-        Task<int> CloseTicket(string command, HelpAdminResult model);
+        Task<int> UpdateTicketStatus(string command, HelpAdminResult model);
+        Task<IEnumerable<HelpAdminResult>> GetOperatorTicketList(string command, int operatorId);
     }
 }
