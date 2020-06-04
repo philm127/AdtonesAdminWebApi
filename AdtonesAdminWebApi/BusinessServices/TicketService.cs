@@ -42,18 +42,18 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> CloseTicket(int id)
+        public async Task<ReturnResult> UpdateTicketStatus(int id,int status)
         {
-            var question = new HelpAdminResult
+            var question = new TicketListModel
             {
                 Id = id,
-                Status = (int)Enums.TicketStatus.Closed,
+                Status = status,
                 UpdatedBy = _httpAccessor.GetUserIdFromJWT()
             };
 
             try
             {
-                result.body = await UpdateTicketStatus(question);
+                result.body = await _ticketDAL.UpdateTicketStatus(_commandText.UpdateTicketStatus, question);
                 return result;
             }
             catch (Exception ex)
@@ -69,43 +69,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                 result.result = 0;
             }
             return result;
-        }
-
-
-        public async Task<ReturnResult> ArchiveTicket(int id)
-        {
-            var question = new HelpAdminResult
-            {
-                Id = id,
-                Status = (int)Enums.TicketStatus.Archived,
-                UpdatedBy = _httpAccessor.GetUserIdFromJWT()
-            };
-
-            try
-            {
-                result.body = await UpdateTicketStatus(question);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "TicketService",
-                    ProcedureName = "ArchiveTicket"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        private async Task<int> UpdateTicketStatus(HelpAdminResult question)
-        {
-            var x = await _ticketDAL.UpdateTicketStatus(_commandText.UpdateTicketStatus, question);
-            return x;
         }
 
 
@@ -138,9 +101,15 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             else
             {
+                var ticketList = new TicketListModel();
                 try
                 {
-                    result.body = await _ticketDAL.GetTicketDetails(_commandText.GetTicketDetails, id);
+                    ticketList = await _ticketDAL.GetTicketDetails(_commandText.GetTicketDetails, id);
+                    var commentList = await _ticketDAL.GetTicketcomments(_commandText.GetTicketComments, id);
+
+                    ticketList.comments = (IEnumerable<TicketComments>)commentList;
+
+                    result.body = ticketList;
                 }
                 catch (Exception ex)
                 {

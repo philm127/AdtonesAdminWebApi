@@ -64,12 +64,13 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                            FROM
                                                                 (SELECT item.UserId, item.RoleId, item.Email, item.DateCreated, item.Activated,
                                                                 item.FirstName,item.LastName
-                                                                FROM Users item Where item.VerificationStatus = 1) item
+                                                                FROM Users item Where item.VerificationStatus = 1 AND item.UserId IN
+                                                                                (SELECT DISTINCT(UserId) AS UserId FROM Advert WHERE OperatorId=@operatorId)) item
                                                             LEFT JOIN
                                                                 (SELECT a.[UserId], b.[AssignCredit], a.[Id] 
-                                                                FROM
-                                                                    (SELECT[UserId], MIN(Id) AS Id FROM UsersCredit GROUP BY[UserId]) a
-                                                                INNER JOIN UsersCredit b ON a.[UserId] = b.[UserId] AND a.Id = b.Id) cred
+                                                                    FROM
+                                                                        (SELECT[UserId], MIN(Id) AS Id FROM UsersCredit GROUP BY[UserId]) a
+                                                            INNER JOIN UsersCredit b ON a.[UserId] = b.[UserId] AND a.Id = b.Id) cred
                                                             ON item.UserId = cred.UserId
                                                             LEFT JOIN
                                                                 (SELECT COUNT(UserId)as TicketCount, UserId FROM Question WHERE Status IN (1, 2) GROUP BY UserId) tkt
@@ -78,7 +79,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                 (SELECT COUNT(CampaignProfileId) AS NoOfactivecampaign,UserId FROM Campaignprofile 
                                                                     WHERE Status IN (4, 3, 2, 1) GROUP BY UserId) camp
                                                             ON item.UserId = camp.UserId
-                                                            INNER JOIN
+                                                            LEFT JOIN
                                                                 (SELECT COUNT(AdvertId) AS NoOfunapprovedadverts,UserId FROM Advert WHERE Status = 4 GROUP BY UserId) ad
                                                             ON item.UserId = ad.UserId
                                                             LEFT JOIN
@@ -92,8 +93,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                 ON bill3.UserId = uc.UserId AND bill3.CampaignProfileId = uc.CampaignProfileId
                                                                 WHERE (ISNULL(bill3.totalAmount, 0) - ISNULL(uc.paidAmount, 0)) > 0
                                                                 GROUP BY bill3.UserId) billit
-                                                            ON item.UserId = billit.UserId
-                                                            WHERE item.OperatorId=@operatorId;";
+                                                            ON item.UserId = billit.UserId;";
 
 
         public string OperatorResultQuery => @"SELECT u.UserId,FirstName,LastName,Email,ISNULL(Organisation,'-') AS Organisation,u.OperatorId,o.CountryId,

@@ -37,7 +37,7 @@ namespace AdtonesAdminWebApi.DAL
             {
 
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<User>(command));
+                                conn => conn.QueryFirstOrDefault<User>(select.RawSql, select.Parameters));
             }
             catch
             {

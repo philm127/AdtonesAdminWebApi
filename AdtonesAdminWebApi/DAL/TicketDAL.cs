@@ -23,17 +23,16 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<HelpAdminResult> GetTicketDetails(string command, int id=0)
+        public async Task<TicketListModel> GetTicketDetails(string command, int id=0)
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(command);
             builder.AddParameters(new { Id =id });
             try
             {
-                builder.AddParameters(new { Id = id });
 
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<HelpAdminResult>(select.RawSql, select.Parameters));
+                                conn => conn.QueryFirstOrDefault<TicketListModel>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -42,7 +41,25 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<HelpAdminResult>> GetTicketList(string command)
+        public async Task<TicketComments> GetTicketcomments(string command, int id = 0)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(command);
+            builder.AddParameters(new { questionId = id });
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<TicketComments>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<TicketListModel>> GetTicketList(string command)
         {
             var sb = new StringBuilder();
             sb.Append(command);
@@ -50,7 +67,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 return  await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<HelpAdminResult>(sb.ToString()));
+                                    conn => conn.Query<TicketListModel>(sb.ToString()));
             }
             catch
             {
@@ -59,7 +76,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<HelpAdminResult>> GetOperatorTicketList(string command,int operatorId)
+        public async Task<IEnumerable<TicketListModel>> GetOperatorTicketList(string command,int operatorId)
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(command);
@@ -72,7 +89,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<HelpAdminResult>(select.RawSql, select.Parameters));
+                                    conn => conn.Query<TicketListModel>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -81,7 +98,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateTicketStatus(string command, HelpAdminResult model)
+        public async Task<int> UpdateTicketStatus(string command, TicketListModel model)
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(command);

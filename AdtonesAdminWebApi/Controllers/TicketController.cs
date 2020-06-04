@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace AdtonesAdminWebApi.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    // [Authorize]
     [ApiController]
     public class TicketController : ControllerBase
     {
@@ -34,10 +34,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains HelpAdminResult</returns>
-        [HttpGet("v1/GetTicketDetails")]
-        public async Task<ReturnResult> GetTicketDetails(IdCollectionViewModel model)
+        [HttpGet("v1/GetTicketDetails/{id}")]
+        public async Task<ReturnResult> GetTicketDetails(int id)
         {
-            return  await _ticketService.GetTicketDetails(model.id);
+            return  await _ticketService.GetTicketDetails(id);
         }
 
 
@@ -48,7 +48,8 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPut("v1/CloseTicket/{id}")]
         public async Task<ReturnResult> CloseTicket(int id)
         {
-            return await _ticketService.CloseTicket(id);
+            var status = (int)Enums.TicketStatus.Closed;
+            return await _ticketService.UpdateTicketStatus(id,status);
         }
 
 
@@ -59,7 +60,8 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPut("v1/ArchiveTicket/{id}")]
         public async Task<ReturnResult> ArchiveTicket(int id)
         {
-            return await _ticketService.ArchiveTicket(id);
+            var status = (int)Enums.TicketStatus.Archived;
+            return await _ticketService.UpdateTicketStatus(id, status);
         }
 
     }

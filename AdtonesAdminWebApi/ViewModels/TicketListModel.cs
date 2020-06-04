@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.ViewModels
 {
-    public class HelpAdminResult
+    public class TicketListModel
     {
         public int Id { get; set; }
 
         public int UserId { get; set; }
 
-        public int? fuserId { get; set; }
         public string UserName { get; set; }
 
         public string Email { get; set; }
@@ -20,12 +19,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string Organisation { get; set; }
         public string QNumber { get; set; }
 
-        public int? ClientId { get; set; }
-        public int? fClientId { get; set; }
-
         public string ClientName { get; set; }
-
-        public int? CampaignProfileId { get; set; }
 
         public string CampaignName { get; set; }
 
@@ -50,5 +44,20 @@ namespace AdtonesAdminWebApi.ViewModels
 
 
         public int UpdatedBy { get; set; }
+        public string UpdatedName { get; set; }
+
+        public IEnumerable<TicketComments> comments { get; set; }
+    }
+
+    public class TicketComments
+    {
+        public int CommentId { get; set; }
+        public int UserId { get; set; }
+        public int QuestionId { get; set; }
+        public string CommentTitle { get; set; }
+        public string Description { get; set; }
+        public DateTime CommentDate { get; set; }
+        public string TicketCode { get; set; }
+        public string UserName { get; set; }
     }
 }

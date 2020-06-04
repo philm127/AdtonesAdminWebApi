@@ -30,7 +30,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// <param name="userForm"></param>
         /// <returns>body contains User</returns>
         [AllowAnonymous]
-        [HttpGet("v1/Login")]
+        [HttpPost("v1/Login")]
         public async Task<ReturnResult> Login(User userForm)
         {
             var tst = await _userService.Login(userForm);
