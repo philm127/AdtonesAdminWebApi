@@ -57,7 +57,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         // Operators version of Advertisers table. INNER JOINS on Advert for only their adverts and does not select Role.
         public string OperatorAdvertiserResultQuery => @"SELECT item.UserId,item.RoleId,item.Email,item.FirstName,item.LastName,
-                                                          ISNULL(camp.NoOfactivecampaign, 0) AS NoOfactivecampaign,
+                                                          ISNULL(camp.NoOfactivecampaign, 0) AS NoOfactivecampaign,con.MobileNumber,
                                                            ISNULL(ad.NoOfunapprovedadverts, 0) AS NoOfunapprovedadverts,
                                                            ISNULL(cred.AssignCredit, 0) AS creditlimit,ISNULL(billit.outStandingInvoice, 0) AS outStandingInvoice,
                                                            item.Activated,item.DateCreated,ISNULL(tkt.TicketCount, 0) AS TicketCount
@@ -93,7 +93,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                 ON bill3.UserId = uc.UserId AND bill3.CampaignProfileId = uc.CampaignProfileId
                                                                 WHERE (ISNULL(bill3.totalAmount, 0) - ISNULL(uc.paidAmount, 0)) > 0
                                                                 GROUP BY bill3.UserId) billit
-                                                            ON item.UserId = billit.UserId;";
+                                                            ON item.UserId = billit.UserId
+                                                            LEFT JOIN Contacts AS con ON con.UserId=item.UserId;";
 
 
         public string OperatorResultQuery => @"SELECT u.UserId,FirstName,LastName,Email,ISNULL(Organisation,'-') AS Organisation,u.OperatorId,o.CountryId,

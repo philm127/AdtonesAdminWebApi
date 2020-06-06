@@ -108,35 +108,12 @@ namespace AdtonesAdminWebApi.DAL.Shared
             }
         }
 
-
-
-
-        public async Task<User> GetUserById(string sql, int id)
-        {
-            try
-            {
-                using (var connection = new SqlConnection(_connStr))
-                {
-                    connection.Open();
-                    return await connection.QueryFirstOrDefaultAsync<User>(sql, new { UserId = id });
-                }
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
     }
 
     public interface ISharedListQuery
     {
         string GetCurrencyList { get; }
         string GetCurrencyListById { get; }
-        string GetProductById { get; }
-        string AddProduct { get; }
-        string UpdateProduct { get; }
-        string RemoveProduct { get; }
     }
 
 
@@ -144,9 +121,6 @@ namespace AdtonesAdminWebApi.DAL.Shared
     {
         public string GetCurrencyList => "SELECT CurrencyId AS Value,CurrencyCode AS Text FROM Currencies";
         public string GetCurrencyListById => "SELECT CurrencyId AS Value,CurrencyCode AS Text FROM Currencies WHERE CurrencyId=@Id";
-        public string GetProductById => "Select * from Product where Id= @Id";
-        public string AddProduct => "Insert into  [Dapper].[dbo].[Product] ([Name], Cost, CreatedDate) values (@Name, @Cost, @CreatedDate)";
-        public string UpdateProduct => "Update [Dapper].[dbo].[Product] set Name = @Name, Cost = @Cost, CreatedDate = GETDATE() where Id =@Id";
-        public string RemoveProduct => "Delete from [Dapper].[dbo].[Product] where Id= @Id";
+
     }
 }

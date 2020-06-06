@@ -10,6 +10,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     {
         Task<ReturnResult> LoadCampaignCreditDataTable();
         Task<ReturnResult> LoadPromoCampaignDataTable();
-        Task<ReturnResult> LoadCampaignDataTable();
+        Task<ReturnResult> LoadCampaignDataTable(int id=0);
     }
 }

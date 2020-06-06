@@ -13,6 +13,5 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<IEnumerable<SharedSelectListViewModel>> GetSelectList(string sql, int id = 0);
         Task<IEnumerable<SharedSelectListViewModel>> TESTGetSelectListById(string command,int id=0);
         Task<IEnumerable<SharedSelectListViewModel>> TESTGetSelectList(string command);
-        Task<User> GetUserById(string sql, int id);
     }
 }

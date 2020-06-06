@@ -45,13 +45,13 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// Populate the datatable
         /// </summary>
         /// <returns></returns>
-        public async Task<ReturnResult> LoadCampaignDataTable()
+        public async Task<ReturnResult> LoadCampaignDataTable(int id=0)
         {
             try
             {
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
-                    result.body = await _campDAL.GetCampaignResultSet(_commandText.GetCampaignResultSet);
+                    result.body = await _campDAL.GetCampaignResultSet(_commandText.GetCampaignResultSet,id);
                 }
             }
             catch (Exception ex)

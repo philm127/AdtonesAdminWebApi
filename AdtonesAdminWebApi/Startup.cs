@@ -15,6 +15,7 @@ using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Shared;
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.DAL;
+using AdtonesAdminWebApi.UserMatchServices;
 
 namespace AdtonesAdminWebApi
 {
@@ -73,6 +74,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IProvisionServerDAL, ProvisionServerDAL>();
             services.AddScoped<ILoginDAL, LoginDAL>();
             services.AddScoped<IUserManagementDAL, UserManagementDAL>();
+            services.AddScoped<IUserMatchDAL, UserMatchDAL>();
 
             #endregion
 
@@ -93,12 +95,17 @@ namespace AdtonesAdminWebApi
             services.AddTransient<IProvisionServerQuery, ProvisionServerQuery>();
             services.AddTransient<ILoginQuery, LoginQuery>();
             services.AddTransient<IUserManagementQuery, UserManagementQuery>();
+            services.AddTransient<IUserMatchQuery, UserMatchQuery>();
 
             #endregion
 
 
             // Special Services
             services.AddScoped<ISaveGetFiles, SaveGetFiles>();
+            services.AddTransient<IUserMatchInterface, UserMatchTableProcess>();
+            services.AddTransient<IAdTransferService, AdTransferService>();
+            services.AddTransient<IGenerateTicketService, GenerateTicketService>();
+            services.AddTransient<ILiveAgentService, LiveAgentService>();
 
             // Client Specific Services
             services.AddScoped<IExpressoProcessPromoUser, ExpressoProcessPromoUser>();

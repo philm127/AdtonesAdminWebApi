@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.TicketingModels;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.Extensions.Configuration;
@@ -59,15 +60,21 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<TicketListModel>> GetTicketList(string command)
+        public async Task<IEnumerable<TicketListModel>> GetTicketList(string command,int id)
         {
             var sb = new StringBuilder();
             sb.Append(command);
-            sb.Append(" ORDER BY q.Id DESC;");
+            if(id == 0)
+                sb.Append(" ORDER BY q.Id DESC;");
+            else
+                sb.Append(" WHERE q.UserId=@userId;");
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(sb.ToString());
+            builder.AddParameters(new { userId = id });
             try
             {
                 return  await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<TicketListModel>(sb.ToString()));
+                                    conn => conn.Query<TicketListModel>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -112,6 +119,34 @@ namespace AdtonesAdminWebApi.DAL
                             conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
                 return x;
 
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<string> CreateNewHelpTicket(string command, TicketFormModel ticket)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(command);
+            builder.AddParameters(new { UserId = ticket.UserId });
+            builder.AddParameters(new { AdvertId = ticket.AdvertId });
+            builder.AddParameters(new { QNumber = ticket.QNumber });
+            builder.AddParameters(new { SubjectId = ticket.SubjectId });
+            builder.AddParameters(new { ClientId = ticket.ClientId });
+            builder.AddParameters(new { CampaignProfileId = ticket.CampaignProfileId });
+            builder.AddParameters(new { PaymentMethodId = ticket.PaymentMethodId });
+            builder.AddParameters(new { QNumber = ticket.QNumber });
+            builder.AddParameters(new { Title = ticket.Title });
+            builder.AddParameters(new { Description = ticket.Description });
+            builder.AddParameters(new { Status = ticket.Status });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<string>(select.RawSql, select.Parameters));
             }
             catch
             {

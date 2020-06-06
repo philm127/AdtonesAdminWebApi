@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="DAL\Interfaces\ILoginDAL.cs" />
     <Compile Include="DAL\Interfaces\IUserManagementDAL.cs" />
+    <Compile Include="DAL\Interfaces\IUserMatchDAL.cs" />
     <Compile Include="DAL\LoginDAL.cs" />
     <Compile Include="DAL\CampaignDAL.cs" />
     <Compile Include="DAL\AreaDAL.cs" />
@@ -67,11 +68,13 @@
     <Compile Include="DAL\Queries\AreaQuery.cs" />
     <Compile Include="DAL\Queries\TicketQuery.cs" />
     <Compile Include="DAL\Queries\UserDashboardQuery.cs" />
+    <Compile Include="DAL\Queries\UserMatchQuery.cs" />
     <Compile Include="DAL\SharedSelectListsDAL.cs" />
     <Compile Include="DAL\AdvertDAL.cs" />
     <Compile Include="DAL\TicketDAL.cs" />
     <Compile Include="DAL\UserDashboardDAL.cs" />
     <Compile Include="DAL\UserManagementDAL.cs" />
+    <Compile Include="DAL\UserMatchDAL.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -84,6 +87,7 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="1.1.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
     <PackageReference Include="RestSharp" Version="106.10.1" />
+    <PackageReference Include="SSH.NET" Version="2016.1.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
   </ItemGroup>
 

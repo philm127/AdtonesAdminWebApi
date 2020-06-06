@@ -80,5 +80,28 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
+
+        public async Task<int> GetUserIdFromAdtoneId(int Id, int operatorId)
+        {
+            var test = true;
+            if (test)
+            {
+                List<string> str = null;
+                str.Add(_configuration.GetConnectionString("TestProvoConnection"));
+                return 0;
+            }
+            else
+            {
+                var conn = await GetSingleConnectionString(operatorId);
+                StringBuilder sb = new StringBuilder("SELECT UserId FROM Users WHERE AdtoneServerUserId=@Id");
+
+                using (var connection = new SqlConnection(conn))
+                {
+                    await connection.OpenAsync();
+                    return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = Id });
+                }
+            }
+        }
+
     }
 }

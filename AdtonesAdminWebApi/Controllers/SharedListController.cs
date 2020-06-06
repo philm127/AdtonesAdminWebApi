@@ -86,17 +86,5 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="some"></param>
-        /// <returns>body contains User model</returns>
-        [HttpGet("v1/GetUserById")]
-        public async Task<ReturnResult> GetUserById(IdCollectionViewModel some)
-        {
-            return await _sharedList.GetUserById(some.userId);
-        }
-
-
     }
 }

@@ -71,20 +71,16 @@ namespace AdtonesAdminWebApi.BusinessServices
             return result;
         }
 
-
-        public async Task<ReturnResult> GetTicketDetails(int id = 0)
+        public async Task<ReturnResult> GetTicketList(int id = 0)
         {
             var roleName = _httpAccessor.GetRoleFromJWT();
 
-            if (id == 0)
-            {
-                if (roleName.ToLower() == "OperatorAdmin".ToLower())
+                if (roleName.ToLower().Contains("operator"))
                     return await GetOperatorTicketList();
-
 
                 try
                 {
-                    result.body = await _ticketDAL.GetTicketList(_commandText.GetLoadTicketDatatable);
+                    result.body = await _ticketDAL.GetTicketList(_commandText.GetLoadTicketDatatable,id);
                 }
                 catch (Exception ex)
                 {
@@ -98,31 +94,35 @@ namespace AdtonesAdminWebApi.BusinessServices
                     _logging.LogError();
                     result.result = 0;
                 }
-            }
-            else
-            {
+            
+            return result;
+        }
+
+
+        public async Task<ReturnResult> GetTicketDetails(int id = 0)
+        {
+            
                 var ticketList = new TicketListModel();
-                try
-                {
-                    ticketList = await _ticketDAL.GetTicketDetails(_commandText.GetTicketDetails, id);
-                    var commentList = await _ticketDAL.GetTicketcomments(_commandText.GetTicketComments, id);
+            try
+            {
+                ticketList = await _ticketDAL.GetTicketDetails(_commandText.GetTicketDetails, id);
+                var commentList = await _ticketDAL.GetTicketcomments(_commandText.GetTicketComments, id);
 
-                    ticketList.comments = (IEnumerable<TicketComments>)commentList;
+                ticketList.comments = (IEnumerable<TicketComments>)commentList;
 
-                    result.body = ticketList;
-                }
-                catch (Exception ex)
+                result.body = ticketList;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
                 {
-                    var _logging = new ErrorLogging()
-                    {
-                        ErrorMessage = ex.Message.ToString(),
-                        StackTrace = ex.StackTrace.ToString(),
-                        PageName = "TicketService",
-                        ProcedureName = "GetTicketDetails"
-                    };
-                    _logging.LogError();
-                    result.result = 0;
-                }
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "TicketService",
+                    ProcedureName = "GetTicketDetails"
+                };
+                _logging.LogError();
+                result.result = 0;
             }
             return result;
         }

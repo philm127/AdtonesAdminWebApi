@@ -25,10 +25,21 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(string command)
+        public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(string command, int id=0)
         {
+            var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            sb.Append(command);
+            if (id == 0)
+                sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
+            else
+            {
+                sb.Append(" WHERE camp.UserId=@userId;");
+                builder.AddParameters(new { userId = id });
+            }
+
+                var select = builder.AddTemplate(sb.ToString());
+            
             try
             {
                 // builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:SiteEmailAddress") });

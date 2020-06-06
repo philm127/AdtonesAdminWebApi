@@ -658,6 +658,29 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> GetUserById(int userId)
+        {
+
+            try
+            {
+                result.body = await _userDAL.GetUserById(_commandText.GetUserById, userId);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "UserManagementService",
+                    ProcedureName = "GetUserById"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
         /// <summary>
         /// Checks if user exists by Email only. Some others such as Operator check if there is an existing admin user.
         /// I'm guessing only allowed one.

@@ -23,10 +23,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains List HelpAdminResult</returns>
-        [HttpGet("v1/GetTicketList")]
-        public async Task<ReturnResult> GetTicketList()
+        [HttpGet("v1/GetTicketList/{id}")]
+        public async Task<ReturnResult> GetTicketList(int id=0)
         {
-            return await _ticketService.GetTicketDetails();
+            return await _ticketService.GetTicketList(id);
         }
 
 

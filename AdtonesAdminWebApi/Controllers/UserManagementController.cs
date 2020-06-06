@@ -115,8 +115,8 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [HttpPut("v1/ApproveORSuspendUser")]
-        public async Task<ReturnResult> ApproveORSuspendUser([FromBodyAttribute] AdvertiserDashboardResult users)
+        [HttpPut("v1/UpdateUserStatus")]
+        public async Task<ReturnResult> UpdateUserStatus([FromBodyAttribute] AdvertiserDashboardResult users)
         {
             return await _userService.UpdateUserStatus(users);
         }
@@ -126,6 +126,18 @@ namespace AdtonesAdminWebApi.Controllers
         public async Task<ReturnResult> UploadPromotionalUser([FromBodyAttribute] PromotionalUserFormModel model)
         {
             return await _promotionalService.SavePromotionalUser(model);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="some"></param>
+        /// <returns>body contains User model</returns>
+        [HttpGet("v1/GetUserById")]
+        public async Task<ReturnResult> GetUserById(IdCollectionViewModel some)
+        {
+            return await _userService.GetUserById(some.userId);
         }
 
 

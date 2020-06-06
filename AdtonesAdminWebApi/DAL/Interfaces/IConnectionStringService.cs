@@ -9,5 +9,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     {
         Task<string> GetSingleConnectionString(int Id);
         Task<IEnumerable<string>> GetConnectionStrings(int Id=0);
+        Task<int> GetUserIdFromAdtoneId(int Id, int operatorId);
     }
 }

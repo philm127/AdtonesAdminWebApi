@@ -30,6 +30,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int NoOfunapprovedadverts { get; set; }
         public double Creditlimit { get; set; }
         public double Outstandinginvoice { get; set; }
+        public string MobileNumber { get; set; }
         
         public int TicketCount { get; set; }
         

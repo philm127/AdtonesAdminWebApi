@@ -1,8 +1,10 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -72,8 +74,9 @@ namespace AdtonesAdminWebApi.DAL
 
                 try
                 {
-                    x = await _executers.ExecuteCommand(operatorConnectionString,
-                                 conn => conn.ExecuteScalar<int>(sel.RawSql, sel.Parameters));
+                    /// TODO: make this live
+                    //x = await _executers.ExecuteCommand(operatorConnectionString,
+                    //             conn => conn.ExecuteScalar<int>(sel.RawSql, sel.Parameters));
                 }
                 catch
                 {
@@ -82,6 +85,25 @@ namespace AdtonesAdminWebApi.DAL
             }
             return x;
 
+        }
+
+
+        public async Task<User> GetUserById(string command, int id)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(command);
+            builder.AddParameters(new { UserId = id });
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                    conn => conn.QueryFirstOrDefault<User>(select.RawSql, select.Parameters));
+                
+            }
+            catch
+            {
+                throw;
+            }
         }
 
 

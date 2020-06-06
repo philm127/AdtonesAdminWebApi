@@ -117,32 +117,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetUserById(int userId)
-        {
-            string query = @"SELECT UserId,OperatorId,Email,FirstName,LastName,DateCreated,Organisation,
-                                        Activated,RoleId,OrganisationTypeId,AdtoneServerUserId 
-                                        FROM Users WHERE UserId=@UserId";
-
-            try
-            {
-                    result.body = await _sharedDal.GetUserById(query, userId);
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetUserById"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
-            return result;
-        }
-
-
         public ReturnResult GetUserRole()
         {
             IEnumerable<UserRole> userroleTypes = Enum.GetValues(typeof(UserRole))

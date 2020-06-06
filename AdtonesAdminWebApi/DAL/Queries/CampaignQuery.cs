@@ -39,7 +39,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 			                                                GROUP BY CampaignProfileId
 		                                                ) AS play
                                                 ON camp.CampaignProfileId=play.CampaignProfileId
-                                                LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId;";
+                                                LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId";
 
 
         public string GetPromoCampaignResultSet =>  @"SELECT promo.ID,promo.OperatorID,op.OperatorName,promo.CampaignName,promo.BatchID,MaxDaily,MaxWeekly,

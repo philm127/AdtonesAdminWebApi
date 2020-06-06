@@ -27,10 +27,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains List UserAdvertResult</returns>
-        [HttpGet("v1/GetAdvertList")]
-        public async Task<ReturnResult> GetAdvertList()
+        [HttpGet("v1/GetAdvertList/{id}")]
+        public async Task<ReturnResult> GetAdvertList(int id=0)
         {
-            return await _advertService.LoadAdvertDataTable();
+            return await _advertService.LoadAdvertDataTable(id);
         }
 
 
@@ -38,10 +38,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains List UserAdvertResult</returns>
-        [HttpGet("v1/GetAdvertDetail")]
-        public async Task<ReturnResult> GetAdvertDetail(IdCollectionViewModel model)
+        [HttpGet("v1/GetAdvertDetail/{id}")]
+        public async Task<ReturnResult> GetAdvertDetail(int id)
         {
-            return await _advertService.LoadAdvertDataTable(model.id);
+            return await _advertService.LoadAdvertDetails(id);
         }
 
 
@@ -77,10 +77,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains List CampaignAdminResult</returns>
-        [HttpGet("v1/GetCampaignDataTable")]
-        public async Task<ReturnResult> GetCampaignDataTable()
+        [HttpGet("v1/GetCampaignDataTable/{id}")]
+        public async Task<ReturnResult> GetCampaignDataTable(int id=0)
         {
-            return await _campService.LoadCampaignDataTable();
+            return await _campService.LoadCampaignDataTable(id);
         }
 
 
