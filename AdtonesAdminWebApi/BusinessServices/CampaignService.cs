@@ -2,6 +2,7 @@
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
+using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
@@ -26,10 +27,11 @@ namespace AdtonesAdminWebApi.BusinessServices
         IHttpContextAccessor _httpAccessor;
         private readonly ICampaignDAL _campDAL;
         private readonly ICampaignQuery _commandText;
-
+        private readonly ICheckExistsDAL _existDAL;
+        private readonly ICheckExistsQuery _checkText;
 
         public CampaignService(IConfiguration configuration, IConnectionStringService connService, IHttpContextAccessor httpAccessor,
-                                ICampaignDAL campDAL, ICampaignQuery commandText) //ISaveFiles saveFile)
+                                ICampaignDAL campDAL, ICampaignQuery commandText, ICheckExistsDAL existDAL, ICheckExistsQuery checkText) //ISaveFiles saveFile)
 
         {
             _configuration = configuration;
@@ -38,6 +40,8 @@ namespace AdtonesAdminWebApi.BusinessServices
             _httpAccessor = httpAccessor;
             _campDAL = campDAL;
             _commandText = commandText;
+            _existDAL = existDAL;
+            _checkText = checkText;
         }
 
 
@@ -120,29 +124,28 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        /// <summary>
+        /// Changed for the actual campaign directly
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public async Task<ReturnResult> UpdateCampaignStatus(IdCollectionViewModel model)
         {
             try
             {
-                if (model.status == 2)
-                {
-                    bool exists = false;
-                    using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                    {
-                        exists = await connection.ExecuteScalarAsync<bool>(@"SELECT COUNT(1) FROM Billing WHERE CampaignProfileId=@Id;",
-                                                                      new { Id = model.id });
-                    }
-                    if (!exists)
-                        model.status = (int)Enums.CampaignStatus.InsufficientFunds;
-                }
-                var update_query = @"UPDATE CampaignProfile SET Status@Status,IsAdminApproval=true WHERE CampaignProfileId=@Id; ";
+                // Need to do this to get OperatorId
+                CampaignProfile _campProfile = await _campDAL.GetCampaignProfileDetail(_commandText.GetCampaignProfileById, model.id);
+                bool exists = false;
 
+                exists = await _existDAL.CheckCampaignBillingExists(_checkText.CheckCampaignBillingExists, model.id);
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.ExecuteAsync(update_query.ToString(), new { Status = model.status, Id = model.id });
-                }
+                if (!exists)
+                    _campProfile.Status = (int)Enums.CampaignStatus.InsufficientFunds;
+                else
+                    _campProfile.Status = model.status;
+
+                result.body = await _campDAL.ChangeCampaignProfileStatus(_commandText.UpdateCampaignProfileStatus, _campProfile);
+                var x = await _campDAL.ChangeCampaignProfileStatusOperator(_commandText.UpdateCampaignProfileStatus, _campProfile);
             }
             catch (Exception ex)
             {
@@ -157,6 +160,76 @@ namespace AdtonesAdminWebApi.BusinessServices
                 result.result = 0;
             }
             return result;
+        }
+
+
+        /// <summary>
+        /// Changed when advert status changed, called by Adverts changed status
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public async Task<bool> ChangeCampaignStatus(int campaignId)
+        {
+            try
+            {
+                CampaignProfile _campProfile = await _campDAL.GetCampaignProfileDetail(_commandText.GetCampaignProfileById, campaignId);
+
+                if (_campProfile != null)
+                {
+                    bool exists = false;
+
+                    exists = await _existDAL.CheckCampaignBillingExists(_checkText.CheckCampaignBillingExists, campaignId);
+
+                    if (exists)
+                    {
+
+                        if (_campProfile.StartDate == null && _campProfile.EndDate == null)
+                        {
+                            _campProfile.Status = (int)Enums.CampaignStatus.Play;
+                        }
+                        else
+                        {
+                            if (_campProfile.StartDate != null)
+                            {
+                                if (_campProfile.StartDate == DateTime.Now.Date)
+                                {
+                                    _campProfile.Status = (int)Enums.CampaignStatus.Play;
+                                }
+                                else
+                                {
+                                    _campProfile.Status = (int)Enums.CampaignStatus.Planned;
+                                }
+                            }
+                            else
+                            {
+                                _campProfile.Status = (int)Enums.CampaignStatus.Planned;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        _campProfile.Status = (int)Enums.CampaignStatus.InsufficientFunds;
+                    }
+
+                    var y = await _campDAL.ChangeCampaignProfileStatus(_commandText.UpdateCampaignProfileStatus, _campProfile);
+                    var x = await _campDAL.ChangeCampaignProfileStatusOperator(_commandText.UpdateCampaignProfileStatus, _campProfile);
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CampaignService",
+                    ProcedureName = "ChangeCampaignStatus"
+                };
+                _logging.LogError();
+                return false;
+            }
+            return true;
         }
 
 

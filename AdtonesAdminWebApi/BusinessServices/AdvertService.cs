@@ -19,6 +19,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IUserMatchQuery _matchText;
         private readonly IAdTransferService _transService;
         private readonly IGenerateTicketService _ticketService;
+        private readonly ICampaignService _campService;
 
         // private IUserMatchInterface _matchInterface;
         private readonly IAdvertDAL _advertDAL;
@@ -29,7 +30,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public AdvertService(IAdvertDAL advertDAL, IAdvertQuery commandText, IHttpContextAccessor httpAccessor, IConnectionStringService connService,
                                 IUserMatchDAL matchDAL, IUserMatchQuery matchText, IAdTransferService transService, 
-                                IGenerateTicketService ticketService)//IUserMatchInterface matchInterface
+                                IGenerateTicketService ticketService, ICampaignService campService)//IUserMatchInterface matchInterface
         {
             _advertDAL = advertDAL;
             _commandText = commandText;
@@ -39,6 +40,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _matchText = matchText;
             _transService = transService;
             _ticketService = ticketService;
+            _campService = campService;
             // _matchInterface = matchInterface;
         }
 
@@ -128,7 +130,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 if (adModel.PrevStatus == 4 && adModel.CampaignProfileId > 0)
                 {
-                    var camstatus = Changecampaignstatus(campaignadvertId.CampaignProfileId);
+                    var camstatus = _campService.ChangeCampaignStatus(adModel.CampaignProfileId);
                 }
 
                 if (adModel.CampaignProfileId > 0)

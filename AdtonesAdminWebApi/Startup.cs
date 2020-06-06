@@ -57,6 +57,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ITicketService, TicketService>();
             services.AddScoped<IAdvertService, AdvertService>();
             services.AddScoped<ICampaignService, CampaignService>();
+            services.AddScoped<IUserProfileService, UserProfileService>();
 
             #endregion
 
@@ -75,6 +76,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ILoginDAL, LoginDAL>();
             services.AddScoped<IUserManagementDAL, UserManagementDAL>();
             services.AddScoped<IUserMatchDAL, UserMatchDAL>();
+            services.AddScoped<IUserProfileDAL, UserProfileDAL>();
 
             #endregion
 
@@ -96,6 +98,7 @@ namespace AdtonesAdminWebApi
             services.AddTransient<ILoginQuery, LoginQuery>();
             services.AddTransient<IUserManagementQuery, UserManagementQuery>();
             services.AddTransient<IUserMatchQuery, UserMatchQuery>();
+            services.AddTransient<IUserProfileQuery, UserProfileQuery>();
 
             #endregion
 

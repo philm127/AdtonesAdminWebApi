@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.Extensions.Configuration;
@@ -15,13 +16,14 @@ namespace AdtonesAdminWebApi.DAL
         private readonly IConfiguration _configuration;
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
+        private readonly IConnectionStringService _connService;
 
-
-        public CampaignDAL(IConfiguration configuration, IExecutionCommand executers)
+        public CampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
+            _connService = connService;
         }
 
 
@@ -88,22 +90,77 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        //        public async Task<UserCampaignResult> GetCampaignDetail(string command, int id = 0)
-        //        {
-        //            var builder = new SqlBuilder();
-        //            var select = builder.AddTemplate(command);
-        //            try
-        //            {
-        //                builder.AddParameters(new { Id = id });
+        public async Task<CampaignProfile> GetCampaignProfileDetail(string command, int id = 0)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(command);
+            try
+            {
+                builder.AddParameters(new { Id = id });
 
-        //                return await _executers.ExecuteCommand(_connStr,
-        //                                conn => conn.QueryFirstOrDefault<UserCampaignResult>(select.RawSql, select.Parameters));
-        //            }
-        //            catch
-        //            {
-        //                throw;
-        //            }
-        //        }
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<CampaignProfile>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> ChangeCampaignProfileStatus(string command, CampaignProfile model)
+        {
+
+            var sb = new StringBuilder();
+            sb.Append(command);
+            sb.Append(" CampaignProfileId=@Id;");
+
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(sb.ToString());
+            try
+            {
+                builder.AddParameters(new { Id = model.CampaignProfileId });
+                builder.AddParameters(new { Status = model.Status });
+
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(command));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// Changes status on operators provisioning server
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public async Task<int> ChangeCampaignProfileStatusOperator(string command, CampaignProfile model)
+        {
+            var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
+
+            var sb = new StringBuilder();
+            sb.Append(command);
+            sb.Append(" AdtoneServerCampaignProfileId=@Id;");
+
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(sb.ToString());
+            try
+            {
+                builder.AddParameters(new { Id = model.CampaignProfileId });
+                builder.AddParameters(new { Status = model.Status });
+
+                return await _executers.ExecuteCommand(operatorConnectionString,
+                                    conn => conn.ExecuteScalar<int>(command));
+            }
+            catch
+            {
+                throw;
+            }
+        }
 
 
         //        public async Task<IEnumerable<CampaignCategoryResult>> GetCampaignCategoryList(string command)
@@ -120,29 +177,7 @@ namespace AdtonesAdminWebApi.DAL
         //        }
 
 
-        //        public async Task<int> ChangeCampaignStatus(string command, UserCampaignResult model)
-        //        {
 
-        //            var sb = new StringBuilder();
-        //            sb.Append(command);
-        //            sb.Append("CampaignId=@CampaignId;");
-
-        //            var builder = new SqlBuilder();
-        //            var select = builder.AddTemplate(command);
-        //            try
-        //            {
-        //                builder.AddParameters(new { CampaignId = model.CampaignId });
-        //                builder.AddParameters(new { UpdatedBy = model.UpdatedBy });
-        //                builder.AddParameters(new { CampaignId = model.CampaignId });
-
-        //                return await _executers.ExecuteCommand(_connStr,
-        //                                    conn => conn.ExecuteScalar<int>(command));
-        //            }
-        //            catch
-        //            {
-        //                throw;
-        //            }
-        //        }
 
 
         ////        //Model.Campaign Campaign = _CampaignRepository.GetById(command.CampaignId);

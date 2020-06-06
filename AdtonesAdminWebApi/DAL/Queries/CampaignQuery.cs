@@ -7,6 +7,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
         string GetCampaignResultSet { get; }
         string GetPromoCampaignResultSet { get; }
         string GetCampaignCreditResultSet { get; }
+        string GetCampaignProfileById { get; }
+        string UpdateCampaignProfileStatus { get; }
         //string UpdateAdvertStatus { get; }
         //string InsertAdvertRejection { get; }
     }
@@ -56,6 +58,22 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     FROM CampaignCreditPeriods AS ccp LEFT JOIN Users AS usr ON ccp.UserId=usr.UserId
                                                     LEFT JOIN CampaignProfile AS camp ON camp.CampaignProfileId=ccp.CampaignProfileId
                                                     ORDER BY CreatedDate DESC;";
+
+
+        public string GetCampaignProfileById => @"SELECT CampaignProfileId,UserId,ClientId,CampaignName,CampaignDescription,
+                                                    TotalBudget,MaxBid,TotalCredit,SpendToDate,AvailableCredit,PlaysToDate,
+                                                    CancelledToDate,SmsToDate,EmailToDate,EmailFileLocation,Active,NumberOfPlays,
+                                                    AverageDailyPlays,SmsRequests,EmailsDelievered,EmailSubject,EmailBody,SmsBody,
+                                                    SMSFileLocation,CreatedDateTime,UpdatedDateTime,Status,StartDate,EndDate,
+                                                    CountryId,IsAdminApproval,ProvidendSpendAmount,AdtoneServerCampaignProfileId,
+                                                    CurrencyCode
+                                                    FROM CampaignProfile AS camp 
+                                                    LEFT JOIN Operators AS op ON camp.CountryId=op.CountryId 
+                                                    WHERE CampaignProfileId=@Id";
+
+
+        public string UpdateCampaignProfileStatus => @"UPDATE CampaignProfile SET Status@Status,IsAdminApproval=true,
+                                                        UpdatedDateTime = GETDATE() WHERE ";
 
 
 

@@ -37,5 +37,24 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
         }
+
+
+        public async Task<bool> CheckCampaignBillingExists(string command, int campaignId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(command);
+            builder.AddParameters(new { Id = campaignId });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<bool>(select.RawSql, select.Parameters));
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }
