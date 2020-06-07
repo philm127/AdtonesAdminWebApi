@@ -88,6 +88,31 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        // Comes from SoapApiService
+        public async Task<int> UpdateCorpUser(string command, int userId)
+        {
+            int x = 0;
+
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(command);
+            builder.AddParameters(new { Id = userId });
+
+            try
+            {
+                x = await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+
+            
+            return x;
+
+        }
+
+
         public async Task<User> GetUserById(string command, int id)
         {
             var builder = new SqlBuilder();

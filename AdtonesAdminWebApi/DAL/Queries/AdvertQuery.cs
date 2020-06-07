@@ -19,11 +19,11 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public string GetAdvertResultSet => @"SELECT ad.AdvertId,ad.UserId,ad.ClientId,ad.AdvertName,ad.Brand,cprof.SmsBody,cprof.EmailBody,
                                                 ISNULL(cl.Name,'-') AS ClientName,ad.OperatorId,cad.CampaignProfileId,
                                                 CONCAT(usr.FirstName,' ',usr.LastName) AS UserName, usr.Email,ad.CreatedDateTime AS CreatedDate,
-                                                ad.Script,ad.Status,ad.MediaFileLocation AS MediaFile,ad.UploadedToMediaServer,
+                                                ad.Script,ad.Status,ad.MediaFileLocation,ad.UploadedToMediaServer,SoapToneCode,
                                                 CASE WHEN ad.MediaFileLocation IS NULL THEN ad.MediaFileLocation 
-                                                    ELSE CONCAT(@siteAddress,ad.MediaFileLocation) END AS MediaFileLocation,
+                                                    ELSE CONCAT(@siteAddress,ad.MediaFileLocation) END AS MediaFile,
                                                 CASE WHEN ad.ScriptFileLocation IS NULL THEN ad.ScriptFileLocation 
-                                                    ELSE CONCAT(@siteAddress,ad.ScriptFileLocation) END AS ScriptFileLocation
+                                                    ELSE CONCAT(@siteAddress,ad.ScriptFileLocation) END AS ScriptFileLocation,ad.SoapToneId
                                                 FROM Advert AS ad LEFT JOIN Client AS cl ON ad.ClientId=cl.Id
                                                 LEFT JOIN Users AS usr ON usr.UserId=ad.UserId
                                                 LEFT JOIN CampaignAdverts AS cad ON cad.AdvertId=ad.AdvertId

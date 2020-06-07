@@ -6,6 +6,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
     {
         string UpdateUserStatus { get; }
         string GetUserById { get; }
+        string UpdateCorpUser { get; }
 
     }
 
@@ -18,6 +19,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                         Activated,RoleId,OrganisationTypeId,AdtoneServerUserId 
                                         FROM Users AS u LEFT JOIN Operators AS op ON op.OperatorId=u.OperatorId 
                                         WHERE UserId=@UserId";
+
+        // Comes from SoapApiService
+        public string UpdateCorpUser => "UPDATE Users SET Activated=3, IsMsisdnMatch=false WHERE UserId=@Id;";
 
     }
 }

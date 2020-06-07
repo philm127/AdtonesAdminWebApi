@@ -109,6 +109,7 @@ namespace AdtonesAdminWebApi
             services.AddTransient<IAdTransferService, AdTransferService>();
             services.AddTransient<IGenerateTicketService, GenerateTicketService>();
             services.AddTransient<ILiveAgentService, LiveAgentService>();
+            services.AddTransient<ISoapApiService, SoapApiService>();
 
             // Client Specific Services
             services.AddScoped<IExpressoProcessPromoUser, ExpressoProcessPromoUser>();

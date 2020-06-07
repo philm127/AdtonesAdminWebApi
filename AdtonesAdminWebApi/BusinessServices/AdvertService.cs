@@ -20,6 +20,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IAdTransferService _transService;
         private readonly IGenerateTicketService _ticketService;
         private readonly ICampaignService _campService;
+        private readonly ISoapApiService _soapApi;
 
         // private IUserMatchInterface _matchInterface;
         private readonly IAdvertDAL _advertDAL;
@@ -30,7 +31,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public AdvertService(IAdvertDAL advertDAL, IAdvertQuery commandText, IHttpContextAccessor httpAccessor, IConnectionStringService connService,
                                 IUserMatchDAL matchDAL, IUserMatchQuery matchText, IAdTransferService transService, 
-                                IGenerateTicketService ticketService, ICampaignService campService)//IUserMatchInterface matchInterface
+                                IGenerateTicketService ticketService, ICampaignService campService, ISoapApiService soapApi)//IUserMatchInterface matchInterface
         {
             _advertDAL = advertDAL;
             _commandText = commandText;
@@ -41,6 +42,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _transService = transService;
             _ticketService = ticketService;
             _campService = campService;
+            _soapApi = soapApi;
             // _matchInterface = matchInterface;
         }
 
@@ -146,7 +148,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                             {
                                 //Add 08-08-2019
                                 string adName = "";
-                                if (adModel.MediaFile == null || adModel.MediaFile == "")
+                                if (adModel.MediaFileLocation == null || adModel.MediaFileLocation == "")
                                 {
                                     adName = "";
                                 }
@@ -157,7 +159,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                                     
                                     FtpDetailsModel operatorFTPDetails = await _advertDAL.GetFtpDetails(_commandText.GetFtpDetails, adModel.OperatorId);
                                         if (operatorFTPDetails != null) 
-                                            adName = operatorFTPDetails.FtpRoot + "/" + adModel.MediaFile.Split('/')[3];
+                                            adName = operatorFTPDetails.FtpRoot + "/" + adModel.MediaFileLocation.Split('/')[3];
                                     }
                                 }
 
@@ -184,7 +186,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     }
                     else
                     {
-                        var crbtResponseValue = SoapApiProcess.UploadToneOnCRBTServer(id);
+                        var crbtResponseValue = _soapApi.UploadToneOnCRBTServer(id);
                         //var crbtResponseValue = "Success";
                         if (crbtResponseValue != "Success")
                         {
@@ -194,7 +196,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         }
                         else
                         {
-                            var responseCode = SoapApiProcess.UploadSoapTone(id);
+                            var responseCode = _soapApi.UploadSoapTone(id);
                             //var responseCode = "000000";
                             if (responseCode == "000000")
                             {
@@ -282,14 +284,14 @@ namespace AdtonesAdminWebApi.BusinessServices
                 EFMVCDataContex db = new EFMVCDataContex();
                 var advertData = db.Adverts.Where(s => s.AdvertId == id).FirstOrDefault();
 
-                if (advertData.OperatorId == (int)OperatorTableId.Safaricom)
+                if (advertData.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                 {
 
                     //if (advertData.SoapToneId != null)
                     //{
                     //var responseCode = SoapApiProcess.DeleteToneSoapApi(id);
                     //271191
-                    var responseCode = SoapApiProcess.DeleteSoapTone(id);
+                    var responseCode = _soapApi.DeleteSoapTone(id);
                     if (responseCode != "000000")
                     {
                         string message = "";

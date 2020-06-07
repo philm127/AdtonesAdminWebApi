@@ -11,6 +11,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     {
         Task<int> UpdateUserStatus(string command, AdvertiserDashboardResult model);
         Task<User> GetUserById(string command, int id);
+        Task<int> UpdateCorpUser(string command, int userId);
 
     }
 }
