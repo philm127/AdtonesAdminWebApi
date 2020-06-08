@@ -9,6 +9,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
         string GetCampaignCreditResultSet { get; }
         string GetCampaignProfileById { get; }
         string UpdateCampaignProfileStatus { get; }
+        string GetCampaignAdvertDetailsById { get; }
         //string UpdateAdvertStatus { get; }
         //string InsertAdvertRejection { get; }
     }
@@ -75,6 +76,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public string UpdateCampaignProfileStatus => @"UPDATE CampaignProfile SET Status@Status,IsAdminApproval=true,
                                                         UpdatedDateTime = GETDATE() WHERE ";
 
+
+        public string GetCampaignAdvertDetailsById => @"SELECT CampaignAdvertId,CampaignProfileId,AdvertId,
+                                                        NextStatus,AdtoneServerCampaignAdvertId
+                                                        FROM CampaignAdverts WHERE ";
 
 
         }

@@ -123,7 +123,7 @@ namespace AdtonesAdminWebApi.DAL
                 builder.AddParameters(new { Status = model.Status });
 
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(command));
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -154,7 +154,7 @@ namespace AdtonesAdminWebApi.DAL
                 builder.AddParameters(new { Status = model.Status });
 
                 return await _executers.ExecuteCommand(operatorConnectionString,
-                                    conn => conn.ExecuteScalar<int>(command));
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -162,6 +162,27 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
+
+        public async Task<CampaignAdverts> GetCampaignAdvertDetailsByAdvertId(string command, int Id)
+        {
+            var sb = new StringBuilder();
+            sb.Append(command);
+            sb.Append(" AdvertId=@Id;");
+
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(sb.ToString());
+            try
+            {
+                builder.AddParameters(new { Id = Id });
+
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.QueryFirstOrDefault<CampaignAdverts>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
 
         //        public async Task<IEnumerable<CampaignCategoryResult>> GetCampaignCategoryList(string command)
         //        {

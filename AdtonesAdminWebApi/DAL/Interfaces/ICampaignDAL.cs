@@ -16,5 +16,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<CampaignProfile> GetCampaignProfileDetail(string command, int id = 0);
         Task<int> ChangeCampaignProfileStatus(string command, CampaignProfile model);
         Task<int> ChangeCampaignProfileStatusOperator(string command, CampaignProfile model);
+        Task<CampaignAdverts> GetCampaignAdvertDetailsByAdvertId(string command, int Id);
     }
 }

@@ -11,6 +11,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
         string InsertAdvertRejection { get; }
         string GetFtpDetails { get; }
         string UpdateMediaLoaded { get; }
+        string RejectAdvertReason { get; }
     }
 
 
@@ -47,5 +48,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         public string UpdateMediaLoaded => "UPDATE Advert SET UploadedToMediaServer = true WHERE AdvertId=@advertId;";
+
+
+        public string RejectAdvertReason => @"INSERT INTO AdvertRejections(UserId,AdvertId,RejectionReason,CreatedDate,AdtoneServerAdvertRejectionId)
+                                                                    VALUES(@UserId,@AdvertId,@RejectionReason,GETDATE(),@AdtoneServerAdvertRejectionId);
+                                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
     }
 }

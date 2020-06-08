@@ -77,6 +77,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IUserManagementDAL, UserManagementDAL>();
             services.AddScoped<IUserMatchDAL, UserMatchDAL>();
             services.AddScoped<IUserProfileDAL, UserProfileDAL>();
+            services.AddScoped<ISoapDAL, SoapDAL>();
 
             #endregion
 
@@ -99,6 +100,7 @@ namespace AdtonesAdminWebApi
             services.AddTransient<IUserManagementQuery, UserManagementQuery>();
             services.AddTransient<IUserMatchQuery, UserMatchQuery>();
             services.AddTransient<IUserProfileQuery, UserProfileQuery>();
+            services.AddTransient<ISoapQuery, SoapQuery>();
 
             #endregion
 

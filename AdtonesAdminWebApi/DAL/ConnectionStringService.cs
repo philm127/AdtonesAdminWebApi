@@ -33,6 +33,7 @@ namespace AdtonesAdminWebApi.DAL
         /// <returns>string value of a ConnectionString</returns>
         public async Task<string> GetSingleConnectionString(int Id = 0)
         {
+            /// TODO: This needs to be sorted in a better manner
             var test = true;
             if (test)
                 return _configuration.GetConnectionString("TestProvoConnection");
@@ -83,23 +84,41 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> GetUserIdFromAdtoneId(int Id, int operatorId)
         {
-            var test = true;
-            if (test)
-            {
-                List<string> str = null;
-                str.Add(_configuration.GetConnectionString("TestProvoConnection"));
-                return 0;
-            }
-            else
-            {
                 var conn = await GetSingleConnectionString(operatorId);
-                StringBuilder sb = new StringBuilder("SELECT UserId FROM Users WHERE AdtoneServerUserId=@Id");
+            var select_string = "SELECT UserId FROM Users WHERE AdtoneServerUserId=@Id";
+
+                using (var connection = new SqlConnection(conn))
+                {
+                    await connection.OpenAsync();
+                    return await connection.QueryFirstOrDefaultAsync<int>(select_string, new { Id = Id });
+                }
+        }
+
+
+        public async Task<int> GetCampaignProfileIdFromAdtoneId(int Id, int operatorId)
+        {
+            
+                var conn = await GetSingleConnectionString(operatorId);
+                StringBuilder sb = new StringBuilder("SELECT CampaignProfileId FROM CampaignProfile WHERE AdtoneServerCampaignProfileId=@Id");
 
                 using (var connection = new SqlConnection(conn))
                 {
                     await connection.OpenAsync();
                     return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = Id });
                 }
+        }
+
+
+        public async Task<int> GetAdvertIdFromAdtoneId(int Id, int operatorId)
+        {
+
+            var conn = await GetSingleConnectionString(operatorId);
+            StringBuilder sb = new StringBuilder("SELECT AdvertId FROM Advert WHERE AdtoneServerAdvertId=@Id");
+
+            using (var connection = new SqlConnection(conn))
+            {
+                await connection.OpenAsync();
+                return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = Id });
             }
         }
 

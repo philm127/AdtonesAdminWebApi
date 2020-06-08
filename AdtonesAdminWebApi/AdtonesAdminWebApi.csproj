@@ -40,6 +40,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="DAL\Queries\SoapQuery.cs" />
+    <Compile Include="DAL\SoapDAL.cs" />
+    <Compile Include="DAL\Interfaces\ISoapDAL.cs" />
     <Compile Include="DAL\Interfaces\ILoginDAL.cs" />
     <Compile Include="DAL\Interfaces\IUserManagementDAL.cs" />
     <Compile Include="DAL\Interfaces\IUserMatchDAL.cs" />

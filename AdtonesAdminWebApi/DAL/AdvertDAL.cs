@@ -123,7 +123,7 @@ namespace AdtonesAdminWebApi.DAL
             var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
             var sb = new StringBuilder();
             sb.Append(command);
-            sb.Append("AdvertId=@AdvertId;");
+            sb.Append(" AdtoneServerAdvertId=@AdvertId;");
 
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sb.ToString());
@@ -180,38 +180,47 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        //        //Model.Advert advert = _advertRepository.GetById(command.AdvertId);
-        //        var advertDetail = _advertRepository.GetById(command.AdvertId);
-        //        advertDetail.Status = command.Status;
-        //            advertDetail.UpdatedBy = command.UpdatedBy;
-        //            _advertRepository.Update(advertDetail);
-        //            var ConnString = ConnectionString.GetConnectionStringByCountryId(advertDetail.CountryId);
-        //            if (ConnString != null && ConnString.Count() > 0)
-        //            {
-        //                foreach (var item in ConnString)
-        //                {
-        //                    EFMVCDataContex db = new EFMVCDataContex(item);
-        //        var externalServerUserId = OperatorServer.GetUserIdFromOperatorServer(db, (int)command.UpdatedBy);
-        //        var advertData = db.Adverts.Where(s => s.AdtoneServerAdvertId == command.AdvertId).FirstOrDefault();
-        //                    if (advertData != null)
-        //                    {
-        //                        advertData.Status = command.Status;
-        //                        if (externalServerUserId != 0)
-        //                        {
-        //                            advertData.UpdatedBy = command.UpdatedBy;
-        //                        }
-        //                        else
-        //                        {
-        //                            advertData.UpdatedBy = null;
-        //                        }
+        public async Task<int> RejectAdvertReason(string command, UserAdvertResult model)
+        {
 
-        //db.SaveChanges();
-        //                    }
-        //                }
-        //            }
-        //            unitOfWork.Commit();
-        //            return new CommandResult(true);
-        //}
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(command);
+            try
+            {
+                builder.AddParameters(new { AdvertId = model.AdvertId });
+                builder.AddParameters(new { UserId = model.UpdatedBy });
+                builder.AddParameters(new { RejectReason = model.RejectionReason });
+                builder.AddParameters(new { AdtoneServerAdvertRejectionI = 0});
+
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> RejectAdvertReasonOperator(string command, UserAdvertResult model,string connString,int uid, int rejId, int adId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(command);
+            try
+            {
+                builder.AddParameters(new { AdvertId = adId });
+                builder.AddParameters(new { UserId = uid });
+                builder.AddParameters(new { RejectReason = model.RejectionReason });
+                builder.AddParameters(new { AdtoneServerAdvertRejectionI = rejId });
+
+                return await _executers.ExecuteCommand(connString,
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
 
 
 

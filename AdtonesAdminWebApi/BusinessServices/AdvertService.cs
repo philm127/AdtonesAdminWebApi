@@ -21,17 +21,21 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IGenerateTicketService _ticketService;
         private readonly ICampaignService _campService;
         private readonly ISoapApiService _soapApi;
+        private readonly ISoapDAL _soapDAL;
 
         // private IUserMatchInterface _matchInterface;
         private readonly IAdvertDAL _advertDAL;
         private readonly IAdvertQuery _commandText;
-        
+        private readonly ISoapQuery _soapText;
+        private readonly ICampaignDAL _campDAL;
+        private readonly ICampaignQuery _campText;
         ReturnResult result = new ReturnResult();
 
 
         public AdvertService(IAdvertDAL advertDAL, IAdvertQuery commandText, IHttpContextAccessor httpAccessor, IConnectionStringService connService,
                                 IUserMatchDAL matchDAL, IUserMatchQuery matchText, IAdTransferService transService, 
-                                IGenerateTicketService ticketService, ICampaignService campService, ISoapApiService soapApi)//IUserMatchInterface matchInterface
+                                IGenerateTicketService ticketService, ICampaignService campService, ISoapApiService soapApi,
+                                ISoapDAL soapDAL, ISoapQuery soapText, ICampaignDAL campDAL, ICampaignQuery campText)//IUserMatchInterface matchInterface
         {
             _advertDAL = advertDAL;
             _commandText = commandText;
@@ -43,6 +47,10 @@ namespace AdtonesAdminWebApi.BusinessServices
             _ticketService = ticketService;
             _campService = campService;
             _soapApi = soapApi;
+            _soapDAL = soapDAL;
+            _soapText = soapText;
+            _campDAL = campDAL;
+            _campText = campText;
             // _matchInterface = matchInterface;
         }
 
@@ -119,62 +127,82 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> ApproveORRejectAdvert(UserAdvertResult adModel)
+        private async Task<bool> ApproveRejectApproveAd(UserAdvertResult adModel, string ConnString)
         {
-            var ConnString = await _connService.GetSingleConnectionString(adModel.OperatorId);
-
-            if (adModel.Status == (int)Enums.AdvertStatus.Live && adModel.PrevStatus != (int)Enums.AdvertStatus.Pending)
+            try
             {
-
-                var x = await _advertDAL.ChangeAdvertStatus(_commandText.UpdateAdvertStatus,adModel);
+                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(_campText.GetCampaignAdvertDetailsById, adModel.AdvertId);
+                var campaignProfile = await _campDAL.GetCampaignProfileDetail(_campText.GetCampaignProfileById, campaignAdvert.CampaignProfileId);
+                if (campaignProfile.Status == 8 && adModel.Status == (int)Enums.AdvertStatus.Pending)
+                {
+                    adModel.Status = (int)Enums.AdvertStatus.CampaignPausedDueToInsufficientFunds;
+                }
+                var x = await _advertDAL.ChangeAdvertStatus(_commandText.UpdateAdvertStatus, adModel);
                 int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
                 var y = await _advertDAL.ChangeAdvertStatusOperator(_commandText.UpdateAdvertStatus, adModel, uid);
 
-                if (adModel.PrevStatus == 4 && adModel.CampaignProfileId > 0)
+                var operatordId = adModel.OperatorId;
+
+                if (adModel.PrevStatus == 4 && campaignAdvert != null)
                 {
-                    var camstatus = _campService.ChangeCampaignStatus(adModel.CampaignProfileId);
+                    // Goes off to Campaign Service to change campaign and returns a bool
+                    var camstatus = _campService.ChangeCampaignStatus(campaignAdvert.CampaignProfileId);
                 }
 
-                if (adModel.CampaignProfileId > 0)
+
+                if (campaignAdvert != null)
                 {
                     if (ConnString != null)
                     {
                         UserMatchTableProcess obj = new UserMatchTableProcess();
 
 
-                        string select_string = @"SELECT * FROM CampaignProfiles WHERE AdtoneServerCampaignProfileId=@CampaignProfileId";//.FirstOrDefault();
-                        var campaigndetails = select_string;
-                            if (campaigndetails != null)
+                        var campaigndetailsid = await _connService.GetCampaignProfileIdFromAdtoneId(campaignAdvert.CampaignProfileId, adModel.OperatorId);
+                        if (campaigndetailsid != 0)
+                        {
+                            //Add 08-08-2019
+                            string adName = "";
+                            if (adModel.MediaFileLocation == null || adModel.MediaFileLocation == "")
                             {
-                                //Add 08-08-2019
-                                string adName = "";
-                                if (adModel.MediaFileLocation == null || adModel.MediaFileLocation == "")
-                                {
-                                    adName = "";
-                                }
-                                else
-                                {
-                                    if (adModel.OperatorId != (int)Enums.OperatorTableId.Safaricom)
-                                    {
-                                    
-                                    FtpDetailsModel operatorFTPDetails = await _advertDAL.GetFtpDetails(_commandText.GetFtpDetails, adModel.OperatorId);
-                                        if (operatorFTPDetails != null) 
-                                            adName = operatorFTPDetails.FtpRoot + "/" + adModel.MediaFileLocation.Split('/')[3];
-                                    }
-                                }
-
-                            var z = await _matchDAL.UpdateMediaLocation(_matchText.UpdateMediaLocation, ConnString, adName, adModel.CampaignProfileId);
-                            await _matchDAL.PrematchProcessForCampaign(adModel.CampaignProfileId, ConnString);
+                                adName = "";
                             }
+                            else
+                            {
+                                if (adModel.OperatorId != (int)Enums.OperatorTableId.Safaricom)
+                                {
+                                    FtpDetailsModel operatorFTPDetails = await _advertDAL.GetFtpDetails(_commandText.GetFtpDetails, adModel.OperatorId);
+                                    if (operatorFTPDetails != null)
+                                        adName = operatorFTPDetails.FtpRoot + "/" + adModel.MediaFileLocation.Split('/')[3];
+                                }
+                            }
+
+                            var z = await _matchDAL.UpdateMediaLocation(_matchText.UpdateMediaLocation, ConnString, adName, campaigndetailsid);
+                            await _matchDAL.PrematchProcessForCampaign(campaigndetailsid, ConnString);
+                        }
                     }
                 }
 
-                result.body = "Advert " + adModel.AdvertName + " is approved successfully.";
-                return result;
+                return true;
             }
-            else if (adModel.Status == (int)Enums.AdvertStatus.Live && adModel.PrevStatus == (int)Enums.AdvertStatus.Pending) // Live
+            catch (Exception ex)
             {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "ApproveRejectApproveAd"
+                };
+                _logging.LogError();
+                return false;
+            }
+        }
 
+
+        private async Task<bool> ApproveRejectLiveFromPending(UserAdvertResult adModel, string ConnString)
+        {
+            try
+            {
                 if (adModel.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                 {
                     var returnValue = await _transService.CopyAdToOpeartorServer(ConnString, adModel);
@@ -182,29 +210,28 @@ namespace AdtonesAdminWebApi.BusinessServices
                     {
                         string message = returnValue;
                         int subjectId = (int)Enums.QuestionSubjectStatus.AdvertError;
-                        await _ticketService.CreateAdTicket(_httpAccessor.GetUserIdFromJWT(), "Advert Error", message, subjectId, 0);
+                        await _ticketService.CreateAdTicket(adModel.UpdatedBy, "Advert Error", message, subjectId, 0);
                     }
                     else
                     {
-                        var crbtResponseValue = _soapApi.UploadToneOnCRBTServer(id);
+                        var crbtResponseValue = _soapApi.UploadToneOnCRBTServer(adModel.AdvertId);
                         //var crbtResponseValue = "Success";
                         if (crbtResponseValue != "Success")
                         {
                             string message = crbtResponseValue;
                             int subjectId = (int)Enums.QuestionSubjectStatus.AdvertError;
-                            await _ticketService.CreateAdTicket(_httpAccessor.GetUserIdFromJWT(), "Advert Error", message, subjectId, 0);
+                            await _ticketService.CreateAdTicket(adModel.UpdatedBy, "Advert Error", message, subjectId, 0);
                         }
                         else
                         {
-                            var responseCode = _soapApi.UploadSoapTone(id);
+                            var responseCode = _soapApi.UploadSoapTone(adModel.AdvertId);
                             //var responseCode = "000000";
                             if (responseCode == "000000")
                             {
-                                ApproveAd(id, command, efmvcUser.UserId, status, oldstatus);
+                                var boolRet = await ApproveRejectApproveAd(adModel, ConnString);
                             }
                             else
                             {
-                                var advertData = _advertRepository.GetById(id);
                                 string message = "";
                                 if (responseCode == "0" || responseCode.Contains("?"))
                                 {
@@ -212,7 +239,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                                 }
                                 else
                                 {
-                                    var responseCodeDetail = _soapApiResponseCodeRepository.GetMany(s => s.ReturnCode == responseCode).FirstOrDefault();
+                                    var responseCodeDetail = await _soapDAL.GetSoapApiResponse(_soapText.GetSoapApiResponseCodes,responseCode);
                                     if (responseCodeDetail != null)
                                     {
                                         message = responseCode + " - " + responseCodeDetail.Description;
@@ -229,12 +256,10 @@ namespace AdtonesAdminWebApi.BusinessServices
                         }
 
                     }
-
-
                 }
                 else if (adModel.OperatorId == (int)Enums.OperatorTableId.Expresso)
                 {
-                    var returnValue = await _transService.CopyAdToOpeartorServer(ConnString,adModel);
+                    var returnValue = await _transService.CopyAdToOpeartorServer(ConnString, adModel);
                     if (returnValue != "Success")
                     {
                         string message = returnValue;
@@ -242,56 +267,78 @@ namespace AdtonesAdminWebApi.BusinessServices
                         await _ticketService.CreateAdTicket(_httpAccessor.GetUserIdFromJWT(), "Advert Error", message, subjectId, 0);
                     }
 
-                    ApproveAd(id, command, efmvcUser.UserId, status, oldstatus);
+                    var boolRet = await ApproveRejectApproveAd(adModel, ConnString);
                 }
 
-
+                return true;
             }
-            else if (adModel.Status == (int)Enums.AdvertStatus.Suspended) // suspended
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "ApproveRejectLiveFromPending"
+                };
+                _logging.LogError();
+                return false;
+            }
+        }
+
+
+        private async Task<bool> ApproveRejectSuspended(UserAdvertResult adModel, string ConnString)
+        {
+            try
             {
                 var x = await _advertDAL.ChangeAdvertStatus(_commandText.UpdateAdvertStatus, adModel);
                 int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
                 var y = await _advertDAL.ChangeAdvertStatusOperator(_commandText.UpdateAdvertStatus, adModel, uid);
 
-                var campaignadvertId = _campaignadvertRepository.Get(top => top.AdvertId == id);
-                var campaigndetails = _campaignprofileRepository.GetById(campaignadvertId.CampaignProfileId);
+                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(_campText.GetCampaignAdvertDetailsById, adModel.AdvertId);
+                var campaignProfile = await _campDAL.GetCampaignProfileDetail(_campText.GetCampaignProfileById, campaignAdvert.CampaignProfileId);
 
                 if (ConnString != null)
                 {
-                    UserMatchTableProcess obj = new UserMatchTableProcess();
-                    foreach (var item in ConnString)
+                    var campaigndetailsid = await _connService.GetCampaignProfileIdFromAdtoneId(campaignAdvert.CampaignProfileId, adModel.OperatorId);
+                    if (campaigndetailsid != 0)
                     {
-                        EFMVCDataContex SQLServerEntities = new EFMVCDataContex(item);
-                        var OperatorCampaigndetails = SQLServerEntities.CampaignProfiles.Where(s => s.AdtoneServerCampaignProfileId == campaignadvertId.CampaignProfileId).FirstOrDefault();
-                        if (OperatorCampaigndetails != null)
-                        {
-                            obj.UpdateMediaFileLocation(OperatorCampaigndetails.CampaignProfileId, null, SQLServerEntities);
-                            PreMatchProcess.PrematchProcessForCampaign(OperatorCampaigndetails.CampaignProfileId, item);
-                        }
-
+                        var z = await _matchDAL.UpdateMediaLocation(_matchText.UpdateMediaLocation, ConnString, null, campaigndetailsid);
+                        await _matchDAL.PrematchProcessForCampaign(campaigndetailsid, ConnString);
                     }
                 }
 
-                result.body = "Advert " + adModel.AdvertName + " is suspended successfully.";
-                return result;
+                return true;
             }
-            else if (adModel.Status == (int)Enums.AdvertStatus.Archived) // Archived(Deleted)
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "ApproveRejectSuspended"
+                };
+                _logging.LogError();
+                return false;
+            }
+        }
+
+
+        private async Task<bool> ApproveRejectArchived(UserAdvertResult adModel, string ConnString)
+        {
+            try
             {
                 var x = await _advertDAL.ChangeAdvertStatus(_commandText.UpdateAdvertStatus, adModel);
                 int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
                 var y = await _advertDAL.ChangeAdvertStatusOperator(_commandText.UpdateAdvertStatus, adModel, uid);
 
-                EFMVCDataContex db = new EFMVCDataContex();
-                var advertData = db.Adverts.Where(s => s.AdvertId == id).FirstOrDefault();
+                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(_campText.GetCampaignAdvertDetailsById, adModel.AdvertId);
+                var campaignProfile = await _campDAL.GetCampaignProfileDetail(_campText.GetCampaignProfileById, campaignAdvert.CampaignProfileId);
 
-                if (advertData.OperatorId == (int)Enums.OperatorTableId.Safaricom)
+                if (adModel.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                 {
-
-                    //if (advertData.SoapToneId != null)
-                    //{
-                    //var responseCode = SoapApiProcess.DeleteToneSoapApi(id);
-                    //271191
-                    var responseCode = _soapApi.DeleteSoapTone(id);
+                    var responseCode = _soapApi.DeleteSoapTone(adModel.AdvertId);
                     if (responseCode != "000000")
                     {
                         string message = "";
@@ -301,7 +348,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         }
                         else
                         {
-                            var responseCodeDetail = _soapApiResponseCodeRepository.GetMany(s => s.ReturnCode == responseCode).FirstOrDefault();
+                            var responseCodeDetail = await _soapDAL.GetSoapApiResponse(_soapText.GetSoapApiResponseCodes,responseCode);
                             if (responseCodeDetail != null)
                             {
                                 message = responseCode + " - " + responseCodeDetail.Description;
@@ -318,41 +365,133 @@ namespace AdtonesAdminWebApi.BusinessServices
                     }
                 }
 
-                var campaignAdvertData = db.CampaignAdverts.Where(s => s.AdvertId == id).ToList();
-                if (campaignAdvertData.Count() > 0)
+                if (ConnString != null)
                 {
-                    var campProfileId = campaignAdvertData.FirstOrDefault().CampaignProfileId;
-                    var CampaignData = _campaignprofileRepository.GetById(campProfileId);
-                    var countryId = CampaignData.CountryId == null ? 0 : CampaignData.CountryId;
-
-                    if (ConnString != null)
+                    var campaigndetailsid = await _connService.GetCampaignProfileIdFromAdtoneId(campaignAdvert.CampaignProfileId, adModel.OperatorId);
+                    if (campaigndetailsid != 0)
                     {
-                        UserMatchTableProcess obj = new UserMatchTableProcess();
-                        foreach (var item in ConnString)
-                        {
-                            EFMVCDataContex SQLServerEntities = new EFMVCDataContex(item);
-                            var OperatorCampaigndetails = SQLServerEntities.CampaignProfiles.Where(s => s.AdtoneServerCampaignProfileId == campProfileId).FirstOrDefault();
-                            if (OperatorCampaigndetails != null)
-                            {
-                                obj.UpdateMediaFileLocation(OperatorCampaigndetails.CampaignProfileId, null, SQLServerEntities);
-                                PreMatchProcess.PrematchProcessForCampaign(OperatorCampaigndetails.CampaignProfileId, item);
-                            }
-
-                        }
+                        var z = await _matchDAL.UpdateMediaLocation(_matchText.UpdateMediaLocation, ConnString, null, campaigndetailsid);
+                        await _matchDAL.PrematchProcessForCampaign(campaigndetailsid, ConnString);
                     }
-
                 }
-                result.body = "Advert " + adModel.AdvertName + " is archived successfully.";
+                return true;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "ApproveRejectArchived"
+                };
+                _logging.LogError();
+                return false;
+            }
+        }
+
+        private async Task<bool> ApproveRejectRejected(UserAdvertResult adModel, string ConnString)
+        {
+            try
+            {
+                int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
+                int adId = await _connService.GetAdvertIdFromAdtoneId(adModel.AdvertId, adModel.OperatorId);
+
+                var x = await _advertDAL.ChangeAdvertStatus(_commandText.UpdateAdvertStatus, adModel);
+                var y = await _advertDAL.ChangeAdvertStatusOperator(_commandText.UpdateAdvertStatus, adModel, uid);
+
+                var rejId = await _advertDAL.RejectAdvertReason(_commandText.RejectAdvertReason, adModel);
+                var z = await _advertDAL.RejectAdvertReasonOperator(_commandText.RejectAdvertReason, adModel, ConnString, uid, rejId,adId);
+
+                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(_campText.GetCampaignAdvertDetailsById, adModel.AdvertId);
+                var campaignProfile = await _campDAL.GetCampaignProfileDetail(_campText.GetCampaignProfileById, campaignAdvert.CampaignProfileId);
+
+                if (ConnString != null)
+                {
+                    var campaigndetailsid = await _connService.GetCampaignProfileIdFromAdtoneId(campaignAdvert.CampaignProfileId, adModel.OperatorId);
+                    if (campaigndetailsid != 0)
+                    {
+                        var f = await _matchDAL.UpdateMediaLocation(_matchText.UpdateMediaLocation, ConnString, null, campaigndetailsid);
+                        await _matchDAL.PrematchProcessForCampaign(campaigndetailsid, ConnString);
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "ApproveRejectRejected"
+                };
+                _logging.LogError();
+                return false;
+            }
+        }
+
+        public async Task<ReturnResult> ApproveORRejectAdvert(UserAdvertResult model)
+        {
+            var adModel = await _advertDAL.GetAdvertDetail(_commandText.GetAdvertDetail, model.AdvertId);
+            adModel.Status = adModel.Status;
+            adModel.PrevStatus = adModel.PrevStatus;
+            adModel.UpdatedBy = adModel.UpdatedBy;
+            adModel.RejectionReason = adModel.RejectionReason;
+            var ConnString = await _connService.GetSingleConnectionString(adModel.OperatorId);
+
+            if (adModel.Status == (int)Enums.AdvertStatus.Live && adModel.PrevStatus != (int)Enums.AdvertStatus.Pending)
+            {
+                adModel.Status = (int)Enums.AdvertStatus.Pending;
+                bool update = false;
+                update = await ApproveRejectApproveAd(adModel, ConnString);
+
+                if(update)
+                    result.body = "Advert " + adModel.AdvertName + " is approved successfully.";
+                
+                return result;
+            }
+            else if (adModel.Status == (int)Enums.AdvertStatus.Live && adModel.PrevStatus == (int)Enums.AdvertStatus.Pending) // Live
+            {
+                bool update = false;
+                update = await ApproveRejectLiveFromPending(adModel, ConnString);
+
+                if (update)
+                    result.body = "Advert " + adModel.AdvertName + " is approved successfully.";
+
+                return result;
+
+            }
+            
+            else if (adModel.Status == (int)Enums.AdvertStatus.Suspended) // suspended
+            {
+                bool update = false;
+                update = await ApproveRejectSuspended(adModel, ConnString);
+
+                if (update)
+                    result.body = "Advert " + adModel.AdvertName + " is suspended successfully.";
+
+                return result;
+            }
+            else if (adModel.Status == (int)Enums.AdvertStatus.Archived) // Archived(Deleted)
+            {
+                bool update = false;
+                update = await ApproveRejectArchived(adModel, ConnString);
+
+                if (update)
+                    result.body = "Advert " + adModel.AdvertName + " is archived successfully.";
+
+                return result;
             }
             else if (adModel.Status == (int)Enums.AdvertStatus.Rejected)
             {
+                bool update = false;
+                update = await ApproveRejectRejected(adModel, ConnString);
 
-                var x = await _advertDAL.ChangeAdvertStatus(_commandText.UpdateAdvertStatus, adModel);
-                int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
-                var y = await _advertDAL.ChangeAdvertStatusOperator(_commandText.UpdateAdvertStatus, adModel, uid);
-
-
-                result.body = "Advert " + adModel.AdvertName + " is rejected successfully.";
+                if (update)
+                    result.body = "Advert " + adModel.AdvertName + " was rejected successfully.";
+                return result;
             }
             return result;
         }
@@ -572,50 +711,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         //    //return Json("error");
         //}
 
-        //public bool Changecampaignstatus(int campaignId)
-        //{
-        //    bool status = false;
-        //    //update campaign status from ad approval to the planned
-        //    ChangeCampaignStatusCommand _campaignstatus = new ChangeCampaignStatusCommand();
-        //    _campaignstatus.CampaignProfileId = campaignId;
-        //    //check campaign details
-        //    var campaigndetails = _campaignprofileRepository.Get(top => top.CampaignProfileId == campaignId);
-        //    if (campaigndetails != null)
-        //    {
-        //        if (campaigndetails.StartDate == null && campaigndetails.EndDate == null)
-        //        {
-        //            _campaignstatus.Status = (int)CampaignStatus.Play;
-        //        }
-        //        else
-        //        {
-        //            if (campaigndetails.StartDate != null)
-        //            {
-        //                if (campaigndetails.StartDate.Value.Date == DateTime.Now.Date)
-        //                {
-        //                    _campaignstatus.Status = (int)CampaignStatus.Play;
-        //                }
-        //                else
-        //                {
-        //                    _campaignstatus.Status = (int)CampaignStatus.Planned;
-        //                }
-        //            }
-        //            else
-        //            {
-        //                _campaignstatus.Status = (int)CampaignStatus.Planned;
-        //            }
-        //        }
-        //    }
-        //    ICommandResult campaignstatuscommandResult = _commandBus.Submit(_campaignstatus);
-        //    if (campaignstatuscommandResult.Success)
-        //    {
-        //        status = true;
-
-        //    }
-        //    return status;
-        //}
-
-
-
+        
 
     }
 }
