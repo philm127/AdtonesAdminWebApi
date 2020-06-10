@@ -44,7 +44,7 @@ namespace AdtonesAdminWebApi.Services
                         var port = Convert.ToInt32(getFTPdetails.Port);
                         var username = getFTPdetails.UserName;
                         var password = getFTPdetails.Password;
-                        var localRoot = System.Web.HttpContext.Current.Server.MapPath("~/Media");
+                        var localRoot = "";//System.Web.HttpContext.Current.Server.MapPath("~/Media"); ///TODO:
                         var ftpRoot = getFTPdetails.FtpRoot;
 
                         // Test FTP Details
@@ -68,7 +68,8 @@ namespace AdtonesAdminWebApi.Services
                             client.Connect();
                             if (client.IsConnected)
                             {
-                                var SourceFile = localRoot + @"\" + advert.UserId + @"\" + System.IO.Path.GetFileName(advert.MediaFileLocation);
+                                // var SourceFile = localRoot + @"\" + advert.UserId + @"\" + System.IO.Path.GetFileName(advert.MediaFileLocation);
+                                var SourceFile = $"{localRoot}\\{advert.UserId}\\{System.IO.Path.GetFileName(advert.MediaFileLocation)}";
                                 var DestinationFile = ftpRoot + "/" + System.IO.Path.GetFileName(advert.MediaFileLocation);
                                 var filestream = new FileStream(SourceFile, FileMode.Open);
                                 //client.UploadFile(filestream, "/usr/local/arthar" + DestinationFile, null);
@@ -82,7 +83,8 @@ namespace AdtonesAdminWebApi.Services
                                     var temp = adName.Split('.')[0];
                                     var secondAdname = Convert.ToInt64(temp) + 1;
 
-                                    var SourceFile2 = localRoot + @"\" + advert.UserId + @"\SecondAudioFile\" + secondAdname + ".wav";
+                                    // var SourceFile2 = localRoot + @"\" + advert.UserId + @"\SecondAudioFile\" + secondAdname + ".wav";
+                                    var SourceFile2 = $"{localRoot}\\{advert.UserId}\\SecondAudioFile\\{secondAdname}.wav";
                                     var DestinationFile2 = ftpRoot + "/" + secondAdname + ".wav";
                                     var filestream2 = new FileStream(SourceFile2, FileMode.Open);
                                     client.UploadFile(filestream2, DestinationFile2, null);

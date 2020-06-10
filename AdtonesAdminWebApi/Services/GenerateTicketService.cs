@@ -41,7 +41,7 @@ namespace AdtonesAdminWebApi.Services
             var userDetail = await _userDal.GetUserById(_commandText.GetUserById,userId);
             string subject = sub;
             string message = msg;
-            string ticketCode = await _liveService.CreateTicket(subject, message, userDetail.Email);
+            string ticketCode =  _liveService.CreateTicket(subject, message, userDetail.Email);
 
             TicketFormModel model = new TicketFormModel();
 
@@ -76,7 +76,7 @@ namespace AdtonesAdminWebApi.Services
             var userDetail = await _userDal.GetUserById(_commandText.GetUserById, userId);
             string subject = sub;
             string message = msg;
-            string ticketCode = await _liveService.CreateTicket(subject, message, userDetail.Email);
+            string ticketCode = _liveService.CreateTicket(subject, message, userDetail.Email);
 
             TicketFormModel model = new TicketFormModel();
 

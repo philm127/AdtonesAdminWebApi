@@ -33,6 +33,7 @@ namespace AdtonesAdminWebApi
         {
 
             services.AddSingleton<IConfiguration>(Configuration);
+            services.AddMemoryCache();
 
             services.AddControllers().AddNewtonsoftJson();
             services.AddHttpContextAccessor();
@@ -58,6 +59,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IAdvertService, AdvertService>();
             services.AddScoped<ICampaignService, CampaignService>();
             services.AddScoped<IUserProfileService, UserProfileService>();
+            services.AddScoped<ICampaignAuditService, CampaignAuditService>();
 
             #endregion
 
@@ -78,6 +80,8 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IUserMatchDAL, UserMatchDAL>();
             services.AddScoped<IUserProfileDAL, UserProfileDAL>();
             services.AddScoped<ISoapDAL, SoapDAL>();
+            services.AddScoped<ICampaignAuditDAL, CampaignAuditDAL>();
+            services.AddScoped<ICurrencyDAL, CurrencyDAL>();
 
             #endregion
 
@@ -101,6 +105,8 @@ namespace AdtonesAdminWebApi
             services.AddTransient<IUserMatchQuery, UserMatchQuery>();
             services.AddTransient<IUserProfileQuery, UserProfileQuery>();
             services.AddTransient<ISoapQuery, SoapQuery>();
+            services.AddTransient<ICampaignAuditQuery, CampaignAuditQuery>();
+            services.AddTransient<ICurrencyQuery, CurrencyQuery>();
 
             #endregion
 

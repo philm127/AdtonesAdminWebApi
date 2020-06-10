@@ -7,10 +7,10 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface IAreaDAL
     {
-        Task<IEnumerable<AreaResult>> LoadAreaResultSet(string command);
-        Task<int> AddArea(string command, AreaResult areamodel);
-        Task<AreaResult> GetAreaById(string command, int id);
-        Task<int> DeleteAreaById(string command, int id);
-        Task<int> UpdateArea(string command, AreaResult model);
+        Task<IEnumerable<AreaResult>> LoadAreaResultSet();
+        Task<int> AddArea(AreaResult areamodel);
+        Task<AreaResult> GetAreaById(int id);
+        Task<int> DeleteAreaById(int id);
+        Task<int> UpdateArea(AreaResult model);
     }
 }

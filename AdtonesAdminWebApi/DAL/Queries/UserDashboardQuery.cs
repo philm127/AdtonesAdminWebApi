@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace AdtonesAdminWebApi.DAL.Queries
 {
@@ -97,6 +98,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                             LEFT JOIN Contacts AS con ON con.UserId=item.UserId;";
 
 
+
         public string OperatorResultQuery => @"SELECT u.UserId,FirstName,LastName,Email,ISNULL(Organisation,'-') AS Organisation,u.OperatorId,o.CountryId,
                                                 c.Name AS CountryName,o.OperatorName,u.Activated,u.DateCreated
                                                 FROM Users AS u LEFT JOIN Operators AS o ON u.OperatorId=o.OperatorId
@@ -104,7 +106,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 WHERE RoleId=6 ORDER BY u.DateCreated DESC";
 
 
-        public string SubscriberResultQuery => @"SELECT TOP 1000 u.UserId,u.Activated,u.DateCreated,FirstName,LastName,p.MSISDN,u.OperatorId,op.CountryId,u.Email
+        public string SubscriberResultQuery => @"SELECT u.UserId,u.Activated,u.DateCreated,FirstName,LastName,p.MSISDN,u.OperatorName,u.Email,u.Activated
                                                   FROM Users AS u LEFT JOIN UserProfile AS p ON p.UserId=u.UserId
                                                   INNER JOIN Operators AS op ON op.OperatorId=u.OperatorId
                                                   WHERE u.RoleId=2 AND u.VerificationStatus=1 AND u.OperatorId IS NOT NULL

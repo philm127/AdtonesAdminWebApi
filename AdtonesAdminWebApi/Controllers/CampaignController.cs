@@ -14,11 +14,13 @@ namespace AdtonesAdminWebApi.Controllers
     {
         private readonly IAdvertService _advertService;
         private readonly ICampaignService _campService;
+        private readonly ICampaignAuditService _auditService;
 
-        public CampaignController(IAdvertService advertService, ICampaignService campService)
+        public CampaignController(IAdvertService advertService, ICampaignService campService, ICampaignAuditService auditService)
         {
             _advertService = advertService;
             _campService = campService;
+            _auditService = auditService;
         }
 
         #region Advert
@@ -96,6 +98,17 @@ namespace AdtonesAdminWebApi.Controllers
 
 
         #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List CampaignAdminResult</returns>
+        [HttpGet("v1/GetCampaignDashboardSummariesOperators/{id}")]
+        public async Task<ReturnResult> GetCampaignDashboardSummariesOperators(int id = 0)
+        {
+            return await _auditService.GetCampaignDashboardSummariesOperators(id);
+        }
+
 
     }
 }

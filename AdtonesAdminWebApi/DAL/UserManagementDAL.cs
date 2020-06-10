@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
@@ -22,15 +23,17 @@ namespace AdtonesAdminWebApi.DAL
         private readonly IExecutionCommand _executers;
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly IConnectionStringService _connService;
+        private readonly IUserManagementQuery _commandText;
 
         public UserManagementDAL(IConfiguration configuration, IExecutionCommand executers, IHttpContextAccessor httpAccessor,
-                                   IConnectionStringService connService)
+                                   IConnectionStringService connService, IUserManagementQuery commandText)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
             _httpAccessor = httpAccessor;
             _connService = connService;
+            _commandText = commandText;
         }
 
 
@@ -124,6 +127,25 @@ namespace AdtonesAdminWebApi.DAL
                 return await _executers.ExecuteCommand(_connStr,
                     conn => conn.QueryFirstOrDefault<User>(select.RawSql, select.Parameters));
                 
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<Contacts> getContactByUserId(int userId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(_commandText.getContactByUserId);
+            builder.AddParameters(new { userid = userId });
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                    conn => conn.QueryFirstOrDefault<Contacts>(select.RawSql, select.Parameters));
+
             }
             catch
             {

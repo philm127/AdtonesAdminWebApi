@@ -73,14 +73,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<Contacts>(@"SELECT Id, UserId,MobileNumber,FixedLine,Email,
-                                                                                    PhoneNumber,Address,CountryId,CurrencyId 
-                                                                                    FROM Contacts WHERE UserId = @userid ",
-                                                                                        new { userid = userId });
-                }
+                result.body = await _userDAL.getContactByUserId(userId);
             }
             catch (Exception ex)
             {

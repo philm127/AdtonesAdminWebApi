@@ -10,6 +10,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
         string GetCampaignProfileById { get; }
         string UpdateCampaignProfileStatus { get; }
         string GetCampaignAdvertDetailsById { get; }
+        string UpdatePromotionalCampaignStatus { get; }
         //string UpdateAdvertStatus { get; }
         //string InsertAdvertRejection { get; }
     }
@@ -82,5 +83,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         FROM CampaignAdverts WHERE ";
 
 
-        }
+        public string UpdatePromotionalCampaignStatus => @"UPDATE PromotionalCampaigns SET Status=@Status,IsAdminApproval=true WHERE CampaignProfileId=@Id; ";
+
+
+    }
 }

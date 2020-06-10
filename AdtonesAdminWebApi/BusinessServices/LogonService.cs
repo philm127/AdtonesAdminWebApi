@@ -14,9 +14,8 @@ using System.Net.Mail;
 using Microsoft.AspNetCore.Hosting;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.DAL.Interfaces;
-using AdtonesAdminWebApi.DAL.Queries;
 using Microsoft.AspNetCore.Http;
-using DocumentFormat.OpenXml.Wordprocessing;
+
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -24,7 +23,6 @@ namespace AdtonesAdminWebApi.BusinessServices
     {
         private readonly IConfiguration _configuration;
         private readonly AuthSettings _appSettings;
-        private ILoginQuery _commandText;
         private readonly IHttpContextAccessor _httpAccessor;
         private IWebHostEnvironment _env;
         private readonly ILoginDAL _loginDAL;
@@ -34,13 +32,12 @@ namespace AdtonesAdminWebApi.BusinessServices
         private const int PASSWORD_HISTORY_LIMIT = 8;
 
         public LogonService(IConfiguration configuration, IOptions<AuthSettings> appSettings, IWebHostEnvironment env,
-                                ILoginDAL loginDAL, ILoginQuery commandText, IHttpContextAccessor httpAccessor)
+                                ILoginDAL loginDAL, IHttpContextAccessor httpAccessor)
         {
             _configuration = configuration;
             _appSettings = appSettings.Value;
             _env = env;
             _loginDAL = loginDAL;
-            _commandText = commandText;
             _httpAccessor = httpAccessor;
 
         }
@@ -51,7 +48,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             User user = new User();
             try
             {                
-                    user = await _loginDAL.GetLoginUser(_commandText.LoginUser, userForm);
+                    user = await _loginDAL.GetLoginUser(userForm);
 
                 if (user != null)
                 {
@@ -86,7 +83,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         {
                             user.Activated = (int)Enums.UserStatus.Approved;
                             user.LockOutTime = null;
-                            var x = await _loginDAL.UpdateUserLockout(_commandText.UpdateLockout, userForm);
+                            var x = await _loginDAL.UpdateUserLockout(userForm);
                         }
                     }
                     else if (user.Activated == 0)
@@ -419,7 +416,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 user.Activated = (int)Enums.UserStatus.Blocked;
                 user.LockOutTime = DateTime.Now;
-                return await _loginDAL.UpdateUserLockout(_commandText.UpdateLockout, user);
+                return await _loginDAL.UpdateUserLockout(user);
 
             }
             catch (Exception ex)

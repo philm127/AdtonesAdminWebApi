@@ -1,6 +1,5 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.DAL.Interfaces;
-using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -13,21 +12,16 @@ namespace AdtonesAdminWebApi.BusinessServices
     {
         IHttpContextAccessor _httpAccessor;
         private readonly IAreaDAL _areaDAL;
-        private readonly IAreaQuery _commandText;
         private readonly ICheckExistsDAL _checkExistsDAL;
-        private readonly ICheckExistsQuery _checkExistsQuery;
 
         ReturnResult result = new ReturnResult();
 
 
-        public AreaService(IAreaDAL areaDAL, IAreaQuery commandText, IHttpContextAccessor httpAccessor, ICheckExistsDAL checkExistsDAL,
-                            ICheckExistsQuery checkExistsQuery)
+        public AreaService(IAreaDAL areaDAL, IHttpContextAccessor httpAccessor, ICheckExistsDAL checkExistsDAL)
 
         {
             _areaDAL = areaDAL;
-            _commandText = commandText;
             _httpAccessor = httpAccessor;
-            _checkExistsQuery = checkExistsQuery;
             _checkExistsDAL = checkExistsDAL;
         }
 
@@ -38,7 +32,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-                result.body = await _areaDAL.LoadAreaResultSet(_commandText.LoadAreaDataTable);
+                result.body = await _areaDAL.LoadAreaResultSet();
             }
             catch (Exception ex)
             {
@@ -61,7 +55,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             areamodel.IsActive = true;
             try
             {
-                bool exists = await _checkExistsDAL.CheckAreaExists(_checkExistsQuery.CheckAreaExists, areamodel);
+                bool exists = await _checkExistsDAL.CheckAreaExists(areamodel);
                 if (exists)
                 {
                     result.result = 0;
@@ -84,7 +78,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-                var cnt = _areaDAL.AddArea(_commandText.AddArea, areamodel);
+                var cnt = _areaDAL.AddArea(areamodel);
                 return result;
             }
             catch (Exception ex)
@@ -108,7 +102,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                result.body = await _areaDAL.GetAreaById(_commandText.GetAreaById, id);
+                result.body = await _areaDAL.GetAreaById(id);
             }
             catch (Exception ex)
             {
@@ -130,7 +124,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                var cnt = await _areaDAL.UpdateArea(_commandText.UpdateArea, areamodel);
+                var cnt = await _areaDAL.UpdateArea(areamodel);
                 return result;
             }
             catch (Exception ex)
@@ -154,7 +148,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                var x = await _areaDAL.DeleteAreaById(_commandText.DeleteArea, id);
+                var x = await _areaDAL.DeleteAreaById(id);
             }
             catch (Exception ex)
             {

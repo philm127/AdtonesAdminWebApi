@@ -12,26 +12,26 @@ namespace AdtonesAdminWebApi.Services
 
     public interface ILiveAgentService
     {
-        Task<string> CreateTicket(string subject, string message, string email);
-        Task<string> ReplyTicket(string subject, string message, string email, string status, string agentMail, int roleId);
-        Task<string> GetAgent();
-        Task DeleteTicket(string ticketCode);
+        string CreateTicket(string subject, string message, string email);
+        string ReplyTicket(string subject, string message, string email, string status, string agentMail, int roleId);
+        string GetAgent();
+        void DeleteTicket(string ticketCode);
     }
 
 
     public class LiveAgentService : ILiveAgentService
     {
-        private static IConfiguration _configuration;
-
+        private readonly IConfiguration _configuration;
+        static string url;
+        static string key;
+        static string liveAgentEmail;
         public LiveAgentService(IConfiguration configuration)
         {
             _configuration = configuration;
+            url = _configuration.GetValue<string>("AppSettings:LiveAgentUrl");
+            key = _configuration.GetValue<string>("AppSettings:LiveAgentKey");
+            liveAgentEmail = _configuration.GetValue<string>("AppSettings:LiveAgentRecipient");
         }
-
-        static string url = _configuration.GetValue<string>("AppSettings:LiveAgentUrl");
-        static string key = _configuration.GetValue<string>("AppSettings:LiveAgentKey");
-        static string liveAgentEmail = _configuration.GetValue<string>("AppSettings:LiveAgentRecipient");
-        
 
 
         // status(string, optional): 
@@ -55,7 +55,8 @@ namespace AdtonesAdminWebApi.Services
 
         //If useridentifier is email address which doesn't belong to any agent then it is a visitor/customer and visitor can create only tickets addressed to the mail accounts added in LiveAgent in Configuration->Email->Mail accounts.
 
-        public async Task<string> CreateTicket(string subject, string message, string email)
+
+        public string CreateTicket(string subject, string message, string email)
         {
             try
             {
@@ -80,6 +81,7 @@ namespace AdtonesAdminWebApi.Services
                 return ex.Message.ToString();
             }
         }
+
 
         private void TransferTicket(string code, string status)
         {
@@ -113,11 +115,19 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "LiveAgentService",
+                    ProcedureName = "TransferTicket"
+                };
+                _logging.LogError();
             }
         }
 
-        public async Task<string> ReplyTicket(string subject, string message, string email, string status, string agentMail, int roleId)
+
+        public string ReplyTicket(string subject, string message, string email, string status, string agentMail, int roleId)
         {
             try
             {
@@ -147,11 +157,20 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                return ex.Message.ToString();
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "LiveAgentService",
+                    ProcedureName = "ReplyTicket"
+                };
+                _logging.LogError();
             }
+            return "error";
         }
 
-        public async Task<string> GetAgent()
+
+        public string GetAgent()
         {
             try
             {
@@ -172,11 +191,20 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                return ex.Message.ToString();
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "LiveAgentService",
+                    ProcedureName = "GetAgent"
+                };
+                _logging.LogError();
             }
+            return "error";
         }
 
-        public async Task DeleteTicket(string ticketCode)
+
+        public void DeleteTicket(string ticketCode)
         {
             try
             {
@@ -189,14 +217,18 @@ namespace AdtonesAdminWebApi.Services
                 IRestResponse response = client.Execute(request);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-
                 }
-
-
             }
             catch (Exception ex)
             {
-
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "LiveAgentService",
+                    ProcedureName = "DeleteTicket"
+                };
+                _logging.LogError();
             }
         }
 
@@ -205,7 +237,6 @@ namespace AdtonesAdminWebApi.Services
         {
             try
             {
-
                 var fullUrl = url + "agents/?_page=1&_perPage=10&_sortDir=ASC";
                 var client = new RestClient(fullUrl);
                 var request = new RestRequest(Method.GET);
@@ -222,9 +253,18 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "LiveAgentService",
+                    ProcedureName = "GetAllAgent"
+                };
+                _logging.LogError();
                 return null;
             }
         }
+
 
         public string GetLiveAgentEmail()
         {
@@ -243,5 +283,6 @@ namespace AdtonesAdminWebApi.Services
             return response.StatusDescription;
 
         }
+    
     }
 }

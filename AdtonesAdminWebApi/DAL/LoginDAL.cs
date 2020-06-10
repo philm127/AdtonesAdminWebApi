@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
@@ -18,20 +19,22 @@ namespace AdtonesAdminWebApi.DAL
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
         private readonly IConnectionStringService _connService;
+        private readonly ILoginQuery _commandText;
 
-        public LoginDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
+        public LoginDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, ILoginQuery commandText)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
             _connService = connService;
+            _commandText = commandText;
         }
 
 
-        public async Task<User> GetLoginUser(string command, User userModel)
+        public async Task<User> GetLoginUser(User userModel)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.LoginUser);
             builder.AddParameters(new { email = userModel.Email.ToLower() });
             try
             {
@@ -46,11 +49,11 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateUserLockout(string command, User userModel)
+        public async Task<int> UpdateUserLockout(User userModel)
         {
             int x = 0;
             var sb1 = new StringBuilder();
-            sb1.Append(command);
+            sb1.Append(_commandText.UpdateLockout);
             sb1.Append("UserId=@userId");
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sb1.ToString());
@@ -72,7 +75,7 @@ namespace AdtonesAdminWebApi.DAL
             {
                 var operatorConnectionString = await _connService.GetSingleConnectionString(userModel.OperatorId);
                 var sb2 = new StringBuilder();
-                sb2.Append(command);
+                sb2.Append(_commandText.UpdateLockout);
                 sb2.Append("AdtoneServerUserId=@userId");
                 var build = new SqlBuilder();
                 var sel = build.AddTemplate(sb2.ToString());
@@ -91,32 +94,6 @@ namespace AdtonesAdminWebApi.DAL
                 }
             }
             return x;
-        }
-
-
-
-
-
-
-        public async Task<int> UpdateArea(string command, AreaResult model)
-        {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
-            builder.AddParameters(new { AreaName = model.AreaName });
-            builder.AddParameters(new { IsActive = model.IsActive });
-            builder.AddParameters(new { CountryId = model.CountryId });
-            builder.AddParameters(new { AreaId = model.AreaId });
-
-            try
-            {
-                return await _executers.ExecuteCommand(_connStr,
-                             conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
-            }
-            catch
-            {
-                throw;
-            }
-
         }
 
 

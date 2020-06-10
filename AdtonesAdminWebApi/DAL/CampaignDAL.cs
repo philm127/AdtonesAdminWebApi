@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
@@ -17,21 +18,23 @@ namespace AdtonesAdminWebApi.DAL
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
         private readonly IConnectionStringService _connService;
+        private readonly ICampaignQuery _commandText;
 
-        public CampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
+        public CampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, ICampaignQuery commandText)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
             _connService = connService;
+            _commandText = commandText;
         }
 
 
-        public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(string command, int id=0)
+        public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(int id=0)
         {
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(command);
+            sb.Append(_commandText.GetCampaignResultSet);
             if (id == 0)
                 sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
             else
@@ -56,10 +59,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<PromotionalCampaignResult>> GetPromoCampaignResultSet(string command)
+        public async Task<IEnumerable<PromotionalCampaignResult>> GetPromoCampaignResultSet()
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.GetPromoCampaignResultSet);
             try
             {
 
@@ -73,10 +76,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<CampaignCreditResult>> GetCampaignCreditResultSet(string command)
+        public async Task<IEnumerable<CampaignCreditResult>> GetCampaignCreditResultSet()
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.GetCampaignCreditResultSet);
             try
             {
 
@@ -90,10 +93,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<CampaignProfile> GetCampaignProfileDetail(string command, int id = 0)
+        public async Task<CampaignProfile> GetCampaignProfileDetail(int id = 0)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.GetCampaignProfileById);
             try
             {
                 builder.AddParameters(new { Id = id });
@@ -108,11 +111,11 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> ChangeCampaignProfileStatus(string command, CampaignProfile model)
+        public async Task<int> ChangeCampaignProfileStatus(CampaignProfile model)
         {
 
             var sb = new StringBuilder();
-            sb.Append(command);
+            sb.Append(_commandText.UpdateCampaignProfileStatus);
             sb.Append(" CampaignProfileId=@Id;");
 
             var builder = new SqlBuilder();
@@ -138,12 +141,12 @@ namespace AdtonesAdminWebApi.DAL
         /// <param name="command"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        public async Task<int> ChangeCampaignProfileStatusOperator(string command, CampaignProfile model)
+        public async Task<int> ChangeCampaignProfileStatusOperator(CampaignProfile model)
         {
             var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
 
             var sb = new StringBuilder();
-            sb.Append(command);
+            sb.Append(_commandText.UpdateCampaignProfileStatus);
             sb.Append(" AdtoneServerCampaignProfileId=@Id;");
 
             var builder = new SqlBuilder();
@@ -163,10 +166,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<CampaignAdverts> GetCampaignAdvertDetailsByAdvertId(string command, int Id)
+        public async Task<CampaignAdverts> GetCampaignAdvertDetailsByAdvertId(int Id)
         {
             var sb = new StringBuilder();
-            sb.Append(command);
+            sb.Append(_commandText.GetCampaignAdvertDetailsById);
             sb.Append(" AdvertId=@Id;");
 
             var builder = new SqlBuilder();
@@ -184,18 +187,26 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
-        //        public async Task<IEnumerable<CampaignCategoryResult>> GetCampaignCategoryList(string command)
-        //        {
-        //            try
-        //            {
-        //                return await _executers.ExecuteCommand(_connStr,
-        //                                    conn => conn.Query<CampaignCategoryResult>(command));
-        //            }
-        //            catch
-        //            {
-        //                throw;
-        //            }
-        //        }
+        public async Task<int> UpdatePromotionalCampaignStatus(IdCollectionViewModel model)
+        {
+            var sb = new StringBuilder();
+            sb.Append(_commandText.UpdatePromotionalCampaignStatus);
+
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(sb.ToString());
+            try
+            {
+                builder.AddParameters(new { Id = model.id });
+                builder.AddParameters(new { Status = model.status });
+
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
 
 
 

@@ -6,7 +6,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface ICheckExistsDAL
     {
-        Task<bool> CheckAreaExists(string command, AreaResult areamodel);
-        Task<bool> CheckCampaignBillingExists(string command, int campaignId);
+        Task<bool> CheckAreaExists(AreaResult areamodel);
+        Task<bool> CheckCampaignBillingExists(int campaignId);
     }
 }

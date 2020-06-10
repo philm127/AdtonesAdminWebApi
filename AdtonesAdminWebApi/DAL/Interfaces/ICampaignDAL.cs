@@ -9,13 +9,14 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface ICampaignDAL
     {
-        Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(string command, int id=0);
-        Task<IEnumerable<PromotionalCampaignResult>> GetPromoCampaignResultSet(string command);
-        Task<IEnumerable<CampaignCreditResult>> GetCampaignCreditResultSet(string command);
+        Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(int id=0);
+        Task<IEnumerable<PromotionalCampaignResult>> GetPromoCampaignResultSet();
+        Task<IEnumerable<CampaignCreditResult>> GetCampaignCreditResultSet();
 
-        Task<CampaignProfile> GetCampaignProfileDetail(string command, int id = 0);
-        Task<int> ChangeCampaignProfileStatus(string command, CampaignProfile model);
-        Task<int> ChangeCampaignProfileStatusOperator(string command, CampaignProfile model);
-        Task<CampaignAdverts> GetCampaignAdvertDetailsByAdvertId(string command, int Id);
+        Task<CampaignProfile> GetCampaignProfileDetail(int id = 0);
+        Task<int> ChangeCampaignProfileStatus(CampaignProfile model);
+        Task<int> ChangeCampaignProfileStatusOperator(CampaignProfile model);
+        Task<CampaignAdverts> GetCampaignAdvertDetailsByAdvertId(int Id);
+        Task<int> UpdatePromotionalCampaignStatus(IdCollectionViewModel model);
     }
 }

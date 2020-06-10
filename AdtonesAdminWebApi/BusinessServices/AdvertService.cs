@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.UserMatchServices;
+using System.Linq;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -28,14 +29,13 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IAdvertQuery _commandText;
         private readonly ISoapQuery _soapText;
         private readonly ICampaignDAL _campDAL;
-        private readonly ICampaignQuery _campText;
         ReturnResult result = new ReturnResult();
 
 
         public AdvertService(IAdvertDAL advertDAL, IAdvertQuery commandText, IHttpContextAccessor httpAccessor, IConnectionStringService connService,
                                 IUserMatchDAL matchDAL, IUserMatchQuery matchText, IAdTransferService transService, 
                                 IGenerateTicketService ticketService, ICampaignService campService, ISoapApiService soapApi,
-                                ISoapDAL soapDAL, ISoapQuery soapText, ICampaignDAL campDAL, ICampaignQuery campText)//IUserMatchInterface matchInterface
+                                ISoapDAL soapDAL, ISoapQuery soapText, ICampaignDAL campDAL)//IUserMatchInterface matchInterface
         {
             _advertDAL = advertDAL;
             _commandText = commandText;
@@ -50,7 +50,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             _soapDAL = soapDAL;
             _soapText = soapText;
             _campDAL = campDAL;
-            _campText = campText;
             // _matchInterface = matchInterface;
         }
 
@@ -63,7 +62,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                    result.body = await _advertDAL.GetAdvertResultSet(_commandText.GetAdvertResultSet,id);
+                result.body = await _advertDAL.GetAdvertResultSet(_commandText.GetAdvertResultSet,id);
 
             }
             catch (Exception ex)
@@ -131,8 +130,8 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(_campText.GetCampaignAdvertDetailsById, adModel.AdvertId);
-                var campaignProfile = await _campDAL.GetCampaignProfileDetail(_campText.GetCampaignProfileById, campaignAdvert.CampaignProfileId);
+                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(adModel.AdvertId);
+                var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
                 if (campaignProfile.Status == 8 && adModel.Status == (int)Enums.AdvertStatus.Pending)
                 {
                     adModel.Status = (int)Enums.AdvertStatus.CampaignPausedDueToInsufficientFunds;
@@ -295,8 +294,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
                 var y = await _advertDAL.ChangeAdvertStatusOperator(_commandText.UpdateAdvertStatus, adModel, uid);
 
-                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(_campText.GetCampaignAdvertDetailsById, adModel.AdvertId);
-                var campaignProfile = await _campDAL.GetCampaignProfileDetail(_campText.GetCampaignProfileById, campaignAdvert.CampaignProfileId);
+                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(adModel.AdvertId);
+                var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
 
                 if (ConnString != null)
                 {
@@ -333,8 +332,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
                 var y = await _advertDAL.ChangeAdvertStatusOperator(_commandText.UpdateAdvertStatus, adModel, uid);
 
-                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(_campText.GetCampaignAdvertDetailsById, adModel.AdvertId);
-                var campaignProfile = await _campDAL.GetCampaignProfileDetail(_campText.GetCampaignProfileById, campaignAdvert.CampaignProfileId);
+                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(adModel.AdvertId);
+                var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
 
                 if (adModel.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                 {
@@ -403,8 +402,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var rejId = await _advertDAL.RejectAdvertReason(_commandText.RejectAdvertReason, adModel);
                 var z = await _advertDAL.RejectAdvertReasonOperator(_commandText.RejectAdvertReason, adModel, ConnString, uid, rejId,adId);
 
-                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(_campText.GetCampaignAdvertDetailsById, adModel.AdvertId);
-                var campaignProfile = await _campDAL.GetCampaignProfileDetail(_campText.GetCampaignProfileById, campaignAdvert.CampaignProfileId);
+                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(adModel.AdvertId);
+                var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
 
                 if (ConnString != null)
                 {

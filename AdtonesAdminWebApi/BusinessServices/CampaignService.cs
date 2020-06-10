@@ -1,17 +1,13 @@
 ﻿
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.DAL.Interfaces;
-using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
-using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 
@@ -26,12 +22,10 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         IHttpContextAccessor _httpAccessor;
         private readonly ICampaignDAL _campDAL;
-        private readonly ICampaignQuery _commandText;
         private readonly ICheckExistsDAL _existDAL;
-        private readonly ICheckExistsQuery _checkText;
 
         public CampaignService(IConfiguration configuration, IConnectionStringService connService, IHttpContextAccessor httpAccessor,
-                                ICampaignDAL campDAL, ICampaignQuery commandText, ICheckExistsDAL existDAL, ICheckExistsQuery checkText) //ISaveFiles saveFile)
+                                ICampaignDAL campDAL, ICheckExistsDAL existDAL) //ISaveFiles saveFile)
 
         {
             _configuration = configuration;
@@ -39,9 +33,7 @@ namespace AdtonesAdminWebApi.BusinessServices
            // _saveFile = saveFile;
             _httpAccessor = httpAccessor;
             _campDAL = campDAL;
-            _commandText = commandText;
             _existDAL = existDAL;
-            _checkText = checkText;
         }
 
 
@@ -55,7 +47,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
-                    result.body = await _campDAL.GetCampaignResultSet(_commandText.GetCampaignResultSet,id);
+                    result.body = await _campDAL.GetCampaignResultSet(id);
                 }
             }
             catch (Exception ex)
@@ -80,7 +72,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
-                    result.body = await _campDAL.GetPromoCampaignResultSet(_commandText.GetPromoCampaignResultSet);
+                    result.body = await _campDAL.GetPromoCampaignResultSet();
                 }
             }
             catch (Exception ex)
@@ -105,7 +97,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
-                    result.body = await _campDAL.GetCampaignCreditResultSet(_commandText.GetCampaignCreditResultSet);
+                    result.body = await _campDAL.GetCampaignCreditResultSet();
                 }
             }
             catch (Exception ex)
@@ -134,18 +126,18 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 // Need to do this to get OperatorId
-                CampaignProfile _campProfile = await _campDAL.GetCampaignProfileDetail(_commandText.GetCampaignProfileById, model.id);
+                CampaignProfile _campProfile = await _campDAL.GetCampaignProfileDetail(model.id);
                 bool exists = false;
 
-                exists = await _existDAL.CheckCampaignBillingExists(_checkText.CheckCampaignBillingExists, model.id);
+                exists = await _existDAL.CheckCampaignBillingExists(model.id);
 
                 if (!exists)
                     _campProfile.Status = (int)Enums.CampaignStatus.InsufficientFunds;
                 else
                     _campProfile.Status = model.status;
 
-                result.body = await _campDAL.ChangeCampaignProfileStatus(_commandText.UpdateCampaignProfileStatus, _campProfile);
-                var x = await _campDAL.ChangeCampaignProfileStatusOperator(_commandText.UpdateCampaignProfileStatus, _campProfile);
+                result.body = await _campDAL.ChangeCampaignProfileStatus(_campProfile);
+                var x = await _campDAL.ChangeCampaignProfileStatusOperator(_campProfile);
             }
             catch (Exception ex)
             {
@@ -172,13 +164,13 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                CampaignProfile _campProfile = await _campDAL.GetCampaignProfileDetail(_commandText.GetCampaignProfileById, campaignId);
+                CampaignProfile _campProfile = await _campDAL.GetCampaignProfileDetail(campaignId);
 
                 if (_campProfile != null)
                 {
                     bool exists = false;
 
-                    exists = await _existDAL.CheckCampaignBillingExists(_checkText.CheckCampaignBillingExists, campaignId);
+                    exists = await _existDAL.CheckCampaignBillingExists(campaignId);
 
                     if (exists)
                     {
@@ -211,8 +203,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                         _campProfile.Status = (int)Enums.CampaignStatus.InsufficientFunds;
                     }
 
-                    var y = await _campDAL.ChangeCampaignProfileStatus(_commandText.UpdateCampaignProfileStatus, _campProfile);
-                    var x = await _campDAL.ChangeCampaignProfileStatusOperator(_commandText.UpdateCampaignProfileStatus, _campProfile);
+                    var y = await _campDAL.ChangeCampaignProfileStatus( _campProfile);
+                    var x = await _campDAL.ChangeCampaignProfileStatusOperator( _campProfile);
 
                     return true;
                 }
@@ -237,14 +229,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                var update_query = @"UPDATE PromotionalCampaigns SET Status@Status,IsAdminApproval=true WHERE CampaignProfileId=@Id; ";
-
-
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.ExecuteAsync(update_query.ToString(), new { Status = model.status, Id = model.id });
-                }
+                result.body = await _campDAL.UpdatePromotionalCampaignStatus(model);
             }
             catch (Exception ex)
             {

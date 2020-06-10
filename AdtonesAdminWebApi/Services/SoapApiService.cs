@@ -26,13 +26,19 @@ namespace AdtonesAdminWebApi.Services
     public class SoapApiService : ISoapApiService
     {
 
-        private static IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
         private readonly IUserProfileDAL _profDAL;
         private readonly IUserProfileQuery _profQuery;
         private readonly IUserManagementDAL _userDAL;
         private readonly IUserManagementQuery _userText;
         private readonly IAdvertDAL _adDAL;
         private readonly IAdvertQuery _adText;
+
+        static string portalAccount;
+        static string portalPassword;
+        static string portalType;
+        static string moduleCode;
+        static string safricomUrl;
 
         public SoapApiService(IConfiguration configuration, IUserProfileDAL profDAL, IUserProfileQuery profQuery,
                                 IUserManagementDAL userDAL, IUserManagementQuery userText, IAdvertDAL adDAL, IAdvertQuery adText)
@@ -44,20 +50,26 @@ namespace AdtonesAdminWebApi.Services
             _userText = userText;
             _adDAL = adDAL;
             _adText = adText;
+
+            portalAccount = _configuration.GetValue<string>("AppSettings:PortalAccount");
+            portalPassword = _configuration.GetValue<string>("AppSettings:PortalPassword");
+            portalType = _configuration.GetValue<string>("AppSettings:PortalType");
+            moduleCode = _configuration.GetValue<string>("AppSettings:ModuleCode");
+            safricomUrl = _configuration.GetValue<string>("AppSettings:SafricomSoapUrl");
         }
 
-        static string portalAccount = _configuration.GetValue<string>("AppSettings:PortalAccount");
-        static string portalPassword = _configuration.GetValue<string>("AppSettings:PortalPassword");
-        static string portalType = _configuration.GetValue<string>("AppSettings:PortalType");
-        //static string role = _configuration.GetValue<string>("AppSettings:Role");
-        //static string roleCode = _configuration.GetValue<string>("AppSettings:RoleCode");
-        //static string corpCode = _configuration.GetValue<string>("AppSettings:CorpCode");
-        static string moduleCode = _configuration.GetValue<string>("AppSettings:ModuleCode");
-        //static string corpId = _configuration.GetValue<string>("AppSettings:CorpID");
-        static string safricomUrl = _configuration.GetValue<string>("AppSettings:SafricomSoapUrl");
-        //static string TIBCOUrl = _configuration.GetValue<string>("AppSettings:AdtonesTIBCOBinding");
-        //static string TIBCOUserName = _configuration.GetValue<string>("AppSettings:AdtonesTIBCOUserName");
-        //static string TIBCOPassword = _configuration.GetValue<string>("AppSettings:AdtonesTIBCOPassword");
+        //static string portalAccount = _configuration.GetValue<string>("AppSettings:PortalAccount");
+        //static string portalPassword = _configuration.GetValue<string>("AppSettings:PortalPassword");
+        //static string portalType = _configuration.GetValue<string>("AppSettings:PortalType");
+        ////static string role = _configuration.GetValue<string>("AppSettings:Role");
+        ////static string roleCode = _configuration.GetValue<string>("AppSettings:RoleCode");
+        ////static string corpCode = _configuration.GetValue<string>("AppSettings:CorpCode");
+        //static string moduleCode = _configuration.GetValue<string>("AppSettings:ModuleCode");
+        ////static string corpId = _configuration.GetValue<string>("AppSettings:CorpID");
+        //static string safricomUrl = _configuration.GetValue<string>("AppSettings:SafricomSoapUrl");
+        ////static string TIBCOUrl = _configuration.GetValue<string>("AppSettings:AdtonesTIBCOBinding");
+        ////static string TIBCOUserName = _configuration.GetValue<string>("AppSettings:AdtonesTIBCOUserName");
+        ////static string TIBCOPassword = _configuration.GetValue<string>("AppSettings:AdtonesTIBCOPassword");
         
 
         public async Task<string> DeleteToneSoapApi(int advertId)

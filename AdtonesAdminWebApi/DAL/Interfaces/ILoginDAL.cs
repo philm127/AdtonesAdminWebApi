@@ -7,8 +7,8 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface ILoginDAL
     {
-        Task<User> GetLoginUser(string command, User userModel);
-        Task<int> UpdateUserLockout(string command, User userModel);
+        Task<User> GetLoginUser(User userModel);
+        Task<int> UpdateUserLockout(User userModel);
 
     }
 }
