@@ -1,8 +1,10 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Model;
+using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Text;
@@ -19,28 +21,37 @@ namespace AdtonesAdminWebApi.DAL
         private readonly IExecutionCommand _executers;
         private readonly IConnectionStringService _connService;
         private readonly ICampaignQuery _commandText;
+        private readonly IHttpContextAccessor _httpAccessor;
 
-        public CampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, ICampaignQuery commandText)
+        public CampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, 
+                            ICampaignQuery commandText, IHttpContextAccessor httpAccessor)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
             _connService = connService;
             _commandText = commandText;
+            _httpAccessor = httpAccessor;
         }
 
 
         public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(int id=0)
         {
+            var roleName = _httpAccessor.GetRoleFromJWT();
+
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(_commandText.GetCampaignResultSet);
+
+
             if (id == 0)
-                sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
-            else
             {
-                sb.Append(" WHERE camp.UserId=@userId;");
-                builder.AddParameters(new { userId = id });
+                sb.Append(_commandText.GetCampaignResultSet);
+                sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
+            }
+            else if (roleName.ToLower().Contains("operator"))
+            {
+                sb.Append(_commandText.GetCampaignResultSetOperator);
+                builder.AddParameters(new { Id = id });
             }
 
                 var select = builder.AddTemplate(sb.ToString());

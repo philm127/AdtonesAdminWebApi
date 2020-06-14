@@ -1,10 +1,12 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
+using AdtonesAdminWebApi.DAL;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 
@@ -40,36 +42,54 @@ namespace AdtonesAdminWebApi.BusinessServices
             //CampaignDashboardChartPREResult summaries = new CampaignDashboardChartPREResult();// (CampaignDashboardChartPREResult)summary;
             // var totalReach = await _summariesProvider.GetCampaignDashboardTotalReachSummaryForUser(efmvcUser.UserId);
             var summaries = await _auditDAL.GetCampaignDashboardSummariesForCampaign(campaignId);
-            var totalBid = summaries.MaxBid;
-            var avgBid = summaries.AvgBid;
-            var totalPlays = summaries.TotalPlays;
+            //var totalBid = summaries.MaxBid;
+            //var avgBid = summaries.AvgBid;
+            //var totalPlays = summaries.TotalPlays;
 
             var _CampaignDashboardChartResult = new CampaignDashboardChartResult
             {
-                PlaystoDate = summaries.TotalPlays,
+                CampaignName = summaries.CampaignName,
+                AdvertName = summaries.AdvertName,
+                TotalPlayed = (int)summaries.TotalPlays,
                 FreePlays = (int)summaries.FreePlays,
-                SpendToDate = (double)summaries.Spend,
+                TotalSpend = (double)summaries.Spend,
                 AverageBid = (double)summaries.AvgBid,
                 AveragePlayTime = (double)summaries.AvgPlayLength,
-                FreePlaysPercentage = (double)summaries.FreePlaysPercentage,
                 TotalBudget = summaries.Budget,
-                TotalBudgetPercentage = (double)summaries.TotalBudgetPercentage,
-                MaxBid = (double)summaries.MaxBid,
-                MaxBidPercantage = (double)Math.Round(totalBid == 0 ? 0 : avgBid / totalBid, 2),
                 MaxPlayLength = summaries.MaxPlayLength,
-                SMSCost = (double)summaries.TotalSMSCost,
-                EmailCost = (double)summaries.TotalEmailCost,
-                Cancelled = 0,
-                TotalPlayed = (int)summaries.TotalPlays,
-                //TotalReach = (int)(totalReach?.Reach ?? 0),
-                TotalSpend = (double)summaries.Spend,
-                AvgMaxBid = (double)summaries.AvgBid,
-                CurrencyCode = "KES",// _currencyConversion.DisplayCurrency.CurrencyCode,
+                TotalReach = (int)summaries.TotalReach,
+                Reach = (int)summaries.Reach,
+                CurrencyCode = summaries.CurrencyCode
                 //MaxPlayLengthPercantage = totalPlays == 0 ? 0 : Math.Round((double)summaries.TotalValuablePlays / totalPlays, 2),
             };
 
             result.body = _CampaignDashboardChartResult;
             return result;
+        }
+
+
+        public async Task<ReturnResult> GetPlayDetailsForOperatorByCampaign(PagingSearchClass paging)
+        {
+            try
+            {
+                // var ct = await _auditDAL.GetPlayDetailsByCampaignCount(paging);
+                var res = await _auditDAL.GetPlayDetailsByCampaign(paging);
+                result.body = res;
+                result.recordcount = res.Count();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "ApproveRejectSuspended"
+                };
+                _logging.LogError();
+                return result;
+            }
         }
 
 

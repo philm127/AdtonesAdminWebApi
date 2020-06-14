@@ -10,5 +10,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int result { get; set; } = 1;
         public string error { get; set; }
         public Object body { get; set; }
+
+        public int recordcount { get; set; }
     }
 }

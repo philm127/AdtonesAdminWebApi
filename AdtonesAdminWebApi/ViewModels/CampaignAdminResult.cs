@@ -31,6 +31,8 @@ namespace AdtonesAdminWebApi.ViewModels
         public int CountryId { get; set; }
         public int OperatorId { get; set; }
         public string OperatorName { get; set; }
+        public string MobileNumber { get; set; }
+        public string Organisation { get; set; }
 
     }
 }

@@ -5,7 +5,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
     public interface ICampaignAuditQuery
     {
 		string GetCampaignDashboardSummaries { get; }
-    }
+		string GetPlayDetailsByCampaign { get; }
+
+	}
 
 
     public class CampaignAuditQuery : ICampaignAuditQuery
@@ -23,7 +25,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 														Cast(ISNULL(p.MaxPlayLen,0) AS bigint) AS MaxPlayLength,
 														Cast(ISNULL(r.UniqueListenrs,0) AS bigint) AS Reach,
 														CAST(ISNULL(p.MaxBid, 0) AS numeric(16,2)) AS MaxBid,
-														cp.CurrencyCode AS CurrencyCode
+														cp.CurrencyCode AS CurrencyCode,ctu.TotalReach
 														FROM Users AS u 
 														LEFT JOIN CampaignProfile AS cp ON cp.UserId = u.UserId
 														LEFT JOIN Client AS c ON c.Id = cp.ClientId
@@ -56,8 +58,35 @@ namespace AdtonesAdminWebApi.DAL.Queries
 															( SELECT DISTINCT AdvertId,CampaignProfileId FROM CampaignAdverts
 															) AS cad ON cad.CampaignProfileId=cp.CampaignProfileId
 														LEFT JOIN Advert AS a ON a.AdvertId = cad.AdvertId
+														LEFT JOIN
+															(SELECT COUNT(UserId) AS TotalReach,op.CountryId FROM Users AS u 
+																INNER JOIN Operators AS op ON u.OperatorId=op.OperatorId 
+																WHERE VerificationStatus=1 AND Activated=1 GROUP BY op.CountryId) AS ctu
+														ON cp.CountryId=ctu.CountryId
 														WHERE ";
 
 
-        }
+		public string GetPlayDetailsByCampaign => @"SELECT CAST(ISNULL(ca.TotalCost,0) AS NUMERIC(36,2)) AS TotalCost,CAST(ISNULL(ca.BidValue,0) AS NUMERIC(36,2)) AS PlayCost,
+													CAST(ISNULL(ca.EmailCost,0) AS NUMERIC(36,2)) AS EmailCost,CAST(ISNULL(ca.SMSCost,0) AS NUMERIC(36,2)) AS SMSCost,
+													ca.StartTime,ca.EndTime,CAST((ca.PlayLengthTicks / 1000) AS NUMERIC(36,2)) AS PlayLength,ca.Email AS EmailMsg,ca.SMS,
+													up.UserId,cp.CurrencyCode,ad.AdvertName,CampaignAuditId
+													FROM CampaignProfile AS cp INNER JOIN CampaignAudit AS ca ON ca.CampaignProfileId=cp.CampaignProfileId
+													LEFT JOIN UserProfile AS up ON ca.UserProfileId=up.UserProfileId
+													LEFT JOIN 
+														(SELECT AdvertId,CampaignProfileId FROM CampaignAdverts WHERE AdvertId in
+			                                                (SELECT MAX(AdvertId) FROM CampaignAdverts GROUP BY CampaignProfileId)
+		                                                ) AS cad 
+													ON cad.CampaignProfileId=ca.CampaignProfileId
+													LEFT JOIN Advert AS ad ON ad.AdvertId=cad.AdvertId
+													WHERE cp.Status != 5
+													AND ca.Status='Played'
+													AND cp.CampaignProfileId=@Id ";
+													// ORDER BY ";
+													//CASE WHEN @sort = 'PlayCost DESC' THEN [BidValue] END DESC,
+													//CASE WHEN @sort = 'PlayCost ASC' THEN [BidValue] END ASC
+													//OFFSET((@PageIndex)*@PageSize) ROWS
+													//FETCH NEXT (@PageSize) ROWS ONLY";
+
+
+	}
 }

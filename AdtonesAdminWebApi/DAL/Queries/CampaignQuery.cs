@@ -5,6 +5,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
     public interface ICampaignQuery
     {
         string GetCampaignResultSet { get; }
+        string GetCampaignResultSetOperator { get; }
         string GetPromoCampaignResultSet { get; }
         string GetCampaignCreditResultSet { get; }
         string GetCampaignProfileById { get; }
@@ -20,9 +21,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
     {
         public string GetCampaignResultSet => @"SELECT camp.CampaignProfileId,camp.UserId,u.Email,CONCAT(u.FirstName,'',u.LastName) AS UserName,op.OperatorName
                                                 ,camp.ClientId, ISNULL(cl.Name,'-') AS ClientName,CampaignName,TotalBudget,camp.CreatedDateTime AS CreatedDate
-                                                ,camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,camp.TotalBudget,
+                                                ,camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,camp.TotalBudget,u.Organisation,
                                                 CASE WHEN bill.Id>0 THEN camp.Status ELSE 8 END AS Status,play.AvgBidValue,play.TotalSpend,
-                                                (camp.TotalBudget - play.TotalSpend) AS FundsAvailable,play.ct AS finaltotalplays
+                                                (camp.TotalBudget - play.TotalSpend) AS FundsAvailable,play.ct AS finaltotalplays,con.MobileNumber
                                                 FROM CampaignProfile AS camp LEFT JOIN Users As u ON u.UserId=camp.UserId
                                                 LEFT JOIN Client AS cl ON camp.ClientId=cl.Id
                                                 LEFT JOIN 
@@ -43,7 +44,11 @@ namespace AdtonesAdminWebApi.DAL.Queries
 			                                                GROUP BY CampaignProfileId
 		                                                ) AS play
                                                 ON camp.CampaignProfileId=play.CampaignProfileId
-                                                LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId";
+                                                LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
+                                                LEFT JOIN Contacts AS con ON con.UserId=camp.UserId ";
+
+
+        public string GetCampaignResultSetOperator => GetCampaignResultSet + @" WHERE u.OperatorId=@Id";
 
 
         public string GetPromoCampaignResultSet =>  @"SELECT promo.ID,promo.OperatorID,op.OperatorName,promo.CampaignName,promo.BatchID,MaxDaily,MaxWeekly,

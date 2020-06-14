@@ -110,5 +110,20 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List CampaignAdminResult</returns>
+        [HttpPut("v1/GetPlayDetailsForOperatorByCampaign")]
+        public async Task<ReturnResult> GetPlayDetailsForOperatorByCampaign(PagingSearchClass paging)//queryParameters)
+        {
+            return await _auditService.GetPlayDetailsForOperatorByCampaign(paging);
+        }
+
+
+
+        
+
+
     }
 }
