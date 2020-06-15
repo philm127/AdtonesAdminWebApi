@@ -57,13 +57,13 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     ISNULL(u.Email, '-') AS Email,ISNULL(QNumber,'-') AS QNumber,
                                                     ISNULL(cl.Name,'-') AS ClientName,q.CampaignProfileId,camp.CampaignName,q.CreatedDate,
                                                     Title AS QuestionTitle,q.Status,LastResponseDateTime,LastResponseDateTimeByUser,
-                                                    ISNULL(u.Organisation,'-') AS Organisation
+                                                    ISNULL(u.Organisation,'-') AS Organisation,q.Description
                                                 FROM Question AS q LEFT JOIN Users AS u ON u.UserId=q.UserId
                                                 LEFT JOIN Client AS cl ON cl.Id=q.ClientId
                                                 LEFT JOIN CampaignProfile AS camp ON camp.CampaignProfileId=q.CampaignProfileId
                                                 LEFT JOIN QuestionSubject AS qs ON qs.SubjectId=q.SubjectId
                                                 LEFT JOIN PaymentMethod AS pay ON pay.Id=q.PaymentMethodId
-                                                LEFT JOIN Users AS upd ON q,UpdatedBy=upd.UserId
+                                                LEFT JOIN Users AS upd ON q.UpdatedBy=upd.UserId
                                                 WHERE q.Id=@Id";
 
         

@@ -235,8 +235,8 @@ namespace AdtonesAdminWebApi.DAL
                         break;
                 }
 
-                sb.Append(" OFFSET((@PageIndex) * @PageSize) ROWS ");
-                sb.Append("FETCH NEXT(@PageSize) ROWS ONLY");
+                // sb.Append(" OFFSET((@PageIndex) * @PageSize) ROWS ");
+                // sb.Append("FETCH NEXT(@PageSize) ROWS ONLY");
 
                 var select = builder.AddTemplate(sb.ToString());
 

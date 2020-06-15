@@ -74,8 +74,9 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 // var ct = await _auditDAL.GetPlayDetailsByCampaignCount(paging);
                 var res = await _auditDAL.GetPlayDetailsByCampaign(paging);
-                result.body = res;
+                // result.body = res;
                 result.recordcount = res.Count();
+                result.body = res.Skip(paging.page * paging.pageSize).Take(paging.pageSize);
                 return result;
             }
             catch (Exception ex)

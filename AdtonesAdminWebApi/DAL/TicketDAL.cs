@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.TicketingModels;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
@@ -14,20 +15,21 @@ namespace AdtonesAdminWebApi.DAL
         private readonly IConfiguration _configuration;
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
+        private readonly ITicketQuery _commandText;
 
-
-        public TicketDAL(IConfiguration configuration, IExecutionCommand executers)
+        public TicketDAL(IConfiguration configuration, IExecutionCommand executers, ITicketQuery commandText)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
+            _commandText = commandText;
         }
 
 
-        public async Task<TicketListModel> GetTicketDetails(string command, int id=0)
+        public async Task<TicketListModel> GetTicketDetails(int id=0)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.GetTicketDetails);
             builder.AddParameters(new { Id =id });
             try
             {
@@ -42,10 +44,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<TicketComments> GetTicketcomments(string command, int id = 0)
+        public async Task<TicketComments> GetTicketcomments(int id = 0)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.GetTicketComments);
             builder.AddParameters(new { questionId = id });
             try
             {
@@ -60,10 +62,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<TicketListModel>> GetTicketList(string command,int id)
+        public async Task<IEnumerable<TicketListModel>> GetTicketList(int id)
         {
             var sb = new StringBuilder();
-            sb.Append(command);
+            sb.Append(_commandText.GetLoadTicketDatatable);
             if(id == 0)
                 sb.Append(" ORDER BY q.Id DESC;");
             else
@@ -83,10 +85,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<TicketListModel>> GetOperatorTicketList(string command,int operatorId)
+        public async Task<IEnumerable<TicketListModel>> GetOperatorTicketList(int operatorId)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.GetOperatorLoadTicketTable);
             builder.AddParameters(new { operatorId = operatorId });
             builder.AddParameters(new { opadrev = (int)Enums.QuestionSubjectStatus.OperatorAdreview });
             builder.AddParameters(new { cred = (int)Enums.QuestionSubjectStatus.OperatorCreditRequest });
@@ -105,10 +107,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateTicketStatus(string command, TicketListModel model)
+        public async Task<int> UpdateTicketStatus(TicketListModel model)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.UpdateTicketStatus);
             builder.AddParameters(new { Id = model.Id });
             builder.AddParameters(new { Status = model.Status });
             builder.AddParameters(new { UpdatedBy = model.UpdatedBy });

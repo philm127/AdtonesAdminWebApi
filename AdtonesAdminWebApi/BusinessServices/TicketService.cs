@@ -17,13 +17,13 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         IHttpContextAccessor _httpAccessor;
         private readonly ITicketDAL _ticketDAL;
-        private readonly ITicketQuery _commandText;
+        // private readonly ITicketQuery _commandText;
 
 
-        public TicketService(IHttpContextAccessor httpAccessor, ITicketDAL ticketDAL, ITicketQuery commandText)
+        public TicketService(IHttpContextAccessor httpAccessor, ITicketDAL ticketDAL)//, ITicketQuery commandText)
         {
             _httpAccessor = httpAccessor;
-            _commandText = commandText;
+            //_commandText = commandText;
             _ticketDAL = ticketDAL;
         }
 
@@ -53,7 +53,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-                result.body = await _ticketDAL.UpdateTicketStatus(_commandText.UpdateTicketStatus, question);
+                result.body = await _ticketDAL.UpdateTicketStatus(question);
                 return result;
             }
             catch (Exception ex)
@@ -80,7 +80,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 try
                 {
-                    result.body = await _ticketDAL.GetTicketList(_commandText.GetLoadTicketDatatable,id);
+                    result.body = await _ticketDAL.GetTicketList(id);
                 }
                 catch (Exception ex)
                 {
@@ -105,8 +105,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var ticketList = new TicketListModel();
             try
             {
-                ticketList = await _ticketDAL.GetTicketDetails(_commandText.GetTicketDetails, id);
-                var commentList = await _ticketDAL.GetTicketcomments(_commandText.GetTicketComments, id);
+                ticketList = await _ticketDAL.GetTicketDetails(id);
+                var commentList = await _ticketDAL.GetTicketcomments(id);
 
                 ticketList.comments = (IEnumerable<TicketComments>)commentList;
 
@@ -137,7 +137,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-                result.body = await _ticketDAL.GetOperatorTicketList(_commandText.GetOperatorLoadTicketTable, operatorId);
+                result.body = await _ticketDAL.GetOperatorTicketList(operatorId);
             }
             catch (Exception ex)
             {

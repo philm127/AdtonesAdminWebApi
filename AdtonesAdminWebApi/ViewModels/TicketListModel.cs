@@ -31,7 +31,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int QuestionSubjectId { get; set; }
         public int? fQuestionSubjectId { get; set; }
         public string QuestionSubject { get; set; }
-
+        public string Description { get; set; }
         public int Status { get; set; }
         public string rStatus => $"{(QuestionStatus)Status}";
 
