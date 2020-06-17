@@ -39,6 +39,31 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        /// <summary>
+        /// Uses memory caching. If in cache returns that values else calls GetCampaignDashboardSummariesOperators
+        /// below. The result is then stored in cache.
+        /// </summary>
+        /// <param name="campaignId"></param>
+        /// <returns></returns>
+        public async Task<CampaignDashboardChartPREResult> GetCampaignDashboardSummariesForOperator(int campaignId)
+        {
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(30));
+            string key = $"DASHBOARD_STATS_{campaignId}";
+            return await _cache.GetOrCreateAsync<CampaignDashboardChartPREResult>(key, cacheEntry =>
+            {
+                cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
+                return GetCampaignDashboardSummariesOperators(campaignId);
+            });
+            // return cacheEntry ?? new List<CampaignDashboardChartPREResult>();
+        }
+
+
+        /// <summary>
+        /// called by GetCampaignDashboardSummariesForOperator if it doesn't have the result set in cache
+        /// </summary>
+        /// <param name="id">camapign Id</param>
+        /// <returns></returns>
         public async Task<CampaignDashboardChartPREResult> GetCampaignDashboardSummariesOperators(int id = 0)
         {
             var sb = new StringBuilder();
@@ -61,18 +86,52 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<CampaignDashboardChartPREResult> GetCampaignDashboardSummariesForCampaign(int campaignId)
+        /// <summary>
+        /// Uses memory caching. If in cache returns that values else calls GetDashboardSummariesOperators
+        /// below. The result is then stored in cache.
+        /// </summary>
+        /// <param name="campaignId"></param>
+        /// <returns></returns>
+        public async Task<CampaignDashboardChartPREResult> GetDashboardSummariesForOperator(int operatorId)
         {
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(30));
-            string key = $"DASHBOARD_STATS_{campaignId}";
+            string key = $"DASHBOARD_STATS_{operatorId}";
             return await _cache.GetOrCreateAsync<CampaignDashboardChartPREResult>(key, cacheEntry =>
             {
                 cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
-                return GetCampaignDashboardSummariesOperators(campaignId);
+                return GetDashboardSummariesOperators(operatorId);
             });
             // return cacheEntry ?? new List<CampaignDashboardChartPREResult>();
         }
+
+
+        /// <summary>
+        /// called by GetDashboardSummariesForOperator if it doesn't have the result set in cache
+        /// </summary>
+        /// <param name="id">operatorId</param>
+        /// <returns></returns>
+        public async Task<CampaignDashboardChartPREResult> GetDashboardSummariesOperators(int id = 0)
+        {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(_commandText.GetCampaignDashboardSummaries);
+            sb.Append(" op.OperatorId=@opId;");
+            var select = builder.AddTemplate(sb.ToString());
+            builder.AddParameters(new { opId = id });
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                                 conn => conn.QueryFirstOrDefault<CampaignDashboardChartPREResult>(select.RawSql, select.Parameters));
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
 
 
         public async Task<List<CampaignDashboardChartPREResult>> GetCampaignDashboardSummariesAdvertisers(int campid = 0, int userId = 0)
@@ -253,6 +312,9 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
         }
+
+
+
 
 
     }

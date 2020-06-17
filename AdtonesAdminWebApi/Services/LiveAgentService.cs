@@ -174,7 +174,6 @@ namespace AdtonesAdminWebApi.Services
         {
             try
             {
-
                 var fullUrl = url + "agents/?_page=1&_perPage=10&_sortDir=ASC";
                 var client = new RestClient(fullUrl);
                 var request = new RestRequest(Method.GET);

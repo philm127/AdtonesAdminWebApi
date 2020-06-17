@@ -61,6 +61,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 builder.AddParameters(new { Id = id });
+                builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
 
                 return await _executers.ExecuteCommand(_connStr,
                                 conn => conn.QueryFirstOrDefault<UserAdvertResult>(select.RawSql, select.Parameters));

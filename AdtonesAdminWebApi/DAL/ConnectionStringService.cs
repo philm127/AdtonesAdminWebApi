@@ -34,7 +34,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<string> GetSingleConnectionString(int Id = 0)
         {
             /// TODO: This needs to be sorted in a better manner
-            var test = true;
+            var test = _configuration.GetValue<bool>("Environment:Test");
             if (test)
                 return _configuration.GetConnectionString("TestProvoConnection");
             else

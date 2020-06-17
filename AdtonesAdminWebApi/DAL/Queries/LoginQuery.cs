@@ -15,8 +15,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
     public class LoginQuery : ILoginQuery
     {
-        public string LoginUser => @"SELECT UserId,RoleId,Email,FirstName,LastName,PasswordHash,Activated,LockOutTime,
-                                    OperatorId, Organisation, DateCreated, VerificationStatus,LastPasswordChangedDate
+        //,LastPasswordChangedDate,LockOutTime,
+        public string LoginUser => @"SELECT UserId,RoleId,Email,FirstName,LastName,PasswordHash,Activated,
+                                    OperatorId, Organisation, DateCreated, VerificationStatus
                                     FROM Users WHERE LOWER(Email)=@email AND Activated !=3;";
 
 

@@ -106,7 +106,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetCampaignDashboardSummariesOperators/{id}")]
         public async Task<ReturnResult> GetCampaignDashboardSummariesOperators(int id = 0)
         {
-            return await _auditService.GetCampaignDashboardSummariesOperators(id);
+            return await _auditService.GetCampaignDashboardSummariesOperatorByCampaign(id);
         }
 
 
@@ -121,8 +121,15 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-
-        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains empty result</returns>
+        [HttpPut("v1/UpdateAdvertStatus")]
+        public async Task<ReturnResult> UpdateAdvertStatus(UserAdvertResult model)
+        {
+            return await _advertService.ApproveORRejectAdvert(model);
+        }
 
 
     }

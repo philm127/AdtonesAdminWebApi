@@ -8,5 +8,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> LoadAdvertCategoryDataTable();
         Task<ReturnResult> LoadAdvertDataTable(int id = 0);
         Task<ReturnResult> LoadAdvertDetails(int id = 0);
+        Task<ReturnResult> ApproveORRejectAdvert(UserAdvertResult model);
     }
 }

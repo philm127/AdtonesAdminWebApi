@@ -72,14 +72,14 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     CancelledToDate,SmsToDate,EmailToDate,EmailFileLocation,Active,NumberOfPlays,
                                                     AverageDailyPlays,SmsRequests,EmailsDelievered,EmailSubject,EmailBody,SmsBody,
                                                     SMSFileLocation,CreatedDateTime,UpdatedDateTime,Status,StartDate,EndDate,
-                                                    CountryId,IsAdminApproval,ProvidendSpendAmount,AdtoneServerCampaignProfileId,
+                                                    camp.CountryId,IsAdminApproval,ProvidendSpendAmount,AdtoneServerCampaignProfileId,
                                                     CurrencyCode
                                                     FROM CampaignProfile AS camp 
                                                     LEFT JOIN Operators AS op ON camp.CountryId=op.CountryId 
                                                     WHERE CampaignProfileId=@Id";
 
 
-        public string UpdateCampaignProfileStatus => @"UPDATE CampaignProfile SET Status@Status,IsAdminApproval=true,
+        public string UpdateCampaignProfileStatus => @"UPDATE CampaignProfile SET Status=@Status,IsAdminApproval=1,
                                                         UpdatedDateTime = GETDATE() WHERE ";
 
 

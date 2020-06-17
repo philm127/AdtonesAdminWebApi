@@ -63,6 +63,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 																INNER JOIN Operators AS op ON u.OperatorId=op.OperatorId 
 																WHERE VerificationStatus=1 AND Activated=1 GROUP BY op.CountryId) AS ctu
 														ON cp.CountryId=ctu.CountryId
+														LEFT JOIN Operators as op ON op.CountryId=cp.CountryId
 														WHERE ";
 
 

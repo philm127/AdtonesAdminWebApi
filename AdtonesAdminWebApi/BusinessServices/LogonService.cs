@@ -52,7 +52,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 if (user != null)
                 {
-                    if (PasswordExpiredAttribute(user))
+                    if (user.OperatorId==2 && PasswordExpiredAttribute(user))
                     {
                         result.result = 0;
                         result.error = "Your Password has expired please reset it";
@@ -67,7 +67,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         return result;
                     }
                     // 4 is user has been blocked for too many incorrect login attempts.
-                    else if (user.Activated == 4)
+                    else if (user.OperatorId==2 && user.Activated == 4)
                     {
                         DateTime date1 = user.LockOutTime.Value;
                         DateTime date2 = DateTime.Now;

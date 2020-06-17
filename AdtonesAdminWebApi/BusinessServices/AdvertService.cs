@@ -29,13 +29,14 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IAdvertQuery _commandText;
         private readonly ISoapQuery _soapText;
         private readonly ICampaignDAL _campDAL;
+        private readonly IConfiguration _configuration;
         ReturnResult result = new ReturnResult();
 
 
         public AdvertService(IAdvertDAL advertDAL, IAdvertQuery commandText, IHttpContextAccessor httpAccessor, IConnectionStringService connService,
                                 IUserMatchDAL matchDAL, IUserMatchQuery matchText, IAdTransferService transService, 
                                 IGenerateTicketService ticketService, ICampaignService campService, ISoapApiService soapApi,
-                                ISoapDAL soapDAL, ISoapQuery soapText, ICampaignDAL campDAL)//IUserMatchInterface matchInterface
+                                ISoapDAL soapDAL, ISoapQuery soapText, ICampaignDAL campDAL, IConfiguration configuration)//IUserMatchInterface matchInterface
         {
             _advertDAL = advertDAL;
             _commandText = commandText;
@@ -50,6 +51,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _soapDAL = soapDAL;
             _soapText = soapText;
             _campDAL = campDAL;
+            _configuration = configuration;
             // _matchInterface = matchInterface;
         }
 
@@ -213,8 +215,10 @@ namespace AdtonesAdminWebApi.BusinessServices
                     }
                     else
                     {
-                        var crbtResponseValue = _soapApi.UploadToneOnCRBTServer(adModel.AdvertId);
-                        //var crbtResponseValue = "Success";
+                        string crbtResponseValue = string.Empty;
+                        var test = _configuration.GetValue<bool>("Environment:Test");
+                        if (!test)
+                            crbtResponseValue = _soapApi.UploadToneOnCRBTServer(adModel.AdvertId);
                         if (crbtResponseValue != "Success")
                         {
                             string message = crbtResponseValue;
@@ -223,7 +227,10 @@ namespace AdtonesAdminWebApi.BusinessServices
                         }
                         else
                         {
-                            var responseCode = _soapApi.UploadSoapTone(adModel.AdvertId);
+                            string responseCode = string.Empty;
+                            var testing = _configuration.GetValue<bool>("Environment:Test");
+                            if (!testing)
+                                responseCode = _soapApi.UploadSoapTone(adModel.AdvertId);
                             //var responseCode = "000000";
                             if (responseCode == "000000")
                             {
@@ -295,7 +302,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var y = await _advertDAL.ChangeAdvertStatusOperator(_commandText.UpdateAdvertStatus, adModel, uid);
 
                 var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(adModel.AdvertId);
-                var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
+                // var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
 
                 if (ConnString != null)
                 {
@@ -337,7 +344,10 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 if (adModel.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                 {
-                    var responseCode = _soapApi.DeleteSoapTone(adModel.AdvertId);
+                    string responseCode = string.Empty;
+                    var testing = _configuration.GetValue<bool>("Environment:Test");
+                    if (!testing)
+                        responseCode = _soapApi.DeleteSoapTone(adModel.AdvertId);
                     if (responseCode != "000000")
                     {
                         string message = "";
@@ -433,64 +443,80 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> ApproveORRejectAdvert(UserAdvertResult model)
         {
-            var adModel = await _advertDAL.GetAdvertDetail(_commandText.GetAdvertDetail, model.AdvertId);
-            adModel.Status = adModel.Status;
-            adModel.PrevStatus = adModel.PrevStatus;
-            adModel.UpdatedBy = adModel.UpdatedBy;
-            adModel.RejectionReason = adModel.RejectionReason;
-            var ConnString = await _connService.GetSingleConnectionString(adModel.OperatorId);
-
-            if (adModel.Status == (int)Enums.AdvertStatus.Live && adModel.PrevStatus != (int)Enums.AdvertStatus.Pending)
+            try
             {
-                adModel.Status = (int)Enums.AdvertStatus.Pending;
-                bool update = false;
-                update = await ApproveRejectApproveAd(adModel, ConnString);
+                var adModel = await _advertDAL.GetAdvertDetail(_commandText.GetAdvertDetail, model.AdvertId);
+                adModel.Status = model.Status;
+                adModel.PrevStatus = model.PrevStatus;
+                adModel.UpdatedBy = model.UpdatedBy;
+                adModel.RejectionReason = model.RejectionReason;
+                var ConnString = await _connService.GetSingleConnectionString(adModel.OperatorId);
 
-                if(update)
-                    result.body = "Advert " + adModel.AdvertName + " is approved successfully.";
-                
-                return result;
+                if (adModel.Status == (int)Enums.AdvertStatus.Live && adModel.PrevStatus != (int)Enums.AdvertStatus.Pending)
+                {
+                    adModel.Status = (int)Enums.AdvertStatus.Pending;
+                    bool update = false;
+                    update = await ApproveRejectApproveAd(adModel, ConnString);
+
+                    if (update)
+                        result.body = "Advert " + adModel.AdvertName + " is approved successfully.";
+
+                    return result;
+                }
+                else if (adModel.Status == (int)Enums.AdvertStatus.Live && adModel.PrevStatus == (int)Enums.AdvertStatus.Pending) // Live
+                {
+                    bool update = false;
+                    update = await ApproveRejectLiveFromPending(adModel, ConnString);
+
+                    if (update)
+                        result.body = "Advert " + adModel.AdvertName + " is approved successfully.";
+
+                    return result;
+
+                }
+
+                else if (adModel.Status == (int)Enums.AdvertStatus.Suspended) // suspended
+                {
+                    bool update = false;
+                    update = await ApproveRejectSuspended(adModel, ConnString);
+
+                    if (update)
+                        result.body = "Advert " + adModel.AdvertName + " is suspended successfully.";
+
+                    return result;
+                }
+                else if (adModel.Status == (int)Enums.AdvertStatus.Archived) // Archived(Deleted)
+                {
+                    bool update = false;
+                    update = await ApproveRejectArchived(adModel, ConnString);
+
+                    if (update)
+                        result.body = "Advert " + adModel.AdvertName + " is archived successfully.";
+
+                    return result;
+                }
+                else if (adModel.Status == (int)Enums.AdvertStatus.Rejected)
+                {
+                    bool update = false;
+                    update = await ApproveRejectRejected(adModel, ConnString);
+
+                    if (update)
+                        result.body = "Advert " + adModel.AdvertName + " was rejected successfully.";
+                    return result;
+                }
             }
-            else if (adModel.Status == (int)Enums.AdvertStatus.Live && adModel.PrevStatus == (int)Enums.AdvertStatus.Pending) // Live
+            catch (Exception ex)
             {
-                bool update = false;
-                update = await ApproveRejectLiveFromPending(adModel, ConnString);
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "ApproveRejectArchived"
+                };
+                _logging.LogError();
+                result.result = 0;
 
-                if (update)
-                    result.body = "Advert " + adModel.AdvertName + " is approved successfully.";
-
-                return result;
-
-            }
-            
-            else if (adModel.Status == (int)Enums.AdvertStatus.Suspended) // suspended
-            {
-                bool update = false;
-                update = await ApproveRejectSuspended(adModel, ConnString);
-
-                if (update)
-                    result.body = "Advert " + adModel.AdvertName + " is suspended successfully.";
-
-                return result;
-            }
-            else if (adModel.Status == (int)Enums.AdvertStatus.Archived) // Archived(Deleted)
-            {
-                bool update = false;
-                update = await ApproveRejectArchived(adModel, ConnString);
-
-                if (update)
-                    result.body = "Advert " + adModel.AdvertName + " is archived successfully.";
-
-                return result;
-            }
-            else if (adModel.Status == (int)Enums.AdvertStatus.Rejected)
-            {
-                bool update = false;
-                update = await ApproveRejectRejected(adModel, ConnString);
-
-                if (update)
-                    result.body = "Advert " + adModel.AdvertName + " was rejected successfully.";
-                return result;
             }
             return result;
         }

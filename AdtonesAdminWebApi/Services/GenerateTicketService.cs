@@ -3,6 +3,7 @@ using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.TicketingModels;
 using AdtonesAdminWebApi.ViewModels;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,15 +25,17 @@ namespace AdtonesAdminWebApi.Services
         private readonly IUserManagementDAL _userDal;
         private readonly ITicketDAL _ticketDAL;
         private readonly ITicketQuery _tikText;
+        private readonly IConfiguration _configuration;
 
         public GenerateTicketService(ILiveAgentService liveService, IUserManagementDAL userDal, ITicketDAL ticketDAL,ITicketQuery tikText,
-                                        IUserManagementQuery commandText)
+                                        IUserManagementQuery commandText, IConfiguration configuration)
         {
             _liveService = liveService;
             _commandText = commandText;
             _userDal = userDal;
             _ticketDAL = ticketDAL;
             _tikText = tikText;
+            _configuration = configuration;
         }
 
 
@@ -41,7 +44,12 @@ namespace AdtonesAdminWebApi.Services
             var userDetail = await _userDal.GetUserById(_commandText.GetUserById,userId);
             string subject = sub;
             string message = msg;
-            string ticketCode =  _liveService.CreateTicket(subject, message, userDetail.Email);
+            string ticketCode = string.Empty;
+            var test = _configuration.GetValue<bool>("Environment:Test");
+            if (!test)
+                ticketCode = _liveService.CreateTicket(subject, message, userDetail.Email);
+            else
+                ticketCode = "testing123";
 
             TicketFormModel model = new TicketFormModel();
 
@@ -76,7 +84,12 @@ namespace AdtonesAdminWebApi.Services
             var userDetail = await _userDal.GetUserById(_commandText.GetUserById, userId);
             string subject = sub;
             string message = msg;
-            string ticketCode = _liveService.CreateTicket(subject, message, userDetail.Email);
+            string ticketCode = string.Empty;
+            var test = _configuration.GetValue<bool>("Environment:Test");
+            if (!test)
+                ticketCode = _liveService.CreateTicket(subject, message, userDetail.Email);
+            else
+                ticketCode = "testing123";
 
             TicketFormModel model = new TicketFormModel();
 
