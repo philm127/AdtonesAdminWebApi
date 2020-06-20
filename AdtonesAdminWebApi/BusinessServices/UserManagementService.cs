@@ -1,18 +1,14 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
-using Dapper;
 using AdtonesAdminWebApi.ViewModels;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Data.SqlClient;
 using AdtonesAdminWebApi.Model;
 using System;
-using System.Linq;
-using Microsoft.Extensions.Logging;
+using Dapper;
 using AdtonesAdminWebApi.Services;
 using System.Text;
 using AdtonesAdminWebApi.DAL.Interfaces;
-using AdtonesAdminWebApi.DAL.Queries;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -21,18 +17,16 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         private readonly ILogonService _logonService;
         private readonly IUserManagementDAL _userDAL;
-        private readonly IUserManagementQuery _commandText;
         ReturnResult result = new ReturnResult();
 
         
 
 
-        public UserManagementService(IConfiguration configuration, ILogonService logonService, IUserManagementDAL userDAL, IUserManagementQuery commandText)
+        public UserManagementService(IConfiguration configuration, ILogonService logonService, IUserManagementDAL userDAL)
         {
             _configuration = configuration;
             _logonService = logonService;
             _userDAL = userDAL;
-            _commandText = commandText;
         }
 
 
@@ -131,17 +125,18 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> UpdateContactForm(Contacts contact)
         {
-            var update_query = @"UPDATE Contacts SET MobileNumber=@MobileNumber,FixedLine=@FixedLine,Email=@Email,
-                                PhoneNumber=@PhoneNumber,Address=@Address,CountryId=@CountryId
-                                WHERE Id = @Id";
+            //var update_query = @"UPDATE Contacts SET MobileNumber=@MobileNumber,FixedLine=@FixedLine,Email=@Email,
+            //                    PhoneNumber=@PhoneNumber,Address=@Address,CountryId=@CountryId
+            //                    WHERE Id = @Id";
 
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.ExecuteAsync(update_query, contact);
-                }
+                result.body = await _userDAL.UpdateContact(contact);
+                //using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                //{
+                //    await connection.OpenAsync();
+                //    result.body = await connection.ExecuteAsync(update_query, contact);
+                //}
             }
             catch (Exception ex)
             {
@@ -161,18 +156,11 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> GetProfileForm(int userId)
         {
-
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<User>(@"SELECT UserId,RoleId,Email,FirstName,Activated,
-                                                                                LastName,Outstandingdays,Organisation,DateCreated 
-                                                                                FROM Users WHERE UserId = @userid ",
-                                                                                    new { userid = userId });
-                    return result;
-                }
+                result.body = await _userDAL.GetUserById(userId);
+                
+                return result;
             }
             catch (Exception ex)
             {
@@ -192,23 +180,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> UpdateProfileForm(User profile)
         {
-            var update_query = new StringBuilder(@"UPDATE Users SET FirstName=@FirstName, LastName = @LastName, Organisation = @Organisation ");
-
-            if (profile.RoleId == 3)
-                update_query.Append(",Outstandingdays=@Outstandingdays ");
-            
-            if(profile.PasswordHash != null && profile.PasswordHash != "")
-                    update_query.Append(" ,PasswordHash=@passwordHash, LastPasswordChangedDate=GETDATE() ");
-
-            update_query.Append(" WHERE UserId = @UserId");
-
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.ExecuteAsync(update_query.ToString(), profile);
-                }
+                result.body = await _userDAL.UpdateUser(profile);
             }
             catch (Exception ex)
             {
@@ -230,13 +204,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<CompanyDetails>(@"SELECT Id, UserId,CompanyName,Address,AdditionalAddress,
-                                            Town,PostCode,CountryId FROM CompanyDetails WHERE UserId = @userid ",
-                                                new { userid = userId });
-                }
+                result.body = await _userDAL.getCompanyDetails(userId);
             }
             catch (Exception ex)
             {
@@ -366,7 +334,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                result.body = await _userDAL.UpdateUserStatus(_commandText.UpdateUserStatus, user);
+                result.body = await _userDAL.UpdateUserStatus(user);
 
             }
             catch (Exception ex)
@@ -617,23 +585,11 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetOperatorAdmin(IdCollectionViewModel model)
+        public async Task<ReturnResult> GetOperatorAdmin(int userId)
         {
             try
             {
-                var select_query = @"SELECT u.UserId,FirstName,LastName,Email,Organisation,u.OperatorId,o.CountryId,
-                                    c.Name AS CountryName,o.OperatorName,u.Activated,u.DateCreated,con.MobileNumber,
-                                    con.PhoneNumber, con.Address,con.Id
-                                    FROM Users AS u LEFT JOIN Operators AS o ON u.OperatorId=o.OperatorId
-                                    LEFT JOIN Country AS c ON o.CountryId=c.Id
-                                    LEFT JOIN Contacts AS con ON con.UserId=u.UserId
-                                    WHERE u.UserId=@userId";
-
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<OperatorAdminFormModel>(select_query, new { userId = model.userId });
-                }
+                result.body = await _userDAL.getOperatorAdmin(userId);
             }
             catch (Exception ex)
             {
@@ -656,7 +612,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-                result.body = await _userDAL.GetUserById(_commandText.GetUserById, userId);
+                result.body = await _userDAL.GetUserById(userId);
             }
             catch (Exception ex)
             {

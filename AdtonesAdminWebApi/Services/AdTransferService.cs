@@ -12,7 +12,7 @@ namespace AdtonesAdminWebApi.Services
     
     public interface IAdTransferService
     {
-        Task<string> CopyAdToOpeartorServer(string conn, UserAdvertResult advert);
+        Task<string> CopyAdToOperatorServer(string conn, UserAdvertResult advert);
     }
 
 
@@ -20,15 +20,13 @@ namespace AdtonesAdminWebApi.Services
     public class AdTransferService : IAdTransferService
     {
         private readonly IAdvertDAL _advertDAL;
-        private readonly IAdvertQuery _commandText;
 
         public AdTransferService(IAdvertDAL advertDAL, IAdvertQuery commandText)
         {
             _advertDAL = advertDAL;
-            _commandText = commandText;
         }
 
-        public async Task<string> CopyAdToOpeartorServer(string conn, UserAdvertResult advert)
+        public async Task<string> CopyAdToOperatorServer(string conn, UserAdvertResult advert)
         {
             try
             {
@@ -36,7 +34,7 @@ namespace AdtonesAdminWebApi.Services
                 var mediaFile = advert.MediaFile;
                 if (!string.IsNullOrEmpty(mediaFile) && advert.UploadedToMediaServer == false)
                 {
-                    FtpDetailsModel getFTPdetails = await _advertDAL.GetFtpDetails(_commandText.GetFtpDetails, advert.OperatorId);
+                    FtpDetailsModel getFTPdetails = await _advertDAL.GetFtpDetails(advert.OperatorId);
 
                     if (getFTPdetails != null)
                     {
@@ -90,7 +88,7 @@ namespace AdtonesAdminWebApi.Services
                                     client.UploadFile(filestream2, DestinationFile2, null);
                                     filestream2.Close();
                                 }
-                                var x = _advertDAL.UpdateMediaLoaded(_commandText.UpdateMediaLoaded, advert);
+                                var x = _advertDAL.UpdateMediaLoaded(advert);
                             }
                             client.Disconnect();
                         }

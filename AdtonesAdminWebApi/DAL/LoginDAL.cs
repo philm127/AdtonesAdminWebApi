@@ -1,11 +1,8 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Model;
-using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,6 +46,27 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<int> UpdatePassword(User userModel)
+        {
+            int x = 0;
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(_commandText.UpdatePassword);
+            builder.AddParameters(new { Email = userModel.Email });
+            builder.AddParameters(new { PasswordHash = userModel.PasswordHash });
+
+            try
+            {
+                x = await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+            return x;
+        }
+
+
         public async Task<int> UpdateUserLockout(User userModel)
         {
             int x = 0;
@@ -70,7 +88,7 @@ namespace AdtonesAdminWebApi.DAL
             {
                 throw;
             }
-            
+
             if (userModel.OperatorId != 0)
             {
                 var operatorConnectionString = await _connService.GetSingleConnectionString(userModel.OperatorId);

@@ -37,13 +37,13 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateUserStatus(string command, AdvertiserDashboardResult model)
+        public async Task<int> UpdateUserStatus(AdvertiserDashboardResult model)
         {
             int x = 0;
             int operatorId = 0;
 
             var sb1 = new StringBuilder();
-            sb1.Append(command);
+            sb1.Append(_commandText.UpdateUserStatus);
             sb1.Append("UserId=@userId");
             
             var builder = new SqlBuilder();
@@ -68,7 +68,7 @@ namespace AdtonesAdminWebApi.DAL
                 var operatorConnectionString = await _connService.GetSingleConnectionString(operatorId);
 
                 var sb2 = new StringBuilder();
-                sb2.Append(command);
+                sb2.Append(_commandText.UpdateUserStatus);
                 sb2.Append("AdtoneServerUserId=@userId");
                 var build = new SqlBuilder();
                 var sel = build.AddTemplate(sb2.ToString());
@@ -90,6 +90,49 @@ namespace AdtonesAdminWebApi.DAL
 
         }
 
+
+        public async Task<int> UpdateContact(Contacts model)
+        {
+            int x = 0;
+            try
+            {
+                x = await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<int>(_commandText.UpdateContacts, model));
+            }
+            catch
+            {
+                throw;
+            }
+
+            return x;
+        }
+
+
+        public async Task<int> UpdateUser(User profile)
+        {
+            int x = 0;
+            var update_query = new StringBuilder(_commandText.UpdateUser);
+
+            if (profile.PasswordHash != null && profile.PasswordHash != "")
+                update_query.Append(" ,PasswordHash=@passwordHash, LastPasswordChangedDate=GETDATE() ");
+
+            update_query.Append(" WHERE UserId = @UserId");
+            try
+            {
+                x = await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<int>(update_query.ToString(), profile));
+            }
+            catch
+            {
+                throw;
+            }
+
+
+            return x;
+
+        }
+
+        
 
         // Comes from SoapApiService
         public async Task<int> UpdateCorpUser(string command, int userId)
@@ -116,10 +159,13 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<User> GetUserById(string command, int id)
+        public async Task<User> GetUserById(int id)
         {
+            var sb = new StringBuilder();
+            sb.Append(_commandText.GetUserDetails);
+            sb.Append(" UserId=@UserId");
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(sb.ToString());
             builder.AddParameters(new { UserId = id });
             try
             {
@@ -127,6 +173,28 @@ namespace AdtonesAdminWebApi.DAL
                 return await _executers.ExecuteCommand(_connStr,
                     conn => conn.QueryFirstOrDefault<User>(select.RawSql, select.Parameters));
                 
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            var sb = new StringBuilder();
+            sb.Append(_commandText.GetUserDetails);
+            sb.Append(" LOWER(Email)=@email");
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(sb.ToString());
+            builder.AddParameters(new { email = email });
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                    conn => conn.QueryFirstOrDefault<User>(select.RawSql, select.Parameters));
+
             }
             catch
             {
@@ -145,6 +213,44 @@ namespace AdtonesAdminWebApi.DAL
 
                 return await _executers.ExecuteCommand(_connStr,
                     conn => conn.QueryFirstOrDefault<Contacts>(select.RawSql, select.Parameters));
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<CompanyDetails> getCompanyDetails(int userId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(_commandText.GetCompanyDetails);
+            builder.AddParameters(new { userid = userId });
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                    conn => conn.QueryFirstOrDefault<CompanyDetails>(select.RawSql, select.Parameters));
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<OperatorAdminFormModel> getOperatorAdmin(int userId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(_commandText.GetOperatorAdmin);
+            builder.AddParameters(new { userId = userId });
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                    conn => conn.QueryFirstOrDefault<OperatorAdminFormModel>(select.RawSql, select.Parameters));
 
             }
             catch

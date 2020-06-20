@@ -15,7 +15,8 @@ using Microsoft.AspNetCore.Hosting;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using Microsoft.AspNetCore.Http;
-
+using System.Net;
+using AdtonesAdminWebApi.Services.Mailer;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -24,6 +25,8 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         private readonly AuthSettings _appSettings;
         private readonly IHttpContextAccessor _httpAccessor;
+        private readonly IUserManagementDAL _userDAL;
+        private readonly ISendEmailMailer _mailer;
         private IWebHostEnvironment _env;
         private readonly ILoginDAL _loginDAL;
 
@@ -32,14 +35,15 @@ namespace AdtonesAdminWebApi.BusinessServices
         private const int PASSWORD_HISTORY_LIMIT = 8;
 
         public LogonService(IConfiguration configuration, IOptions<AuthSettings> appSettings, IWebHostEnvironment env,
-                                ILoginDAL loginDAL, IHttpContextAccessor httpAccessor)
+                                ILoginDAL loginDAL, IHttpContextAccessor httpAccessor, IUserManagementDAL userDAL, ISendEmailMailer mailer)
         {
             _configuration = configuration;
             _appSettings = appSettings.Value;
             _env = env;
             _loginDAL = loginDAL;
             _httpAccessor = httpAccessor;
-
+            _userDAL = userDAL;
+            _mailer = mailer;
         }
 
 
@@ -59,13 +63,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         return result;
                     }
 
-                    if (user.VerificationStatus == false)
-                    {
-                        // ModelState.AddModelError("", "Please verify your email account.");
-                        result.result = 0;
-                        result.error = "Please verify your email account.";
-                        return result;
-                    }
+                    
                     // 4 is user has been blocked for too many incorrect login attempts.
                     else if (user.OperatorId==2 && user.Activated == 4)
                     {
@@ -86,33 +84,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                             var x = await _loginDAL.UpdateUserLockout(userForm);
                         }
                     }
-                    else if (user.Activated == 0)
-                    {
-                        if (user.RoleId == 6)
-                        {
-                            result.result = 0;
-                            result.error = "Your account has been InActive by adtones administrator.so, Please contact adtones admin.";
-                            return result;
-                        }
-                        else
-                        {
-                            result.result = 0;
-                            result.error = "Your account is not approved by Adtones so please contact Adtones Admin.";
-                            return result;
-                        }
-                    }
-                    else if (user.Activated == 2)
-                    {
-                        result.result = 0;
-                        result.error = "Your account has been suspended by Adtones, please contact Adtones admin.";
-                        return result;
-                    }
-                    else if (user.Activated == 3)
-                    {
-                        result.result = 0;
-                        result.error = "Your account has been deleted by adtones administrator so please contact adtones admin.";
-                       return result;
-                    }
+                    
+
+                    ReturnResult verify = PartialVerification(user);
+                    if (verify.result == 0)
+                        return verify;
+
                     if (ValidatePassword(user, userForm))
                     {
                         var jwt = new AuthService(_configuration);
@@ -123,6 +100,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         result.result = 0;
                         result.error = "The user name and/or password provided is incorrect.";
                         user = null;
+                        return result;
                     }
                 }
                 else
@@ -158,16 +136,8 @@ namespace AdtonesAdminWebApi.BusinessServices
             User user = new User();
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    user = await connection.QueryFirstOrDefaultAsync<User>(@"SELECT UserId,RoleId,Email,FirstName,PasswordHash,Activated,
-                                                                                        LastName,Outstandingdays,Organisation,DateCreated,
-                                                                                        VerificationStatus
-                                                                                        FROM Users WHERE LOWER(Email) = @email 
-                                                                                        AND RoleId IN (1,4,5,6)",
-                                                                                            new { email = emailAddress.ToLower() });
-                }
+                user = await _userDAL.GetUserByEmail(emailAddress.ToLower());
+                
                 /// TODO: Remove once testing done
                 // emailAddress = "philm127@gmail.com";
                 if (user == null)
@@ -176,30 +146,11 @@ namespace AdtonesAdminWebApi.BusinessServices
                     result.error = "Your account cannot be found.";
                     return result;
                 }
-                else if (user.VerificationStatus == false)
-                {
-                    result.result = 0;
-                    result.error = "Please verify your email account.";
-                    return result;
-                }
-                else if (user.Activated == 0)
-                {
-                    result.result = 0;
-                    result.error = "Your account is not approved by adtones administrator so please contact adtones admin.";
-                    return result;
-                }
-                else if (user.Activated == 2)
-                {
-                    result.result = 0;
-                    result.error = "Your account is  suspended by adtones administrator so please contact adtones admin.";
-                    return result;
-                }
-                else if (user.Activated == 3)
-                {
-                    result.result = 0;
-                    result.error = "Your account is  deleted by adtones administrator so please contact adtones admin.";
-                    return result;
-                }
+
+                ReturnResult verify = PartialVerification(user);
+                if (verify.result == 0)
+                    return verify;
+
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                 // Send an email with this link
                 string email = EncryptionHelper.EncryptSingleValue(user.Email);
@@ -207,43 +158,23 @@ namespace AdtonesAdminWebApi.BusinessServices
                 string url = string.Format("{0}?activationCode={1}", _configuration.GetValue<string>(
                                 "AppSettings:AdminResetPassword"), email);
 
-                /// TODO: Check the working of filepaths
-                if (string.IsNullOrWhiteSpace(_env.WebRootPath))
-                {
-                    _env.WebRootPath = Directory.GetCurrentDirectory();
-                }
+                var otherpath = _env.ContentRootPath;
+                var template = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("ResetPasswordEmailTemplate").Value;
+                var path = otherpath + template;
+                var reader = new StreamReader(path);
 
-                string webroot = _env.WebRootPath + _configuration.GetValue<string>("AppSettings:ResetPasswordEmailTemplate");
 
-                var reader =
-                    new StreamReader(webroot);
-                //Path.Combine(webroot, _configuration.GetValue<string>("AppSettings:ResetPasswordEmailTemplate")));
                 string emailContent = reader.ReadToEnd();
                 emailContent = string.Format(emailContent, url);
 
-                MailMessage mail = new MailMessage();
-                mail.To.Add(user.Email);
-                //mail.To.Add("xxx@gmail.com");
-                var whatever = _configuration.GetValue<string>("AppSettings:SiteEmailAddress");
-                mail.From = new MailAddress("support@adtones.com");// _configuration.GetValue<string>("SiteEmailAddress"));
-                mail.Subject = "Email Verification";
-
-                mail.Body = emailContent.Replace("\n", "<br/>");
-
-                mail.IsBodyHtml = true;
-                SmtpClient smtp = new SmtpClient();
-                smtp.Host = _configuration.GetValue<string>("AppSettings:SmtpServerAddress"); //Or Your SMTP Server Address
-                smtp.Credentials = new System.Net.NetworkCredential
-                     (_configuration.GetValue<string>("AppSettings:SMTPEmail"), _configuration.GetValue<string>("AppSettings:SMTPPassword")); // ***use valid credentials***
-
-                smtp.Port = int.Parse(_configuration.GetValue<string>("AppSettings:SmtpServerPort"));
-
-                //Or your Smtp Email ID and Password
+                SendEmailModel emailModel = new SendEmailModel();
+                emailModel.Body = emailContent.Replace("\n", "<br/>");
+                emailModel.SingleTo = emailAddress;
+                emailModel.From = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SiteEmailAddress").Value;
+                emailModel.Subject = "Email Verification";
                 try
                 {
-                    /// TODO: fix email service
-                    smtp.EnableSsl = Convert.ToBoolean(_configuration.GetValue<string>("AppSettings:EnableEmailSending").ToString());
-                    smtp.Send(mail);
+                    _mailer.SendEmail(emailModel);
                 }
                 catch (Exception ex)
                 {
@@ -260,6 +191,166 @@ namespace AdtonesAdminWebApi.BusinessServices
                     result.result = 0;
                     result.error = "Email failed to send";
                 }
+
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "LogonService",
+                    ProcedureName = "ForgotPassword"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// Used within profile form checks current password against db current password.
+        /// On success password will be updated. If is safaricom will check against password history..
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public async Task<ReturnResult> ChangePassword(PasswordModel model)
+        {
+            User change = new User();
+            try
+            {
+                User user = await _userDAL.GetUserById(model.Userid);
+                change.PasswordHash = model.OldPassword;
+                change.Email = user.Email;
+
+                /// TODO: Remove once testing done
+                // emailAddress = "philm127@gmail.com";
+                if (user == null)
+                {
+                    result.result = 0;
+                    result.error = "Your account cannot be found.";
+                    return result;
+                }
+
+                ReturnResult verify = PartialVerification(user);
+                if (verify.result == 0)
+                    return verify;
+
+                if (!ValidatePassword(user, change))
+                {
+                    result.result = 0;
+                    result.error = "Your current password provided is incorrect.";
+                    return result;
+                }
+
+
+                change.PasswordHash = Md5Encrypt.Md5EncryptPassword(model.NewPassword);
+
+
+                if (user.OperatorId == 2)
+                {
+                    if (await IsPreviousPassword(user.UserId, change.PasswordHash))
+                    {
+                        result.error = "Cannot reuse an old password. Please select another";
+                        result.result = 0;
+                        return result;
+                    }
+                    var y = UpdatePasswordHistory(user.UserId, change.PasswordHash);
+                }
+                try
+                {
+                    var x = _loginDAL.UpdatePassword(change);
+                }
+                catch (Exception ex)
+                {
+                    var _logging = new ErrorLogging()
+                    {
+                        ErrorMessage = ex.Message.ToString(),
+                        StackTrace = ex.StackTrace.ToString(),
+                        PageName = "LogonService",
+                        ProcedureName = "ChangePassword - updateQuery"
+                    };
+                    _logging.LogError();
+                    result.result = 0;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "LogonService",
+                    ProcedureName = "ForgotPassword"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// Comes after ForgotPassword and email link sent.
+        /// If is safaricom will check against password history.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public async Task<ReturnResult> ResetPassword(PasswordModel model)
+        {
+            User change = new User();
+            try
+            {
+                User user = await _userDAL.GetUserByEmail(model.Email);
+                
+
+                /// TODO: Remove once testing done
+                // emailAddress = "philm127@gmail.com";
+                if (user == null)
+                {
+                    result.result = 0;
+                    result.error = "Your account cannot be found.";
+                    return result;
+                }
+
+                change.PasswordHash = Md5Encrypt.Md5EncryptPassword(model.NewPassword);
+                change.Email = model.Email;
+
+                ReturnResult verify = PartialVerification(user);
+                if (verify.result == 0)
+                    return verify;
+
+
+               
+                if (user.OperatorId == 2)
+                {
+                    if (await IsPreviousPassword(user.UserId, change.PasswordHash))
+                    {
+                        result.error = "Cannot reuse an old password. Please select another";
+                        result.result = 0;
+                        return result;
+                    }
+                    var y = UpdatePasswordHistory(user.UserId, change.PasswordHash);
+                }
+                try
+                {
+                    var x = _loginDAL.UpdatePassword(change);
+                }
+                catch (Exception ex)
+                {
+                    var _logging = new ErrorLogging()
+                    {
+                        ErrorMessage = ex.Message.ToString(),
+                        StackTrace = ex.StackTrace.ToString(),
+                        PageName = "LogonService",
+                        ProcedureName = "ChangePassword - updateQuery"
+                    };
+                    _logging.LogError();
+                    result.result = 0;
+                }
+
             }
             catch (Exception ex)
             {
@@ -335,6 +426,45 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+
+        private ReturnResult PartialVerification(User user)
+        {
+            if (user.VerificationStatus == false)
+            {
+                result.result = 0;
+                result.error = "Please verify your email account.";
+                return result;
+            }
+            else if (user.Activated == 0)
+            {
+                if (user.RoleId == 6)
+                {
+                    result.result = 0;
+                    result.error = "Your account has been InActive by adtones administrator.so, Please contact adtones admin.";
+                    return result;
+                }
+                else
+                {
+                    result.result = 0;
+                    result.error = "Your account is not approved by Adtones so please contact Adtones Admin.";
+                    return result;
+                }
+            }
+            else if (user.Activated == 2)
+            {
+                result.result = 0;
+                result.error = "Your account is  suspended by adtones administrator so please contact adtones admin.";
+                return result;
+            }
+            else if (user.Activated == 3)
+            {
+                result.result = 0;
+                result.error = "Your account is  deleted by adtones administrator so please contact adtones admin.";
+                return result;
+            }
+            return result;
+        }
+
         private bool PasswordExpiredAttribute(User user)
         {
 
@@ -350,6 +480,13 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        /// <summary>
+        /// Gets password from userlogin/change/reset Passwordhash with
+        /// model Passwordhash from DB
+        /// </summary>
+        /// <param name="user">Model retrived from DB</param>
+        /// <param name="userForm">Model sent by user</param>
+        /// <returns></returns>
         private bool ValidatePassword(User user,User userForm)
         {
             try
@@ -436,3 +573,52 @@ namespace AdtonesAdminWebApi.BusinessServices
 
     }
 }
+
+
+/////XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+//public void changepassowrd(string email)
+//{
+
+//    var server = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress");
+//    var template = _configuration.GetValue<string>("AppSettings:ChangePassowordTemplate");
+//    var reader =
+//        new StreamReader(server + template);
+
+//    string emailContent = reader.ReadToEnd();
+//    emailContent = string.Format(emailContent, email);
+//    MailSending("support@adtones.xyz", "Supp0rtPa55w0rd!", "ChangePassword", email, emailContent, "smtp.gmail.com", 587, true);
+
+//}
+
+//public void MailSending(string Username, string Password, string mailSubject, string mailTo, string mailBody, string host, int port, bool EnableSSL)
+//{
+//    MailMessage mail = new MailMessage();
+//    SmtpClient client = new SmtpClient();
+
+//    mail.From = new MailAddress(Username, Username);
+//    mail.Subject = mailSubject;
+//    mail.To.Add(mailTo);
+//    mail.Body = mailBody;
+//    mail.Priority = MailPriority.High;
+//    mail.IsBodyHtml = true;
+
+
+//    client.Port = port;
+//    client.EnableSsl = EnableSSL;
+//    if (String.IsNullOrEmpty(Username) && String.IsNullOrEmpty(Password))
+//    {
+//        client.UseDefaultCredentials = true;
+
+//    }
+//    else
+//    {
+//        client.UseDefaultCredentials = false;
+
+//    }
+//    client.Host = host;
+//    client.Credentials = new NetworkCredential(Username, Password);
+//    client.SendMailAsync(mail);
+//}
+
+/////XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

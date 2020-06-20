@@ -1,12 +1,7 @@
-﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
-using AdtonesAdminWebApi.DAL.Interfaces;
-using AdtonesAdminWebApi.DAL.Queries;
+﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.TicketingModels;
-using AdtonesAdminWebApi.ViewModels;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.Services
@@ -21,27 +16,23 @@ namespace AdtonesAdminWebApi.Services
     public class GenerateTicketService : IGenerateTicketService
     {
         private readonly ILiveAgentService _liveService;
-        private readonly IUserManagementQuery _commandText;
         private readonly IUserManagementDAL _userDal;
         private readonly ITicketDAL _ticketDAL;
-        private readonly ITicketQuery _tikText;
         private readonly IConfiguration _configuration;
 
-        public GenerateTicketService(ILiveAgentService liveService, IUserManagementDAL userDal, ITicketDAL ticketDAL,ITicketQuery tikText,
-                                        IUserManagementQuery commandText, IConfiguration configuration)
+        public GenerateTicketService(ILiveAgentService liveService, IUserManagementDAL userDal, ITicketDAL ticketDAL,
+                                        IConfiguration configuration)
         {
             _liveService = liveService;
-            _commandText = commandText;
             _userDal = userDal;
             _ticketDAL = ticketDAL;
-            _tikText = tikText;
             _configuration = configuration;
         }
 
 
         public async Task CreateAdTicket(int userId, string sub, string msg, int subjectId, int advertId)
         {
-            var userDetail = await _userDal.GetUserById(_commandText.GetUserById,userId);
+            var userDetail = await _userDal.GetUserById(userId);
             string subject = sub;
             string message = msg;
             string ticketCode = string.Empty;
@@ -76,12 +67,12 @@ namespace AdtonesAdminWebApi.Services
                 model.AdvertId = advertId;
             }
 
-            var x = _ticketDAL.CreateNewHelpTicket(_tikText.CreateNewHelpTicket, model);
+            var x = _ticketDAL.CreateNewHelpTicket(model);
         }
 
         public async Task CreateAdTicketForBilling(int userId, string sub, string msg, int subjectId, int? ClientId, int CampaignProfileId, int PaymentMethodId)
         {
-            var userDetail = await _userDal.GetUserById(_commandText.GetUserById, userId);
+            var userDetail = await _userDal.GetUserById(userId);
             string subject = sub;
             string message = msg;
             string ticketCode = string.Empty;
@@ -109,7 +100,7 @@ namespace AdtonesAdminWebApi.Services
             model.UpdatedBy = null;
             model.AdvertId = null;
 
-            var x = _ticketDAL.CreateNewHelpTicket(_tikText.CreateNewHelpTicket, model);
+            var x = _ticketDAL.CreateNewHelpTicket(model);
         }
     }
 }

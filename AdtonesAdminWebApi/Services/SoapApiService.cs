@@ -76,7 +76,7 @@ namespace AdtonesAdminWebApi.Services
         {
             try
             {
-                var advertData = await _adDAL.GetAdvertDetail(_adText.GetAdvertDetail, advertId);
+                var advertData = await _adDAL.GetAdvertDetail(advertId);
 
                 if (!string.IsNullOrEmpty(advertData.MediaFileLocation))
                 {

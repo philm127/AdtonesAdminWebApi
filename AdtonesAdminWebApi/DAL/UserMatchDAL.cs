@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.DAL.Queries;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -16,20 +17,23 @@ namespace AdtonesAdminWebApi.DAL
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
         private readonly IConnectionStringService _connService;
+        private readonly IUserMatchQuery _commandText;
 
-        public UserMatchDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
+        public UserMatchDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService,
+                            IUserMatchQuery commandText)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
             _connService = connService;
+            _commandText = commandText;
         }
 
 
-        public async Task<int> UpdateMediaLocation(string command, string conn, string media, int id)
+        public async Task<int> UpdateMediaLocation(string conn, string media, int id)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.UpdateMediaLocation);
             try
             {
                 builder.AddParameters(new { media = media });

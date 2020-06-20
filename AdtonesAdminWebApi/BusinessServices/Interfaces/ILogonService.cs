@@ -13,5 +13,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> ForgotPassword(string emailAddress);
         Task<int> UpdatePasswordHistory(int userId, string password);
         Task<bool> IsPreviousPassword(int userId, string newPassword);
+        Task<ReturnResult> ChangePassword(PasswordModel model);
+        Task<ReturnResult> ResetPassword(PasswordModel model);
     }
 }

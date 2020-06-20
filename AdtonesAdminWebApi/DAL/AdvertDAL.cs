@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.Extensions.Configuration;
@@ -16,28 +17,25 @@ namespace AdtonesAdminWebApi.DAL
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
         private readonly IConnectionStringService _connService;
+        private readonly IAdvertQuery _commandText;
 
-        public AdvertDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
+        public AdvertDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService,
+                            IAdvertQuery commandText)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
             _connService = connService;
+            _commandText = commandText;
         }
 
 
-        public async Task<IEnumerable<UserAdvertResult>> GetAdvertResultSet(string command, int id=0)
+        public async Task<IEnumerable<UserAdvertResult>> GetAdvertResultSet()
         {
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(command);
-            if (id == 0)
-                sb.Append(" ORDER BY ad.AdvertId DESC;");
-            else
-            {
-                sb.Append(" WHERE ad.UserId=@userId;");
-                builder.AddParameters(new { userId = id });
-            }
+            sb.Append(_commandText.GetAdvertResultSet);
+            sb.Append(" ORDER BY ad.AdvertId DESC;");
 
             var select = builder.AddTemplate(sb.ToString());
             try
@@ -54,10 +52,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<UserAdvertResult> GetAdvertDetail(string command, int id = 0)
+        public async Task<UserAdvertResult> GetAdvertDetail(int id = 0)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.GetAdvertDetail);
             try
             {
                 builder.AddParameters(new { Id = id });
@@ -73,12 +71,12 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<AdvertCategoryResult>> GetAdvertCategoryList(string command)
+        public async Task<IEnumerable<AdvertCategoryResult>> GetAdvertCategoryList()
         {
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<AdvertCategoryResult>(command));
+                                    conn => conn.Query<AdvertCategoryResult>(_commandText.GetAdvertCategoryDataTable));
             }
             catch
             {
@@ -87,11 +85,11 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> ChangeAdvertStatus(string command, UserAdvertResult model)
+        public async Task<int> ChangeAdvertStatus(UserAdvertResult model)
         {
 
             var sb = new StringBuilder();
-            sb.Append(command);
+            sb.Append(_commandText.UpdateAdvertStatus);
             sb.Append("AdvertId=@AdvertId;");
 
             var builder = new SqlBuilder();
@@ -119,11 +117,11 @@ namespace AdtonesAdminWebApi.DAL
         /// <param name="model"></param>
         /// <param name="userId">UserId obtained from operator provisioning server using AdtonesDServerUserId</param>
         /// <returns></returns>
-        public async Task<int> ChangeAdvertStatusOperator(string command, UserAdvertResult model,int userId)
+        public async Task<int> ChangeAdvertStatusOperator(UserAdvertResult model,int userId)
         {
             var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
             var sb = new StringBuilder();
-            sb.Append(command);
+            sb.Append(_commandText.UpdateAdvertStatus);
             sb.Append(" AdtoneServerAdvertId=@AdvertId;");
 
             var builder = new SqlBuilder();
@@ -144,11 +142,11 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<FtpDetailsModel> GetFtpDetails(string command, int operatorId)
+        public async Task<FtpDetailsModel> GetFtpDetails(int operatorId)
         {
 
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.GetFtpDetails);
             try
             {
                 builder.AddParameters(new { OperatorId = operatorId });
@@ -163,10 +161,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateMediaLoaded(string command, UserAdvertResult advert)
+        public async Task<int> UpdateMediaLoaded(UserAdvertResult advert)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.UpdateMediaLoaded);
             try
             {
                 builder.AddParameters(new { advertId = advert.AdvertId });
@@ -181,11 +179,11 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> RejectAdvertReason(string command, UserAdvertResult model)
+        public async Task<int> RejectAdvertReason(UserAdvertResult model)
         {
 
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.RejectAdvertReason);
             try
             {
                 builder.AddParameters(new { AdvertId = model.AdvertId });
@@ -203,10 +201,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> RejectAdvertReasonOperator(string command, UserAdvertResult model,string connString,int uid, int rejId, int adId)
+        public async Task<int> RejectAdvertReasonOperator(UserAdvertResult model,string connString,int uid, int rejId, int adId)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.RejectAdvertReason);
             try
             {
                 builder.AddParameters(new { AdvertId = adId });
@@ -222,7 +220,6 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
         }
-
 
 
     }

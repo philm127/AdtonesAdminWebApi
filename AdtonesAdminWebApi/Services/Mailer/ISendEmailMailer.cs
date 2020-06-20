@@ -7,7 +7,6 @@ namespace AdtonesAdminWebApi.Services.Mailer
 {
     public interface ISendEmailMailer
     {
-        /// TODO: Not sure what to do keep this or new
-        // MvcMailMessage SendEmail(SendEmailModel model);
+        void SendEmail(SendEmailModel mail);
     }
 }

@@ -17,39 +17,33 @@ namespace AdtonesAdminWebApi.BusinessServices
         IHttpContextAccessor _httpAccessor;
         private IConnectionStringService _connService;
         private readonly IUserMatchDAL _matchDAL;
-        private readonly IUserMatchQuery _matchText;
         private readonly IAdTransferService _transService;
         private readonly IGenerateTicketService _ticketService;
         private readonly ICampaignService _campService;
         private readonly ISoapApiService _soapApi;
         private readonly ISoapDAL _soapDAL;
 
-        // private IUserMatchInterface _matchInterface;
+        private IUserMatchInterface _matchInterface;
         private readonly IAdvertDAL _advertDAL;
-        private readonly IAdvertQuery _commandText;
-        private readonly ISoapQuery _soapText;
         private readonly ICampaignDAL _campDAL;
         private readonly IConfiguration _configuration;
         ReturnResult result = new ReturnResult();
 
 
         public AdvertService(IAdvertDAL advertDAL, IAdvertQuery commandText, IHttpContextAccessor httpAccessor, IConnectionStringService connService,
-                                IUserMatchDAL matchDAL, IUserMatchQuery matchText, IAdTransferService transService, 
+                                IUserMatchDAL matchDAL, IAdTransferService transService, 
                                 IGenerateTicketService ticketService, ICampaignService campService, ISoapApiService soapApi,
-                                ISoapDAL soapDAL, ISoapQuery soapText, ICampaignDAL campDAL, IConfiguration configuration)//IUserMatchInterface matchInterface
+                                ISoapDAL soapDAL, ICampaignDAL campDAL, IConfiguration configuration)//IUserMatchInterface matchInterface
         {
             _advertDAL = advertDAL;
-            _commandText = commandText;
             _httpAccessor = httpAccessor;
             _connService = connService;
             _matchDAL = matchDAL;
-            _matchText = matchText;
             _transService = transService;
             _ticketService = ticketService;
             _campService = campService;
             _soapApi = soapApi;
             _soapDAL = soapDAL;
-            _soapText = soapText;
             _campDAL = campDAL;
             _configuration = configuration;
             // _matchInterface = matchInterface;
@@ -64,7 +58,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                result.body = await _advertDAL.GetAdvertResultSet(_commandText.GetAdvertResultSet,id);
+                result.body = await _advertDAL.GetAdvertResultSet();
 
             }
             catch (Exception ex)
@@ -87,7 +81,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                result.body = await _advertDAL.GetAdvertResultSet(_commandText.GetAdvertDetail,id);
+                result.body = await _advertDAL.GetAdvertDetail(id);
 
             }
             catch (Exception ex)
@@ -110,7 +104,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                result.body = await _advertDAL.GetAdvertCategoryList(_commandText.GetAdvertCategoryDataTable);
+                result.body = await _advertDAL.GetAdvertCategoryList();
             }
             catch (Exception ex)
             {
@@ -138,9 +132,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     adModel.Status = (int)Enums.AdvertStatus.CampaignPausedDueToInsufficientFunds;
                 }
-                var x = await _advertDAL.ChangeAdvertStatus(_commandText.UpdateAdvertStatus, adModel);
-                int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
-                var y = await _advertDAL.ChangeAdvertStatusOperator(_commandText.UpdateAdvertStatus, adModel, uid);
+                var updstatus = UpdateStatus(adModel);
 
                 var operatordId = adModel.OperatorId;
 
@@ -171,13 +163,13 @@ namespace AdtonesAdminWebApi.BusinessServices
                             {
                                 if (adModel.OperatorId != (int)Enums.OperatorTableId.Safaricom)
                                 {
-                                    FtpDetailsModel operatorFTPDetails = await _advertDAL.GetFtpDetails(_commandText.GetFtpDetails, adModel.OperatorId);
+                                    FtpDetailsModel operatorFTPDetails = await _advertDAL.GetFtpDetails(adModel.OperatorId);
                                     if (operatorFTPDetails != null)
                                         adName = operatorFTPDetails.FtpRoot + "/" + adModel.MediaFileLocation.Split('/')[3];
                                 }
                             }
 
-                            var z = await _matchDAL.UpdateMediaLocation(_matchText.UpdateMediaLocation, ConnString, adName, campaigndetailsid);
+                            var z = await _matchDAL.UpdateMediaLocation(ConnString, adName, campaigndetailsid);
                             await _matchDAL.PrematchProcessForCampaign(campaigndetailsid, ConnString);
                         }
                     }
@@ -206,7 +198,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 if (adModel.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                 {
-                    var returnValue = await _transService.CopyAdToOpeartorServer(ConnString, adModel);
+                    var returnValue = await _transService.CopyAdToOperatorServer(ConnString, adModel);
                     if (returnValue != "Success")
                     {
                         string message = returnValue;
@@ -245,7 +237,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                                 }
                                 else
                                 {
-                                    var responseCodeDetail = await _soapDAL.GetSoapApiResponse(_soapText.GetSoapApiResponseCodes,responseCode);
+                                    var responseCodeDetail = await _soapDAL.GetSoapApiResponse(responseCode);
                                     if (responseCodeDetail != null)
                                     {
                                         message = responseCode + " - " + responseCodeDetail.Description;
@@ -265,7 +257,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 else if (adModel.OperatorId == (int)Enums.OperatorTableId.Expresso)
                 {
-                    var returnValue = await _transService.CopyAdToOpeartorServer(ConnString, adModel);
+                    var returnValue = await _transService.CopyAdToOperatorServer(ConnString, adModel);
                     if (returnValue != "Success")
                     {
                         string message = returnValue;
@@ -297,22 +289,9 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                var x = await _advertDAL.ChangeAdvertStatus(_commandText.UpdateAdvertStatus, adModel);
-                int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
-                var y = await _advertDAL.ChangeAdvertStatusOperator(_commandText.UpdateAdvertStatus, adModel, uid);
+                var updStatus = await UpdateStatus(adModel);
 
-                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(adModel.AdvertId);
-                // var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
-
-                if (ConnString != null)
-                {
-                    var campaigndetailsid = await _connService.GetCampaignProfileIdFromAdtoneId(campaignAdvert.CampaignProfileId, adModel.OperatorId);
-                    if (campaigndetailsid != 0)
-                    {
-                        var z = await _matchDAL.UpdateMediaLocation(_matchText.UpdateMediaLocation, ConnString, null, campaigndetailsid);
-                        await _matchDAL.PrematchProcessForCampaign(campaigndetailsid, ConnString);
-                    }
-                }
+                var updLoc = await UpdateMediaFileLocation(adModel, ConnString);
 
                 return true;
             }
@@ -335,12 +314,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                var x = await _advertDAL.ChangeAdvertStatus(_commandText.UpdateAdvertStatus, adModel);
-                int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
-                var y = await _advertDAL.ChangeAdvertStatusOperator(_commandText.UpdateAdvertStatus, adModel, uid);
-
-                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(adModel.AdvertId);
-                var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
+                var updstatus = UpdateStatus(adModel);
 
                 if (adModel.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                 {
@@ -357,7 +331,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         }
                         else
                         {
-                            var responseCodeDetail = await _soapDAL.GetSoapApiResponse(_soapText.GetSoapApiResponseCodes,responseCode);
+                            var responseCodeDetail = await _soapDAL.GetSoapApiResponse(responseCode);
                             if (responseCodeDetail != null)
                             {
                                 message = responseCode + " - " + responseCodeDetail.Description;
@@ -374,15 +348,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     }
                 }
 
-                if (ConnString != null)
-                {
-                    var campaigndetailsid = await _connService.GetCampaignProfileIdFromAdtoneId(campaignAdvert.CampaignProfileId, adModel.OperatorId);
-                    if (campaigndetailsid != 0)
-                    {
-                        var z = await _matchDAL.UpdateMediaLocation(_matchText.UpdateMediaLocation, ConnString, null, campaigndetailsid);
-                        await _matchDAL.PrematchProcessForCampaign(campaigndetailsid, ConnString);
-                    }
-                }
+                var updLoc = UpdateMediaFileLocation(adModel, ConnString);
                 return true;
             }
             catch (Exception ex)
@@ -399,31 +365,19 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
         }
 
+
         private async Task<bool> ApproveRejectRejected(UserAdvertResult adModel, string ConnString)
         {
             try
             {
+                var updstatus = UpdateStatus(adModel);
                 int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
                 int adId = await _connService.GetAdvertIdFromAdtoneId(adModel.AdvertId, adModel.OperatorId);
 
-                var x = await _advertDAL.ChangeAdvertStatus(_commandText.UpdateAdvertStatus, adModel);
-                var y = await _advertDAL.ChangeAdvertStatusOperator(_commandText.UpdateAdvertStatus, adModel, uid);
+                var rejId = await _advertDAL.RejectAdvertReason(adModel);
+                var z = await _advertDAL.RejectAdvertReasonOperator(adModel, ConnString, uid, rejId,adId);
 
-                var rejId = await _advertDAL.RejectAdvertReason(_commandText.RejectAdvertReason, adModel);
-                var z = await _advertDAL.RejectAdvertReasonOperator(_commandText.RejectAdvertReason, adModel, ConnString, uid, rejId,adId);
-
-                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(adModel.AdvertId);
-                var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
-
-                if (ConnString != null)
-                {
-                    var campaigndetailsid = await _connService.GetCampaignProfileIdFromAdtoneId(campaignAdvert.CampaignProfileId, adModel.OperatorId);
-                    if (campaigndetailsid != 0)
-                    {
-                        var f = await _matchDAL.UpdateMediaLocation(_matchText.UpdateMediaLocation, ConnString, null, campaigndetailsid);
-                        await _matchDAL.PrematchProcessForCampaign(campaigndetailsid, ConnString);
-                    }
-                }
+                var updLoc = UpdateMediaFileLocation(adModel, ConnString);
 
                 return true;
             }
@@ -441,11 +395,40 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
         }
 
+
+        private async Task<bool> UpdateStatus(UserAdvertResult adModel)
+        {
+            var x = await _advertDAL.ChangeAdvertStatus(adModel);
+            int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
+            var y = await _advertDAL.ChangeAdvertStatusOperator(adModel, uid);
+            return true;
+        }
+
+
+        private async Task<bool> UpdateMediaFileLocation(UserAdvertResult adModel, string ConnString)
+        {
+            //ApproveRejectRejected
+            var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(adModel.AdvertId);
+            var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
+
+            if (ConnString != null)
+            {
+                var campaigndetailsid = await _connService.GetCampaignProfileIdFromAdtoneId(campaignAdvert.CampaignProfileId, adModel.OperatorId);
+                if (campaigndetailsid != 0)
+                {
+                    var f = await _matchDAL.UpdateMediaLocation(ConnString, null, campaigndetailsid);
+                    await _matchDAL.PrematchProcessForCampaign(campaigndetailsid, ConnString);
+                }
+            }
+            return true;
+        }
+
+
         public async Task<ReturnResult> ApproveORRejectAdvert(UserAdvertResult model)
         {
             try
             {
-                var adModel = await _advertDAL.GetAdvertDetail(_commandText.GetAdvertDetail, model.AdvertId);
+                var adModel = await _advertDAL.GetAdvertDetail(model.AdvertId);
                 adModel.Status = model.Status;
                 adModel.PrevStatus = model.PrevStatus;
                 adModel.UpdatedBy = model.UpdatedBy;

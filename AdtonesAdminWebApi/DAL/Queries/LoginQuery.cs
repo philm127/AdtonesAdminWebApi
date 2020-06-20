@@ -10,6 +10,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
     {
         string LoginUser { get; }
         string UpdateLockout { get; }
+        string UpdatePassword { get; }
     }
 
 
@@ -22,6 +23,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         public string UpdateLockout => @"UPDATE Users SET Activated=@activated, LockOutTime=@lockOutTime WHERE;";
+
+        public string UpdatePassword => @"Update Users SET PasswordHash=@PasswordHash, LastPasswordChangedDate=GETDATE() WHERE Email=@Email";
 
 
     }

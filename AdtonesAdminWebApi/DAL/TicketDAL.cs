@@ -129,10 +129,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<string> CreateNewHelpTicket(string command, TicketFormModel ticket)
+        public async Task<string> CreateNewHelpTicket(TicketFormModel ticket)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(_commandText.CreateNewHelpTicket);
             builder.AddParameters(new { UserId = ticket.UserId });
             builder.AddParameters(new { AdvertId = ticket.AdvertId });
             builder.AddParameters(new { QNumber = ticket.QNumber });

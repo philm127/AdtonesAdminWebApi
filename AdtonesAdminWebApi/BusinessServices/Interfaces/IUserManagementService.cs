@@ -22,7 +22,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> AddUser(User user);
         Task<ReturnResult> AddOperatorAdminUser(OperatorAdminFormModel model);
         Task<ReturnResult> UpdateOperatorAdminUser(OperatorAdminFormModel model);
-        Task<ReturnResult> GetOperatorAdmin(IdCollectionViewModel model);
+        Task<ReturnResult> GetOperatorAdmin(int userId);
 
         Task<ReturnResult> GetUserById(int userId);
     }

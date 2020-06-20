@@ -16,6 +16,7 @@ using AdtonesAdminWebApi.DAL.Shared;
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.DAL;
 using AdtonesAdminWebApi.UserMatchServices;
+using AdtonesAdminWebApi.Services.Mailer;
 
 namespace AdtonesAdminWebApi
 {
@@ -118,6 +119,7 @@ namespace AdtonesAdminWebApi
             services.AddTransient<IGenerateTicketService, GenerateTicketService>();
             services.AddTransient<ILiveAgentService, LiveAgentService>();
             services.AddTransient<ISoapApiService, SoapApiService>();
+            services.AddTransient<ISendEmailMailer, SendEmailMailer>();
 
             // Client Specific Services
             services.AddScoped<IExpressoProcessPromoUser, ExpressoProcessPromoUser>();

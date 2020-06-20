@@ -7,6 +7,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface ISoapDAL
     {
-        Task<SoapApiResponseCodes> GetSoapApiResponse(string command, string id);
+        Task<SoapApiResponseCodes> GetSoapApiResponse(string id);
     }
 }

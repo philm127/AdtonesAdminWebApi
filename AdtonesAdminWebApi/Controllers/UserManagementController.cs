@@ -61,10 +61,10 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [HttpGet("v1/GetCompanyDetails")]
-        public async Task<ReturnResult> GetCompanyDetails([FromBodyAttribute]User users)
+        [HttpGet("v1/GetCompanyDetails/{userId}")]
+        public async Task<ReturnResult> GetCompanyDetails(int userId)
         {
-            return await _userService.GetCompanyForm(users.UserId);
+            return await _userService.GetCompanyForm(userId);
         }
 
 

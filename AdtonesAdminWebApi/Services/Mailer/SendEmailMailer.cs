@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.Services.Mailer
@@ -8,8 +11,54 @@ namespace AdtonesAdminWebApi.Services.Mailer
     /// <summary>
     /// TODO: Need to sort whole of the mailing out
     /// </summary>
-    public class SendEmailMailer //: MailerBase, ISendEmailMailer
+    public class SendEmailMailer : ISendEmailMailer
     {
+        private readonly IConfiguration _configuration;
+
+        public SendEmailMailer(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+
+        public void SendEmail(SendEmailModel mail)
+        {
+            using (var message = new MailMessage())
+            {
+                //foreach (var two in mail.To)
+                //{
+                //    message.To.Add(new MailAddress(two));
+                //}
+                message.To.Add(mail.SingleTo);
+                message.From = new MailAddress(mail.From);
+                if (mail.Bcc != null)
+                {
+                    foreach (var blind in mail.Bcc)
+                    {
+                        message.Bcc.Add(new MailAddress(blind));
+                    }
+                }
+                if (mail.CC != null)
+                {
+                    foreach (var share in mail.CC)
+                    {
+                        message.CC.Add(new MailAddress(share));
+                    }
+                }
+                message.Subject = mail.Subject;
+                message.Body = mail.Body;
+                message.IsBodyHtml = true;
+               
+                using (var client = new SmtpClient(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerAddress").Value))
+                {
+                    client.Port = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerPort").Value);
+                    client.Credentials = new NetworkCredential(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPEmail").Value, _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPPassword").Value);
+                    client.EnableSsl = true;
+                    client.Send(message);
+                }
+            }
+        }
+        
         //public SendEmailMailer()
         //{
         //    MasterName = "_Layout";

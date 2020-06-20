@@ -9,6 +9,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     {
         Task<User> GetLoginUser(User userModel);
         Task<int> UpdateUserLockout(User userModel);
+        Task<int> UpdatePassword(User userModel);
 
     }
 }
