@@ -56,7 +56,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 if (user != null)
                 {
-                    if (user.OperatorId==2 && PasswordExpiredAttribute(user))
+                    if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && PasswordExpiredAttribute(user))
                     {
                         result.result = 0;
                         result.error = "Your Password has expired please reset it";
@@ -65,7 +65,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                     
                     // 4 is user has been blocked for too many incorrect login attempts.
-                    else if (user.OperatorId==2 && user.Activated == 4)
+                    else if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.Activated == 4)
                     {
                         DateTime date1 = user.LockOutTime.Value;
                         DateTime date2 = DateTime.Now;
@@ -155,8 +155,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 // Send an email with this link
                 string email = EncryptionHelper.EncryptSingleValue(user.Email);
 
-                string url = string.Format("{0}?activationCode={1}", _configuration.GetValue<string>(
-                                "AppSettings:AdminResetPassword"), email);
+                string url = string.Format("{0}?activationCode={1}", 
+                                    _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("AdminResetPassword").Value, email);
 
                 var otherpath = _env.ContentRootPath;
                 var template = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("ResetPasswordEmailTemplate").Value;
@@ -248,7 +248,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 change.PasswordHash = Md5Encrypt.Md5EncryptPassword(model.NewPassword);
 
 
-                if (user.OperatorId == 2)
+                if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                 {
                     if (await IsPreviousPassword(user.UserId, change.PasswordHash))
                     {
@@ -324,7 +324,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
 
                
-                if (user.OperatorId == 2)
+                if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                 {
                     if (await IsPreviousPassword(user.UserId, change.PasswordHash))
                     {
@@ -468,7 +468,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         private bool PasswordExpiredAttribute(User user)
         {
 
-                int PasswordExpiresInDays = int.Parse(_configuration.GetSection("AppSettings").GetSection("PasswordExpiresInDays").Value);
+                int PasswordExpiresInDays = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("PasswordExpiresInDays").Value);
 
                 TimeSpan ts = DateTime.Today - user.LastPasswordChangedDate;
 
@@ -575,50 +575,3 @@ namespace AdtonesAdminWebApi.BusinessServices
 }
 
 
-/////XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-//public void changepassowrd(string email)
-//{
-
-//    var server = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress");
-//    var template = _configuration.GetValue<string>("AppSettings:ChangePassowordTemplate");
-//    var reader =
-//        new StreamReader(server + template);
-
-//    string emailContent = reader.ReadToEnd();
-//    emailContent = string.Format(emailContent, email);
-//    MailSending("support@adtones.xyz", "Supp0rtPa55w0rd!", "ChangePassword", email, emailContent, "smtp.gmail.com", 587, true);
-
-//}
-
-//public void MailSending(string Username, string Password, string mailSubject, string mailTo, string mailBody, string host, int port, bool EnableSSL)
-//{
-//    MailMessage mail = new MailMessage();
-//    SmtpClient client = new SmtpClient();
-
-//    mail.From = new MailAddress(Username, Username);
-//    mail.Subject = mailSubject;
-//    mail.To.Add(mailTo);
-//    mail.Body = mailBody;
-//    mail.Priority = MailPriority.High;
-//    mail.IsBodyHtml = true;
-
-
-//    client.Port = port;
-//    client.EnableSsl = EnableSSL;
-//    if (String.IsNullOrEmpty(Username) && String.IsNullOrEmpty(Password))
-//    {
-//        client.UseDefaultCredentials = true;
-
-//    }
-//    else
-//    {
-//        client.UseDefaultCredentials = false;
-
-//    }
-//    client.Host = host;
-//    client.Credentials = new NetworkCredential(Username, Password);
-//    client.SendMailAsync(mail);
-//}
-
-/////XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

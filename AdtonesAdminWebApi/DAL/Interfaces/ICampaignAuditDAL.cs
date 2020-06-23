@@ -8,7 +8,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface ICampaignAuditDAL
     {
-        Task<CampaignDashboardChartPREResult> GetCampaignDashboardSummariesOperators(int id = 0);
         Task<List<CampaignDashboardChartPREResult>> GetCampaignDashboardSummariesAdvertisers(int campid = 0, int userId = 0);
 
         Task<CampaignDashboardChartPREResult> GetCampaignDashboardSummariesForOperator(int campaignId);

@@ -25,14 +25,14 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                         WHERE ";
 
 
-        public string getContactByUserId => @"SELECT Id, UserId,MobileNumber,FixedLine,Email, PhoneNumber,Address,CountryId,CurrencyId 
+        public string getContactByUserId => @"SELECT Id, UserId,ISNULL(MobileNumber,'-') AS MobileNumber,FixedLine,Email, PhoneNumber,Address,CountryId,CurrencyId 
                                                                                                 FROM Contacts WHERE UserId = @userid ";
 
         // Comes from SoapApiService
         public string UpdateCorpUser => "UPDATE Users SET Activated=3, IsMsisdnMatch=false WHERE UserId=@Id;";
 
 
-        public string GetCompanyDetails => @"SELECT Id, UserId,CompanyName,Address,AdditionalAddress,
+        public string GetCompanyDetails => @"SELECT Id, UserId,ISNULL(CompanyName,'-') AS CompanyName,Address,AdditionalAddress,
                                             Town,PostCode,CountryId FROM CompanyDetails WHERE UserId = @userid ";
 
 

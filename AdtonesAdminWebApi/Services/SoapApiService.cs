@@ -50,26 +50,13 @@ namespace AdtonesAdminWebApi.Services
             _userText = userText;
             _adDAL = adDAL;
             _adText = adText;
-
-            portalAccount = _configuration.GetValue<string>("AppSettings:PortalAccount");
-            portalPassword = _configuration.GetValue<string>("AppSettings:PortalPassword");
-            portalType = _configuration.GetValue<string>("AppSettings:PortalType");
-            moduleCode = _configuration.GetValue<string>("AppSettings:ModuleCode");
-            safricomUrl = _configuration.GetValue<string>("AppSettings:SafricomSoapUrl");
+            
+            portalAccount = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("PortalAccount").Value;
+            portalPassword = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("PortalPassword").Value;
+            portalType = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("PortalType").Value;
+            moduleCode = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("ModuleCode").Value;
+            safricomUrl = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("SafricomSoapUrl").Value;
         }
-
-        //static string portalAccount = _configuration.GetValue<string>("AppSettings:PortalAccount");
-        //static string portalPassword = _configuration.GetValue<string>("AppSettings:PortalPassword");
-        //static string portalType = _configuration.GetValue<string>("AppSettings:PortalType");
-        ////static string role = _configuration.GetValue<string>("AppSettings:Role");
-        ////static string roleCode = _configuration.GetValue<string>("AppSettings:RoleCode");
-        ////static string corpCode = _configuration.GetValue<string>("AppSettings:CorpCode");
-        //static string moduleCode = _configuration.GetValue<string>("AppSettings:ModuleCode");
-        ////static string corpId = _configuration.GetValue<string>("AppSettings:CorpID");
-        //static string safricomUrl = _configuration.GetValue<string>("AppSettings:SafricomSoapUrl");
-        ////static string TIBCOUrl = _configuration.GetValue<string>("AppSettings:AdtonesTIBCOBinding");
-        ////static string TIBCOUserName = _configuration.GetValue<string>("AppSettings:AdtonesTIBCOUserName");
-        ////static string TIBCOPassword = _configuration.GetValue<string>("AppSettings:AdtonesTIBCOPassword");
         
 
         public async Task<string> DeleteToneSoapApi(int advertId)
@@ -87,7 +74,7 @@ namespace AdtonesAdminWebApi.Services
                     var roleCode = "admin";
                     var toneID = advertData.SoapToneId;
                     var toneCode = advertData.SoapToneCode;
-                    string soapUIUrl = _configuration.GetValue<string>("AppSettings:MediaSoapUIUrl");
+                    string soapUIUrl = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("MediaSoapUIUrl").Value;
                     var client = new RestClient(soapUIUrl);
 
                     var request = new RestRequest(Method.POST);
@@ -176,7 +163,7 @@ namespace AdtonesAdminWebApi.Services
 
         public string UploadToneOnCRBTServer(int advertId)
         {
-            var safariProjURL = _configuration.GetValue<string>("AppSettings:SafricomProjUrl");
+            var safariProjURL = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("SafricomProjUrl").Value;
             //var url = safariProjURL + "AdTransfer/Index?advertId=" + advertId;
             // var url = "http://172.29.128.103/AdTransfer/Index?advertId=1332";
             var url = safricomUrl + "AdvertTransfer?advertId=" + advertId;

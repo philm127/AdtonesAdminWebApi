@@ -15,14 +15,16 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         private readonly IConfiguration _configuration;
         private readonly ISharedSelectListsDAL _sharedDal;
+        private readonly IUserCreditDAL _userDAL;
 
         ReturnResult result = new ReturnResult();
 
-        public UsersCreditService(IConfiguration configuration, ISharedSelectListsDAL sharedDal)
+        public UsersCreditService(IConfiguration configuration, ISharedSelectListsDAL sharedDal,IUserCreditDAL userDAL)
 
         {
             _configuration = configuration;
             _sharedDal = sharedDal;
+            _userDAL = userDAL;
         }
 
 
@@ -34,11 +36,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryAsync<UserCreditResult>(UserResultQuery());
-                }
+                result.body = await _userDAL.LoadUserCreditResultSet();
             }
             catch (Exception ex)
             {
@@ -98,30 +96,23 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _usercredit.UpdatedDate = DateTime.Now;
                 _usercredit.CurrencyId = _creditmodel.CurrencyId;
 
+                int x = 0;
+
                 var query = string.Empty;
                 if (_creditmodel.Id == 0)
                 {
-                    query = @"UPDATE UsersCredit SET UserId=@UserId,AssignCredit=@AssignCredit,AvailableCredit=@AssignCredit,
-                                UpdatedDate=GETDATE(),CurrencyId=@CurrencyId
-                                WHERE Id = @Id";
+                    x = await _userDAL.AddUserCredit(_usercredit);
                 }
                 else
                 {
-                    query = @"INSERT INTO UsersCredit(UserId,AssignCredit,AvailableCredit,UpdatedDate,CreatedDate,CurrencyId) 
-                        VALUES(@UserId,@AssignCredit,@AssignCredit,GETDATE(),GETDATE(),@CurrencyId)";
+                    x = await _userDAL.UpdateUserCredit(_usercredit);
                 }
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                if (x != 1)
                 {
-                    await connection.OpenAsync();
-                    int x = await connection.ExecuteAsync(query, _usercredit);
-
-                    if (x != 1)
-                    {
-                        result.result = 0;
-                        result.error = "Credit was not added successfully";
-                        return result;
-                    }
+                    result.result = 0;
+                    result.error = "Credit was not added successfully";
+                    return result;
                 }
             }
             catch (Exception ex)
@@ -279,7 +270,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             return @"SELECT u.Id,u.UserId,usrs.Email,usrs.FullName,usrs.Organisation,u.CreatedDate,
              u.AssignCredit AS Credit,u.AvailableCredit,ISNULL(bil.FundAmount,0) AS TotalUsed,ISNULL(pay.Amount,0) AS TotalPaid,
-             (ISNULL(bil.FundAmount,0) - ISNULL(pay.Amount,0)) AS RemainingAmount
+             (ISNULL(bil.FundAmount,0) - ISNULL(pay.Amount,0)) AS RemainingAmount,ctry.Name AS CountryName
              FROM UsersCredit AS u
              LEFT JOIN 
              (SELECT UserId,SUM(FundAmount) AS FundAmount FROM Billing WHERE PaymentMethodId=1 GROUP BY UserId) bil
@@ -290,6 +281,8 @@ namespace AdtonesAdminWebApi.BusinessServices
              LEFT JOIN
              (SELECT UserId,Email,CONCAT(FirstName,' ',LastName) AS FullName,Organisation FROM Users) usrs
              ON usrs.UserId=u.UserId
+            LEFT JOIN Currencies AS cur ON u.CurrencyId=cur.CurrencyId
+            LEFT JOIN Country AS ctry ON ctry.Id=cur.CountryId
              ORDER BY u.Id DESC;";
         }
 

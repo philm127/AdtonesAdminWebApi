@@ -99,12 +99,24 @@ namespace AdtonesAdminWebApi.Controllers
 
         #endregion
 
+
         /// <summary>
         /// 
         /// </summary>
         /// <returns>body contains List CampaignAdminResult</returns>
-        [HttpGet("v1/GetCampaignDashboardSummariesOperators/{id}")]
-        public async Task<ReturnResult> GetCampaignDashboardSummariesOperators(int id = 0)
+        [HttpGet("v1/GetDashboardSummaryByOperator/{id}")]
+        public async Task<ReturnResult> GetDashboardSummaryByOperator(int id = 0)
+        {
+            return await _auditService.GetDashboardSummariesByOperator(id);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List CampaignAdminResult</returns>
+        [HttpGet("v1/GetDashboardSummaryByCampaign/{id}")]
+        public async Task<ReturnResult> GetDashboardSummaryByCampaign(int id = 0)
         {
             return await _auditService.GetCampaignDashboardSummariesOperatorByCampaign(id);
         }
@@ -115,7 +127,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <returns>body contains List CampaignAdminResult</returns>
         [HttpPut("v1/GetPlayDetailsForOperatorByCampaign")]
-        public async Task<ReturnResult> GetPlayDetailsForOperatorByCampaign(PagingSearchClass paging)//queryParameters)
+        public async Task<ReturnResult> GetPlayDetailsForOperatorByCampaign(PagingSearchClass paging)
         {
             return await _auditService.GetPlayDetailsForOperatorByCampaign(paging);
         }

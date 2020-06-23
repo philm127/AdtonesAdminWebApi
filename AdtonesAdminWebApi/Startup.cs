@@ -83,6 +83,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ISoapDAL, SoapDAL>();
             services.AddScoped<ICampaignAuditDAL, CampaignAuditDAL>();
             services.AddScoped<ICurrencyDAL, CurrencyDAL>();
+            services.AddScoped<IUserCreditDAL, UserCreditDAL>();
 
             #endregion
 
@@ -108,6 +109,7 @@ namespace AdtonesAdminWebApi
             services.AddTransient<ISoapQuery, SoapQuery>();
             services.AddTransient<ICampaignAuditQuery, CampaignAuditQuery>();
             services.AddTransient<ICurrencyQuery, CurrencyQuery>();
+            services.AddTransient<IUserCreditQuery, UserCreditQuery>();
 
             #endregion
 

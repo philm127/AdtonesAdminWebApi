@@ -208,9 +208,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                     else
                     {
                         string crbtResponseValue = string.Empty;
-                        var test = _configuration.GetValue<bool>("Environment:Test");
-                        if (!test)
-                            crbtResponseValue = _soapApi.UploadToneOnCRBTServer(adModel.AdvertId);
+                        crbtResponseValue = _soapApi.UploadToneOnCRBTServer(adModel.AdvertId);
+
                         if (crbtResponseValue != "Success")
                         {
                             string message = crbtResponseValue;
@@ -220,9 +219,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         else
                         {
                             string responseCode = string.Empty;
-                            var testing = _configuration.GetValue<bool>("Environment:Test");
-                            if (!testing)
-                                responseCode = _soapApi.UploadSoapTone(adModel.AdvertId);
+                            responseCode = _soapApi.UploadSoapTone(adModel.AdvertId);
                             //var responseCode = "000000";
                             if (responseCode == "000000")
                             {
@@ -319,9 +316,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 if (adModel.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                 {
                     string responseCode = string.Empty;
-                    var testing = _configuration.GetValue<bool>("Environment:Test");
-                    if (!testing)
-                        responseCode = _soapApi.DeleteSoapTone(adModel.AdvertId);
+                    responseCode = _soapApi.DeleteSoapTone(adModel.AdvertId);
+
                     if (responseCode != "000000")
                     {
                         string message = "";

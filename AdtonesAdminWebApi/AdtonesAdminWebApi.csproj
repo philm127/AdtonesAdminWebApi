@@ -40,10 +40,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="DAL\Interfaces\IUserCreditDAL.cs" />
+    <Compile Include="DAL\UserCreditDAL.cs" />
     <Compile Include="DAL\CampaignAuditDAL.cs" />
     <Compile Include="DAL\CurrencyDAL.cs" />
     <Compile Include="DAL\Interfaces\ICampaignAuditDAL.cs" />
     <Compile Include="DAL\Interfaces\ICurrencyDAL.cs" />
+    <Compile Include="DAL\Queries\UserCreditQuery.cs" />
     <Compile Include="DAL\Queries\CampaignAuditQuery.cs" />
     <Compile Include="DAL\Queries\CurrencyQuery.cs" />
     <Compile Include="DAL\Queries\SoapQuery.cs" />

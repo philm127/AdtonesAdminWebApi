@@ -28,9 +28,9 @@ namespace AdtonesAdminWebApi.Services
         public LiveAgentService(IConfiguration configuration)
         {
             _configuration = configuration;
-            url = _configuration.GetValue<string>("AppSettings:LiveAgentUrl");
-            key = _configuration.GetValue<string>("AppSettings:LiveAgentKey");
-            liveAgentEmail = _configuration.GetValue<string>("AppSettings:LiveAgentRecipient");
+            url = _configuration.GetSection("AppSettings").GetSection("LiveAgent").GetSection("LiveAgentUrl").Value;
+            key = _configuration.GetSection("AppSettings").GetSection("LiveAgent").GetSection("LiveAgentKey").Value;
+            liveAgentEmail = _configuration.GetSection("AppSettings").GetSection("LiveAgent").GetSection("LiveAgentRecipient").Value;
         }
 
 

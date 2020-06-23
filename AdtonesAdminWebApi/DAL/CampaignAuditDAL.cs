@@ -40,7 +40,7 @@ namespace AdtonesAdminWebApi.DAL
 
 
         /// <summary>
-        /// Uses memory caching. If in cache returns that values else calls GetCampaignDashboardSummariesOperators
+        /// Uses memory caching. If in cache returns that values else calls CampaignDashboardSummariesOperators
         /// below. The result is then stored in cache.
         /// </summary>
         /// <param name="campaignId"></param>
@@ -49,11 +49,11 @@ namespace AdtonesAdminWebApi.DAL
         {
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(30));
-            string key = $"DASHBOARD_STATS_{campaignId}";
+            string key = $"OPERATOR_DASHBOARD_CAMPAIGN_STATS_{campaignId}";
             return await _cache.GetOrCreateAsync<CampaignDashboardChartPREResult>(key, cacheEntry =>
             {
                 cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
-                return GetCampaignDashboardSummariesOperators(campaignId);
+                return CampaignDashboardSummariesOperators(campaignId);
             });
             // return cacheEntry ?? new List<CampaignDashboardChartPREResult>();
         }
@@ -64,14 +64,14 @@ namespace AdtonesAdminWebApi.DAL
         /// </summary>
         /// <param name="id">camapign Id</param>
         /// <returns></returns>
-        public async Task<CampaignDashboardChartPREResult> GetCampaignDashboardSummariesOperators(int id = 0)
+        private async Task<CampaignDashboardChartPREResult> CampaignDashboardSummariesOperators(int campaignId)
         {
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(_commandText.GetCampaignDashboardSummaries);
             sb.Append(" cp.CampaignProfileId=@campId;");
             var select = builder.AddTemplate(sb.ToString());
-            builder.AddParameters(new { campId = id });
+            builder.AddParameters(new { campId = campaignId });
             try
             {
 
@@ -87,20 +87,20 @@ namespace AdtonesAdminWebApi.DAL
 
 
         /// <summary>
-        /// Uses memory caching. If in cache returns that values else calls GetDashboardSummariesOperators
+        /// Uses memory caching. If in cache returns that values else calls DashboardSummariesOperators
         /// below. The result is then stored in cache.
         /// </summary>
-        /// <param name="campaignId"></param>
+        /// <param name="operatorId"></param>
         /// <returns></returns>
         public async Task<CampaignDashboardChartPREResult> GetDashboardSummariesForOperator(int operatorId)
         {
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(30));
-            string key = $"DASHBOARD_STATS_{operatorId}";
+            string key = $"OPERATOR_DASHBOARD_STATS_{operatorId}";
             return await _cache.GetOrCreateAsync<CampaignDashboardChartPREResult>(key, cacheEntry =>
             {
                 cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
-                return GetDashboardSummariesOperators(operatorId);
+                return DashboardSummariesOperators(operatorId);
             });
             // return cacheEntry ?? new List<CampaignDashboardChartPREResult>();
         }
@@ -111,14 +111,11 @@ namespace AdtonesAdminWebApi.DAL
         /// </summary>
         /// <param name="id">operatorId</param>
         /// <returns></returns>
-        public async Task<CampaignDashboardChartPREResult> GetDashboardSummariesOperators(int id = 0)
+        private async Task<CampaignDashboardChartPREResult> DashboardSummariesOperators(int operatorId)
         {
-            var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(_commandText.GetCampaignDashboardSummaries);
-            sb.Append(" op.OperatorId=@opId;");
-            var select = builder.AddTemplate(sb.ToString());
-            builder.AddParameters(new { opId = id });
+            var select = builder.AddTemplate(_commandText.GetCampaignDashboardSummariesByOperator);
+            builder.AddParameters(new { opId = operatorId });
             try
             {
 
@@ -143,7 +140,7 @@ namespace AdtonesAdminWebApi.DAL
             if (campid > 0)
                 campId = campid;
 
-            sb.Append(" u.UserId=@userId and(@campaignId is null or(cp.CampaignProfileId = @campaignId)); ");
+            sb.Append(" u.UserId=@userId and(cp.CampaignProfileId is null or(cp.CampaignProfileId = @campaignId)); ");
             var select = builder.AddTemplate(sb.ToString());
             builder.AddParameters(new { campId = campId });
             builder.AddParameters(new { userId = userId });
@@ -163,6 +160,11 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        /// <summary>
+        /// Maybe redundant
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<CampaignAuditOperatorTable>> GetPlayDetailsByCampaignCount(PagingSearchClass param)
         {
 
@@ -182,6 +184,7 @@ namespace AdtonesAdminWebApi.DAL
             }
 
         }
+
 
         public async Task<IEnumerable<CampaignAuditOperatorTable>> GetPlayDetailsByCampaign(PagingSearchClass param)
         {

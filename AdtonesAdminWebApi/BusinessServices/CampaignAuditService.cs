@@ -109,5 +109,47 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> GetDashboardSummariesByOperator(int operatorId)
+        {
+            try
+            {
+                var summaries = await _auditDAL.GetDashboardSummariesForOperator(operatorId);
+
+                var _CampaignDashboardChartResult = new CampaignDashboardChartResult
+                {
+                    CampaignName = summaries.CampaignName,
+                    AdvertName = summaries.AdvertName,
+                    TotalPlayed = (int)summaries.TotalPlays,
+                    FreePlays = (int)summaries.FreePlays,
+                    TotalSpend = (double)summaries.Spend,
+                    AverageBid = (double)summaries.AvgBid,
+                    AveragePlayTime = (double)summaries.AvgPlayLength,
+                    TotalBudget = summaries.Budget,
+                    MaxPlayLength = summaries.MaxPlayLength,
+                    TotalReach = (int)summaries.TotalReach,
+                    Reach = (int)summaries.Reach,
+                    CurrencyCode = summaries.CurrencyCode
+                    //MaxPlayLengthPercantage = totalPlays == 0 ? 0 : Math.Round((double)summaries.TotalValuablePlays / totalPlays, 2),
+                };
+
+                result.body = _CampaignDashboardChartResult;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CampaignAuditService",
+                    ProcedureName = "GetDashboardSummariesByOperator"
+                };
+                _logging.LogError();
+                result.result = 0;
+                return result;
+            }
+        }
+
+
     }
 }

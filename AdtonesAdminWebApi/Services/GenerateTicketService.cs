@@ -36,11 +36,7 @@ namespace AdtonesAdminWebApi.Services
             string subject = sub;
             string message = msg;
             string ticketCode = string.Empty;
-            var test = _configuration.GetValue<bool>("Environment:Test");
-            if (!test)
-                ticketCode = _liveService.CreateTicket(subject, message, userDetail.Email);
-            else
-                ticketCode = "testing123";
+            ticketCode = _liveService.CreateTicket(subject, message, userDetail.Email);
 
             TicketFormModel model = new TicketFormModel();
 
@@ -76,11 +72,7 @@ namespace AdtonesAdminWebApi.Services
             string subject = sub;
             string message = msg;
             string ticketCode = string.Empty;
-            var test = _configuration.GetValue<bool>("Environment:Test");
-            if (!test)
-                ticketCode = _liveService.CreateTicket(subject, message, userDetail.Email);
-            else
-                ticketCode = "testing123";
+            ticketCode = _liveService.CreateTicket(subject, message, userDetail.Email);
 
             TicketFormModel model = new TicketFormModel();
 
