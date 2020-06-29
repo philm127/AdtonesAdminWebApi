@@ -14,5 +14,8 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         ReturnResult GetUserStatus();
         Task<ReturnResult> GetOperatorList(int countryId = 0);
         Task<ReturnResult> GetCurrencyList(int currencyId = 0);
+        Task<ReturnResult> GetAddCreditUsersList();
+        Task<ReturnResult> GetUserCreditList();
+        Task<ReturnResult> GetUserDetailCreditList();
     }
 }

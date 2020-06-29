@@ -58,7 +58,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                result.body = await _advertDAL.GetAdvertResultSet();
+                result.body = await _advertDAL.GetAdvertResultSet(id);
 
             }
             catch (Exception ex)

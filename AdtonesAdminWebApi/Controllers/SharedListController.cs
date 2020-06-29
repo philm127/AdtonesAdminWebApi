@@ -86,5 +86,40 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        /// <summary>
+        /// Gets all the selcted lists required Country, Currency and Users
+        /// </summary>
+        /// <returns>body contains 3 List SharedSelectListViewModel
+        /// Country, Currency and Credit Users</returns>
+        [HttpGet("v1/GetUserDetailCreditList")]
+        public async Task<ReturnResult> GetUserDetailCreditList()
+        {
+            return await _sharedList.GetUserDetailCreditList();
+        }
+
+
+        /// <summary>
+        /// Gets the advertisers who have a credit account
+        /// </summary>
+        /// <returns>body contains List SharedSelectListViewModel</returns>
+        [HttpGet("v1/GetAddUserCreditList")]
+        public async Task<ReturnResult> GetAddUserCreditList()
+        {
+            return await _sharedList.GetAddCreditUsersList();
+        }
+
+
+        /// <summary>
+        /// Gets the advertisers who currently do not have a credit yet
+        /// </summary>
+        /// <returns>body contains List SharedSelectListViewModel
+        /// or a single one if id entered</returns>
+        [HttpGet("v1/GetUserCreditList")]
+        public async Task<ReturnResult> GetUserCreditList()
+        {
+            return await _sharedList.GetUserCreditList();
+        }
+
+
     }
 }

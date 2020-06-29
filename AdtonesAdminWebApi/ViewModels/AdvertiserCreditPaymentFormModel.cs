@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.ViewModels
 {
-    public class UserCreditPaymentFormModel
+    public class AdvertiserCreditPaymentFormModel
     {
         public int UserId { get; set; }
         public int BillingId { get; set; }

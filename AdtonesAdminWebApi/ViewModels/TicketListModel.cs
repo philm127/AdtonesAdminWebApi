@@ -1,6 +1,8 @@
 ﻿using AdtonesAdminWebApi.Enums;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -59,5 +61,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public DateTime CommentDate { get; set; }
         public string TicketCode { get; set; }
         public string UserName { get; set; }
+        public string? ImageFile { get; set; }
+        public IFormFile CommentImage { get; set; }
     }
 }

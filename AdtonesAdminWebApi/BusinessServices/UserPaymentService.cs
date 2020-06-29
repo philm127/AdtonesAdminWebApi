@@ -58,8 +58,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                var select_query = ("SELECT Id AS Value,CampaignNameName AS Text FROM CampaignProfile");
-                result.body = await _sharedDal.GetSelectList(select_query);
+                result.body = await _sharedDal.GetCamapignList(0);
             }
             catch (Exception ex)
             {
@@ -82,10 +81,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                var select_query = (@"SELECT UserId AS Value,CONCAT(FirstName,'',LastName,'(',Email,')') AS Text FROM Users
-                                        WHERE Activated=1 AND RoleId=3 AND Verification=1");
-
-                result.body = await _sharedDal.GetSelectList(select_query);
+                result.body = await _sharedDal.GetUserPaymentList(0);
             }
             catch (Exception ex)
             {
@@ -144,10 +140,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 if (outstanding > 0)
                 {
-                    var select_query = (@"SELECT Id AS Value,InvoiceNumber AS Text FROM Billing WHERE PaymentMethod=1
-                                            AND CampaignProfileId=@Id ORDER BY Id DEC");
-
-                    result.body = await _sharedDal.GetSelectList(select_query,id);
+                    result.body = await _sharedDal.GetInvoiceList(id);
                 }
             }
             catch (Exception ex)
@@ -167,7 +160,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> ReceivePayment(UserCreditPaymentFormModel model)
+        public async Task<ReturnResult> ReceivePayment(AdvertiserCreditPaymentFormModel model)
         {
             try
             {

@@ -13,6 +13,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> FillUserPaymentDropdown();
         Task<ReturnResult> GetOutstandingBalance(int id);
         Task<ReturnResult> GetInvoiceDetails(int id);
-        Task<ReturnResult> ReceivePayment(UserCreditPaymentFormModel model);
+        Task<ReturnResult> ReceivePayment(AdvertiserCreditPaymentFormModel model);
     }
 }

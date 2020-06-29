@@ -45,10 +45,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
                     result.body = await _campDAL.GetCampaignResultSet(id);
-                }
             }
             catch (Exception ex)
             {

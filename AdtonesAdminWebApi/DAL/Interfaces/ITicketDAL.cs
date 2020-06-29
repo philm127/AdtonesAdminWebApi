@@ -14,7 +14,10 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<TicketListModel> GetTicketDetails(int id = 0);
         Task<int> UpdateTicketStatus(TicketListModel model);
         Task<IEnumerable<TicketListModel>> GetOperatorTicketList(int operatorId);
-        Task<TicketComments> GetTicketcomments(int id = 0);
+        Task<IEnumerable<TicketComments>> GetTicketcomments(int id = 0);
         Task<string> CreateNewHelpTicket(TicketFormModel ticket);
+        Task<int> UpdateTicketByUser(TicketListModel model);
+        Task<int> AddNewComment(TicketComments ticket);
+        Task<int> AddNewCommentImage(TicketComments ticket);
     }
 }

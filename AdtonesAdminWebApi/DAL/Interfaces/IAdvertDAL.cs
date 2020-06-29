@@ -7,7 +7,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface IAdvertDAL
     {
-        Task<IEnumerable<UserAdvertResult>> GetAdvertResultSet();
+        Task<IEnumerable<UserAdvertResult>> GetAdvertResultSet(int id = 0);
         Task<IEnumerable<AdvertCategoryResult>> GetAdvertCategoryList();
         Task<UserAdvertResult> GetAdvertDetail(int id = 0);
         Task<int> ChangeAdvertStatus(UserAdvertResult command);

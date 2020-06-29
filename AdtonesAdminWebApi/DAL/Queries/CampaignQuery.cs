@@ -5,7 +5,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
     public interface ICampaignQuery
     {
         string GetCampaignResultSet { get; }
-        string GetCampaignResultSetOperator { get; }
         string GetPromoCampaignResultSet { get; }
         string GetCampaignCreditResultSet { get; }
         string GetCampaignProfileById { get; }
@@ -46,9 +45,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 ON camp.CampaignProfileId=play.CampaignProfileId
                                                 LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
                                                 LEFT JOIN Contacts AS con ON con.UserId=camp.UserId ";
-
-
-        public string GetCampaignResultSetOperator => GetCampaignResultSet + @" WHERE u.OperatorId=@Id";
 
 
         public string GetPromoCampaignResultSet =>  @"SELECT promo.ID,promo.OperatorID,op.OperatorName,promo.CampaignName,promo.BatchID,MaxDaily,MaxWeekly,

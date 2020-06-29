@@ -64,5 +64,16 @@ namespace AdtonesAdminWebApi.Controllers
             return await _ticketService.UpdateTicketStatus(id, status);
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains message success</returns>
+        [HttpPost("v1/AddTicketComment")]
+        public async Task<ReturnResult> AddTicketComment([FromForm] TicketComments model)
+        {
+            return await _ticketService.AddComment(model);
+        }
+
     }
 }

@@ -42,17 +42,27 @@ namespace AdtonesAdminWebApi.DAL
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
 
-
-            if (id == 0)
+            if (roleName.ToLower().Contains("operator"))
+            {
+                sb.Append(_commandText.GetCampaignResultSet);
+                sb.Append(" WHERE u.OperatorId=@Id ");
+                sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
+                builder.AddParameters(new { Id = id });
+            }
+            else if (id == 0)
             {
                 sb.Append(_commandText.GetCampaignResultSet);
                 sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
             }
-            else if (roleName.ToLower().Contains("operator"))
+            else if ( id > 0 )
             {
-                sb.Append(_commandText.GetCampaignResultSetOperator);
+                sb.Append(_commandText.GetCampaignResultSet);
+                sb.Append(" WHERE camp.UserId=@Id ");
+                sb.Append(" AND camp.Status IN(1,2,3,4) ");
+                sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
                 builder.AddParameters(new { Id = id });
             }
+
 
                 var select = builder.AddTemplate(sb.ToString());
             

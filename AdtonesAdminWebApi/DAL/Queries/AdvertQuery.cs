@@ -6,7 +6,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
     {
         string GetAdvertResultSet { get; }
         string GetAdvertCategoryDataTable { get; }
-        string GetAdvertDetail { get; }
         string UpdateAdvertStatus { get; }
         string InsertAdvertRejection { get; }
         string GetFtpDetails { get; }
@@ -30,8 +29,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 LEFT JOIN CampaignAdverts AS cad ON cad.AdvertId=ad.AdvertId
                                                 LEFT JOIN CampaignProfile AS cprof ON cprof.CampaignProfileId=cad.CampaignProfileId";
 
-
-        public string GetAdvertDetail => GetAdvertResultSet + " Where ad.AdvertId=@Id";
         
 
         public string GetAdvertCategoryDataTable => @"SELECT AdvertCategoryId,ac.Name AS CategoryName,ac.CountryId, ISNULL(c.Name,'-') AS CountryName, ac.CreatedDate

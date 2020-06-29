@@ -18,10 +18,10 @@ namespace AdtonesAdminWebApi.Controllers
 
         private readonly IInvoiceService _invoiceService;
         private readonly IUserPaymentService _paymentService;
-        private readonly IUsersCreditService _creditService;
+        private readonly IAdvertiserCreditService _creditService;
 
 
-        public FinancialsController(IInvoiceService invoiceService, IUserPaymentService paymentService, IUsersCreditService creditService)
+        public FinancialsController(IInvoiceService invoiceService, IUserPaymentService paymentService, IAdvertiserCreditService creditService)
         {
             _invoiceService = invoiceService;
             _paymentService = paymentService;
@@ -115,7 +115,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// <param name="model"></param>
         /// <returns>body contains success message</returns>
         [HttpPost("v1/ReceivePayment")]
-        public async Task<ReturnResult> ReceivePayment(UserCreditPaymentFormModel model)
+        public async Task<ReturnResult> ReceivePayment(AdvertiserCreditPaymentFormModel model)
         {
             return await _paymentService.ReceivePayment(model);
         }
@@ -134,24 +134,12 @@ namespace AdtonesAdminWebApi.Controllers
 
 
         /// <summary>
-        /// When Add Credit selected this populates dropdown with credit users
-        /// </summary>
-        /// <returns>body contains List SharedSelectListViewModel</returns>
-        [HttpGet("v1/GetAddCreditUsersList")]
-        public async Task<ReturnResult> GetAddCreditUsersList()
-        {
-            var tst = await _creditService.GetAddCreditUsersList();
-            return tst;
-        }
-
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="_creditmodel"></param>
         /// <returns>body contains nothing</returns>
         [HttpPost("v1/AddCredit")]
-        public async Task<ReturnResult> AddCredit(UserCreditFormModel _creditmodel)
+        public async Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _creditmodel)
         {
             var tst = await _creditService.AddCredit(_creditmodel);
             return tst;
@@ -163,25 +151,24 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns>body contains UsersCreditFormModel</returns>
-        [HttpGet("v1/GetCreditDetails")]
-        public async Task<ReturnResult> GetCreditDetails(IdCollectionViewModel model)
+        [HttpGet("v1/GetCreditDetails/{id}")]
+        public async Task<ReturnResult> GetCreditDetails(int id)
         {
-            var tst = await _creditService.GetCreditDetails(model);
-            return tst;
+            return await _creditService.GetCreditDetails(id);
         }
 
 
-        /// <summary>
-        /// Updates FROM the User Credit Details screen 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns>body contains nothing</returns>
-        [HttpPut("v1/UpdateCredit")]
-        public async Task<ReturnResult> UpdateCredit(UsersCreditFormModel model)
-        {
-            var tst = await _creditService.UpdateCredit(model);
-            return tst;
-        }
+        ///// <summary>
+        ///// Updates FROM the User Credit Details screen 
+        ///// </summary>
+        ///// <param name="model"></param>
+        ///// <returns>body contains nothing</returns>
+        //[HttpPut("v1/UpdateCredit")]
+        //public async Task<ReturnResult> UpdateCredit(UsersCreditFormModel model)
+        //{
+        //    var tst = await _creditService.UpdateCredit(model);
+        //    return tst;
+        //}
 
 
 

@@ -51,8 +51,8 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             User user = new User();
             try
-            {                
-                    user = await _loginDAL.GetLoginUser(userForm);
+            {
+                user = await _loginDAL.GetLoginUser(userForm);
 
                 if (user != null)
                 {
@@ -63,7 +63,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         return result;
                     }
 
-                    
+
                     // 4 is user has been blocked for too many incorrect login attempts.
                     else if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.Activated == 4)
                     {
@@ -84,7 +84,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                             var x = await _loginDAL.UpdateUserLockout(userForm);
                         }
                     }
-                    
+
 
                     ReturnResult verify = PartialVerification(user);
                     if (verify.result == 0)
@@ -137,7 +137,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 user = await _userDAL.GetUserByEmail(emailAddress.ToLower());
-                
+
                 /// TODO: Remove once testing done
                 // emailAddress = "philm127@gmail.com";
                 if (user == null)
@@ -155,7 +155,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 // Send an email with this link
                 string email = EncryptionHelper.EncryptSingleValue(user.Email);
 
-                string url = string.Format("{0}?activationCode={1}", 
+                string url = string.Format("{0}?activationCode={1}",
                                     _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("AdminResetPassword").Value, email);
 
                 var otherpath = _env.ContentRootPath;
@@ -304,7 +304,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 User user = await _userDAL.GetUserByEmail(model.Email);
-                
+
 
                 /// TODO: Remove once testing done
                 // emailAddress = "philm127@gmail.com";
@@ -323,7 +323,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     return verify;
 
 
-               
+
                 if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                 {
                     if (await IsPreviousPassword(user.UserId, change.PasswordHash))
@@ -468,14 +468,14 @@ namespace AdtonesAdminWebApi.BusinessServices
         private bool PasswordExpiredAttribute(User user)
         {
 
-                int PasswordExpiresInDays = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("PasswordExpiresInDays").Value);
+            int PasswordExpiresInDays = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("PasswordExpiresInDays").Value);
 
-                TimeSpan ts = DateTime.Today - user.LastPasswordChangedDate;
+            TimeSpan ts = DateTime.Today - user.LastPasswordChangedDate;
 
-                if (ts.TotalDays > PasswordExpiresInDays)
-                    return true;
-                else
-                    return false;
+            if (ts.TotalDays > PasswordExpiresInDays)
+                return true;
+            else
+                return false;
 
         }
 
@@ -487,7 +487,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// <param name="user">Model retrived from DB</param>
         /// <param name="userForm">Model sent by user</param>
         /// <returns></returns>
-        private bool ValidatePassword(User user,User userForm)
+        private bool ValidatePassword(User user, User userForm)
         {
             try
             {
@@ -571,6 +571,37 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> RefreshAccessToken(string email)
+        {
+            User user = new User();
+            user.Email = email;
+            try
+            {
+                user = await _loginDAL.GetLoginUser(user);
+
+                if (user != null)
+                {
+                    var jwt = new AuthService(_configuration);
+                    result.body = jwt.GenerateSecurityToken(user);
+                    return result;
+                }
+                result.result = 0;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "LogonService",
+                    ProcedureName = "RefreshAccessToken"
+                };
+                _logging.LogError();
+                result.result = 0;
+                return result;
+            }
+        }
     }
 }
 

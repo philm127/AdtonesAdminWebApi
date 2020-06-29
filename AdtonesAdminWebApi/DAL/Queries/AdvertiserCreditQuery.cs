@@ -5,15 +5,18 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL.Queries
 {
-    public interface IUserCreditQuery
+    public interface IAdvertiserCreditQuery
     {
         string LoadUserCreditDataTable { get; }
         string UpdateUserCredit { get; }
         string AddUserCredit { get; }
+        string UserCreditDetails { get; }
+        string GetTotalPaymentsByUser { get; }
+        string GetTotalBilledByUser { get; }
     }
 
 
-    public class UserCreditQuery : IUserCreditQuery
+    public class AdvertiserCreditQuery : IAdvertiserCreditQuery
     {
         public string LoadUserCreditDataTable => @"SELECT u.Id,u.UserId,usrs.Email,usrs.FullName,usrs.Organisation,u.CreatedDate,
                                                  u.AssignCredit AS Credit,u.AvailableCredit,ISNULL(bil.FundAmount,0) AS TotalUsed,ISNULL(pay.Amount,0) AS TotalPaid,
@@ -40,6 +43,17 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public string AddUserCredit => @"INSERT INTO UsersCredit(UserId,AssignCredit,AvailableCredit,UpdatedDate,CreatedDate,CurrencyId) 
                                             VALUES(@UserId,@AssignCredit,@AssignCredit,GETDATE(),GETDATE(),@CurrencyId)";
+
+
+        public string UserCreditDetails => @"SELECT uc.Id,uc.UserId,AssignCredit,AvailableCredit,uc.CreatedDate,uc.CurrencyId,c.CountryId 
+                                                FROM  UsersCredit AS uc LEFT JOIN Currencies AS c ON c.CurrencyId=uc.CurrencyId
+                                                WHERE uc.UserId=@Id";
+
+
+        public string GetTotalPaymentsByUser => @"SELECT sum(Amount) FROM UsersCreditPayment WHERE UserId=@UserId GROUP BY UserId";
+
+
+        public string GetTotalBilledByUser => @"SELECT sum(FundAmount) FROM Billing WHERE PaymentMethodId=1 AND UserId=@UserId GROUP BY UserId";
 
     }
 

@@ -13,7 +13,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
         string UpdateTicketStatus { get; }
         string GetTicketComments { get; }
         string CreateNewHelpTicket { get; }
-
+        string UpdateTicketUpdatedByUser { get; }
+        string UpdateTicketUpdatedByAdmin { get; }
+        string InsertCommentImage { get; }
+        string AddComment { get; }
     }
 
 
@@ -68,19 +71,40 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         
         public string GetTicketComments => @"SELECT qc.Id AS CommentId,qc.UserId,QuestionId,Title AS CommentTitle,Description,
+                                                CASE WHEN qci.UploadImages IS NOT NULL THEN CONCAT(@siteAddress,qci.UploadImages) 
+                                                    ELSE qci.UploadImages END AS ImageFile,
                                                 ResponseDatetime AS CommentDate,TicketCode,CONCAT(u.FirstName,' ',u.LastName) AS UserName
-                                                FROM QuestionComment AS qc INNER JOIN Users AS u ON u.UserId=qc.UserId WHERE qc.QuestionId=@questionId";
+                                                FROM QuestionComment AS qc INNER JOIN Users AS u ON u.UserId=qc.UserId 
+                                                LEFT JOIN QuestionCommentImages AS qci ON qci.QuestionCommentId=qc.Id
+                                                WHERE qc.QuestionId=@questionId ORDER BY qc.Id DESC";
         
         
         public string UpdateTicketStatus => "UPDATE Question SET UpdatedDate=GETDATE(),UpdatedBy=@UpdatedBy,Status=@Status,LastResponseDateTime=GETDATE() where Id= @Id";
 
 
         public string CreateNewHelpTicket => @"INSERT INTO dbo.Question(UserId,QNumber,SubjectId,ClientId,CampaignProfileId,PaymentMethodId,
-                                                        Title,Description,CreatedDate,UpdatedDate,Status,Email,AdvertId)
+                                                        Title,Description,CreatedDate,UpdatedDate,Status,Email,AdvertId,LastResponseDateTimeByUser,
+                                                        LastResponseDateTime,UpdatedBy)
                                                 VALUES(@UserId,@QNumber,@SubjectId,@ClientId,@CampaignProfileId,@PaymentMethodId,@Title,
-                                                                        @Description,GETDATE(),GETDATE(),@Status,@Email,@AdvertId);";
-    
-    
+                                                        @Description,GETDATE(),GETDATE(),@Status,@Email,@AdvertId,GETDATE(),GETDATE(),@UserId);";
+
+
+        // If DB UserId and current user same
+        public string UpdateTicketUpdatedByUser => @"UPDATE Question SET Status=@Status, LastResponseDateTimeByUser=GETDATE(),UpdatedDate=GETDATE(), UpdatedBy=@UpdatedBy WHERE Id=@Id";
+
+
+        // If DB UserId and current user are different
+        public string UpdateTicketUpdatedByAdmin => @"UPDATE Question SET Status=@Status, LastResponseDateTime=GETDATE(),UpdatedDate=GETDATE(), UpdatedBy=@UpdatedBy WHERE Id=@Id";
+
+
+        public string AddComment => @"INSERT INTO QuestionComment(UserId,QuestionId,Description,ResponseDatetime) 
+                                            VALUES(@UserId,@QuestionId,@Description,GETDATE());
+                                            SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+
+        public string InsertCommentImage => @"INSERT INTO QuestionCommentImages(QuestionCommentId,UploadImages) VALUES(@QuestionCommentId,@UploadImages)";
+
+
     }
 
 }

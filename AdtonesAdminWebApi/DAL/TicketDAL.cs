@@ -44,16 +44,17 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<TicketComments> GetTicketcomments(int id = 0)
+        public async Task<IEnumerable<TicketComments>> GetTicketcomments(int id = 0)
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(_commandText.GetTicketComments);
             builder.AddParameters(new { questionId = id });
+            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:siteAddress") });
             try
             {
 
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<TicketComments>(select.RawSql, select.Parameters));
+                                conn => conn.Query<TicketComments>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -66,10 +67,13 @@ namespace AdtonesAdminWebApi.DAL
         {
             var sb = new StringBuilder();
             sb.Append(_commandText.GetLoadTicketDatatable);
-            if(id == 0)
+            if (id == 0)
                 sb.Append(" ORDER BY q.Id DESC;");
             else
-                sb.Append(" WHERE q.UserId=@userId;");
+            {
+                sb.Append(" WHERE q.UserId=@userId ");
+                sb.Append(" ORDER BY q.Id DESC;");
+            }
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sb.ToString());
             builder.AddParameters(new { userId = id });
@@ -149,6 +153,74 @@ namespace AdtonesAdminWebApi.DAL
             {
                 return await _executers.ExecuteCommand(_connStr,
                                     conn => conn.ExecuteScalar<string>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> UpdateTicketByUser(TicketListModel model)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(string.Empty);
+            
+            if (model.UserId == model.UpdatedBy)
+                select = builder.AddTemplate(_commandText.UpdateTicketUpdatedByUser);
+            else
+                select = builder.AddTemplate(_commandText.UpdateTicketUpdatedByAdmin);
+
+            builder.AddParameters(new { Id = model.Id });
+            builder.AddParameters(new { UpdatedBy = model.UpdatedBy });
+            builder.AddParameters(new { Status = model.Status });
+
+            try
+            {
+                var x = await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+                return x;
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+
+        public async Task<int> AddNewComment(TicketComments ticket)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(_commandText.AddComment);
+            builder.AddParameters(new { UserId = ticket.UserId });
+            builder.AddParameters(new { QuestionId = ticket.QuestionId });
+            builder.AddParameters(new { Description = ticket.Description });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> AddNewCommentImage(TicketComments ticket)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(_commandText.InsertCommentImage);
+            builder.AddParameters(new { QuestionCommentId = ticket.CommentId });
+            builder.AddParameters(new { UploadImages = ticket.ImageFile });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
             }
             catch
             {

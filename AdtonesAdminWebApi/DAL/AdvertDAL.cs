@@ -30,11 +30,18 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<UserAdvertResult>> GetAdvertResultSet()
+        public async Task<IEnumerable<UserAdvertResult>> GetAdvertResultSet(int id = 0)
         {
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(_commandText.GetAdvertResultSet);
+
+            if(id > 0)
+            {
+                sb.Append(" WHERE ad.UserId=@UserId AND ad.Status=4 ");
+                builder.AddParameters(new { UserId = id });
+            }
+
             sb.Append(" ORDER BY ad.AdvertId DESC;");
 
             var select = builder.AddTemplate(sb.ToString());
@@ -54,8 +61,11 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<UserAdvertResult> GetAdvertDetail(int id = 0)
         {
+            var sb = new StringBuilder();
+            sb.Append(_commandText.GetAdvertResultSet);
+            sb.Append(" Where ad.AdvertId=@Id");
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.GetAdvertDetail);
+            var select = builder.AddTemplate(sb.ToString());
             try
             {
                 builder.AddParameters(new { Id = id });

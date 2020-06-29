@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.ViewModels
 {
-    public class UserCreditFormModel
+    public class AdvertiserCreditFormModel
     {
         [Key]
         public int Id { get; set; }
@@ -14,11 +14,12 @@ namespace AdtonesAdminWebApi.ViewModels
         public int UserId { get; set; }
 
         public int CurrencyId { get; set; }
+        public int CountryId { get; set; }
 
         public decimal AssignCredit { get; set; }
     }
 
-    public class UsersCreditFormModel : UserCreditFormModel
+    public class UsersCreditFormModel : AdvertiserCreditFormModel
     {
         public decimal AvailableCredit { get; set; }
 

@@ -1,11 +1,11 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.DAL.Interfaces;
-using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,14 +17,13 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         IHttpContextAccessor _httpAccessor;
         private readonly ITicketDAL _ticketDAL;
-        // private readonly ITicketQuery _commandText;
+        private readonly ISaveGetFiles _saveFile;
 
-
-        public TicketService(IHttpContextAccessor httpAccessor, ITicketDAL ticketDAL)//, ITicketQuery commandText)
+        public TicketService(IHttpContextAccessor httpAccessor, ITicketDAL ticketDAL, ISaveGetFiles saveFile)
         {
             _httpAccessor = httpAccessor;
-            //_commandText = commandText;
             _ticketDAL = ticketDAL;
+            _saveFile = saveFile;
         }
 
 
@@ -63,7 +62,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "TicketService",
-                    ProcedureName = "CloseTicket"
+                    ProcedureName = "UpdateTicketStatus"
                 };
                 _logging.LogError();
                 result.result = 0;
@@ -107,6 +106,13 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 ticketList = await _ticketDAL.GetTicketDetails(id);
                 var commentList = await _ticketDAL.GetTicketcomments(id);
+
+                if(ticketList == null)
+                {
+                    result.result = 0;
+                    result.error = "There is no matching record";
+                    return result;
+                }
 
                 ticketList.comments = (IEnumerable<TicketComments>)commentList;
 
@@ -155,6 +161,99 @@ namespace AdtonesAdminWebApi.BusinessServices
             return result;
         }
 
+
+        public async Task<ReturnResult> AddComment(TicketComments model)
+        {
+            int userId = _httpAccessor.GetUserIdFromJWT();
+            var ticket = new TicketListModel();
+            ticket.UserId = model.UserId;
+            ticket.Id = model.QuestionId;
+            ticket.UpdatedBy = userId;
+            ticket.Status = 2;
+            try
+            {
+                // If updated by and userid are same will update as user.
+                // If not will update as Admin or other than original user.
+                var x = await _ticketDAL.UpdateTicketByUser(ticket);
+
+                model.UserId = userId;
+
+                model.CommentId = await _ticketDAL.AddNewComment(model);
+               
+
+                if (model.CommentImage != null && model.CommentImage.Length > 0)
+                {
+                    var extension = Path.GetExtension(model.CommentImage.FileName);
+                    var commlower = extension.ToLower();
+                    string[] exts = { ".png", ".jpeg", ".jpg", ".tif" };
+                    if (!exts.Contains(extension.ToLower()))
+                    {
+                        result.result = 0;
+                        result.error = "Please upload an image file only.";
+                        return result;
+                    }
+
+                    var path = await SaveCommentImage(model, extension, userId);
+
+                    if (path == "fail")
+                    {
+                        result.result = 0;
+                        result.error = "The file could not be uploaded.";
+                        return result;
+                    }
+                    else
+                    {
+                        model.ImageFile = path;
+                        var z = await _ticketDAL.AddNewCommentImage(model);
+                        return result;
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "TicketService",
+                    ProcedureName = "AddComment"
+                };
+                _logging.LogError();
+                result.result = 0;
+                return result;
+            }
+            return result;
+
+        }
+
+        private async Task<string> SaveCommentImage(TicketComments model, string extension, int userId)
+        {
+            try
+            {
+                // Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                // string filename = unixTimestamp.ToString() + "_" + userId.ToString() + extension;
+
+                /// TODO: Need to sort file saving out
+                string directoryName = "/QuestionComment/";
+
+                var filename = await _saveFile.SaveFileToSite(directoryName, model.CommentImage);
+
+                return directoryName + filename;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "TicketService",
+                    ProcedureName = "SaveCommentImage"
+                };
+                _logging.LogError();
+                return "fail";
+            }
+        }
 
     }
 }

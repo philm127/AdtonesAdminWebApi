@@ -26,7 +26,9 @@ namespace AdtonesAdminWebApi.Controllers
         #region Advert
 
         /// <summary>
-        /// 
+        /// The optional id refers to the selection made from advertisers screen
+        /// so later will use status to only return unapproved.
+        /// Otherwise all adverts returned
         /// </summary>
         /// <returns>body contains List UserAdvertResult</returns>
         [HttpGet("v1/GetAdvertList/{id}")]

@@ -15,5 +15,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<bool> IsPreviousPassword(int userId, string newPassword);
         Task<ReturnResult> ChangePassword(PasswordModel model);
         Task<ReturnResult> ResetPassword(PasswordModel model);
+        Task<ReturnResult> RefreshAccessToken(string email);
     }
 }

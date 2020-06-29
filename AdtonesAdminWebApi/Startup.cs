@@ -44,7 +44,7 @@ namespace AdtonesAdminWebApi
             // Business Services
             services.AddScoped<ISharedSelectListsService, SharedSelectListsService>();
             services.AddScoped<IUserManagementService, UserManagementService>();
-            services.AddScoped<IUsersCreditService, UsersCreditService>();
+            services.AddScoped<IAdvertiserCreditService, AdvertiserCreditService>();
             services.AddScoped<IPromotionalUsersService, PromotionalUsersService>();
             services.AddScoped<IAreaService, AreaService>();
             services.AddScoped<IProfileMatchInfoService, ProfileMatchInfoService>();
@@ -83,7 +83,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ISoapDAL, SoapDAL>();
             services.AddScoped<ICampaignAuditDAL, CampaignAuditDAL>();
             services.AddScoped<ICurrencyDAL, CurrencyDAL>();
-            services.AddScoped<IUserCreditDAL, UserCreditDAL>();
+            services.AddScoped<IAdvertiserCreditDAL, AdvertiserCreditDAL>();
 
             #endregion
 
@@ -109,7 +109,7 @@ namespace AdtonesAdminWebApi
             services.AddTransient<ISoapQuery, SoapQuery>();
             services.AddTransient<ICampaignAuditQuery, CampaignAuditQuery>();
             services.AddTransient<ICurrencyQuery, CurrencyQuery>();
-            services.AddTransient<IUserCreditQuery, UserCreditQuery>();
+            services.AddTransient<IAdvertiserCreditQuery, AdvertiserCreditQuery>();
 
             #endregion
 

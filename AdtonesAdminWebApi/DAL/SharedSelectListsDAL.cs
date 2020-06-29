@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL.Shared
@@ -28,36 +30,122 @@ namespace AdtonesAdminWebApi.DAL.Shared
         }
 
 
-        //public async Task<IEnumerable<SharedSelectListViewModel>> TESTGetSelectList<T>(string sql,dynamic model, int id = 0)
-        //{
-        //    Type typeParameterType = typeof(T);
-        //    var builder = new SqlBuilder();
-        //    var select = builder.AddTemplate(sql);
-        //    if (id != 0)
-        //        builder.AddParameters(new { Id = id });
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetCurrency(int id = 0)
+        {
+            var sb = new StringBuilder();
+            sb.Append(_commandText.GetCurrencyList);
 
-        //    try
-        //    {
-        //        using (var connection = new SqlConnection(_connStr))
-        //        {
-        //            connection.Open();
-        //            return await connection.QueryAsync<SharedSelectListViewModel>(select.RawSql, select.Parameters);
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        throw;
-        //    }
-        //}
+            if (id != 0)
+            {
+                sb.Append(" WHERE CurrencyId=@Id");
+            }
+            try
+            {
+                return await GetSelectList(sb.ToString(), id);
+            }
+            catch
+            {
+                throw;
+            }
+        }
 
 
-        public async Task<IEnumerable<SharedSelectListViewModel>> GetSelectList(string sql, int id = 0)
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetOperators(int id = 0)
+        {
+            var sb = new StringBuilder();
+            sb.Append(_commandText.GetOperators);
+
+            if (id != 0)
+            {
+                sb.Append(" AND CountryId = @Id");
+            }
+            try
+            {
+                return await GetSelectList(sb.ToString(), id);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetCountry(int id = 0)
+        {
+            try
+            {
+                return await GetSelectList(_commandText.GetCountryList, id);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetCreditUsers(int id = 0)
+        {
+            try
+            {
+                return await GetSelectList(_commandText.GetCreditUsers, id);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetCamapignList(int id = 0)
+        {
+            try
+            {
+                return await GetSelectList(_commandText.GetCampaignList, id);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetUserPaymentList(int id = 0)
+        {
+            try
+            {
+                return await GetSelectList(_commandText.GetUserPaymentList, id);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<SharedSelectListViewModel>> AddCreditUsers(int id = 0)
+        {
+            var sb = new StringBuilder();
+            sb.Append(_commandText.AddCreditUserList);
+            try
+            {
+                return await GetSelectList(sb.ToString(), id);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        private async Task<IEnumerable<SharedSelectListViewModel>> GetSelectList(string sql, int id=0)
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sql);
-            if (id != 0)
-                builder.AddParameters(new { Id = id });
 
+            if (id != 0)
+            {
+                builder.AddParameters(new { Id = id });
+            }
             try
             {
                 using (var connection = new SqlConnection(_connStr))
@@ -73,14 +161,11 @@ namespace AdtonesAdminWebApi.DAL.Shared
         }
 
 
-        public async Task<IEnumerable<SharedSelectListViewModel>> TESTGetSelectList(string command)
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetInvoiceList(int id = 0)
         {
-
             try
             {
-                var query = await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<SharedSelectListViewModel>(command));
-                return query;
+                return await GetSelectList(_commandText.GetInvoiceList, id);
             }
             catch
             {
@@ -89,38 +174,41 @@ namespace AdtonesAdminWebApi.DAL.Shared
         }
 
 
-        public async Task<IEnumerable<SharedSelectListViewModel>> TESTGetSelectListById(string command, int id = 0)
-        {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+        //public async Task<IEnumerable<SharedSelectListViewModel>> TESTGetSelectList(string command)
+        //{
 
-            if (id != 0)
-                builder.AddParameters(new { Id = id });
+        //    try
+        //    {
+        //        var query = await _executers.ExecuteCommand(_connStr,
+        //                            conn => conn.Query<SharedSelectListViewModel>(command));
+        //        return query;
+        //    }
+        //    catch
+        //    {
+        //        throw;
+        //    }
+        //}
 
-            try
-            {
-                return await _executers.ExecuteCommand(_connStr,
-                                        conn => conn.Query<SharedSelectListViewModel>(select.RawSql, select.Parameters));
-            }
-            catch
-            {
-                throw;
-            }
-        }
+
+        //public async Task<IEnumerable<SharedSelectListViewModel>> GetSelectListById(string command, int id = 0)
+        //{
+        //    var builder = new SqlBuilder();
+        //    var select = builder.AddTemplate(command);
+
+        //    if (id != 0)
+        //        builder.AddParameters(new { Id = id });
+
+        //    try
+        //    {
+        //        return await _executers.ExecuteCommand(_connStr,
+        //                                conn => conn.Query<SharedSelectListViewModel>(select.RawSql, select.Parameters));
+        //    }
+        //    catch
+        //    {
+        //        throw;
+        //    }
+        //}
 
     }
 
-    public interface ISharedListQuery
-    {
-        string GetCurrencyList { get; }
-        string GetCurrencyListById { get; }
-    }
-
-
-    public class SharedListQuery : ISharedListQuery
-    {
-        public string GetCurrencyList => "SELECT CurrencyId AS Value,CurrencyCode AS Text FROM Currencies";
-        public string GetCurrencyListById => "SELECT CurrencyId AS Value,CurrencyCode AS Text FROM Currencies WHERE CurrencyId=@Id";
-
-    }
 }

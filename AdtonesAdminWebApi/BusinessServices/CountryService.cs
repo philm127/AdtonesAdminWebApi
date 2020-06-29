@@ -104,10 +104,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                     /// TODO: Need to sort file saving out
                     string directoryName = "/TermAndCondition/";
-                    // Put this to return either the filename or filepath from service
-                    string nameOrPath = "name";
-                    string path = await _saveFile.SaveFileToSite(directoryName, countrymodel.file, nameOrPath);
-                    countrymodel.TermAndConditionFileName = path;
+
+                    string filename = await _saveFile.SaveFileToSite(directoryName, countrymodel.file);
+                    countrymodel.TermAndConditionFileName = filename;
 
                     string insert_string = @"INSERT INTO Country(UserId,Name,ShortName,CreatedDate,UpdatedDate,Status,
                                             TermAndConditionFileName,CountryCode,TaxPercentage)
@@ -157,10 +156,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                         bool delfile = _saveFile.DeleteFileByName(directoryName, countrymodel.TermAndConditionFileName);
                     }
 
-                    // Put this to return either the filename or filepath from service
-                    string nameOrPath = "name";
-                    string path = await _saveFile.SaveFileToSite(directoryName, countrymodel.file, nameOrPath);
-                    countrymodel.TermAndConditionFileName = path;
+                    string filename = await _saveFile.SaveFileToSite(directoryName, countrymodel.file);
+                    countrymodel.TermAndConditionFileName = filename;
                 }
                 string update_string = @"UPDATE Country SET UserId = @UserId, Name = @Name, ShortName = @ShortName, 
                                                             UpdatedDate = GETDATE(),Status = @Status, CountryCode = @CountryCode,

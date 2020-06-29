@@ -11,7 +11,7 @@ using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.Enums;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using Microsoft.AspNetCore.Http;
-using AdtonesAdminWebApi.DAL.Shared;
+using AdtonesAdminWebApi.DAL.Queries;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -20,19 +20,16 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly IConfiguration _configuration;
         private readonly ISharedSelectListsDAL _sharedDal;
-        private readonly ISharedListQuery _commandText;
 
         ReturnResult result = new ReturnResult();
         
 
-        public SharedSelectListsService(IConfiguration configuration, ISharedSelectListsDAL sharedDal, IHttpContextAccessor httpAccessor, 
-                                        ISharedListQuery commandText)
+        public SharedSelectListsService(IConfiguration configuration, ISharedSelectListsDAL sharedDal, IHttpContextAccessor httpAccessor)
 
         {
             _configuration = configuration;
             _sharedDal = sharedDal;
             _httpAccessor = httpAccessor;
-            _commandText = commandText;
         }
 
 
@@ -40,8 +37,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                var select_query = @"SELECT Id AS Value,Name AS Text FROM Country";
-                result.body = await _sharedDal.GetSelectList(select_query);
+                result.body = await _sharedDal.GetCountry();
             }
             catch (Exception ex)
             {
@@ -61,13 +57,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> GetOperatorList(int countryId = 0)
         {
-            StringBuilder sb = new StringBuilder("SELECT OperatorId AS Value,OperatorName AS Text FROM Operators WHERE IsActive=1");
-            if (countryId > 0)
-                sb.Append(" AND CountryId = @countryId");
-
             try
             {
-                result.body = await _sharedDal.GetSelectList(sb.ToString(),countryId);
+                result.body = await _sharedDal.GetOperators(countryId);
             }
             catch (Exception ex)
             {
@@ -92,14 +84,9 @@ namespace AdtonesAdminWebApi.BusinessServices
             var ytr = _httpAccessor.GetRoleIdFromJWT();
             var cvb = _httpAccessor.GetOperatorFromJWT();
 
-            var sb = new StringBuilder(_commandText.GetCurrencyList);
-            
-            if (currencyId > 0) 
-                sb.Append(" WHERE CurrencyId = @Id");
-
             try
             {
-                result.body = await _sharedDal.TESTGetSelectListById(sb.ToString(), currencyId);
+                result.body = await _sharedDal.GetCurrency(currencyId);
             }
             catch (Exception ex)
             {
@@ -145,7 +132,92 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        
+        public async Task<ReturnResult> GetUserCreditList()
+        {
+            try
+            {
+                result.body = await _sharedDal.GetCreditUsers();
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "SharedSelectListsService",
+                    ProcedureName = "GetUserCreditList"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// When Add Credit selected this populates dropdown with credit users
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ReturnResult> GetAddCreditUsersList()
+        {
+            try
+            {
+                result.body = await _sharedDal.AddCreditUsers();
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "SharedSelectListsService",
+                    ProcedureName = "GetAddCreditUsersList"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+
+        /// <summary>
+        /// Gets the 4 potential lists to be used by update/add advertiser credit
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ReturnResult> GetUserDetailCreditList()
+        {
+            var usercreditlist = new AdvertiserCreditSharedListsModel();
+            try
+            {
+                Task<ReturnResult> users = GetUserCreditList();
+                Task<ReturnResult> country = GetCountryList();
+                Task<ReturnResult> currency = GetCurrencyList();
+                Task<ReturnResult> addUser = GetAddCreditUsersList();
+
+                await Task.WhenAll(users, country, currency, addUser);
+
+                usercreditlist.country = (IEnumerable<SharedSelectListViewModel>)country.Result.body;
+                usercreditlist.users = (IEnumerable<SharedSelectListViewModel>)users.Result.body;
+                usercreditlist.currency = (IEnumerable<SharedSelectListViewModel>)currency.Result.body;
+                usercreditlist.addUser = (IEnumerable<SharedSelectListViewModel>)addUser.Result.body;
+                result.body = usercreditlist;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "SharedSelectListsService",
+                    ProcedureName = "GetUserCreditList"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
 
     }
 }

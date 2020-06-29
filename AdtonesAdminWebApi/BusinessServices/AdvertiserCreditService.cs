@@ -10,16 +10,16 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
-    public class UsersCreditService : IUsersCreditService
+    public class AdvertiserCreditService : IAdvertiserCreditService
     {
 
         private readonly IConfiguration _configuration;
         private readonly ISharedSelectListsDAL _sharedDal;
-        private readonly IUserCreditDAL _userDAL;
+        private readonly IAdvertiserCreditDAL _userDAL;
 
         ReturnResult result = new ReturnResult();
 
-        public UsersCreditService(IConfiguration configuration, ISharedSelectListsDAL sharedDal,IUserCreditDAL userDAL)
+        public AdvertiserCreditService(IConfiguration configuration, ISharedSelectListsDAL sharedDal,IAdvertiserCreditDAL userDAL)
 
         {
             _configuration = configuration;
@@ -54,38 +54,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        /// <summary>
-        /// When Add Credit selected this populates dropdown with credit users
-        /// </summary>
-        /// <returns></returns>
-        public async Task<ReturnResult> GetAddCreditUsersList()
-        {
-            try
-            {
-                var select_query = @"SELECT UserId AS Value, CONCAT(FirstName,' ',LastName,'(',Email,')') AS Text FROM Users 
-                                    WHERE VerificationStatus=1
-                                    AND Activated=1 AND RoleId=3 
-                                    AND UserId NOT IN(SELECT UserId FROM UsersCredit)";
-
-                result.body = await _sharedDal.GetSelectList(select_query);
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UsersCreditService",
-                    ProcedureName = "GetAddCreditUsersList"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> AddCredit(UserCreditFormModel _creditmodel)
+        public async Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _creditmodel)
         {
             try
             {
@@ -101,10 +70,13 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var query = string.Empty;
                 if (_creditmodel.Id == 0)
                 {
+                    _usercredit.AvailableCredit = 
                     x = await _userDAL.AddUserCredit(_usercredit);
                 }
                 else
                 {
+                    var available = await CalculateNewCredit(_creditmodel.UserId);
+                    _usercredit.AvailableCredit = _creditmodel.AssignCredit + available;
                     x = await _userDAL.UpdateUserCredit(_usercredit);
                 }
 
@@ -139,31 +111,14 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public async Task<ReturnResult> GetCreditDetails(IdCollectionViewModel model)
+        public async Task<ReturnResult> GetCreditDetails(int id)
         {
             string select_query = string.Empty;
             int Id = 0;
 
             try
             {
-                if (model.userId != 0)
-                {
-                    Id = model.userId;
-                    select_query = @"SELECT Id,UserId,AssignCredit,AvailableCredit,CreatedDate,CurrencyId FROM  UsersCredit
-                                            WHERE UserId=@Id";
-                }
-                else
-                {
-                    Id = model.id;
-                    select_query = @"SELECT Id,UserId,AssignCredit,AvailableCredit,CreatedDate,CurrencyId FROM  UsersCredit
-                                             WHERE Id=@Id";
-                }
-
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<UsersCreditFormModel>(select_query, new { Id = Id });
-                }
+                result.body = await _userDAL.GetUserCreditDetail(id);
             }
             catch (Exception ex)
             {
@@ -182,71 +137,58 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        /// <summary>
-        /// Updates FROM the User Credit Details screen
-        /// </summary>
-        /// <param name="_creditmodel"></param>
-        /// <returns></returns>
-        public async Task<ReturnResult> UpdateCredit(UsersCreditFormModel _creditmodel)
-        {
-            try
-            {
-                _creditmodel.AvailableCredit = await CalculateNewCredit(_creditmodel);
+        ///// <summary>
+        ///// Updates FROM the User Credit Details screen
+        ///// </summary>
+        ///// <param name="_creditmodel"></param>
+        ///// <returns></returns>
+        //public async Task<ReturnResult> UpdateCredit(UsersCreditFormModel _creditmodel)
+        //{
+        //    try
+        //    {
+        //        _creditmodel.AvailableCredit = await CalculateNewCredit(_creditmodel.UserId);
 
-                var update_query = @"UPDATE UsersCredit SET UserId = @UserId,AssignCredit = @AssignCredit,AvailableCredit = @AvailableCredit,
-                                                                                         UpdatedDate = GETDATE(),CurrencyId = @CurrencyId
-                                                                                         WHERE Id = @Id";
+        //        var update_query = @"UPDATE UsersCredit SET UserId = @UserId,AssignCredit = @AssignCredit,AvailableCredit = @AvailableCredit,
+        //                                                                                 UpdatedDate = GETDATE(),CurrencyId = @CurrencyId
+        //                                                                                 WHERE Id = @Id";
 
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.ExecuteAsync(update_query, _creditmodel);
-                }
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserCreditService",
-                    ProcedureName = "UpdateCredit"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
-            return result;
+        //        using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+        //        {
+        //            await connection.OpenAsync();
+        //            result.body = await connection.ExecuteAsync(update_query, _creditmodel);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var _logging = new ErrorLogging()
+        //        {
+        //            ErrorMessage = ex.Message.ToString(),
+        //            StackTrace = ex.StackTrace.ToString(),
+        //            PageName = "UserCreditService",
+        //            ProcedureName = "UpdateCredit"
+        //        };
+        //        _logging.LogError();
+        //        result.result = 0;
+        //    }
+        //    return result;
 
-        }
+        //}
 
 
 
         /// <summary>
         /// Calculates the available credit from the User Credit Details screen
         /// </summary>
-        /// <param name="model">Passed the UserCreditFormModel from UpdateCredit</param>
+        /// <param name="id">Passed the UserId</param>
         /// <returns>The available credit</returns>
-        private async Task<decimal> CalculateNewCredit(UserCreditFormModel model)
+        private async Task<decimal> CalculateNewCredit(int userId)
         {
-            string select_query1 = @"SELECT sum(Amount) FROM UsersCreditPayment WHERE UserId=@UserId GROUP BY UserId";
-
-            string select_query2 = @"SELECT sum(FundAmount) FROM Billing WHERE PaymentMethodId=1 AND UserId=@UserId GROUP BY UserId";
-            decimal cred = 0.0000M;
-            decimal bil = 0.0000M;
+            decimal available = 0.0000M;
+            
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    cred = await connection.QueryFirstOrDefaultAsync<decimal>(select_query1, new { UserId = model.UserId });
-                }
-
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    bil = await connection.QueryFirstOrDefaultAsync<decimal>(select_query2, new { UserId = model.UserId });
-                }
+                available = await _userDAL.GetCreditBalance(userId);
             }
             catch (Exception ex)
             {
@@ -260,8 +202,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logging.LogError();
                 throw;
             }
-            var res = (cred + model.AssignCredit) - bil;
-            return res;
+            
+            return available;
         }
 
 

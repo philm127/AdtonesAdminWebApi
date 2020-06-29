@@ -9,7 +9,7 @@ namespace AdtonesAdminWebApi.Services
 {
     public class RemoteDownload
     {
-       
+
         public class HttpRemoteDownload : RemoteDownload
         {
 
@@ -48,3 +48,5 @@ namespace AdtonesAdminWebApi.Services
         }
     }
 }
+
+    
