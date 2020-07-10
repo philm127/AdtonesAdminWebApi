@@ -2,21 +2,9 @@
 
 namespace AdtonesAdminWebApi.DAL.Queries
 {
-    public interface IAdvertQuery
+    public static class AdvertQuery
     {
-        string GetAdvertResultSet { get; }
-        string GetAdvertCategoryDataTable { get; }
-        string UpdateAdvertStatus { get; }
-        string InsertAdvertRejection { get; }
-        string GetFtpDetails { get; }
-        string UpdateMediaLoaded { get; }
-        string RejectAdvertReason { get; }
-    }
-
-
-    public class AdvertQuery : IAdvertQuery
-    {
-        public string GetAdvertResultSet => @"SELECT ad.AdvertId,ad.UserId,ad.ClientId,ad.AdvertName,ad.Brand,cprof.SmsBody,cprof.EmailBody,
+        public static string GetAdvertResultSet => @"SELECT ad.AdvertId,ad.UserId,ad.ClientId,ad.AdvertName,ad.Brand,cprof.SmsBody,cprof.EmailBody,
                                                 ISNULL(cl.Name,'-') AS ClientName,ad.OperatorId,cad.CampaignProfileId,
                                                 CONCAT(usr.FirstName,' ',usr.LastName) AS UserName, usr.Email,ad.CreatedDateTime AS CreatedDate,
                                                 ad.Script,ad.Status,ad.MediaFileLocation,ad.UploadedToMediaServer,SoapToneCode,
@@ -31,23 +19,23 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         
 
-        public string GetAdvertCategoryDataTable => @"SELECT AdvertCategoryId,ac.Name AS CategoryName,ac.CountryId, ISNULL(c.Name,'-') AS CountryName, ac.CreatedDate
+        public static string GetAdvertCategoryDataTable => @"SELECT AdvertCategoryId,ac.Name AS CategoryName,ac.CountryId, ISNULL(c.Name,'-') AS CountryName, ac.CreatedDate
                                                         FROM AdvertCategories AS ac INNER JOIN Country AS c ON c.Id = ac.CountryId;";
 
 
-        public string UpdateAdvertStatus => @"UPDATE Advert SET Status=@Status,UpdatedBy=@UpdatedBy, UpdatedDateTime=GETDATE() WHERE ";
+        public static string UpdateAdvertStatus => @"UPDATE Advert SET Status=@Status,UpdatedBy=@UpdatedBy, UpdatedDateTime=GETDATE() WHERE ";
 
 
-        public string InsertAdvertRejection => @"INSERT INTO AdvertRejections(AdvertId,UserId,CreatedDateRejectionReason ) VALUES(@AdvertId,@UserId,GETDATE(),@RejectionReason);";
+        public static string InsertAdvertRejection => @"INSERT INTO AdvertRejections(AdvertId,UserId,CreatedDateRejectionReason ) VALUES(@AdvertId,@UserId,GETDATE(),@RejectionReason);";
 
 
-        public string GetFtpDetails => @"SELECT OperatorFTPDetailId,Host,Port,UserName,Password,FtpRoot FROM OperatorFTPDetails WHERE OperatorId=@OperatorId";
+        public static string GetFtpDetails => @"SELECT OperatorFTPDetailId,Host,Port,UserName,Password,FtpRoot FROM OperatorFTPDetails WHERE OperatorId=@OperatorId";
 
 
-        public string UpdateMediaLoaded => "UPDATE Advert SET UploadedToMediaServer = true WHERE AdvertId=@advertId;";
+        public static string UpdateMediaLoaded => "UPDATE Advert SET UploadedToMediaServer = true WHERE AdvertId=@advertId;";
 
 
-        public string RejectAdvertReason => @"INSERT INTO AdvertRejections(UserId,AdvertId,RejectionReason,CreatedDate,AdtoneServerAdvertRejectionId)
+        public static string RejectAdvertReason => @"INSERT INTO AdvertRejections(UserId,AdvertId,RejectionReason,CreatedDate,AdtoneServerAdvertRejectionId)
                                                                     VALUES(@UserId,@AdvertId,@RejectionReason,GETDATE(),@AdtoneServerAdvertRejectionId);
                                                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
     }

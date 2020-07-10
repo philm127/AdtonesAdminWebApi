@@ -1,6 +1,7 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,7 @@ namespace AdtonesAdminWebApi.Services
     public interface IAdTransferService
     {
         Task<string> CopyAdToOperatorServer(string conn, UserAdvertResult advert);
+        Task<bool> CopyPromoAdToOperatorServer(PromotionalCampaignResult model, string fileName);
     }
 
 
@@ -20,10 +22,12 @@ namespace AdtonesAdminWebApi.Services
     public class AdTransferService : IAdTransferService
     {
         private readonly IAdvertDAL _advertDAL;
+        private readonly IWebHostEnvironment env;
 
-        public AdTransferService(IAdvertDAL advertDAL, IAdvertQuery commandText)
+        public AdTransferService(IAdvertDAL advertDAL, IWebHostEnvironment _env)
         {
             _advertDAL = advertDAL;
+            env = _env;
         }
 
         public async Task<string> CopyAdToOperatorServer(string conn, UserAdvertResult advert)
@@ -101,5 +105,51 @@ namespace AdtonesAdminWebApi.Services
                 return ex.Message.ToString();
             }
         }
+
+
+        public async Task<bool> CopyPromoAdToOperatorServer(PromotionalCampaignResult model, string fileName)
+        {
+            try
+            {
+                var otherpath = env.ContentRootPath;
+                var mediaFile = model.AdvertLocation;
+                if (!string.IsNullOrEmpty(mediaFile))
+                {
+                    FtpDetailsModel getFTPdetails = await _advertDAL.GetFtpDetails(model.OperatorID);
+
+                    if (getFTPdetails != null)
+                    {
+                        var host = getFTPdetails.Host;
+                        var port = Convert.ToInt32(getFTPdetails.Port);
+                        var username = getFTPdetails.UserName;
+                        var password = getFTPdetails.Password;
+                        var localRoot = Path.Combine(otherpath,model.AdvertLocation);
+                        var ftpRoot = getFTPdetails.FtpRoot;
+
+                        using (var client = new Renci.SshNet.SftpClient(host, port, username, password))
+                        {
+                            client.Connect();
+                            if (client.IsConnected)
+                            {
+                                var SourceFile = Path.Combine(otherpath, model.AdvertLocation);
+                                var DestinationFile = ftpRoot + "/" + fileName;
+                                var filestream = new FileStream(SourceFile, FileMode.Open);
+                                client.UploadFile(filestream, DestinationFile, null);
+                                filestream.Close();
+                            }
+                            client.Disconnect();
+                        }
+                    }
+                }
+                return true;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+
     }
 }

@@ -30,7 +30,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         ReturnResult result = new ReturnResult();
 
 
-        public AdvertService(IAdvertDAL advertDAL, IAdvertQuery commandText, IHttpContextAccessor httpAccessor, IConnectionStringService connService,
+        public AdvertService(IAdvertDAL advertDAL, IHttpContextAccessor httpAccessor, IConnectionStringService connService,
                                 IUserMatchDAL matchDAL, IAdTransferService transService, 
                                 IGenerateTicketService ticketService, ICampaignService campService, ISoapApiService soapApi,
                                 ISoapDAL soapDAL, ICampaignDAL campDAL, IConfiguration configuration)//IUserMatchInterface matchInterface

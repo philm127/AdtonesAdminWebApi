@@ -151,5 +151,54 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> GetPromoCampaignDashboardSummary(int campaignId)
+        {
+            try
+            {
+                result.body = await _auditDAL.GetPromoCampaignDashboardSummaries(campaignId);
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CampaignAuditService",
+                    ProcedureName = "GetPromoCampaignDashboardSummary"
+                };
+                _logging.LogError();
+                result.result = 0;
+                return result;
+            }
+        }
+
+
+        public async Task<ReturnResult> GetPromoPlayDetails(PagingSearchClass paging)
+        {
+            try
+            {
+                var res = await _auditDAL.GetPromoPlayDetails(paging);
+                result.recordcount = res.Count();
+                result.body = res.Skip(paging.page * paging.pageSize).Take(paging.pageSize);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CampaignAuditService",
+                    ProcedureName = "GetPromoPlayDetails"
+                };
+                _logging.LogError();
+                result.result = 0;
+                return result;
+            }
+        }
+
+
     }
 }

@@ -15,14 +15,12 @@ namespace AdtonesAdminWebApi.DAL
         private readonly IConfiguration _configuration;
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
-        private readonly IAreaQuery _commandText;
 
-        public AreaDAL(IConfiguration configuration, IExecutionCommand executers, IAreaQuery commandText)
+        public AreaDAL(IConfiguration configuration, IExecutionCommand executers)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
-            _commandText = commandText;
         }
 
 
@@ -32,7 +30,7 @@ namespace AdtonesAdminWebApi.DAL
             {
 
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.Query<AreaResult>(_commandText.LoadAreaDataTable));
+                                conn => conn.Query<AreaResult>(AreaQuery.LoadAreaDataTable));
             }
             catch
             {
@@ -44,7 +42,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<AreaResult> GetAreaById(int id)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.GetAreaById);
+            var select = builder.AddTemplate(AreaQuery.GetAreaById);
             builder.AddParameters(new { areaid = id });
 
             try
@@ -62,7 +60,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> DeleteAreaById(int id)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.DeleteArea);
+            var select = builder.AddTemplate(AreaQuery.DeleteArea);
             builder.AddParameters(new { areaid = id });
 
             try
@@ -80,7 +78,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> UpdateArea(AreaResult model)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.UpdateArea);
+            var select = builder.AddTemplate(AreaQuery.UpdateArea);
             builder.AddParameters(new { AreaName = model.AreaName });
             builder.AddParameters(new { IsActive = model.IsActive });
             builder.AddParameters(new { CountryId = model.CountryId });
@@ -102,7 +100,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> AddArea(AreaResult areamodel)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.AddArea);
+            var select = builder.AddTemplate(AreaQuery.AddArea);
             builder.AddParameters(new { AreaName = areamodel.AreaName.Trim().ToLower() });
             builder.AddParameters(new { CountryId = areamodel.CountryId });
 
@@ -118,5 +116,23 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<bool> CheckAreaExists(AreaResult areamodel)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(AreaQuery.CheckAreaExists);
+            builder.AddParameters(new { areaname = areamodel.AreaName.Trim().ToLower() });
+            builder.AddParameters(new { countryId = areamodel.CountryId });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<bool>(select.RawSql, select.Parameters));
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }

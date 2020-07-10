@@ -125,18 +125,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> UpdateContactForm(Contacts contact)
         {
-            //var update_query = @"UPDATE Contacts SET MobileNumber=@MobileNumber,FixedLine=@FixedLine,Email=@Email,
-            //                    PhoneNumber=@PhoneNumber,Address=@Address,CountryId=@CountryId
-            //                    WHERE Id = @Id";
-
             try
             {
                 result.body = await _userDAL.UpdateContact(contact);
-                //using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                //{
-                //    await connection.OpenAsync();
-                //    result.body = await connection.ExecuteAsync(update_query, contact);
-                //}
             }
             catch (Exception ex)
             {
@@ -272,6 +263,28 @@ namespace AdtonesAdminWebApi.BusinessServices
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "UserManagementService",
                     ProcedureName = "AddCompanyDetails"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> UpdateUserPermission(IdCollectionViewModel model)
+        {
+            try
+            {
+                result.body = await _userDAL.UpdateUserPermission(model);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "UserManagementService",
+                    ProcedureName = "UpdateContactForm"
                 };
                 _logging.LogError();
                 result.result = 0;

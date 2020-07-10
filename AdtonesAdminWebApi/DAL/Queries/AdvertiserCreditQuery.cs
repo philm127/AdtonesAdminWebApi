@@ -5,20 +5,10 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL.Queries
 {
-    public interface IAdvertiserCreditQuery
+    
+    public static class AdvertiserCreditQuery
     {
-        string LoadUserCreditDataTable { get; }
-        string UpdateUserCredit { get; }
-        string AddUserCredit { get; }
-        string UserCreditDetails { get; }
-        string GetTotalPaymentsByUser { get; }
-        string GetTotalBilledByUser { get; }
-    }
-
-
-    public class AdvertiserCreditQuery : IAdvertiserCreditQuery
-    {
-        public string LoadUserCreditDataTable => @"SELECT u.Id,u.UserId,usrs.Email,usrs.FullName,usrs.Organisation,u.CreatedDate,
+        public static string LoadUserCreditDataTable => @"SELECT u.Id,u.UserId,usrs.Email,usrs.FullName,usrs.Organisation,u.CreatedDate,
                                                  u.AssignCredit AS Credit,u.AvailableCredit,ISNULL(bil.FundAmount,0) AS TotalUsed,ISNULL(pay.Amount,0) AS TotalPaid,
                                                  (ISNULL(bil.FundAmount,0) - ISNULL(pay.Amount,0)) AS RemainingAmount,ctry.Name AS CountryName
                                                  FROM UsersCredit AS u
@@ -36,24 +26,24 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                  ORDER BY u.Id DESC;";
 
 
-        public string UpdateUserCredit => @"UPDATE UsersCredit SET UserId=@UserId,AssignCredit=@AssignCredit,AvailableCredit=@AssignCredit,
+        public static string UpdateUserCredit => @"UPDATE UsersCredit SET UserId=@UserId,AssignCredit=@AssignCredit,AvailableCredit=@AssignCredit,
                                                 UpdatedDate=GETDATE(),CurrencyId=@CurrencyId
                                                 WHERE Id = @Id";
 
 
-        public string AddUserCredit => @"INSERT INTO UsersCredit(UserId,AssignCredit,AvailableCredit,UpdatedDate,CreatedDate,CurrencyId) 
+        public static string AddUserCredit => @"INSERT INTO UsersCredit(UserId,AssignCredit,AvailableCredit,UpdatedDate,CreatedDate,CurrencyId) 
                                             VALUES(@UserId,@AssignCredit,@AssignCredit,GETDATE(),GETDATE(),@CurrencyId)";
 
 
-        public string UserCreditDetails => @"SELECT uc.Id,uc.UserId,AssignCredit,AvailableCredit,uc.CreatedDate,uc.CurrencyId,c.CountryId 
+        public static string UserCreditDetails => @"SELECT uc.Id,uc.UserId,AssignCredit,AvailableCredit,uc.CreatedDate,uc.CurrencyId,c.CountryId 
                                                 FROM  UsersCredit AS uc LEFT JOIN Currencies AS c ON c.CurrencyId=uc.CurrencyId
                                                 WHERE uc.UserId=@Id";
 
 
-        public string GetTotalPaymentsByUser => @"SELECT sum(Amount) FROM UsersCreditPayment WHERE UserId=@UserId GROUP BY UserId";
+        public static string GetTotalPaymentsByUser => @"SELECT sum(Amount) FROM UsersCreditPayment WHERE UserId=@UserId GROUP BY UserId";
 
 
-        public string GetTotalBilledByUser => @"SELECT sum(FundAmount) FROM Billing WHERE PaymentMethodId=1 AND UserId=@UserId GROUP BY UserId";
+        public static string GetTotalBilledByUser => @"SELECT sum(FundAmount) FROM Billing WHERE PaymentMethodId=1 AND UserId=@UserId GROUP BY UserId";
 
     }
 

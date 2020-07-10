@@ -6,18 +6,9 @@ using System.Xml;
 
 namespace AdtonesAdminWebApi.DAL.Queries
 {
-    public interface IUserDashboardQuery
+    public static class UserDashboardQuery
     {
-        string AdvertiserResultQuery { get; }
-        string OperatorAdvertiserResultQuery { get; }
-        string OperatorResultQuery { get; }
-        string SubscriberResultQuery { get; }
-    }
-
-
-    public class UserDashboardQuery : IUserDashboardQuery
-    {
-        public string AdvertiserResultQuery => @"SELECT item.UserId,item.RoleId,item.Email,item.FirstName,item.LastName,
+        public static string AdvertiserResultQuery => @"SELECT item.UserId,item.RoleId,item.Email,item.FirstName,item.LastName,
                                                   ISNULL(camp.NoOfactivecampaign, 0) AS NoOfactivecampaign,
                                                    ISNULL(ad.NoOfunapprovedadverts, 0) AS NoOfunapprovedadverts,
                                                    ISNULL(cred.AssignCredit, 0) AS creditlimit,ISNULL(billit.outStandingInvoice, 0) AS outStandingInvoice,
@@ -57,7 +48,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         // Operators version of Advertisers table. INNER JOINS on Advert for only their adverts and does not select Role.
-        public string OperatorAdvertiserResultQuery => @"SELECT item.UserId,item.RoleId,item.Email,item.FirstName,item.LastName,
+        public static string OperatorAdvertiserResultQuery => @"SELECT item.UserId,item.RoleId,item.Email,item.FirstName,item.LastName,
                                                           ISNULL(camp.NoOfactivecampaign, 0) AS NoOfactivecampaign,con.MobileNumber,
                                                            ISNULL(ad.NoOfunapprovedadverts, 0) AS NoOfunapprovedadverts,
                                                            ISNULL(cred.AssignCredit, 0) AS creditlimit,ISNULL(billit.outStandingInvoice, 0) AS outStandingInvoice,
@@ -99,14 +90,14 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
 
-        public string OperatorResultQuery => @"SELECT u.UserId,FirstName,LastName,Email,ISNULL(Organisation,'-') AS Organisation,u.OperatorId,o.CountryId,
+        public static string OperatorResultQuery => @"SELECT u.UserId,FirstName,LastName,Email,ISNULL(Organisation,'-') AS Organisation,u.OperatorId,o.CountryId,
                                                 c.Name AS CountryName,o.OperatorName,u.Activated,u.DateCreated
                                                 FROM Users AS u LEFT JOIN Operators AS o ON u.OperatorId=o.OperatorId
                                                 LEFT JOIN Country AS c ON o.CountryId=c.Id
                                                 WHERE RoleId=6 ORDER BY u.DateCreated DESC";
 
 
-        public string SubscriberResultQuery => @"SELECT u.UserId,u.Activated,u.DateCreated,FirstName,LastName,p.MSISDN,u.OperatorName,u.Email,u.Activated
+        public static string SubscriberResultQuery => @"SELECT u.UserId,u.Activated,u.DateCreated,FirstName,LastName,p.MSISDN,u.OperatorName,u.Email,u.Activated
                                                   FROM Users AS u LEFT JOIN UserProfile AS p ON p.UserId=u.UserId
                                                   INNER JOIN Operators AS op ON op.OperatorId=u.OperatorId
                                                   WHERE u.RoleId=2 AND u.VerificationStatus=1 AND u.OperatorId IS NOT NULL

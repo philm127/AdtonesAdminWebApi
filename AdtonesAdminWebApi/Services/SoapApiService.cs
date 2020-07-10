@@ -27,12 +27,9 @@ namespace AdtonesAdminWebApi.Services
     {
 
         private readonly IConfiguration _configuration;
-        private readonly IUserProfileDAL _profDAL;
-        private readonly IUserProfileQuery _profQuery;
+        //private readonly IUserProfileDAL _profDAL;
         private readonly IUserManagementDAL _userDAL;
-        private readonly IUserManagementQuery _userText;
         private readonly IAdvertDAL _adDAL;
-        private readonly IAdvertQuery _adText;
 
         static string portalAccount;
         static string portalPassword;
@@ -40,16 +37,13 @@ namespace AdtonesAdminWebApi.Services
         static string moduleCode;
         static string safricomUrl;
 
-        public SoapApiService(IConfiguration configuration, IUserProfileDAL profDAL, IUserProfileQuery profQuery,
-                                IUserManagementDAL userDAL, IUserManagementQuery userText, IAdvertDAL adDAL, IAdvertQuery adText)
+        public SoapApiService(IConfiguration configuration, //IUserProfileDAL profDAL,
+                                IUserManagementDAL userDAL, IAdvertDAL adDAL)
         {
             _configuration = configuration;
-            _profDAL = profDAL;
-            _profQuery = profQuery;
+            //_profDAL = profDAL;
             _userDAL = userDAL;
-            _userText = userText;
             _adDAL = adDAL;
-            _adText = adText;
             
             portalAccount = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("PortalAccount").Value;
             portalPassword = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("PortalPassword").Value;

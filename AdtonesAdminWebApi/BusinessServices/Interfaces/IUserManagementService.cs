@@ -25,5 +25,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> GetOperatorAdmin(int userId);
 
         Task<ReturnResult> GetUserById(int userId);
+        Task<ReturnResult> UpdateUserPermission(IdCollectionViewModel model);
     }
 }

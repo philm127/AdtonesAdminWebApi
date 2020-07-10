@@ -15,5 +15,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<CampaignDashboardChartPREResult> GetDashboardSummariesForOperator(int operatorId);
         Task<IEnumerable<CampaignAuditOperatorTable>> GetPlayDetailsByCampaign(PagingSearchClass paging);
         Task<IEnumerable<CampaignAuditOperatorTable>> GetPlayDetailsByCampaignCount(PagingSearchClass param);
+        Task<IEnumerable<CampaignAuditOperatorTable>> GetPromoPlayDetails(PagingSearchClass paging);
+        Task<CampaignDashboardChartResult> GetPromoCampaignDashboardSummaries(int campaignId);
     }
 }

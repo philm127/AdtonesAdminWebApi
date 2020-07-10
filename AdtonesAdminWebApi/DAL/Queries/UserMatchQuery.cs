@@ -6,14 +6,9 @@ using System.Threading.Tasks;
 namespace AdtonesAdminWebApi.DAL.Queries
 {
 
-    public interface IUserMatchQuery
+    public static class UserMatchQuery
     {
-        string UpdateMediaLocation { get; }
-    }
-
-    public class UserMatchQuery : IUserMatchQuery
-    {
-        public string UpdateMediaLocation => "UPDATE CampaignMatches SET MEDIA_URL=@media WHERE MSCampaignProfileId=@campaignProfileId";
+        public static string UpdateMediaLocation => "UPDATE CampaignMatches SET MEDIA_URL=@media WHERE MSCampaignProfileId=@campaignProfileId";
 
 
     }

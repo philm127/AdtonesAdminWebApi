@@ -1,4 +1,5 @@
 ﻿
+using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Microsoft.Data.SqlClient;
@@ -12,9 +13,14 @@ namespace AdtonesAdminWebApi.OperatorSpecific
 {
     public class SavePUToDatabase
     {
+
         ReturnResult result = new ReturnResult();
-        public async Task<bool> DoSaveToDatabase<T>(IEnumerable<T> source, Func<IEnumerable<T>, DataTable, List<DataRow>> rowConverter, string operatorConnectionString, string destinationTableName)
+        private IConnectionStringService _connService;
+
+        public async Task<bool> DoSaveToDatabase<T>(IEnumerable<T> source, Func<IEnumerable<T>, DataTable, List<DataRow>> rowConverter, int operatorId)
         {
+            
+            var operatorConnectionString = await _connService.GetSingleConnectionString(operatorId);
             try
             {
                 // creating inmemory table
@@ -25,8 +31,6 @@ namespace AdtonesAdminWebApi.OperatorSpecific
                 table.Columns.Add("WeeklyPlay", typeof(int));
                 table.Columns.Add("DailyPlay", typeof(int));
                 table.Columns.Add("Status", typeof(int));
-                table.Columns.Add("DeliveryServerConnectionString", typeof(string));
-                table.Columns.Add("DeliveryServerIpAddress", typeof(string));
                 table.BeginInit();
 
                 // converting source items to DataRow instances via rowConverter.
@@ -41,7 +45,7 @@ namespace AdtonesAdminWebApi.OperatorSpecific
                 using (SqlBulkCopy copy = new SqlBulkCopy(operatorConnectionString))
                 {
                     copy.BatchSize = 10000;
-                    copy.DestinationTableName = destinationTableName;
+                    copy.DestinationTableName = "dbo.PromotionalUsers";
                     await copy.WriteToServerAsync(table, DataRowState.Added);
                 }
                 return true;
@@ -52,7 +56,7 @@ namespace AdtonesAdminWebApi.OperatorSpecific
                 {
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SavePUToDatabase",
+                    PageName = "SavePUToDatabase For Operator " + operatorId.ToString(),
                     ProcedureName = "DoSaveToDatabase"
                 };
                 _logging.LogError();

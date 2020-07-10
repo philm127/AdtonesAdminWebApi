@@ -13,7 +13,6 @@ using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.OperatorSpecific;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Shared;
-using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.DAL;
 using AdtonesAdminWebApi.UserMatchServices;
 using AdtonesAdminWebApi.Services.Mailer;
@@ -45,7 +44,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ISharedSelectListsService, SharedSelectListsService>();
             services.AddScoped<IUserManagementService, UserManagementService>();
             services.AddScoped<IAdvertiserCreditService, AdvertiserCreditService>();
-            services.AddScoped<IPromotionalUsersService, PromotionalUsersService>();
+            services.AddScoped<IPromotionalCampaignService, PromotionalCampaignService>();
             services.AddScoped<IAreaService, AreaService>();
             services.AddScoped<IProfileMatchInfoService, ProfileMatchInfoService>();
             services.AddScoped<ICountryService, CountryService>();
@@ -73,13 +72,12 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IAdvertDAL, AdvertDAL>();
             services.AddScoped<IAreaDAL, AreaDAL>();
             services.AddScoped<ICampaignDAL, CampaignDAL>();
-            services.AddScoped<ICheckExistsDAL, CheckExistsDAL>();
             services.AddScoped<IUserDashboardDAL, UserDashboardDAL>();
-            services.AddScoped<IProvisionServerDAL, ProvisionServerDAL>();
+            services.AddScoped<IPromotionalCampaignDAL, PromotionalCampaignDAL>();
             services.AddScoped<ILoginDAL, LoginDAL>();
             services.AddScoped<IUserManagementDAL, UserManagementDAL>();
             services.AddScoped<IUserMatchDAL, UserMatchDAL>();
-            services.AddScoped<IUserProfileDAL, UserProfileDAL>();
+            // services.AddScoped<IUserProfileDAL, UserProfileDAL>();
             services.AddScoped<ISoapDAL, SoapDAL>();
             services.AddScoped<ICampaignAuditDAL, CampaignAuditDAL>();
             services.AddScoped<ICurrencyDAL, CurrencyDAL>();
@@ -90,28 +88,6 @@ namespace AdtonesAdminWebApi
 
             // DAL Query Execution.
             services.AddTransient<IExecutionCommand, ExecutionCommand>();
-
-            #region SQL Queries
-
-            // DAL Queries.
-            services.AddTransient<ISharedListQuery, SharedListQuery>();
-            services.AddTransient<ITicketQuery, TicketQuery>();
-            services.AddTransient<IUserDashboardQuery, UserDashboardQuery>();
-            services.AddTransient<IAdvertQuery, AdvertQuery>();
-            services.AddTransient<ICampaignQuery, CampaignQuery>();
-            services.AddTransient<IAreaQuery, AreaQuery>();
-            services.AddTransient<ICheckExistsQuery, CheckExistsQuery>();
-            services.AddTransient<IProvisionServerQuery, ProvisionServerQuery>();
-            services.AddTransient<ILoginQuery, LoginQuery>();
-            services.AddTransient<IUserManagementQuery, UserManagementQuery>();
-            services.AddTransient<IUserMatchQuery, UserMatchQuery>();
-            services.AddTransient<IUserProfileQuery, UserProfileQuery>();
-            services.AddTransient<ISoapQuery, SoapQuery>();
-            services.AddTransient<ICampaignAuditQuery, CampaignAuditQuery>();
-            services.AddTransient<ICurrencyQuery, CurrencyQuery>();
-            services.AddTransient<IAdvertiserCreditQuery, AdvertiserCreditQuery>();
-
-            #endregion
 
 
             // Special Services

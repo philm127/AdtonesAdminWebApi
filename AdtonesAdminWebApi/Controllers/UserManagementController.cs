@@ -14,10 +14,10 @@ namespace AdtonesAdminWebApi.Controllers
     public class UserManagementController : ControllerBase
     {
         private readonly IUserManagementService _userService;
-        private readonly IPromotionalUsersService _promotionalService;
+        private readonly IPromotionalCampaignService _promotionalService;
         private readonly IUserDashboardService _dashboardService;
 
-        public UserManagementController(IUserManagementService userService,IPromotionalUsersService promotionalService,
+        public UserManagementController(IUserManagementService userService,IPromotionalCampaignService promotionalService,
                                             IUserDashboardService dashboardService)
         {
             _userService = userService;
@@ -138,6 +138,18 @@ namespace AdtonesAdminWebApi.Controllers
         public async Task<ReturnResult> GetUserById(IdCollectionViewModel some)
         {
             return await _userService.GetUserById(some.userId);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="some"></param>
+        /// <returns>body contains User model</returns>
+        [HttpPut("v1/UpdateUserPermission")]
+        public async Task<ReturnResult> UpdateUserPermission(IdCollectionViewModel some)
+        {
+            return await _userService.UpdateUserPermission(some);
         }
 
 

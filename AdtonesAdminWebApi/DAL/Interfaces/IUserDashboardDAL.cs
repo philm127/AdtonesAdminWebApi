@@ -8,8 +8,8 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface IUserDashboardDAL
     {
-        Task<IEnumerable<AdvertiserDashboardResult>> GetAdvertiserDashboard(string command, int operatorId=0);
-        Task<IEnumerable<OperatorDashboardResult>> GetOperatorDashboard(string command);
-        Task<IEnumerable<SubscriberDashboardResult>> GetSubscriberDashboard(string command);
+        Task<IEnumerable<AdvertiserDashboardResult>> GetAdvertiserDashboard(int operatorId=0);
+        Task<IEnumerable<OperatorDashboardResult>> GetOperatorDashboard();
+        Task<IEnumerable<SubscriberDashboardResult>> GetSubscriberDashboard();
     }
 }

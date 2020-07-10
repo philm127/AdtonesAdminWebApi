@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Enums;
+using AdtonesAdminWebApi.DAL.Queries;
 
 namespace AdtonesAdminWebApi.DAL
 {
@@ -24,10 +25,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<AdvertiserDashboardResult>> GetAdvertiserDashboard(string command,int operatorId=0)
+        public async Task<IEnumerable<AdvertiserDashboardResult>> GetAdvertiserDashboard(int operatorId=0)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
+            var select = builder.AddTemplate(UserDashboardQuery.AdvertiserResultQuery);
             if(operatorId > 0)
                 builder.AddParameters(new { operatorId = operatorId });
 
@@ -43,12 +44,12 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<OperatorDashboardResult>> GetOperatorDashboard(string command)
+        public async Task<IEnumerable<OperatorDashboardResult>> GetOperatorDashboard()
         {
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<OperatorDashboardResult>(command));
+                                    conn => conn.Query<OperatorDashboardResult>(UserDashboardQuery.OperatorResultQuery));
             }
             catch
             {
@@ -57,12 +58,12 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<SubscriberDashboardResult>> GetSubscriberDashboard(string command)
+        public async Task<IEnumerable<SubscriberDashboardResult>> GetSubscriberDashboard()
         {
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<SubscriberDashboardResult>(command));
+                                    conn => conn.Query<SubscriberDashboardResult>(UserDashboardQuery.SubscriberResultQuery));
             }
             catch
             {

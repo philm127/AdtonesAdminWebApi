@@ -17,15 +17,13 @@ namespace AdtonesAdminWebApi.DAL.Shared
     {
         private readonly IConfiguration _configuration;
         private readonly string _connStr;
-        private readonly ISharedListQuery _commandText;
         private readonly IExecutionCommand _executers;
 
-        public SharedSelectListsDAL(IConfiguration configuration, ISharedListQuery commandText, IExecutionCommand executers)
+        public SharedSelectListsDAL(IConfiguration configuration, IExecutionCommand executers)
 
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
-            _commandText = commandText;
             _executers = executers;
         }
 
@@ -33,7 +31,7 @@ namespace AdtonesAdminWebApi.DAL.Shared
         public async Task<IEnumerable<SharedSelectListViewModel>> GetCurrency(int id = 0)
         {
             var sb = new StringBuilder();
-            sb.Append(_commandText.GetCurrencyList);
+            sb.Append(SharedListQuery.GetCurrencyList);
 
             if (id != 0)
             {
@@ -53,7 +51,7 @@ namespace AdtonesAdminWebApi.DAL.Shared
         public async Task<IEnumerable<SharedSelectListViewModel>> GetOperators(int id = 0)
         {
             var sb = new StringBuilder();
-            sb.Append(_commandText.GetOperators);
+            sb.Append(SharedListQuery.GetOperators);
 
             if (id != 0)
             {
@@ -74,7 +72,7 @@ namespace AdtonesAdminWebApi.DAL.Shared
         {
             try
             {
-                return await GetSelectList(_commandText.GetCountryList, id);
+                return await GetSelectList(SharedListQuery.GetCountryList, id);
             }
             catch
             {
@@ -87,7 +85,7 @@ namespace AdtonesAdminWebApi.DAL.Shared
         {
             try
             {
-                return await GetSelectList(_commandText.GetCreditUsers, id);
+                return await GetSelectList(SharedListQuery.GetCreditUsers, id);
             }
             catch
             {
@@ -100,7 +98,7 @@ namespace AdtonesAdminWebApi.DAL.Shared
         {
             try
             {
-                return await GetSelectList(_commandText.GetCampaignList, id);
+                return await GetSelectList(SharedListQuery.GetCampaignList, id);
             }
             catch
             {
@@ -113,7 +111,7 @@ namespace AdtonesAdminWebApi.DAL.Shared
         {
             try
             {
-                return await GetSelectList(_commandText.GetUserPaymentList, id);
+                return await GetSelectList(SharedListQuery.GetUserPaymentList, id);
             }
             catch
             {
@@ -125,7 +123,7 @@ namespace AdtonesAdminWebApi.DAL.Shared
         public async Task<IEnumerable<SharedSelectListViewModel>> AddCreditUsers(int id = 0)
         {
             var sb = new StringBuilder();
-            sb.Append(_commandText.AddCreditUserList);
+            sb.Append(SharedListQuery.AddCreditUserList);
             try
             {
                 return await GetSelectList(sb.ToString(), id);
@@ -165,7 +163,7 @@ namespace AdtonesAdminWebApi.DAL.Shared
         {
             try
             {
-                return await GetSelectList(_commandText.GetInvoiceList, id);
+                return await GetSelectList(SharedListQuery.GetInvoiceList, id);
             }
             catch
             {

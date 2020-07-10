@@ -18,18 +18,16 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         IHttpContextAccessor _httpAccessor;
         private readonly IUserDashboardDAL _dashboardDal;
-        private readonly IUserDashboardQuery _commandText;
+
 
         ReturnResult result = new ReturnResult();
 
 
-        public UserDashboardService(IConfiguration configuration, IHttpContextAccessor httpAccessor,IUserDashboardDAL dashboardDal,
-                                        IUserDashboardQuery commandText)
+        public UserDashboardService(IConfiguration configuration, IHttpContextAccessor httpAccessor,IUserDashboardDAL dashboardDal)
         {
             _configuration = configuration;
             _httpAccessor = httpAccessor;
             _dashboardDal = dashboardDal;
-            _commandText = commandText;
         }
 
 
@@ -43,7 +41,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-                result.body = await _dashboardDal.GetAdvertiserDashboard(_commandText.AdvertiserResultQuery);
+                result.body = await _dashboardDal.GetAdvertiserDashboard();
             }
             catch (Exception ex)
             {
@@ -70,7 +68,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-                result.body = await _dashboardDal.GetAdvertiserDashboard(_commandText.OperatorAdvertiserResultQuery, operatorId);
+                result.body = await _dashboardDal.GetAdvertiserDashboard(operatorId);
             }
             catch (Exception ex)
             {
@@ -92,7 +90,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                result.body = await _dashboardDal.GetOperatorDashboard(_commandText.OperatorResultQuery);
+                result.body = await _dashboardDal.GetOperatorDashboard();
             }
             catch (Exception ex)
             {
@@ -114,7 +112,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                result.body = await _dashboardDal.GetSubscriberDashboard(_commandText.SubscriberResultQuery);
+                result.body = await _dashboardDal.GetSubscriberDashboard();
             }
             catch (Exception ex)
             {

@@ -12,8 +12,7 @@ namespace AdtonesAdminWebApi.OperatorSpecific
     {
         private const int ProvisionBatchSize = 1500;
         ReturnResult result = new ReturnResult();
-        public async Task<ReturnResult> ProcPromotionalUser(HashSet<string> promoMsisdns, string DestinationTableName,
-                                                            string operatorConnectionString, PromotionalUserFormModel model)
+        public async Task<ReturnResult> ProcPromotionalUser(HashSet<string> promoMsisdns, PromotionalUserFormModel model)
         {
             try
             {
@@ -29,12 +28,10 @@ namespace AdtonesAdminWebApi.OperatorSpecific
                                         row["DailyPlay"] = 0;
                                         row["Status"] = (int)Enums.PromotionalUserStatus.Active;
                                         row["BatchID"] = model.BatchID;
-                                        row["DeliveryServerConnectionString"] = model.DeliveryServerConnectionString;
-                                        row["DeliveryServerIpAddress"] = model.DeliveryServerIpAddress;
                                         row.EndEdit();
                                         return row;
                                     }).ToList(),
-                                    operatorConnectionString, DestinationTableName);
+                                    model.OperatorId);
                 result.body = "User(s) added successfully for Safaricom ";
                 return result;
             }

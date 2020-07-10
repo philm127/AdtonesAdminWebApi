@@ -15,14 +15,12 @@ namespace AdtonesAdminWebApi.DAL
         private readonly IConfiguration _configuration;
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
-        private readonly IAdvertiserCreditQuery _commandText;
 
-        public AdvertiserCreditDAL(IConfiguration configuration, IExecutionCommand executers, IAdvertiserCreditQuery commandText)
+        public AdvertiserCreditDAL(IConfiguration configuration, IExecutionCommand executers)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
-            _commandText = commandText;
         }
 
 
@@ -32,7 +30,7 @@ namespace AdtonesAdminWebApi.DAL
             {
 
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.Query<AdvertiserCreditResult>(_commandText.LoadUserCreditDataTable));
+                                conn => conn.Query<AdvertiserCreditResult>(AdvertiserCreditQuery.LoadUserCreditDataTable));
             }
             catch
             {
@@ -46,7 +44,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                             conn => conn.ExecuteScalar<int>(_commandText.AddUserCredit,_creditmodel));
+                             conn => conn.ExecuteScalar<int>(AdvertiserCreditQuery.AddUserCredit,_creditmodel));
             }
             catch
             {
@@ -60,7 +58,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                             conn => conn.ExecuteScalar<int>(_commandText.UpdateUserCredit, _creditmodel));
+                             conn => conn.ExecuteScalar<int>(AdvertiserCreditQuery.UpdateUserCredit, _creditmodel));
             }
             catch
             {
@@ -72,7 +70,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<AdvertiserCreditFormModel> GetUserCreditDetail(int id)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.UserCreditDetails);
+            var select = builder.AddTemplate(AdvertiserCreditQuery.UserCreditDetails);
             try
             {
                 builder.AddParameters(new { Id = id });
@@ -90,11 +88,11 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<decimal> GetCreditBalance(int id)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.GetTotalPaymentsByUser);
+            var select = builder.AddTemplate(AdvertiserCreditQuery.GetTotalPaymentsByUser);
             builder.AddParameters(new { UserId = id });
 
             var builder2 = new SqlBuilder();
-            var select2 = builder2.AddTemplate(_commandText.GetTotalBilledByUser);
+            var select2 = builder2.AddTemplate(AdvertiserCreditQuery.GetTotalBilledByUser);
             builder2.AddParameters(new { UserId = id });
             try
             {

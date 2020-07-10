@@ -15,12 +15,15 @@ namespace AdtonesAdminWebApi.Controllers
         private readonly IAdvertService _advertService;
         private readonly ICampaignService _campService;
         private readonly ICampaignAuditService _auditService;
+        private readonly IPromotionalCampaignService _promoService;
 
-        public CampaignController(IAdvertService advertService, ICampaignService campService, ICampaignAuditService auditService)
+        public CampaignController(IAdvertService advertService, ICampaignService campService, ICampaignAuditService auditService,
+            IPromotionalCampaignService promoService)
         {
             _advertService = advertService;
             _campService = campService;
             _auditService = auditService;
+            _promoService = promoService;
         }
 
         #region Advert
@@ -60,6 +63,17 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains empty result</returns>
+        [HttpPut("v1/UpdateAdvertStatus")]
+        public async Task<ReturnResult> UpdateAdvertStatus(UserAdvertResult model)
+        {
+            return await _advertService.ApproveORRejectAdvert(model);
+        }
+
+
         #endregion
 
 
@@ -85,17 +99,6 @@ namespace AdtonesAdminWebApi.Controllers
         public async Task<ReturnResult> GetCampaignDataTable(int id=0)
         {
             return await _campService.LoadCampaignDataTable(id);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>body contains List PromotionalCampaignResult</returns>
-        [HttpGet("v1/GetPromoCampaignDataTable")]
-        public async Task<ReturnResult> GetPromoCampaignDataTable()
-        {
-            return await _campService.LoadPromoCampaignDataTable();
         }
 
 
@@ -128,21 +131,21 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains List CampaignAdminResult</returns>
-        [HttpPut("v1/GetPlayDetailsForOperatorByCampaign")]
-        public async Task<ReturnResult> GetPlayDetailsForOperatorByCampaign(PagingSearchClass paging)
+        [HttpGet("v1/GetPromoDashboardSummary/{id}")]
+        public async Task<ReturnResult> GetPromoDashboardSummary(int id = 0)
         {
-            return await _auditService.GetPlayDetailsForOperatorByCampaign(paging);
+            return await _auditService.GetPromoCampaignDashboardSummary(id);
         }
 
 
         /// <summary>
         /// 
         /// </summary>
-        /// <returns>body contains empty result</returns>
-        [HttpPut("v1/UpdateAdvertStatus")]
-        public async Task<ReturnResult> UpdateAdvertStatus(UserAdvertResult model)
+        /// <returns>body contains List CampaignAdminResult</returns>
+        [HttpPut("v1/GetPlayDetailsForOperatorByCampaign")]
+        public async Task<ReturnResult> GetPlayDetailsForOperatorByCampaign(PagingSearchClass paging)
         {
-            return await _advertService.ApproveORRejectAdvert(model);
+            return await _auditService.GetPlayDetailsForOperatorByCampaign(paging);
         }
 
 

@@ -6,15 +6,8 @@ using System.Threading.Tasks;
 namespace AdtonesAdminWebApi.DAL.Queries
 {
     
-    public interface IUserProfileQuery
+    public static class UserProfileQuery
     {
-        string GetMsisdnNumber { get; }
-    }
-
-
-
-    public class UserProfileQuery : IUserProfileQuery
-    {
-        public string GetMsisdnNumber => "SELECT MSISDN FROM UserProfile WHERE UserId=@Id;";
+        public static string GetMsisdnNumber => "SELECT MSISDN FROM UserProfile WHERE UserId=@Id;";
     }
 }

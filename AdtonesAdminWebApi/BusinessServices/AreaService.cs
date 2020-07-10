@@ -12,17 +12,15 @@ namespace AdtonesAdminWebApi.BusinessServices
     {
         IHttpContextAccessor _httpAccessor;
         private readonly IAreaDAL _areaDAL;
-        private readonly ICheckExistsDAL _checkExistsDAL;
 
         ReturnResult result = new ReturnResult();
 
 
-        public AreaService(IAreaDAL areaDAL, IHttpContextAccessor httpAccessor, ICheckExistsDAL checkExistsDAL)
+        public AreaService(IAreaDAL areaDAL, IHttpContextAccessor httpAccessor)
 
         {
             _areaDAL = areaDAL;
             _httpAccessor = httpAccessor;
-            _checkExistsDAL = checkExistsDAL;
         }
 
 
@@ -55,7 +53,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             areamodel.IsActive = true;
             try
             {
-                bool exists = await _checkExistsDAL.CheckAreaExists(areamodel);
+                bool exists = await _areaDAL.CheckAreaExists(areamodel);
                 if (exists)
                 {
                     result.result = 0;

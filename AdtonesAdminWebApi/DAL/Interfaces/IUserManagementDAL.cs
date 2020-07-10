@@ -18,5 +18,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<CompanyDetails> getCompanyDetails(int userId);
         Task<int> UpdateContact(Contacts model);
         Task<int> UpdateUser(User profile);
+        Task<int> UpdateUserPermission(IdCollectionViewModel model);
     }
 }

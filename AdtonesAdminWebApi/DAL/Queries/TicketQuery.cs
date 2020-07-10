@@ -5,24 +5,9 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL.Queries
 {
-    public interface ITicketQuery
+    public class TicketQuery
     {
-        string GetLoadTicketDatatable { get; }
-        string GetOperatorLoadTicketTable { get; }
-        string GetTicketDetails { get; }
-        string UpdateTicketStatus { get; }
-        string GetTicketComments { get; }
-        string CreateNewHelpTicket { get; }
-        string UpdateTicketUpdatedByUser { get; }
-        string UpdateTicketUpdatedByAdmin { get; }
-        string InsertCommentImage { get; }
-        string AddComment { get; }
-    }
-
-
-    public class TicketQuery : ITicketQuery
-    {
-        public string GetLoadTicketDatatable => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,ISNULL(pay.Name,'-') AS PaymentMethod,
+        public static string GetLoadTicketDatatable => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,ISNULL(pay.Name,'-') AS PaymentMethod,
                                                     ISNULL(CONCAT(u.FirstName,' ',u.LastName), '-') AS UserName,qs.Name AS QuestionSubject,
                                                     ISNULL(u.Email, '-') AS Email,ISNULL(QNumber,'-') AS QNumber,
                                                     ISNULL(cl.Name,'-') AS ClientName,q.CampaignProfileId,camp.CampaignName,q.CreatedDate,
@@ -35,7 +20,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 LEFT JOIN PaymentMethod AS pay ON pay.Id=q.PaymentMethodId";
 
 
-        public string GetOperatorLoadTicketTable => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,q.ClientId,qs.Name AS QuestionSubject,
+        public static string GetOperatorLoadTicketTable => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,q.ClientId,qs.Name AS QuestionSubject,
                                                     ISNULL(CONCAT(u.FirstName,' ',u.LastName), '-') AS UserName,q.Description,
                                                     ISNULL(u.Email, '-') AS Email,ISNULL(QNumber,'-') AS QNumber,
                                                     camp.CampaignName,q.CreatedDate,
@@ -53,7 +38,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 AND q.Status < 4
                                                 ORDER BY q.Id DESC;";
 
-        public string GetTicketDetails => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,q.ClientId,PaymentMethodId,ISNULL(pay.Name,'-') AS PaymentMethod,
+        public static string GetTicketDetails => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,q.ClientId,PaymentMethodId,ISNULL(pay.Name,'-') AS PaymentMethod,
                                                     ISNULL(CONCAT(u.FirstName,' ',u.LastName), '-') AS UserName,
                                                     ISNULL(CONCAT(upd.FirstName,' ',upd.LastName), '-') AS UpdatedName,
                                                     qs.Name AS QuestionSubject,
@@ -70,7 +55,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 WHERE q.Id=@Id";
 
         
-        public string GetTicketComments => @"SELECT qc.Id AS CommentId,qc.UserId,QuestionId,Title AS CommentTitle,Description,
+        public static string GetTicketComments => @"SELECT qc.Id AS CommentId,qc.UserId,QuestionId,Title AS CommentTitle,Description,
                                                 CASE WHEN qci.UploadImages IS NOT NULL THEN CONCAT(@siteAddress,qci.UploadImages) 
                                                     ELSE qci.UploadImages END AS ImageFile,
                                                 ResponseDatetime AS CommentDate,TicketCode,CONCAT(u.FirstName,' ',u.LastName) AS UserName
@@ -79,10 +64,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 WHERE qc.QuestionId=@questionId ORDER BY qc.Id DESC";
         
         
-        public string UpdateTicketStatus => "UPDATE Question SET UpdatedDate=GETDATE(),UpdatedBy=@UpdatedBy,Status=@Status,LastResponseDateTime=GETDATE() where Id= @Id";
+        public static string UpdateTicketStatus => "UPDATE Question SET UpdatedDate=GETDATE(),UpdatedBy=@UpdatedBy,Status=@Status,LastResponseDateTime=GETDATE() where Id= @Id";
 
 
-        public string CreateNewHelpTicket => @"INSERT INTO dbo.Question(UserId,QNumber,SubjectId,ClientId,CampaignProfileId,PaymentMethodId,
+        public static string CreateNewHelpTicket => @"INSERT INTO dbo.Question(UserId,QNumber,SubjectId,ClientId,CampaignProfileId,PaymentMethodId,
                                                         Title,Description,CreatedDate,UpdatedDate,Status,Email,AdvertId,LastResponseDateTimeByUser,
                                                         LastResponseDateTime,UpdatedBy)
                                                 VALUES(@UserId,@QNumber,@SubjectId,@ClientId,@CampaignProfileId,@PaymentMethodId,@Title,
@@ -90,19 +75,19 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         // If DB UserId and current user same
-        public string UpdateTicketUpdatedByUser => @"UPDATE Question SET Status=@Status, LastResponseDateTimeByUser=GETDATE(),UpdatedDate=GETDATE(), UpdatedBy=@UpdatedBy WHERE Id=@Id";
+        public static string UpdateTicketUpdatedByUser => @"UPDATE Question SET Status=@Status, LastResponseDateTimeByUser=GETDATE(),UpdatedDate=GETDATE(), UpdatedBy=@UpdatedBy WHERE Id=@Id";
 
 
         // If DB UserId and current user are different
-        public string UpdateTicketUpdatedByAdmin => @"UPDATE Question SET Status=@Status, LastResponseDateTime=GETDATE(),UpdatedDate=GETDATE(), UpdatedBy=@UpdatedBy WHERE Id=@Id";
+        public static string UpdateTicketUpdatedByAdmin => @"UPDATE Question SET Status=@Status, LastResponseDateTime=GETDATE(),UpdatedDate=GETDATE(), UpdatedBy=@UpdatedBy WHERE Id=@Id";
 
 
-        public string AddComment => @"INSERT INTO QuestionComment(UserId,QuestionId,Description,ResponseDatetime) 
+        public static string AddComment => @"INSERT INTO QuestionComment(UserId,QuestionId,Description,ResponseDatetime) 
                                             VALUES(@UserId,@QuestionId,@Description,GETDATE());
                                             SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
 
-        public string InsertCommentImage => @"INSERT INTO QuestionCommentImages(QuestionCommentId,UploadImages) VALUES(@QuestionCommentId,@UploadImages)";
+        public static string InsertCommentImage => @"INSERT INTO QuestionCommentImages(QuestionCommentId,UploadImages) VALUES(@QuestionCommentId,@UploadImages)";
 
 
     }

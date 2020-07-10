@@ -5,18 +5,12 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL.Queries
 {
-    public interface ICurrencyQuery
-    {
-        string GetCurrencyByCountry { get; }
-        string GetCurrencyByCurrency { get; }
-    }
-    
-    public class CurrencyQuery : ICurrencyQuery
+    public static class CurrencyQuery
     {
 
-        public string GetCurrencyByCountry => "SELECT CurrencyId, CurrencyCode,CountryId FROM Currencies WHERE CountryId=@CountryId";
+        public static string GetCurrencyByCountry => "SELECT CurrencyId, CurrencyCode,CountryId FROM Currencies WHERE CountryId=@CountryId";
 
 
-        public string GetCurrencyByCurrency => "SELECT CurrencyId, CurrencyCode,CountryId FROM Currencies WHERE CurrencyCode=@CurrencyCode";
+        public static string GetCurrencyByCurrency => "SELECT CurrencyId, CurrencyCode,CountryId FROM Currencies WHERE CurrencyCode=@CurrencyCode";
     }
 }

@@ -33,6 +33,8 @@ namespace AdtonesAdminWebApi.Model
         public string Role => $"{(UserRole)RoleId}";
         public bool VerificationStatus { get; set; }
 
+        public string Permissions { get; set; }
+
         public int CountryId { get; set; }
 
         public int Outstandingdays { get; set; }

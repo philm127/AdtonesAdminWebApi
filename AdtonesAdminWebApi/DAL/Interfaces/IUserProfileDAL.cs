@@ -7,6 +7,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface IUserProfileDAL
     {
-        Task<string> GetUserProfileMsisdn(string command, int id);
+        Task<string> GetUserProfileMsisdn(int id);
     }
 }

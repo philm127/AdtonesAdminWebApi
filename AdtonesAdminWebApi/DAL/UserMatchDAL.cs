@@ -17,23 +17,20 @@ namespace AdtonesAdminWebApi.DAL
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
         private readonly IConnectionStringService _connService;
-        private readonly IUserMatchQuery _commandText;
 
-        public UserMatchDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService,
-                            IUserMatchQuery commandText)
+        public UserMatchDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
             _connService = connService;
-            _commandText = commandText;
         }
 
 
         public async Task<int> UpdateMediaLocation(string conn, string media, int id)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.UpdateMediaLocation);
+            var select = builder.AddTemplate(UserMatchQuery.UpdateMediaLocation);
             try
             {
                 builder.AddParameters(new { media = media });

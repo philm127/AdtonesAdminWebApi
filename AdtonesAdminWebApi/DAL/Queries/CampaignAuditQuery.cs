@@ -2,18 +2,9 @@
 
 namespace AdtonesAdminWebApi.DAL.Queries
 {
-    public interface ICampaignAuditQuery
+    public static class CampaignAuditQuery
     {
-		string GetCampaignDashboardSummaries { get; }
-		string GetPlayDetailsByCampaign { get; }
-		string GetCampaignDashboardSummariesByOperator { get; }
-
-	}
-
-
-    public class CampaignAuditQuery : ICampaignAuditQuery
-    {
-        public string GetCampaignDashboardSummaries => @"SELECT u.Userid,cp.CampaignProfileId,a.AdvertId,cp.CampaignName,a.AdvertName,
+        public static string GetCampaignDashboardSummaries => @"SELECT u.Userid,cp.CampaignProfileId,a.AdvertId,cp.CampaignName,a.AdvertName,
 														CONCAT(u.FirstName,' ',u.LastName, ' (', u.Email, ')') AS CampaignHolder,
 														ISNULL(cp.TotalBudget,0) AS Budget, ISNULL(g.TotalPlayedCost,0) AS Spend,
 														ISNULL(cp.TotalBudget,0) - ISNULL(g.TotalPlayedCost,0) AS FundsAvailable,
@@ -68,7 +59,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 														WHERE ";
 
 
-		public string GetCampaignDashboardSummariesByOperator => @"SELECT ISNULL(cp.TotalBudget,0) AS Budget, ISNULL(g.TotalPlayedCost,0) AS Spend,
+		public static string GetCampaignDashboardSummariesByOperator => @"SELECT ISNULL(cp.TotalBudget,0) AS Budget, ISNULL(g.TotalPlayedCost,0) AS Spend,
 																	ISNULL(cp.TotalBudget,0) - ISNULL(g.TotalPlayedCost,0) AS FundsAvailable,
 																	ISNULL(g.TotalAvgCost,0) AS AvgBid,CAST(ISNULL(g.TotalSMS,0) AS bigint) AS TotalSMS,
 																	ISNULL(g.TotalSMSCost,0) AS TotalSMSCost,CAST(ISNULL(g.TotalEmail,0) AS bigint) AS TotalEmail,
@@ -118,7 +109,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 																	WHERE op.OperatorId=@opId;";
 
 
-		public string GetPlayDetailsByCampaign => @"SELECT CAST(ISNULL(ca.TotalCost,0) AS NUMERIC(36,2)) AS TotalCost,CAST(ISNULL(ca.BidValue,0) AS NUMERIC(36,2)) AS PlayCost,
+		public static string GetPlayDetailsByCampaign => @"SELECT CAST(ISNULL(ca.TotalCost,0) AS NUMERIC(36,2)) AS TotalCost,CAST(ISNULL(ca.BidValue,0) AS NUMERIC(36,2)) AS PlayCost,
 													CAST(ISNULL(ca.EmailCost,0) AS NUMERIC(36,2)) AS EmailCost,CAST(ISNULL(ca.SMSCost,0) AS NUMERIC(36,2)) AS SMSCost,
 													ca.StartTime,ca.EndTime,CAST((ca.PlayLengthTicks / 1000) AS NUMERIC(36,2)) AS PlayLength,ca.Email AS EmailMsg,ca.SMS,
 													up.UserId,cp.CurrencyCode,ad.AdvertName,CampaignAuditId
@@ -133,11 +124,41 @@ namespace AdtonesAdminWebApi.DAL.Queries
 													WHERE cp.Status != 5
 													AND ca.Status='Played'
 													AND cp.CampaignProfileId=@Id ";
-													// ORDER BY ";
-													//CASE WHEN @sort = 'PlayCost DESC' THEN [BidValue] END DESC,
-													//CASE WHEN @sort = 'PlayCost ASC' THEN [BidValue] END ASC
-													//OFFSET((@PageIndex)*@PageSize) ROWS
-													//FETCH NEXT (@PageSize) ROWS ONLY";
+
+
+		public static string GetPromoCampaignDashboard => @"SELECT (CAST((ticks.sumplay / audCT.totalPlayCount) as DECIMAL(9,2)) / 1000) AS AveragePlayTime,
+													pc.CampaignName,audCT.totalPlayCount AS TotalPlayed,dist.totalReach AS Reach,op.OperatorName,
+													pa.AdvertName,CONCAT(@siteAddress,pa.AdvertLocation) AS AdvertLocation
+													FROM PromotionalCampaigns AS pc LEFT JOIN PromotionalCampaignAudits AS pca
+													ON pc.ID=pca.PromotionalCampaignId
+													INNER JOIN PromotionalAdverts AS pa
+													ON pa.CampaignID=pca.PromotionalCampaignId
+													LEFT JOIN 
+														(SELECT COUNT(PromotionalCampaignAuditId)  AS totalPlayCount,pca.PromotionalCampaignId 
+															FROM PromotionalCampaignAudits AS pca
+															GROUP BY pca.PromotionalCampaignId) AS audCT
+													ON audCT.PromotionalCampaignId=pc.ID
+													LEFT JOIN
+														(SELECT COUNT(DISTINCT(MSISDN)) AS totalReach, PromotionalCampaignId 
+															FROM PromotionalCampaignAudits
+															WHERE (DTMFKey != '0' AND DTMFKey IS NOT NULL) GROUP BY PromotionalCampaignId) AS dist
+													ON dist.PromotionalCampaignId=pc.ID
+													LEFT JOIN 
+														(SELECT SUM(PlayLengthTicks) AS sumplay, PromotionalCampaignId FROM PromotionalCampaignAudits
+															GROUP BY PromotionalCampaignId) AS ticks
+													ON ticks.PromotionalCampaignId=pc.ID
+													INNER JOIN Operators AS op ON op.OperatorId=pc.OperatorID
+													WHERE pc.ID=@Id
+													GROUP BY ticks.sumplay,pc.CampaignName,audCT.totalPlayCount,dist.totalReach,op.OperatorName,
+													pa.AdvertName,pa.AdvertLocation";
+
+
+		public static string GetPromoPlayDetails => @"SELECT ROUND(pca.PlayLengthTicks/1000,0) AS PlayLength,pa.AdvertName,
+												pca.PromotionalCampaignAuditId AS AuditId,pca.MSISDN,pca.StartTime,ISNULL(pca.DTMFKey,'-') AS DTMFKey
+												FROM PromotionalCampaignAudits AS pca
+												INNER JOIN PromotionalAdverts AS pa
+												ON pa.CampaignID=pca.PromotionalCampaignId
+												WHERE pca.PromotionalCampaignId=@Id";
 
 
 	}

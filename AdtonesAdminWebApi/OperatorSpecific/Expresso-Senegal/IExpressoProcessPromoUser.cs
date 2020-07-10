@@ -8,7 +8,6 @@ namespace AdtonesAdminWebApi.OperatorSpecific
 {
     public interface IExpressoProcessPromoUser
     {
-        Task<ReturnResult> ProcPromotionalUser(HashSet<string> promoMsisdns, string DestinationTableName,
-                                                            string operatorConnectionString, PromotionalUserFormModel model);
+        Task<ReturnResult> ProcPromotionalUser(HashSet<string> promoMsisdns, PromotionalUserFormModel model);
     }
 }

@@ -23,17 +23,15 @@ namespace AdtonesAdminWebApi.DAL
         private readonly IExecutionCommand _executers;
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly IConnectionStringService _connService;
-        private readonly IUserManagementQuery _commandText;
 
         public UserManagementDAL(IConfiguration configuration, IExecutionCommand executers, IHttpContextAccessor httpAccessor,
-                                   IConnectionStringService connService, IUserManagementQuery commandText)
+                                   IConnectionStringService connService)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
             _httpAccessor = httpAccessor;
             _connService = connService;
-            _commandText = commandText;
         }
 
 
@@ -43,7 +41,7 @@ namespace AdtonesAdminWebApi.DAL
             int operatorId = 0;
 
             var sb1 = new StringBuilder();
-            sb1.Append(_commandText.UpdateUserStatus);
+            sb1.Append(UserManagementQuery.UpdateUserStatus);
             sb1.Append("UserId=@userId");
             
             var builder = new SqlBuilder();
@@ -68,7 +66,7 @@ namespace AdtonesAdminWebApi.DAL
                 var operatorConnectionString = await _connService.GetSingleConnectionString(operatorId);
 
                 var sb2 = new StringBuilder();
-                sb2.Append(_commandText.UpdateUserStatus);
+                sb2.Append(UserManagementQuery.UpdateUserStatus);
                 sb2.Append("AdtoneServerUserId=@userId");
                 var build = new SqlBuilder();
                 var sel = build.AddTemplate(sb2.ToString());
@@ -77,9 +75,9 @@ namespace AdtonesAdminWebApi.DAL
 
                 try
                 {
-                    /// TODO: make this live
-                    //x = await _executers.ExecuteCommand(operatorConnectionString,
-                    //             conn => conn.ExecuteScalar<int>(sel.RawSql, sel.Parameters));
+                    // TODO: make this live
+                    return await _executers.ExecuteCommand(operatorConnectionString,
+                                 conn => conn.ExecuteScalar<int>(sel.RawSql, sel.Parameters));
                 }
                 catch
                 {
@@ -97,7 +95,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 x = await _executers.ExecuteCommand(_connStr,
-                         conn => conn.ExecuteScalar<int>(_commandText.UpdateContacts, model));
+                         conn => conn.ExecuteScalar<int>(UserManagementQuery.UpdateContacts, model));
             }
             catch
             {
@@ -108,10 +106,29 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<int> UpdateUserPermission(IdCollectionViewModel model)
+        {
+            var build = new SqlBuilder();
+            var sel = build.AddTemplate(UserManagementQuery.UpdateUserPermissions);
+            build.AddParameters(new { userId = model.userId});
+            build.AddParameters(new { perm = model.permData.ToString() });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<int>(sel.RawSql, sel.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<int> UpdateUser(User profile)
         {
             int x = 0;
-            var update_query = new StringBuilder(_commandText.UpdateUser);
+            var update_query = new StringBuilder(UserManagementQuery.UpdateUser);
 
             if (profile.PasswordHash != null && profile.PasswordHash != "")
                 update_query.Append(" ,PasswordHash=@passwordHash, LastPasswordChangedDate=GETDATE() ");
@@ -162,7 +179,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<User> GetUserById(int id)
         {
             var sb = new StringBuilder();
-            sb.Append(_commandText.GetUserDetails);
+            sb.Append(UserManagementQuery.GetUserDetails);
             sb.Append(" UserId=@UserId");
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sb.ToString());
@@ -184,7 +201,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<User> GetUserByEmail(string email)
         {
             var sb = new StringBuilder();
-            sb.Append(_commandText.GetUserDetails);
+            sb.Append(UserManagementQuery.GetUserDetails);
             sb.Append(" LOWER(Email)=@email");
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sb.ToString());
@@ -206,7 +223,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<Contacts> getContactByUserId(int userId)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.getContactByUserId);
+            var select = builder.AddTemplate(UserManagementQuery.getContactByUserId);
             builder.AddParameters(new { userid = userId });
             try
             {
@@ -225,7 +242,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<CompanyDetails> getCompanyDetails(int userId)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.GetCompanyDetails);
+            var select = builder.AddTemplate(UserManagementQuery.GetCompanyDetails);
             builder.AddParameters(new { userid = userId });
             try
             {
@@ -244,7 +261,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<OperatorAdminFormModel> getOperatorAdmin(int userId)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.GetOperatorAdmin);
+            var select = builder.AddTemplate(UserManagementQuery.GetOperatorAdmin);
             builder.AddParameters(new { userId = userId });
             try
             {

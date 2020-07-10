@@ -22,7 +22,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<string> GetUserProfileMsisdn(string command, int id)
+        public async Task<string> GetUserProfileMsisdn(int id)
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(command);

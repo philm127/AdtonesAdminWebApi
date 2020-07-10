@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
-    public interface IPromotionalUsersService
+    public interface IPromotionalCampaignService
     {
         Task<ReturnResult> SavePromotionalUser(PromotionalUserFormModel model);
+        Task<ReturnResult> LoadPromoCampaignDataTable();
     }
 }

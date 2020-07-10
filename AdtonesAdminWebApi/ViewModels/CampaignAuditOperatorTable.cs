@@ -7,6 +7,7 @@ namespace AdtonesAdminWebApi.ViewModels
 {
     public class CampaignAuditOperatorTable
     {
+        public int AuditId { get; set; }
         public double TotalCost { get; set; }
         public double PlayCost { get; set; }
         public double EmailCost { get; set; }
@@ -19,5 +20,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string AdvertName { get; set; }
         public string EmailMsg { get; set; }
         public string SMS { get; set; }
+        public string MSISDN { get; set; }
+        public string DTMFKey { get; set; }
     }
 }

@@ -21,6 +21,8 @@ namespace AdtonesAdminWebApi.ViewModels
         public int TotalReach { get; set; }
         public int Reach { get; set; }
         public string CurrencyCode { get; set; }
+        public string OperatorName { get; set; }
+        public string AdvertLocation { get; set; }
 
 
         //public double PlaystoDate { get; set; }
@@ -61,19 +63,6 @@ namespace AdtonesAdminWebApi.ViewModels
         public int Reach { get; set; }
         public int TotalReach { get; set; }
         public string CurrencyCode { get; set; }
-
-        //public double Available { get; set; }
-        //public double FreePlaysPercentage { get; set; }
-        //public double TotalBudgetPercentage { get; set; }
-        //public double MaxBid { get; set; }
-        //public double MaxBidPercantage { get; set; }
-        //public double MaxPlayLengthPercantage { get; set; }
-        //public int TotalSMS { get; set; }
-        //public double TotalSMSCost { get; set; }
-        //public int TotalEmail { get; set; }
-        //public double TotalEmailCost { get; set; }
-        //public double Cancelled { get; set; }
-        //public CurrencyConvertModel currencyConvertModels { get; set; }
 
         //public CampaignDashboardChartPREResult()
         //{

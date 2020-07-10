@@ -16,22 +16,20 @@ namespace AdtonesAdminWebApi.DAL
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
         private readonly IConnectionStringService _connService;
-        private readonly ILoginQuery _commandText;
 
-        public LoginDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, ILoginQuery commandText)
+        public LoginDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
             _connService = connService;
-            _commandText = commandText;
         }
 
 
         public async Task<User> GetLoginUser(User userModel)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.LoginUser);
+            var select = builder.AddTemplate(LoginQuery.LoginUser);
             builder.AddParameters(new { email = userModel.Email.ToLower() });
             try
             {
@@ -50,7 +48,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             int x = 0;
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.UpdatePassword);
+            var select = builder.AddTemplate(LoginQuery.UpdatePassword);
             builder.AddParameters(new { Email = userModel.Email });
             builder.AddParameters(new { PasswordHash = userModel.PasswordHash });
 
@@ -71,7 +69,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             int x = 0;
             var sb1 = new StringBuilder();
-            sb1.Append(_commandText.UpdateLockout);
+            sb1.Append(LoginQuery.UpdateLockout);
             sb1.Append("UserId=@userId");
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sb1.ToString());
@@ -93,7 +91,7 @@ namespace AdtonesAdminWebApi.DAL
             {
                 var operatorConnectionString = await _connService.GetSingleConnectionString(userModel.OperatorId);
                 var sb2 = new StringBuilder();
-                sb2.Append(_commandText.UpdateLockout);
+                sb2.Append(LoginQuery.UpdateLockout);
                 sb2.Append("AdtoneServerUserId=@userId");
                 var build = new SqlBuilder();
                 var sel = build.AddTemplate(sb2.ToString());

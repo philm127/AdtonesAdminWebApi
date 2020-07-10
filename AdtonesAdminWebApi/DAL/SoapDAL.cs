@@ -16,21 +16,19 @@ namespace AdtonesAdminWebApi.DAL
         private readonly IConfiguration _configuration;
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
-        private readonly ISoapQuery _commandText;
 
-        public SoapDAL(IConfiguration configuration, IExecutionCommand executers, ISoapQuery commandText)
+        public SoapDAL(IConfiguration configuration, IExecutionCommand executers)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
-            _commandText = commandText;
         }
 
 
         public async Task<SoapApiResponseCodes> GetSoapApiResponse(string id)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.GetSoapApiResponseCodes);
+            var select = builder.AddTemplate(SoapQuery.GetSoapApiResponseCodes);
             builder.AddParameters(new { returnCode = id });
             try
             {

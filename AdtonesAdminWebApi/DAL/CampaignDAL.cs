@@ -20,17 +20,15 @@ namespace AdtonesAdminWebApi.DAL
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
         private readonly IConnectionStringService _connService;
-        private readonly ICampaignQuery _commandText;
         private readonly IHttpContextAccessor _httpAccessor;
 
         public CampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, 
-                            ICampaignQuery commandText, IHttpContextAccessor httpAccessor)
+                            IHttpContextAccessor httpAccessor)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
             _connService = connService;
-            _commandText = commandText;
             _httpAccessor = httpAccessor;
         }
 
@@ -44,19 +42,19 @@ namespace AdtonesAdminWebApi.DAL
 
             if (roleName.ToLower().Contains("operator"))
             {
-                sb.Append(_commandText.GetCampaignResultSet);
+                sb.Append(CampaignQuery.GetCampaignResultSet);
                 sb.Append(" WHERE u.OperatorId=@Id ");
                 sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
                 builder.AddParameters(new { Id = id });
             }
             else if (id == 0)
             {
-                sb.Append(_commandText.GetCampaignResultSet);
+                sb.Append(CampaignQuery.GetCampaignResultSet);
                 sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
             }
             else if ( id > 0 )
             {
-                sb.Append(_commandText.GetCampaignResultSet);
+                sb.Append(CampaignQuery.GetCampaignResultSet);
                 sb.Append(" WHERE camp.UserId=@Id ");
                 sb.Append(" AND camp.Status IN(1,2,3,4) ");
                 sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
@@ -80,27 +78,10 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<PromotionalCampaignResult>> GetPromoCampaignResultSet()
-        {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.GetPromoCampaignResultSet);
-            try
-            {
-
-                return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.Query<PromotionalCampaignResult>(select.RawSql, select.Parameters));
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-
         public async Task<IEnumerable<CampaignCreditResult>> GetCampaignCreditResultSet()
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.GetCampaignCreditResultSet);
+            var select = builder.AddTemplate(CampaignQuery.GetCampaignCreditResultSet);
             try
             {
 
@@ -117,7 +98,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<CampaignProfile> GetCampaignProfileDetail(int id = 0)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.GetCampaignProfileById);
+            var select = builder.AddTemplate(CampaignQuery.GetCampaignProfileById);
             try
             {
                 builder.AddParameters(new { Id = id });
@@ -136,7 +117,7 @@ namespace AdtonesAdminWebApi.DAL
         {
 
             var sb = new StringBuilder();
-            sb.Append(_commandText.UpdateCampaignProfileStatus);
+            sb.Append(CampaignQuery.UpdateCampaignProfileStatus);
             sb.Append(" CampaignProfileId=@Id;");
 
             var builder = new SqlBuilder();
@@ -167,7 +148,7 @@ namespace AdtonesAdminWebApi.DAL
             var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
 
             var sb = new StringBuilder();
-            sb.Append(_commandText.UpdateCampaignProfileStatus);
+            sb.Append(CampaignQuery.UpdateCampaignProfileStatus);
             sb.Append(" AdtoneServerCampaignProfileId=@Id;");
 
             var builder = new SqlBuilder();
@@ -190,7 +171,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<CampaignAdverts> GetCampaignAdvertDetailsByAdvertId(int Id)
         {
             var sb = new StringBuilder();
-            sb.Append(_commandText.GetCampaignAdvertDetailsById);
+            sb.Append(CampaignQuery.GetCampaignAdvertDetailsById);
             sb.Append(" AdvertId=@Id;");
 
             var builder = new SqlBuilder();
@@ -208,65 +189,24 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
-        public async Task<int> UpdatePromotionalCampaignStatus(IdCollectionViewModel model)
-        {
-            var sb = new StringBuilder();
-            sb.Append(_commandText.UpdatePromotionalCampaignStatus);
 
+        public async Task<bool> CheckCampaignBillingExists(int campaignId)
+        {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(sb.ToString());
+            var select = builder.AddTemplate(CampaignQuery.CheckCampaignBillingExists);
+            builder.AddParameters(new { Id = campaignId });
+
             try
             {
-                builder.AddParameters(new { Id = model.id });
-                builder.AddParameters(new { Status = model.status });
-
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+                             conn => conn.ExecuteScalar<bool>(select.RawSql, select.Parameters));
+
             }
             catch
             {
                 throw;
             }
         }
-
-
-
-
-
-        ////        //Model.Campaign Campaign = _CampaignRepository.GetById(command.CampaignId);
-        ////        var CampaignDetail = _CampaignRepository.GetById(command.CampaignId);
-        ////        CampaignDetail.Status = command.Status;
-        ////            CampaignDetail.UpdatedBy = command.UpdatedBy;
-        ////            _CampaignRepository.Update(CampaignDetail);
-        ////            var ConnString = ConnectionString.GetConnectionStringByCountryId(CampaignDetail.CountryId);
-        ////            if (ConnString != null && ConnString.Count() > 0)
-        ////            {
-        ////                foreach (var item in ConnString)
-        ////                {
-        ////                    EFMVCDataContex db = new EFMVCDataContex(item);
-        ////        var externalServerUserId = OperatorServer.GetUserIdFromOperatorServer(db, (int)command.UpdatedBy);
-        ////        var CampaignData = db.Campaigns.Where(s => s.AdtoneServerCampaignId == command.CampaignId).FirstOrDefault();
-        ////                    if (CampaignData != null)
-        ////                    {
-        ////                        CampaignData.Status = command.Status;
-        ////                        if (externalServerUserId != 0)
-        ////                        {
-        ////                            CampaignData.UpdatedBy = command.UpdatedBy;
-        ////                        }
-        ////                        else
-        ////                        {
-        ////                            CampaignData.UpdatedBy = null;
-        ////                        }
-
-        ////db.SaveChanges();
-        ////                    }
-        ////                }
-        ////            }
-        ////            unitOfWork.Commit();
-        ////            return new CommandResult(true);
-        //        //}
-
-
 
     }
 }

@@ -19,5 +19,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string Email { get; set; } = string.Empty;
         public string rStatus { get; set; } = string.Empty;
         public int status { get; set; } = 0;
+        public int operatorId { get; set; }
+        public List<PermissionModel> permData { get; set; }
     }
 }

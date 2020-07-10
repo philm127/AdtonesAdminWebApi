@@ -15,21 +15,19 @@ namespace AdtonesAdminWebApi.DAL
         private readonly IConfiguration _configuration;
         private readonly string _connStr;
         private readonly IExecutionCommand _executers;
-        private readonly ITicketQuery _commandText;
 
-        public TicketDAL(IConfiguration configuration, IExecutionCommand executers, ITicketQuery commandText)
+        public TicketDAL(IConfiguration configuration, IExecutionCommand executers)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
-            _commandText = commandText;
         }
 
 
         public async Task<TicketListModel> GetTicketDetails(int id=0)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.GetTicketDetails);
+            var select = builder.AddTemplate(TicketQuery.GetTicketDetails);
             builder.AddParameters(new { Id =id });
             try
             {
@@ -47,7 +45,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<IEnumerable<TicketComments>> GetTicketcomments(int id = 0)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.GetTicketComments);
+            var select = builder.AddTemplate(TicketQuery.GetTicketComments);
             builder.AddParameters(new { questionId = id });
             builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:siteAddress") });
             try
@@ -66,7 +64,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<IEnumerable<TicketListModel>> GetTicketList(int id)
         {
             var sb = new StringBuilder();
-            sb.Append(_commandText.GetLoadTicketDatatable);
+            sb.Append(TicketQuery.GetLoadTicketDatatable);
             if (id == 0)
                 sb.Append(" ORDER BY q.Id DESC;");
             else
@@ -92,7 +90,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<IEnumerable<TicketListModel>> GetOperatorTicketList(int operatorId)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.GetOperatorLoadTicketTable);
+            var select = builder.AddTemplate(TicketQuery.GetOperatorLoadTicketTable);
             builder.AddParameters(new { operatorId = operatorId });
             builder.AddParameters(new { opadrev = (int)Enums.QuestionSubjectStatus.OperatorAdreview });
             builder.AddParameters(new { cred = (int)Enums.QuestionSubjectStatus.OperatorCreditRequest });
@@ -114,7 +112,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> UpdateTicketStatus(TicketListModel model)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.UpdateTicketStatus);
+            var select = builder.AddTemplate(TicketQuery.UpdateTicketStatus);
             builder.AddParameters(new { Id = model.Id });
             builder.AddParameters(new { Status = model.Status });
             builder.AddParameters(new { UpdatedBy = model.UpdatedBy });
@@ -136,7 +134,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<string> CreateNewHelpTicket(TicketFormModel ticket)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.CreateNewHelpTicket);
+            var select = builder.AddTemplate(TicketQuery.CreateNewHelpTicket);
             builder.AddParameters(new { UserId = ticket.UserId });
             builder.AddParameters(new { AdvertId = ticket.AdvertId });
             builder.AddParameters(new { QNumber = ticket.QNumber });
@@ -167,9 +165,9 @@ namespace AdtonesAdminWebApi.DAL
             var select = builder.AddTemplate(string.Empty);
             
             if (model.UserId == model.UpdatedBy)
-                select = builder.AddTemplate(_commandText.UpdateTicketUpdatedByUser);
+                select = builder.AddTemplate(TicketQuery.UpdateTicketUpdatedByUser);
             else
-                select = builder.AddTemplate(_commandText.UpdateTicketUpdatedByAdmin);
+                select = builder.AddTemplate(TicketQuery.UpdateTicketUpdatedByAdmin);
 
             builder.AddParameters(new { Id = model.Id });
             builder.AddParameters(new { UpdatedBy = model.UpdatedBy });
@@ -193,7 +191,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> AddNewComment(TicketComments ticket)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.AddComment);
+            var select = builder.AddTemplate(TicketQuery.AddComment);
             builder.AddParameters(new { UserId = ticket.UserId });
             builder.AddParameters(new { QuestionId = ticket.QuestionId });
             builder.AddParameters(new { Description = ticket.Description });
@@ -213,7 +211,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> AddNewCommentImage(TicketComments ticket)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(_commandText.InsertCommentImage);
+            var select = builder.AddTemplate(TicketQuery.InsertCommentImage);
             builder.AddParameters(new { QuestionCommentId = ticket.CommentId });
             builder.AddParameters(new { UploadImages = ticket.ImageFile });
 

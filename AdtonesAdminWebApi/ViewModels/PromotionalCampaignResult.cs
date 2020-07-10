@@ -21,5 +21,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int Status { get; set; }
         public string rStatus => Status == 1 ? "Play" : "Stop";
         public IFormFile Files { get; set; }
+
+        public int? AdtoneServerPromotionalCampaignId { get; set; }
     }
 }

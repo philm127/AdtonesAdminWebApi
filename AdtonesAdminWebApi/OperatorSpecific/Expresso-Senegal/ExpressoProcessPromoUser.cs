@@ -12,8 +12,7 @@ namespace AdtonesAdminWebApi.OperatorSpecific
     {
         private const int ProvisionBatchSize = 1500;
         ReturnResult result = new ReturnResult();
-        public async Task<ReturnResult> ProcPromotionalUser(HashSet<string> promoMsisdns, string DestinationTableName,
-                                                            string operatorConnectionString, PromotionalUserFormModel model)
+        public async Task<ReturnResult> ProcPromotionalUser(HashSet<string> promoMsisdns, PromotionalUserFormModel model)
         {
             try
             {
@@ -27,11 +26,11 @@ namespace AdtonesAdminWebApi.OperatorSpecific
                 {
                     var nextChunk = promoMsisdnsList.Skip(processedCount).Take(ProvisionBatchSize).ToList();
                     processedCount += nextChunk.Count;
-                    await DoExpressoProvisionAndSaveToDatabase(nextChunk, operatorConnectionString, DestinationTableName, model);
+                    await DoExpressoProvisionAndSaveToDatabase(nextChunk, model);
                 }
 
                 if (overallCount - processedCount > 0) // processing the rest of the batch.
-                    await DoExpressoProvisionAndSaveToDatabase(promoMsisdnsList.Skip(processedCount).ToList(), operatorConnectionString, DestinationTableName, model);
+                    await DoExpressoProvisionAndSaveToDatabase(promoMsisdnsList.Skip(processedCount).ToList(), model);
 
                 result.body = "User(s) added successfully for Expresso ";
                 return result;
@@ -53,7 +52,7 @@ namespace AdtonesAdminWebApi.OperatorSpecific
         }
 
 
-        private async Task<bool> DoExpressoProvisionAndSaveToDatabase(List<string> nextChunk, string operatorConnectionString, string destinationTableName, PromotionalUserFormModel model)
+        private async Task<bool> DoExpressoProvisionAndSaveToDatabase(List<string> nextChunk, PromotionalUserFormModel model)
         {
             try
             {
@@ -80,12 +79,10 @@ namespace AdtonesAdminWebApi.OperatorSpecific
                                             ? (int)Enums.PromotionalUserStatus.Active
                                             : (int)Enums.PromotionalUserStatus.Fail;
                                         row["BatchID"] = model.BatchID;
-                                        row["DeliveryServerConnectionString"] = model.DeliveryServerConnectionString;
-                                        row["DeliveryServerIpAddress"] = model.DeliveryServerIpAddress;
                                         row.EndEdit();
                                         return row;
                                     }).ToList(),
-                                operatorConnectionString, destinationTableName);
+                                model.OperatorId);
                 return true;
             }
             catch (Exception ex)
