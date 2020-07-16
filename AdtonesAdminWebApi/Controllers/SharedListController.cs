@@ -19,10 +19,12 @@ namespace AdtonesAdminWebApi.Controllers
     public class SharedListController : ControllerBase
     {
         private readonly ISharedSelectListsService _sharedList;
+        private readonly IManagementReportService _manService;
 
-        public SharedListController(ISharedSelectListsService sharedList)
+        public SharedListController(ISharedSelectListsService sharedList, IManagementReportService manService)
         {
             _sharedList = sharedList;
+            _manService = manService;
         }
 
 
@@ -120,6 +122,24 @@ namespace AdtonesAdminWebApi.Controllers
             return await _sharedList.GetUserCreditList();
         }
 
+
+        /// <summary>
+        /// Gets the users who are not subscribers and has role tagged on
+        /// </summary>
+        /// <returns>body contains List SharedSelectListViewModel
+        /// or a single one if id entered</returns>
+        [HttpGet("v1/GetUsersnRoles")]
+        public async Task<ReturnResult> GetUsersnRoles()
+        {
+            return await _sharedList.GetUsersnRoles();
+        }
+
+
+        [HttpGet("v1/GetTestAllusers")]
+        public async Task<ReturnResult> GetTestAllusers(ManagementReportsSearch search)
+        {
+            return await _manService.GetNumOfTotalUser(search);
+        }
 
     }
 }

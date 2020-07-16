@@ -5,10 +5,16 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.ViewModels
 {
+    
+    public class PermissionList
+    {
+        public List<PermissionModel> pages { get; set; }
+    }
+    
     public class PermissionModel
     {
         public string pageName { get; set; }
-        public string visible { get; set; }
+        public bool visible { get; set; }
         public List<PermElement> elements { get; set; }
     }
 

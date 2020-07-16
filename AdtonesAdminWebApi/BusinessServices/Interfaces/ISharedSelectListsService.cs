@@ -17,5 +17,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> GetAddCreditUsersList();
         Task<ReturnResult> GetUserCreditList();
         Task<ReturnResult> GetUserDetailCreditList();
+        Task<ReturnResult> GetUsersnRoles();
     }
 }

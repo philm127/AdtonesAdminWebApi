@@ -85,7 +85,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <param name="id">email</param>
         /// <returns>body contains token string</returns>
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("v1/RefreshAccessToken/{id}")]
         public async Task<ReturnResult> RefreshAccessToken(string id)
         {

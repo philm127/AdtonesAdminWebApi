@@ -155,6 +155,41 @@ namespace AdtonesAdminWebApi.BusinessServices
 
 
         /// <summary>
+        /// Get users without subscribers with roles tagged on
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ReturnResult> GetUsersnRoles()
+        {
+            List<SharedSelectListViewModel> selectedList = new List<SharedSelectListViewModel>();
+            try
+            {
+                var dt = await _sharedDal.GetUsersnRoles();
+                foreach(dynamic item in dt)
+                {
+                    var itemModel = new SharedSelectListViewModel();
+                    itemModel.Value = item.Value.ToString();
+                    itemModel.Text = item.Text + " (" + Enum.GetName(typeof(Enums.UserRole), item.RoleId).ToString()  + ")";
+                    selectedList.Add(itemModel);
+                }
+                result.body = selectedList;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "SharedSelectListsService",
+                    ProcedureName = "GetUserCreditList"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        /// <summary>
         /// When Add Credit selected this populates dropdown with credit users
         /// </summary>
         /// <returns></returns>

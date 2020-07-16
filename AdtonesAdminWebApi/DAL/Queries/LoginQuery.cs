@@ -9,8 +9,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
     public static class LoginQuery
     {
         //,LastPasswordChangedDate,LockOutTime,
-        public static string LoginUser => @"SELECT UserId,RoleId,Email,FirstName,LastName,PasswordHash,Activated,
-                                    OperatorId, Organisation, DateCreated, VerificationStatus,Permissions
+        public static string LoginUser => @"SELECT UserId,RoleId,Email,FirstName,LastName,PasswordHash,Activated,OperatorId, 
+                                    Organisation, DateCreated, VerificationStatus,Permissions,LastPasswordChangedDate,LockOutTime
                                     FROM Users WHERE LOWER(Email)=@email AND Activated !=3;";
 
 

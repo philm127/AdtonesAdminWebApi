@@ -26,26 +26,27 @@ namespace AdtonesAdminWebApi.Services
 
     public class CurrencyConversion
     {
-        static string url;
+        private readonly string url;
         private readonly IHttpContextAccessor _httpAccessor;
-        private readonly Dictionary<string, decimal> _cachedRates =
-            new Dictionary<string, decimal>();
+        private readonly Dictionary<string, decimal> _cachedRates = new Dictionary<string, decimal>();
         private readonly IConfiguration _configuration;
        public static int Userjwt { get; private set; }
 
         private readonly ICurrencyDAL _repository;
 
-        public CurrencyConversion(IConfiguration configuration, IHttpContextAccessor httpAccessor, ICurrencyDAL repository)
+        public CurrencyConversion(IConfiguration configuration, IHttpContextAccessor httpAccessor)
         {
             _configuration = configuration;
             _httpAccessor = httpAccessor;
-            url =  _configuration.GetValue<string>("AppSettings:CurrencyUrl");
-           Userjwt = _httpAccessor.GetUserIdFromJWT();
-            _repository = repository;
+            url = _configuration.GetValue<string>("AppSettings:CurrencyUrl"); 
+             Userjwt = _httpAccessor.GetUserIdFromJWT();
         }
 
 
-        public CurrencyConversion(){ }
+        public CurrencyConversion(ICurrencyDAL repository)
+        {
+            _repository = repository;
+        }
 
 
         public Model.Currency DisplayCurrency { get; private set; }
@@ -54,6 +55,19 @@ namespace AdtonesAdminWebApi.Services
         public async Task InitializeAsync(int userId)
         {
             DisplayCurrency = await _repository.GetDisplayCurrencyCodeForUserAsync(userId);
+        }
+
+
+        public void Initialize(int userId)
+        {
+            DisplayCurrency = _repository.GetDisplayCurrencyCodeForUserAsync(userId).Result;
+        }
+
+        public static CurrencyConversion CreateForCurrentUser(ICurrencyDAL currencyRepository)
+        {
+            CurrencyConversion conversion = new CurrencyConversion(currencyRepository);
+            conversion.Initialize(Userjwt);
+            return conversion;
         }
 
         //public static async Task<CurrencyConversion> CreateForCurrentUserAsync(object controller)
@@ -98,10 +112,13 @@ namespace AdtonesAdminWebApi.Services
 
         private decimal CallForRate(string currencyFrom, string currencyTo)
         {
+            var config = _configuration;
+            //var url2 = _configuration.GetValue<string>("AppSettings:CurrencyUrl");
             try
             {
+                
                 var param = new Currency { Amount = 1M, From = currencyFrom, To = currencyTo };
-                var client = new RestClient(url);
+                var client = new RestClient("http://217.160.184.168:5555/api/currency/convert");
                 var request = new RestRequest(Method.POST);
                 request.AddHeader("Content-Type", "application/json");
                 request.AddJsonBody(param);

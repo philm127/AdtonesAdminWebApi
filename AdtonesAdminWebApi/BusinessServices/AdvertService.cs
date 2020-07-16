@@ -23,7 +23,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly ISoapApiService _soapApi;
         private readonly ISoapDAL _soapDAL;
 
-        private IUserMatchInterface _matchInterface;
+        // private IUserMatchInterface _matchInterface;
         private readonly IAdvertDAL _advertDAL;
         private readonly ICampaignDAL _campDAL;
         private readonly IConfiguration _configuration;

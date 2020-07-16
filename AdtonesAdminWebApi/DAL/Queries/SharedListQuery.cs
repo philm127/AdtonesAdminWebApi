@@ -21,6 +21,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 INNER JOIN UsersCredit AS uc ON uc.UserId=u.UserId";
 
 
+        public static string GetUserwRole => @"SELECT u.UserId AS Value,RoleId, CONCAT(FirstName,' ',LastName) AS Text 
+                                                FROM Users AS u WHERE RoleId !=2 ORDER BY RoleId";
+
+
         public static string AddCreditUserList => @"SELECT UserId AS Value, CONCAT(FirstName,' ',LastName,'(',Email,')') AS Text FROM Users 
                                                 WHERE VerificationStatus=1
                                                 AND Activated=1 AND RoleId=3 

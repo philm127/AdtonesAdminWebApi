@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
 
 namespace AdtonesAdminWebApi.DAL.Shared
 {
@@ -40,6 +41,23 @@ namespace AdtonesAdminWebApi.DAL.Shared
             try
             {
                 return await GetSelectList(sb.ToString(), id);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<object>> GetUsersnRoles()
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connStr))
+                {
+                    connection.Open();
+                    return await connection.QueryAsync<object>(SharedListQuery.GetUserwRole);
+                }
             }
             catch
             {
