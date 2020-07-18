@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Security.Claims;
 using System.Linq;
+using System.IO;
+using Microsoft.Extensions.FileProviders;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace AdtonesAdminWebApi.Controllers
 {
@@ -19,12 +22,10 @@ namespace AdtonesAdminWebApi.Controllers
     public class SharedListController : ControllerBase
     {
         private readonly ISharedSelectListsService _sharedList;
-        private readonly IManagementReportService _manService;
 
-        public SharedListController(ISharedSelectListsService sharedList, IManagementReportService manService)
+        public SharedListController(ISharedSelectListsService sharedList)
         {
             _sharedList = sharedList;
-            _manService = manService;
         }
 
 
@@ -64,12 +65,12 @@ namespace AdtonesAdminWebApi.Controllers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="some"></param>
+        /// <param name="id">CountryId</param>
         /// <returns>body contains List SharedSelectListViewModel</returns>
-        [HttpGet("v1/GetOperatorList")]
-        public async Task<ReturnResult> GetOperatorList([FromBodyAttribute] IdCollectionViewModel some)
+        [HttpGet("v1/GetOperatorList/{id}")]
+        public async Task<ReturnResult> GetOperatorList(int id = 0)
         {
-            return await _sharedList.GetOperatorList(some.countryId);
+            return await _sharedList.GetOperatorList(id);
         }
 
 
@@ -134,12 +135,6 @@ namespace AdtonesAdminWebApi.Controllers
             return await _sharedList.GetUsersnRoles();
         }
 
-
-        [HttpGet("v1/GetTestAllusers")]
-        public async Task<ReturnResult> GetTestAllusers(ManagementReportsSearch search)
-        {
-            return await _manService.GetNumOfTotalUser(search);
-        }
 
     }
 }

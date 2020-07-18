@@ -10,5 +10,8 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     {
         Task<int> GetreportInts(ManagementReportsSearch search, string query);
         Task<IEnumerable<SpendCredit>> GetTotalCreditCost(ManagementReportsSearch search, string query);
+
+        Task<IEnumerable<int>> GetAllOperators();
+        Task<IEnumerable<string>> GetOperatorNames(ManagementReportsSearch search);
     }
 }

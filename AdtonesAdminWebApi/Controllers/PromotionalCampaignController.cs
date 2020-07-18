@@ -32,27 +32,38 @@ namespace AdtonesAdminWebApi.Controllers
         {
             return await _campService.LoadPromoCampaignDataTable();
         }
-      
+
+
         /// <summary>
         /// 
         /// </summary>
-        /// <returns>body contains List CampaignAdminResult</returns>
-        [HttpGet("v1/GetPromoDashboardSummary/{id}")]
-        public async Task<ReturnResult> GetPromoDashboardSummary(int id = 0)
+        /// <returns>body success or error message</returns>
+        [HttpPost("v1/AddPromoCampaign")]
+        public async Task<ReturnResult> AddPromoCampaign([FromForm] PromotionalCampaignResult model)
         {
-            return await _auditService.GetPromoCampaignDashboardSummary(id);
+            return await _campService.AddPromotionalCampaign(model);
         }
 
-        
+
         /// <summary>
         /// 
         /// </summary>
-        /// <returns>body contains List CampaignAdminResult</returns>
-        [HttpPut("v1/GetPromoPlayDetailsByCampaign")]
-        public async Task<ReturnResult> GetPromoPlayDetailsByCampaign(PagingSearchClass paging)
+        /// <returns>body success or error message</returns>
+        [HttpPost("v1/AddPromoUser")]
+        public async Task<ReturnResult> AddPromoUser([FromForm] PromotionalUserFormModel model)
         {
-            return await _auditService.GetPromoPlayDetails(paging);
+            return await _campService.SavePromotionalUser(model);
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body success or error message</returns>
+        [HttpPost("v1/UpdatePromoCampaignStatus")]
+        public async Task<ReturnResult> UpdatePromoCampaignStatus(IdCollectionViewModel model)
+        {
+            return await _campService.UpdatePromotionalCampaignStatus(model);
+        }
     }
 }

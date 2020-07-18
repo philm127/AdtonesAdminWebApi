@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.ViewModels;
+using ClosedXML.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
     public interface IManagementReportService
     {
-        Task<ReturnResult> GetNumOfTotalUser(ManagementReportsSearch search);
+        Task<ReturnResult> GetReportData(ManagementReportsSearch search);
+        Task<XLWorkbook> GenerateExcelReport(ManagementReportsSearch search);
     }
 }

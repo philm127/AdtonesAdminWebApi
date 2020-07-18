@@ -42,61 +42,23 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             if (search.operators == null || search.operators.Length == 0)
             {
-                var ops = new[] { 1, 2 };
-                search.operators = ops.Concat(new[] { 3 }).ToArray();
+                List<int> ops = _reportDAL.GetAllOperators().Result.ToList();
+                search.operators = ops.ToArray();
             }
 
             return search;
         }
 
 
-        public async Task<ReturnResult> GetNumOfTotalUser(ManagementReportsSearch search)
+        public async Task<ReturnResult> GetReportData(ManagementReportsSearch search)
         {
-            search = SetDefaults(search);
-
-            ManagementReportModel model = new ManagementReportModel();
-
-
             try
             {
-                Task<int> totUser = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTotalUser);
-                Task<int> totrem = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfRemovedUser);
-                Task<int> totads = _reportDAL.GetreportInts(search, ManagementReportQuery.NumberOfAdsProvisioned);
-                Task<int> up2Aud = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfUpdateToAudit);
-                
-                Task<IEnumerable<SpendCredit>> totCost = _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetTotalCost);
-                
-                Task<int> totCancel = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfCancel);
-                Task<int> totCam = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfLiveCampaign);
-                Task<int> totEmail = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfEmail);
-                Task<int> totFile = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTextFile);
-                Task<int> totline = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTextLine);
-                Task<int> totSMS = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfSMS);
-                Task<int> totPlays = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfPlay);
-
-                await Task.WhenAll(totUser, totrem, totads, up2Aud, totCancel, totCam, totEmail, totFile, totline, totSMS, totPlays,
-                                    totCost);
-
-                model.NumOfTotalUser = totUser.Result;
-                model.NumOfRemovedUser = totrem.Result;
-                model.NumberOfAdsProvisioned = totads.Result;
-                model.NumOfUpdateToAudit = up2Aud.Result;
-                model.NumOfCancel = totCancel.Result;
-                model.NumOfLiveCampaign = totCam.Result;
-                model.NumOfEmail = totEmail.Result;
-                model.NumOfTextFile = totFile.Result;
-                model.NumOfTextLine = totline.Result;
-                model.NumOfSMS = totSMS.Result;
-                model.NumOfPlay = totPlays.Result;
-
-                var costAudit = totCost.Result.ToList();
-
-                var calcModel = CalculateSearchData(costAudit);
-
-                model.TotalCredit = calcModel.TotalCredit;
-                model.TotalSpend = calcModel.TotalSpend;
-
-                result.body = model;
+                ManagementReportModel model = await GetManReports(search);
+                if (model == null)
+                    result.result = 0;
+                else
+                    result.body = model;
             }
             catch (Exception ex)
             {
@@ -113,6 +75,262 @@ namespace AdtonesAdminWebApi.BusinessServices
             return result;
         }
 
+
+        private async Task<ManagementReportModel> GetManReports(ManagementReportsSearch search)
+        {
+            search = SetDefaults(search);
+
+            ManagementReportModel model = new ManagementReportModel();
+
+            try
+            {
+
+                // Separated this out as conversion likely to take more time than the initial fetch.
+                IEnumerable<SpendCredit> totCosts = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetTotalCost);
+                var costAudit = totCosts.ToList();
+
+                Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit);
+
+                Task<int> totUser = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTotalUser);
+                Task<int> totrem = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfRemovedUser);
+                Task<int> totads = _reportDAL.GetreportInts(search, ManagementReportQuery.NumberOfAdsProvisioned);
+                Task<int> up2Aud = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfUpdateToAudit);
+                
+                Task<int> totCancel = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfCancel);
+                Task<int> totCam = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfLiveCampaign);
+                Task<int> totEmail = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfEmail);
+                Task<int> totFile = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTextFile);
+                Task<int> totline = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTextLine);
+                Task<int> totSMS = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfSMS);
+                Task<int> totPlays = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfPlay);
+                Task<int> totLess6Plays = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfPlayUnder6);
+
+
+                await Task.WhenAll(totUser, totrem, totads, up2Aud, totCancel, totCam, totEmail, totFile, totline, totSMS, totPlays,
+                                    totCost, totLess6Plays);
+
+                model.NumOfTotalUser = totUser.Result;
+                model.NumOfRemovedUser = totrem.Result;
+                model.NumberOfAdsProvisioned = totads.Result;
+                model.NumOfUpdateToAudit = up2Aud.Result;
+                model.NumOfCancel = totCancel.Result;
+                model.NumOfLiveCampaign = totCam.Result;
+                model.NumOfEmail = totEmail.Result;
+                model.NumOfTextFile = totFile.Result;
+                model.NumOfTextLine = totline.Result;
+                model.NumOfSMS = totSMS.Result;
+                model.NumOfPlay = totPlays.Result;
+                model.NumOfPlayUnder6secs = totLess6Plays.Result;
+                model.AveragePlaysPerUser = (double)totPlays.Result / (double)totUser.Result;
+                model.TotalCredit = totCost.Result.TotalCredit;
+                model.TotalSpend = totCost.Result.TotalSpend;
+
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "ManagementReportService",
+                    ProcedureName = "GetQueries"
+                };
+                _logging.LogError();
+                
+            }
+            return model;
+        }
+
+
+        public async Task<XLWorkbook> GenerateExcelReport(ManagementReportsSearch search)
+        {
+            
+            var wb = new XLWorkbook();
+
+            List<ManagementReportModel> mappingResult = new List<ManagementReportModel>();
+            ManagementReportModel model = new ManagementReportModel();
+
+            model = await GetManReports(search);
+            mappingResult.Add(model);
+
+            // Get defaults or real to show in report
+            search = SetDefaults(search);
+
+            string[] operatorArray = _reportDAL.GetOperatorNames(search).Result.ToList().ToArray();
+            //string[] operatorArray = ops.ToArray();
+            string operatorName = string.Join(", ", operatorArray);
+
+            string fromDate = "", toDate = "";
+            fromDate = search.DateFrom.ToString();
+            toDate = search.DateTo.ToString();
+
+
+            var ws = wb.Worksheets.Add("Management Report");
+            ws.Style.Font.FontSize = 9;
+            ws.Range("A1" + ":" + "N1").Merge().Value = "Management Report Data";
+            ws.Range("A1" + ":" + "N1").Style.Font.FontSize = 14;
+            ws.Range("A1" + ":" + "N1").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("A1" + ":" + "N1").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("A1" + ":" + "N1").Style.Font.Bold = true;
+            ws.Columns("A:M").Width = 25;
+
+            ws.Range("A2" + ":" + "B2").Merge().Value = "Operator";
+            ws.Range("A2" + ":" + "B2").Style.Font.FontSize = 12;
+            ws.Range("A2" + ":" + "B2").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("A2" + ":" + "B2").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("A2" + ":" + "B2").Style.Font.Bold = true;
+            ws.Columns("A:B").Width = 10;
+
+            ws.Range("C2" + ":" + "D2").Merge().Value = operatorName.ToString();
+            ws.Range("C2" + ":" + "D2").Style.Font.FontSize = 10;
+            ws.Range("C2" + ":" + "D2").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("C2" + ":" + "D2").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Columns("C:D").Width = 10;
+
+            ws.Range("A3" + ":" + "B3").Merge().Value = "Date";
+            ws.Range("A3" + ":" + "B3").Style.Font.FontSize = 12;
+            ws.Range("A3" + ":" + "B3").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("A3" + ":" + "B3").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("A3" + ":" + "B3").Style.Font.Bold = true;
+            ws.Columns("A:B").Width = 10;
+
+            ws.Range("C3" + ":" + "D3").Merge().Value = fromDate + " - " + toDate;
+            ws.Range("C3" + ":" + "D3").Style.Font.FontSize = 10;
+            ws.Range("C3" + ":" + "C3").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("C3" + ":" + "C3").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Columns("C:D").Width = 10;
+
+            ws.Range("A4" + ":" + "A5").Merge().Value = "Total Users";
+            ws.Range("A4" + ":" + "A5").Style.Font.FontSize = 12;
+            ws.Range("A4" + ":" + "A5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("A4" + ":" + "A5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("A4" + ":" + "A5").Style.Font.Bold = true;
+            ws.Column("A").Width = 15;
+
+            ws.Range("B4" + ":" + "B5").Merge().Value = "Removed Users";
+            ws.Range("B4" + ":" + "B5").Style.Font.FontSize = 12;
+            ws.Range("B4" + ":" + "B5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("B4" + ":" + "B5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("B4" + ":" + "B5").Style.Font.Bold = true;
+            ws.Column("B").Width = 18;
+
+            ws.Range("C4" + ":" + "C5").Merge().Value = "Plays";
+            ws.Range("C4" + ":" + "C5").Style.Font.FontSize = 12;
+            ws.Range("C4" + ":" + "C5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("C4" + ":" + "C5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("C4" + ":" + "C5").Style.Font.Bold = true;
+            ws.Column("C").Width = 10;
+
+            ws.Range("D4" + ":" + "D5").Merge().Value = "Plays (Under 6sec)";
+            ws.Range("D4" + ":" + "D5").Style.Font.FontSize = 12;
+            ws.Range("D4" + ":" + "D5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("D4" + ":" + "D5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("D4" + ":" + "D5").Style.Font.Bold = true;
+            ws.Column("D").Width = 20;
+
+            ws.Range("E4" + ":" + "E5").Merge().Value = "SMS";
+            ws.Range("E4" + ":" + "E5").Style.Font.FontSize = 12;
+            ws.Range("E4" + ":" + "E5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("E4" + ":" + "E5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("E4" + ":" + "E5").Style.Font.Bold = true;
+            ws.Column("E").Width = 10;
+
+            ws.Range("F4" + ":" + "F5").Merge().Value = "Email";
+            ws.Range("F4" + ":" + "F5").Style.Font.FontSize = 12;
+            ws.Range("F4" + ":" + "F5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("F4" + ":" + "F5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("F4" + ":" + "F5").Style.Font.Bold = true;
+            ws.Column("F").Width = 10;
+
+            ws.Range("G4" + ":" + "G5").Merge().Value = "Live Campaign";
+            ws.Range("G4" + ":" + "G5").Style.Font.FontSize = 12;
+            ws.Range("G4" + ":" + "G5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("G4" + ":" + "G5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("G4" + ":" + "G5").Style.Font.Bold = true;
+            ws.Column("G").Width = 18;
+
+            ws.Range("H4" + ":" + "H5").Merge().Value = "Ads provisioned";
+            ws.Range("H4" + ":" + "H5").Style.Font.FontSize = 12;
+            ws.Range("H4" + ":" + "H5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("H4" + ":" + "H5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("H4" + ":" + "H5").Style.Font.Bold = true;
+            ws.Column("H").Width = 20;
+
+            ws.Range("I4" + ":" + "I5").Merge().Value = "Total Spend (in GBP)";
+            ws.Range("I4" + ":" + "I5").Style.Font.FontSize = 12;
+            ws.Range("I4" + ":" + "I5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("I4" + ":" + "I5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("I4" + ":" + "I5").Style.Font.Bold = true;
+            ws.Column("I").Width = 25;
+
+            ws.Range("J4" + ":" + "J5").Merge().Value = "Total Credit (in GBP)";
+            ws.Range("J4" + ":" + "J5").Style.Font.FontSize = 12;
+            ws.Range("J4" + ":" + "J5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("J4" + ":" + "J5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("J4" + ":" + "J5").Style.Font.Bold = true;
+            ws.Column("J").Width = 25;
+
+            ws.Range("K4" + ":" + "K5").Merge().Value = "Total Cancel";
+            ws.Range("K4" + ":" + "K5").Style.Font.FontSize = 12;
+            ws.Range("K4" + ":" + "K5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("K4" + ":" + "K5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("K4" + ":" + "K5").Style.Font.Bold = true;
+            ws.Column("K").Width = 15;
+
+            ws.Range("L4" + ":" + "L5").Merge().Value = "Average Plays Per User";
+            ws.Range("L4" + ":" + "L5").Style.Font.FontSize = 12;
+            ws.Range("L4" + ":" + "L5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("L4" + ":" + "L5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("L4" + ":" + "L5").Style.Font.Bold = true;
+            ws.Column("L").Width = 25;
+
+            ws.Range("M4" + ":" + "M5").Merge().Value = "Text Files Processed";
+            ws.Range("M4" + ":" + "M5").Style.Font.FontSize = 12;
+            ws.Range("M4" + ":" + "M5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("M4" + ":" + "M5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("M4" + ":" + "M5").Style.Font.Bold = true;
+            ws.Column("M").Width = 25;
+
+            ws.Range("N4" + ":" + "N5").Merge().Value = "Text Lines Processed";
+            ws.Range("N4" + ":" + "N5").Style.Font.FontSize = 12;
+            ws.Range("N4" + ":" + "N5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            ws.Range("N4" + ":" + "N5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Range("N4" + ":" + "N5").Style.Font.Bold = true;
+            ws.Column("N").Width = 25;
+
+
+
+            int first = 5;
+            int last = first;
+            int excelrowno = first;
+            if (mappingResult.Count() > 0)
+            {
+                for (int i = 0; i < mappingResult.Count(); i++)
+                {
+                    excelrowno += 1;
+                    int j = excelrowno;
+
+                    ws.Cell("A" + j.ToString()).Value = mappingResult[i].NumOfTotalUser.ToString();
+                    ws.Cell("B" + j.ToString()).Value = mappingResult[i].NumOfRemovedUser.ToString();
+                    ws.Cell("C" + j.ToString()).Value = mappingResult[i].NumOfPlay.ToString();
+                    ws.Cell("D" + j.ToString()).Value = mappingResult[i].NumOfPlayUnder6secs.ToString();
+                    ws.Cell("E" + j.ToString()).Value = mappingResult[i].NumOfSMS.ToString();
+                    ws.Cell("F" + j.ToString()).Value = mappingResult[i].NumOfEmail.ToString();
+                    ws.Cell("G" + j.ToString()).Value = mappingResult[i].NumOfLiveCampaign.ToString();
+                    ws.Cell("H" + j.ToString()).Value = mappingResult[i].NumberOfAdsProvisioned.ToString();
+                    ws.Cell("I" + j.ToString()).Value = mappingResult[i].TotalSpend.ToString("N");
+                    ws.Cell("J" + j.ToString()).Value = mappingResult[i].TotalCredit.ToString("N");
+                    ws.Cell("K" + j.ToString()).Value = mappingResult[i].NumOfCancel.ToString();
+                    ws.Cell("L" + j.ToString()).Value = mappingResult[i].AveragePlaysPerUser.ToString();
+                    ws.Cell("M" + j.ToString()).Value = mappingResult[i].NumOfTextFile.ToString();
+                    ws.Cell("N" + j.ToString()).Value = mappingResult[i].NumOfUpdateToAudit.ToString();
+                }
+            }
+
+            return wb;
+        }
+
+
         public class CurrencyListing
         {
             public string CurrencyCode { get; set; }
@@ -127,7 +345,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        private List<CurrencyListing> GetConvertedCurrency(List<SpendCredit> creditList)
+        private async Task<List<CurrencyListing>> GetConvertedCurrency(List<SpendCredit> creditList)
         {
             string toCurrencyCode = "GBP";
             var currency = creditList.Select(y => y.CurrencyCode).Distinct().ToList();
@@ -157,13 +375,13 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        private TotalCostCredit CalculateSearchData(List<SpendCredit> creditList)
+        private async Task<TotalCostCredit> CalculateConvertedSpendCredit(List<SpendCredit> creditList)
         {
             TotalCostCredit campaignAudit = new TotalCostCredit();
 
             if (creditList.Count > 0)
             {
-                var currencyConv = GetConvertedCurrency(creditList);
+                var currencyConv = await GetConvertedCurrency(creditList);
 
                 foreach (var campaignAuditItem in creditList)
                 {

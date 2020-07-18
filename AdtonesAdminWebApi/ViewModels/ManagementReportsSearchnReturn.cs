@@ -38,7 +38,9 @@ namespace AdtonesAdminWebApi.ViewModels
         public double TotalCredit { get; set; }
         public int NumOfCancel { get; set; }
 
-        public int AveragePlaysPerUser { get; set; }
+        public int NumOfPlayUnder6secs { get; set; }
+
+        public double AveragePlaysPerUser { get; set; }
     }
 
     public class TotalCostCredit

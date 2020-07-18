@@ -45,6 +45,37 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<IEnumerable<int>> GetAllOperators()
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.Query<int>(ManagementReportQuery.GetAllOperators));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<string>> GetOperatorNames(ManagementReportsSearch search)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.Query<string>(ManagementReportQuery.GetOperatorNameById, new
+                                {
+                                    operators = search.operators.ToArray()
+                                }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<IEnumerable<SpendCredit>> GetTotalCreditCost(ManagementReportsSearch search, string query)
         {
             try

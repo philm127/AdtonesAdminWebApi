@@ -14,15 +14,13 @@ namespace AdtonesAdminWebApi.Controllers
     {
         private readonly IAdvertService _advertService;
         private readonly ICampaignService _campService;
-        private readonly ICampaignAuditService _auditService;
         private readonly IPromotionalCampaignService _promoService;
 
-        public CampaignController(IAdvertService advertService, ICampaignService campService, ICampaignAuditService auditService,
+        public CampaignController(IAdvertService advertService, ICampaignService campService,
             IPromotionalCampaignService promoService)
         {
             _advertService = advertService;
             _campService = campService;
-            _auditService = auditService;
             _promoService = promoService;
         }
 
@@ -103,50 +101,6 @@ namespace AdtonesAdminWebApi.Controllers
 
 
         #endregion
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>body contains List CampaignAdminResult</returns>
-        [HttpGet("v1/GetDashboardSummaryByOperator/{id}")]
-        public async Task<ReturnResult> GetDashboardSummaryByOperator(int id = 0)
-        {
-            return await _auditService.GetDashboardSummariesByOperator(id);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>body contains List CampaignAdminResult</returns>
-        [HttpGet("v1/GetDashboardSummaryByCampaign/{id}")]
-        public async Task<ReturnResult> GetDashboardSummaryByCampaign(int id = 0)
-        {
-            return await _auditService.GetCampaignDashboardSummariesOperatorByCampaign(id);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>body contains List CampaignAdminResult</returns>
-        [HttpGet("v1/GetPromoDashboardSummary/{id}")]
-        public async Task<ReturnResult> GetPromoDashboardSummary(int id = 0)
-        {
-            return await _auditService.GetPromoCampaignDashboardSummary(id);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>body contains List CampaignAdminResult</returns>
-        [HttpPut("v1/GetPlayDetailsForOperatorByCampaign")]
-        public async Task<ReturnResult> GetPlayDetailsForOperatorByCampaign(PagingSearchClass paging)
-        {
-            return await _auditService.GetPlayDetailsForOperatorByCampaign(paging);
-        }
 
 
     }

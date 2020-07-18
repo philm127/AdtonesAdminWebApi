@@ -46,6 +46,12 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                             WHERE ca.Status= 'played' AND ca.PlayLengthTicks > 6000
                                             AND AddedDate>=@start AND AddedDate<=@end AND OperatorId IN @operators;";
 
+        public static string NumOfPlayUnder6 => @"SELECT COUNT(CampaignAuditId) AS NumOfPlay FROM CampaignAudit AS ca
+                                            INNER JOIN CampaignProfile AS cp ON ca.CampaignProfileId=cp.CampaignProfileId
+                                            INNER JOIN Operators AS op ON op.CountryId=cp.CountryId
+                                            WHERE ca.Status= 'played' AND ca.PlayLengthTicks <= 6000
+                                            AND AddedDate>=@start AND AddedDate<=@end AND OperatorId IN @operators;";
+
 
         public static string NumOfSMS => @"SELECT COUNT(CampaignAuditId) AS NumOfSMS FROM CampaignAudit AS ca
                                             INNER JOIN CampaignProfile AS cp ON ca.CampaignProfileId=cp.CampaignProfileId
@@ -74,6 +80,12 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string NumberOfAdsProvisioned => @"SELECT COUNT(Advertid) AS NumberOfAdsProvisioned 
                                                         FROM Advert AS ad WHERE CreatedDateTime>=@start AND CreatedDateTime<=@end 
                                                         AND OperatorId IN @operators;";
+
+
+        public static string GetAllOperators => @"SELECT OperatorId FROM Operators;";
+
+
+        public static string GetOperatorNameById => @"SELECT OperatorName FROM Operators WHERE OperatorId IN @operators;";
 
     }
 }
