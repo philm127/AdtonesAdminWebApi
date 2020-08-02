@@ -99,6 +99,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(PromotionalCampaignQuery.GetPromoCampaignResultSet);
+            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             try
             {
 
@@ -129,7 +130,7 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> AddPromotionalCampaignToOperator(PromotionalCampaignResult model)
         {
-            var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorID);
+            var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
             try
             {
 
@@ -166,7 +167,7 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> AddPromotionalAdvertToOperator(PromotionalCampaignResult model)
         {
-            var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorID);
+            var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(PromotionalCampaignQuery.AddPromoAdvert);
             try

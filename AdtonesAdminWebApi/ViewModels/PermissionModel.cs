@@ -26,5 +26,6 @@ namespace AdtonesAdminWebApi.ViewModels
         public string type { get; set; }
         public string route { get; set; }
         public string description { get; set; }
+        public int[] arrayId { get; set; }
     }
 }

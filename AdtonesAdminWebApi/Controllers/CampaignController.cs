@@ -40,6 +40,19 @@ namespace AdtonesAdminWebApi.Controllers
 
 
         /// <summary>
+        /// The optional id refers to the selection made from advertisers screen
+        /// so later will use status to only return unapproved.
+        /// Otherwise all adverts returned
+        /// </summary>
+        /// <returns>body contains List UserAdvertResult</returns>
+        [HttpGet("v1/GetAdvertListById/{id}")]
+        public async Task<ReturnResult> GetAdvertListById(int id = 0)
+        {
+            return await _advertService.LoadAdvertDataTableById(id);
+        }
+
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns>body contains List UserAdvertResult</returns>
@@ -72,6 +85,50 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains empty result</returns>
+        [HttpPut("v1/DeleteAdvertCategory")]
+        public async Task<ReturnResult> DeleteAdvertCategory(IdCollectionViewModel model)
+        {
+            return await _advertService.DeleteAdvertCategory(model);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains empty result</returns>
+        [HttpPut("v1/UpdateAdvertCategory")]
+        public async Task<ReturnResult> UpdateAdvertCategory(AdvertCategoryResult model)
+        {
+            return await _advertService.UpdateAdvertCategory(model);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains empty result</returns>
+        [HttpGet("v1/GetAdvertCategoryDetails/{id}")]
+        public async Task<ReturnResult> GetAdvertCategoryDetails(int id)
+        {
+            return await _advertService.GetAdvertCategoryDetails(id);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains empty result</returns>
+        [HttpPost("v1/AddAdvertCategory")]
+        public async Task<ReturnResult> AddAdvertCategory(AdvertCategoryResult model)
+        {
+            return await _advertService.AddAdvertCategory(model);
+        }
+
+
         #endregion
 
 
@@ -82,10 +139,32 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains List CampaignCreditResult</returns>
-        [HttpGet("v1/GetCampaignCreditDataTable")]
-        public async Task<ReturnResult> GetCampaignCreditDataTable()
+        [HttpGet("v1/GetCampaignCreditDataTable/{id}")]
+        public async Task<ReturnResult> GetCampaignCreditDataTable(int id=0)
         {
-            return await _campService.LoadCampaignCreditDataTable();
+            return await _campService.LoadCampaignCreditDataTable(id);
+        }
+        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains empty result</returns>
+        [HttpPut("v1/UpdateCampaignCredit")]
+        public async Task<ReturnResult> UpdateCampaignCredit(CampaignCreditResult model)
+        {
+            return await _campService.UpdateCampaignCredit(model);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains empty result</returns>
+        [HttpPost("v1/InsertCampaignCredit")]
+        public async Task<ReturnResult> InsertCampaignCredit(CampaignCreditResult model)
+        {
+            return await _campService.AddCampaignCredit(model);
         }
 
 
@@ -97,6 +176,17 @@ namespace AdtonesAdminWebApi.Controllers
         public async Task<ReturnResult> GetCampaignDataTable(int id=0)
         {
             return await _campService.LoadCampaignDataTable(id);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List CampaignAdminResult</returns>
+        [HttpGet("v1/GetCampaignDataTableByCampId/{id}")]
+        public async Task<ReturnResult> GetCampaignDataTableByCampId(int id)
+        {
+            return await _campService.LoadCampaignDataTableById(id);
         }
 
 

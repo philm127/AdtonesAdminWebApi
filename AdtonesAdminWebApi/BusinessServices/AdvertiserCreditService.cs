@@ -28,55 +28,23 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        /// <summary>
-        /// Populates the datatable
-        /// </summary>
-        /// <returns></returns>
-        public async Task<ReturnResult> LoadDataTable()
+       
+
+        public async Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _usercredit)
         {
             try
             {
-                result.body = await _userDAL.LoadUserCreditResultSet();
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserCreditService",
-                    ProcedureName = "GetUserResult"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _creditmodel)
-        {
-            try
-            {
-                UsersCreditFormModel _usercredit = new UsersCreditFormModel();
-                _usercredit.UserId = _creditmodel.UserId;
-                _usercredit.AssignCredit = _creditmodel.AssignCredit;
-                _usercredit.AvailableCredit = _creditmodel.AssignCredit;
-                _usercredit.UpdatedDate = DateTime.Now;
-                _usercredit.CurrencyId = _creditmodel.CurrencyId;
-
                 int x = 0;
 
                 var query = string.Empty;
-                if (_creditmodel.Id == 0)
+                if (await _userDAL.CheckUserCreditExist(_usercredit.UserId))
                 {
-                    _usercredit.AvailableCredit = 
                     x = await _userDAL.AddUserCredit(_usercredit);
                 }
                 else
                 {
-                    var available = await CalculateNewCredit(_creditmodel.UserId);
-                    _usercredit.AvailableCredit = _creditmodel.AssignCredit + available;
+                    var available = await CalculateNewCredit(_usercredit.UserId);
+                    _usercredit.AvailableCredit = _usercredit.AssignCredit + available;
                     x = await _userDAL.UpdateUserCredit(_usercredit);
                 }
 
@@ -93,7 +61,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UsersCreditService",
+                    PageName = "AdvertisersCreditService",
                     ProcedureName = "AddCredit"
                 };
                 _logging.LogError();
@@ -126,7 +94,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UsersCreditService",
+                    PageName = "AdvertisersCreditService",
                     ProcedureName = "CreditDetails"
                 };
                 _logging.LogError();
@@ -196,7 +164,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UsersCreditService",
+                    PageName = "AdvertisersCreditService",
                     ProcedureName = "CalculateNewCredit"
                 };
                 _logging.LogError();
@@ -207,28 +175,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        #region Long SQL Queries
-        private string UserResultQuery()
-        {
-            return @"SELECT u.Id,u.UserId,usrs.Email,usrs.FullName,usrs.Organisation,u.CreatedDate,
-             u.AssignCredit AS Credit,u.AvailableCredit,ISNULL(bil.FundAmount,0) AS TotalUsed,ISNULL(pay.Amount,0) AS TotalPaid,
-             (ISNULL(bil.FundAmount,0) - ISNULL(pay.Amount,0)) AS RemainingAmount,ctry.Name AS CountryName
-             FROM UsersCredit AS u
-             LEFT JOIN 
-             (SELECT UserId,SUM(FundAmount) AS FundAmount FROM Billing WHERE PaymentMethodId=1 GROUP BY UserId) bil
-             ON u.UserId=bil.UserId
-             LEFT JOIN
-             (SELECT UserId,SUM(Amount) AS Amount from UsersCreditPayment GROUP BY UserId) pay
-             ON u.UserId=pay.UserId
-             LEFT JOIN
-             (SELECT UserId,Email,CONCAT(FirstName,' ',LastName) AS FullName,Organisation FROM Users) usrs
-             ON usrs.UserId=u.UserId
-            LEFT JOIN Currencies AS cur ON u.CurrencyId=cur.CurrencyId
-            LEFT JOIN Country AS ctry ON ctry.Id=cur.CountryId
-             ORDER BY u.Id DESC;";
-        }
-
-        #endregion
 
         #region Not sure about wait on design decisiones TODO:
 
@@ -251,7 +197,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         //        {
         //            ErrorMessage = ex.Message.ToString(),
         //            StackTrace = ex.StackTrace.ToString(),
-        //            PageName = "UsersCreditService",
+        //            PageName = "AdvertisersCreditService",
         //            ProcedureName = "UserCreditPayment"
         //        };
         //        _logging.LogError();
@@ -286,7 +232,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         //        {
         //            ErrorMessage = ex.Message.ToString(),
         //            StackTrace = ex.StackTrace.ToString(),
-        //            PageName = "UsersCreditService",
+        //            PageName = "AdvertisersCreditService",
         //            ProcedureName = "GetCreditDetailsUsersList"
         //        };
         //        _logging.LogError();

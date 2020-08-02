@@ -12,5 +12,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> GetReward(int id);
         Task<ReturnResult> AddReward(RewardResult model);
         Task<ReturnResult> UpdateReward(RewardResult model);
+        Task<ReturnResult> DeleteReward(int id);
     }
 }

@@ -115,7 +115,7 @@ namespace AdtonesAdminWebApi.Services
                 var mediaFile = model.AdvertLocation;
                 if (!string.IsNullOrEmpty(mediaFile))
                 {
-                    FtpDetailsModel getFTPdetails = await _advertDAL.GetFtpDetails(model.OperatorID);
+                    FtpDetailsModel getFTPdetails = await _advertDAL.GetFtpDetails(model.OperatorId);
 
                     if (getFTPdetails != null)
                     {

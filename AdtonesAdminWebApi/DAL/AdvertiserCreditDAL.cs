@@ -1,42 +1,29 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
+using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
+using DocumentFormat.OpenXml.Office2010.Drawing;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL
 {
 
 
-    public class AdvertiserCreditDAL : IAdvertiserCreditDAL
+    public class AdvertiserCreditDAL : BaseDAL, IAdvertiserCreditDAL
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connStr;
-        private readonly IExecutionCommand _executers;
 
-        public AdvertiserCreditDAL(IConfiguration configuration, IExecutionCommand executers)
-        {
-            _configuration = configuration;
-            _connStr = _configuration.GetConnectionString("DefaultConnection");
-            _executers = executers;
-        }
+        public AdvertiserCreditDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService) 
+            : base(configuration, executers, connService)
+        { }
 
 
-        public async Task<IEnumerable<AdvertiserCreditResult>> LoadUserCreditResultSet()
-        {
-            try
-            {
-
-                return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.Query<AdvertiserCreditResult>(AdvertiserCreditQuery.LoadUserCreditDataTable));
-            }
-            catch
-            {
-                throw;
-            }
-        }
+        
 
 
         public async Task<int> AddUserCredit(AdvertiserCreditFormModel _creditmodel)
@@ -59,6 +46,21 @@ namespace AdtonesAdminWebApi.DAL
             {
                 return await _executers.ExecuteCommand(_connStr,
                              conn => conn.ExecuteScalar<int>(AdvertiserCreditQuery.UpdateUserCredit, _creditmodel));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<bool> CheckUserCreditExist(int userId)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<bool>(AdvertiserCreditQuery.CheckIfUserExists,
+                                                                    new {userId = userId}));
             }
             catch
             {
@@ -112,6 +114,6 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
-
+        
     }
 }

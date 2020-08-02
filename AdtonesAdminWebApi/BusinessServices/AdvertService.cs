@@ -77,6 +77,33 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        /// <summary>
+        /// Gets a single Advert as Result list when clicked through from Campaign Page.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ReturnResult> LoadAdvertDataTableById(int id = 0)
+        {
+            try
+            {
+                result.body = await _advertDAL.GetAdvertResultSetById(id);
+
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "LoadAdvertDataTable"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
         public async Task<ReturnResult> LoadAdvertDetails(int id = 0)
         {
             try
@@ -114,6 +141,95 @@ namespace AdtonesAdminWebApi.BusinessServices
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "AdvertService",
                     ProcedureName = "LoadAdvertCategoryDataTable"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> DeleteAdvertCategory(IdCollectionViewModel model)
+        {
+            try
+            {
+                result.body = await _advertDAL.RemoveAdvertCategory(model);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "DeleteAdvertCategory"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> UpdateAdvertCategory(AdvertCategoryResult model)
+        {
+            try
+            {
+                result.body = await _advertDAL.UpdateAdvertCategory(model);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "UpdateAdvertCategory"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> GetAdvertCategoryDetails(int id)
+        {
+            try
+            {
+                result.body = await _advertDAL.GetAdvertCategoryDetails(id);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "GetAdvertCategoryDetails"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> AddAdvertCategory(AdvertCategoryResult model)
+        {
+            try
+            {
+                var catId = await _advertDAL.InsertAdvertCategory(model);
+                result.body = await _advertDAL.InsertAdvertCategoryOperator(model,catId);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "AddAdvertCategory"
                 };
                 _logging.LogError();
                 result.result = 0;

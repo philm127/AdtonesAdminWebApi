@@ -38,13 +38,26 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns>body contains SystemConfigResult</returns>
-        [HttpGet("v1/GetSystemConfig")]
-        public async Task<ReturnResult> GetSystemConfig(IdCollectionViewModel model)
+        [HttpGet("v1/GetSystemConfig/{id}")]
+        public async Task<ReturnResult> GetSystemConfig(int id)
         {
-            return await _configService.GetSystemConfig(model.id);
+            return await _configService.GetSystemConfig(id);
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>body contains SystemConfigResult</returns>
+        [HttpGet("v1/GetConfigTypeList")]
+        public async Task<ReturnResult> GetConfigTypeList()
+        {
+            return _configService.GetSystemConfigType();
+        }
+
+
+        
         /// <summary>
         /// 
         /// </summary>
@@ -54,6 +67,13 @@ namespace AdtonesAdminWebApi.Controllers
         public async Task<ReturnResult> AddSystemConfig(SystemConfigResult model)
         {
             return await _configService.AddSystemConfig(model);
+        }
+
+
+        [HttpDelete("v1/DeleteSystemConfig/{id}")]
+        public async Task<ReturnResult> DeleteSystemConfig(int id)
+        {
+            return await _configService.DeleteSystemConfig(id);
         }
 
 
@@ -90,10 +110,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns>body contains RewardResult</returns>
-        [HttpGet("v1/GetReward")]
-        public async Task<ReturnResult> GetReward(IdCollectionViewModel model)
+        [HttpGet("v1/GetReward/{id}")]
+        public async Task<ReturnResult> GetReward(int id)
         {
-            return await _rewardService.GetReward(model.id);
+            return await _rewardService.GetReward(id);
         }
 
 
@@ -120,7 +140,11 @@ namespace AdtonesAdminWebApi.Controllers
             return await _rewardService.UpdateReward(model);
         }
 
-
+        [HttpDelete("v1/DeleteReward/{id}")]
+        public async Task<ReturnResult> DeleteReward(int id)
+        {
+            return await _rewardService.DeleteReward(id);
+        }
 
         #endregion
     }

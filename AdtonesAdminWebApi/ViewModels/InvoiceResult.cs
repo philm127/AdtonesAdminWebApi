@@ -6,35 +6,46 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.ViewModels
 {
-    public class InvoiceResult
+    public class InvoiceBase
     {
-        public int ID { get; set; }
-        public string InvoiceNumber { get; set; }
-        public string PONumber { get; set; }
-
         public int UserId { get; set; }
-
+        public int BillingId { get; set; }
+        public string InvoiceNumber { get; set; }
         public string FullName { get; set; }
         public string Organisation { get; set; }
         public string Email { get; set; }
-        public int ClientId { get; set; }
         public string ClientName { get; set; }
-        public int CampaignId { get; set; }
         public string CampaignName { get; set; }
-        // Invoice Date.
+        public int CampaignProfileId { get; set; }
         public string CreatedDate { get; set; }
+        public int Status { get; set; }
+        public string Description { get; set; }
 
+    }
+    
+    public class InvoiceResult : InvoiceBase
+    {
+        
+        public string PONumber { get; set; }
+       
         public decimal InvoiceTotal { get; set; }
         // public int Status { get; set; }
-        public int Status { get; set; }
+       
         public string rStatus { get; set; }
 
         public string SettledDate { get; set; }
 
         public string PaymentMethod { get; set; }
 
-        public int PaymentMethodId { get; set; }
+        public int UsersCreditPaymentId { get; set; }
 
-        public int UsersCreditPaymentID { get; set; }
+    }
+
+    public class OutstandingInvoiceResult : InvoiceBase
+    {
+        public decimal PaidAmount { get; set; }
+        public decimal CreditAmount { get; set; }
+        public decimal OutstandingAmount { get; set; }
+        
     }
 }

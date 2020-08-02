@@ -7,8 +7,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
     public static class PromotionalCampaignQuery
     {
         
-        public static string GetPromoCampaignResultSet =>  @"SELECT promo.ID,promo.OperatorID,op.OperatorName,promo.CampaignName,promo.BatchID,MaxDaily,MaxWeekly,
-                                                    promo.AdvertLocation,promo.Status,pa.AdvertName,
+        public static string GetPromoCampaignResultSet => @"SELECT promo.ID,promo.OperatorID AS OperatorId,op.OperatorName,promo.CampaignName,promo.BatchID,MaxDaily,MaxWeekly,
+                                                    CASE WHEN promo.AdvertLocation IS NULL THEN promo.AdvertLocation 
+                                                    ELSE CONCAT(@siteAddress,promo.AdvertLocation) END AS AdvertLocation,
+                                                    promo.Status,pa.AdvertName,
                                                     CASE WHEN promo.Status=1 THEN 'Play' ELSE 'Stop' END AS rStatus
                                                     FROM PromotionalCampaigns AS promo 
                                                     LEFT JOIN PromotionalAdverts AS pa ON pa.CampaignID=promo.ID
@@ -40,7 +42,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string AddPromoCampaign => @"INSERT INTO PromotionalCampaigns(OperatorID,CampaignName,BatchID,MaxDaily,MaxWeekly,AdvertLocation,
                                             Status,AdtoneServerPromotionalCampaignId)
-                                            VALUES(@OperatorID,@CampaignName,@BatchID,@MaxDaily,@MaxWeekly,@AdvertLocation,
+                                            VALUES(@OperatorId,@CampaignName,@BatchID,@MaxDaily,@MaxWeekly,@AdvertLocation,
                                             @Status,@AdtoneServerPromotionalCampaignId);
                                             SELECT CAST(SCOPE_IDENTITY() AS INT);";
 

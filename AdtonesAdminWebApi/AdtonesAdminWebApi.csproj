@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -30,15 +30,40 @@
     <Compile Remove="Controllers\AreaController.cs" />
     <Compile Remove="Controllers\RewardController.cs" />
     <Compile Remove="Controllers\WeatherForecastController.cs" />
+    <Compile Remove="Model\CampaignProfile.cs" />
     <Compile Remove="OperatorSpecific\ExpressoPromotionalCampaign.cs" />
     <Compile Remove="Services\AuthenticationExtension.cs" />
     <Compile Remove="Services\ExpressoOperators.cs" />
+    <Compile Remove="Services\GeneralPemissionAssignment.cs" />
     <Compile Remove="Services\PromotionalUserStatus.cs" />
     <Compile Remove="Model\UsersModel.cs" />
+    <Compile Remove="ViewModels\AdvertCategoryResult.cs" />
+    <Compile Remove="ViewModels\AdvertiserCreditFormModel.cs" />
+    <Compile Remove="ViewModels\AdvertiserCreditPaymentFormModel.cs" />
+    <Compile Remove="ViewModels\AdvertiserCreditPaymentResult.cs" />
+    <Compile Remove="ViewModels\AdvertiserCreditResult.cs" />
+    <Compile Remove="ViewModels\AdvertiserCreditSharedListsModel.cs" />
+    <Compile Remove="ViewModels\AreaResult.cs" />
+    <Compile Remove="ViewModels\CampaignAdminResult.cs" />
+    <Compile Remove="ViewModels\CampaignAdverts.cs" />
+    <Compile Remove="ViewModels\CampaignCreditResult.cs" />
+    <Compile Remove="ViewModels\OperatorConfigurationResult.cs" />
+    <Compile Remove="ViewModels\OperatorFormModel.cs" />
+    <Compile Remove="ViewModels\OperatorMaxAdvertsFormModel.cs" />
+    <Compile Remove="ViewModels\OperatorResult.cs" />
+    <Compile Remove="ViewModels\ProfileMatchLabelFormModel.cs" />
+    <Compile Remove="ViewModels\PromotionalCampaignResult.cs" />
+    <Compile Remove="ViewModels\PromotionalUserFormModel.cs" />
+    <Compile Remove="ViewModels\UserAdvertResult.cs" />
     <Compile Remove="WeatherForecast.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="DAL\BaseDAL.cs" />
+    <Compile Include="DAL\AdvertiserPaymentDAL.cs" />
+    <Compile Include="DAL\Interfaces\IFinanceTablesDAL.cs" />
+    <Compile Include="DAL\Interfaces\IAdvertiserPaymentDAL.cs" />
+    <Compile Include="DAL\FinanceTablesDAL.cs" />
     <Compile Include="DAL\Interfaces\IManagementReportDAL.cs" />
     <Compile Include="DAL\Interfaces\IPermissionManagementDAL.cs" />
     <Compile Include="DAL\ManagementReportDAL.cs" />
@@ -46,6 +71,8 @@
     <Compile Include="DAL\Interfaces\IAdvertiserCreditDAL.cs" />
     <Compile Include="DAL\Interfaces\IPromotionalCampaignDAL.cs" />
     <Compile Include="DAL\PomotionalCampaignDAL.cs" />
+    <Compile Include="DAL\Queries\AdvertiserPaymentQuery.cs" />
+    <Compile Include="DAL\Queries\FinancialTablesQuery.cs" />
     <Compile Include="DAL\Queries\ManagementReportQuery.cs" />
     <Compile Include="DAL\Queries\PermissionManagementQuery.cs" />
     <Compile Include="DAL\Queries\PromotionalCampaignQuery.cs" />

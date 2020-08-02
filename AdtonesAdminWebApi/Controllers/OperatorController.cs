@@ -40,10 +40,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains OperatorConfigurationResult</returns>
-        [HttpGet("v1/GetOperatorConfig")]
-        public async Task<ReturnResult> GetOperatorConfig(IdCollectionViewModel model)
+        [HttpGet("v1/GetOperatorConfig/{id}")]
+        public async Task<ReturnResult> GetOperatorConfig(int id)
         {
-            return await _operatorConfigService.GetOperatorConfig(model.id);
+            return await _operatorConfigService.GetOperatorConfig(id);
         }
 
 
@@ -99,10 +99,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains OperatorFormModel</returns>
-        [HttpGet("v1/GetOperator")]
-        public async Task<ReturnResult> GetOperator(IdCollectionViewModel model)
+        [HttpGet("v1/GetOperator/{id}")]
+        public async Task<ReturnResult> GetOperator(int id)
         {
-            return await _operatorService.GetOperator(model.id);
+            return await _operatorService.GetOperator(id);
         }
 
 
@@ -145,10 +145,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains OperatorMaxAdvertsFormModel</returns>
-        [HttpGet("v1/GetOperatorMaxAdvert")]
-        public async Task<ReturnResult> GetOperatorMaxAdvert(IdCollectionViewModel model)
+        [HttpGet("v1/GetOperatorMaxAdvert/{id}")]
+        public async Task<ReturnResult> GetOperatorMaxAdvert(int id)
         {
-            return await _operatorService.GetOperatorMaxAdvert(model.id);
+            return await _operatorService.GetOperatorMaxAdvert(id);
         }
 
 

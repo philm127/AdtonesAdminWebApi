@@ -10,8 +10,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
     {
         //,LastPasswordChangedDate,LockOutTime,
         public static string LoginUser => @"SELECT UserId,RoleId,Email,FirstName,LastName,PasswordHash,Activated,OperatorId, 
-                                    Organisation, DateCreated, VerificationStatus,Permissions,LastPasswordChangedDate,LockOutTime
-                                    FROM Users WHERE LOWER(Email)=@email AND Activated !=3;";
+                                    Organisation, DateCreated, VerificationStatus,LastPasswordChangedDate,LockOutTime
+                                    FROM Users WHERE LOWER(Email)=@email AND Activated !=3;"; //Permissions,
 
 
         public static string UpdateLockout => @"UPDATE Users SET Activated=@activated, LockOutTime=@lockOutTime WHERE;";

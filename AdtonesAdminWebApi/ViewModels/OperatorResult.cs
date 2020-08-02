@@ -17,6 +17,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public decimal EmailCost { get; set; }
         public decimal SmsCost { get; set; }
         public string Currency { get; set; }
+        public int CurrencyId { get; set; }
     }
 
 }

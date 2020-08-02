@@ -16,12 +16,12 @@ namespace AdtonesAdminWebApi.Controllers
     public class FinancialsController : ControllerBase
     {
 
-        private readonly IInvoiceService _invoiceService;
-        private readonly IUserPaymentService _paymentService;
+        private readonly IFinanceTablesService _invoiceService;
+        private readonly IAdvertiserPaymentService _paymentService;
         private readonly IAdvertiserCreditService _creditService;
 
 
-        public FinancialsController(IInvoiceService invoiceService, IUserPaymentService paymentService, IAdvertiserCreditService creditService)
+        public FinancialsController(IFinanceTablesService invoiceService, IAdvertiserPaymentService paymentService, IAdvertiserCreditService creditService)
         {
             _invoiceService = invoiceService;
             _paymentService = paymentService;
@@ -48,7 +48,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/SendInvoice")]
         public async Task<ReturnResult> SendInvoice(IdCollectionViewModel model)
         {
-            return await _invoiceService.SendInvoice(model);
+            return await _paymentService.SendInvoice(model);
         }
 
 
@@ -59,30 +59,9 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetOutstandingInvoiceData")]
         public async Task<ReturnResult> GetOutstandingInvoiceData()
         {
-            return await _paymentService.LoadPaymentDataTable();
+            return await _invoiceService.LoadOutstandingInvoiceDataTable();
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>body contains List SharedSelectListViewModel</returns>
-        [HttpGet("v1/FillCampaignDropdown")]
-        public async Task<ReturnResult> FillCampaignDropdown()
-        {
-            return await _paymentService.FillCampaignDropdown();
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>body contains List SharedSelectListViewModel</returns>
-        [HttpGet("v1/FillUserPaymentDropdown")]
-        public async Task<ReturnResult> FillUserPaymentDropdown()
-        {
-            return await _paymentService.FillUserPaymentDropdown();
-        }
 
 
         /// <summary>
@@ -115,7 +94,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// <param name="model"></param>
         /// <returns>body contains success message</returns>
         [HttpPost("v1/ReceivePayment")]
-        public async Task<ReturnResult> ReceivePayment(AdvertiserCreditPaymentFormModel model)
+        public async Task<ReturnResult> ReceivePayment(AdvertiserCreditFormModel model)
         {
             return await _paymentService.ReceivePayment(model);
         }
@@ -128,7 +107,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetCreditData")]
         public async Task<ReturnResult> GetCreditData()
         {
-            var tst = await _creditService.LoadDataTable();
+            var tst = await _invoiceService.LoadUserCreditDataTable();
             return tst;
         }
 

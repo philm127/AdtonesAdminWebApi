@@ -48,8 +48,8 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IAreaService, AreaService>();
             services.AddScoped<IProfileMatchInfoService, ProfileMatchInfoService>();
             services.AddScoped<ICountryService, CountryService>();
-            services.AddScoped<IInvoiceService, InvoiceService>();
-            services.AddScoped<IUserPaymentService, UserPaymentService>();
+            services.AddScoped<IFinanceTablesService, FinanceTablesService>();
+            services.AddScoped<IAdvertiserPaymentService, AdvertiserPaymentService>();
             services.AddScoped<IUserDashboardService, UserDashboardService>();
             services.AddScoped<IOperatorConfigService, OperatorConfigService>();
             services.AddScoped<IOperatorService, OperatorService>();
@@ -84,8 +84,10 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ICampaignAuditDAL, CampaignAuditDAL>();
             services.AddScoped<ICurrencyDAL, CurrencyDAL>();
             services.AddScoped<IAdvertiserCreditDAL, AdvertiserCreditDAL>();
+            services.AddScoped<IAdvertiserPaymentDAL, AdvertiserPaymentDAL>();
             services.AddScoped<IPermissionManagementDAL, PermissionManagementDAL>();
             services.AddScoped<IManagementReportDAL, ManagementReportDAL>();
+            services.AddScoped<IFinanceTablesDAL, FinanceTablesDAL>();
 
             #endregion
 
@@ -102,6 +104,7 @@ namespace AdtonesAdminWebApi
             services.AddTransient<ILiveAgentService, LiveAgentService>();
             services.AddTransient<ISoapApiService, SoapApiService>();
             services.AddTransient<ISendEmailMailer, SendEmailMailer>();
+            // services.AddTransient<IGeneralPemissionAssignment, GeneralPemissionAssignment> ();
 
             // Client Specific Services
             services.AddScoped<IExpressoProcessPromoUser, ExpressoProcessPromoUser>();

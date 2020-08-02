@@ -225,17 +225,17 @@ namespace AdtonesAdminWebApi.BusinessServices
             var usercreditlist = new AdvertiserCreditSharedListsModel();
             try
             {
-                Task<ReturnResult> users = GetUserCreditList();
-                Task<ReturnResult> country = GetCountryList();
-                Task<ReturnResult> currency = GetCurrencyList();
-                Task<ReturnResult> addUser = GetAddCreditUsersList();
+                Task<IEnumerable<SharedSelectListViewModel>> userCL = _sharedDal.GetCreditUsers();
+                Task<IEnumerable<SharedSelectListViewModel>> countryL = _sharedDal.GetCountry();
+                Task<IEnumerable<SharedSelectListViewModel>> currencyL = _sharedDal.GetCurrency(0);
+                Task<IEnumerable<SharedSelectListViewModel>> addUserCL = _sharedDal.AddCreditUsers();
 
-                await Task.WhenAll(users, country, currency, addUser);
+                await Task.WhenAll(userCL, countryL, currencyL, addUserCL);
 
-                usercreditlist.country = (IEnumerable<SharedSelectListViewModel>)country.Result.body;
-                usercreditlist.users = (IEnumerable<SharedSelectListViewModel>)users.Result.body;
-                usercreditlist.currency = (IEnumerable<SharedSelectListViewModel>)currency.Result.body;
-                usercreditlist.addUser = (IEnumerable<SharedSelectListViewModel>)addUser.Result.body;
+                usercreditlist.country = countryL.Result;
+                usercreditlist.users = userCL.Result;
+                usercreditlist.currency = currencyL.Result;
+                usercreditlist.addUser = addUserCL.Result;
                 result.body = usercreditlist;
             }
             catch (Exception ex)
@@ -253,6 +253,50 @@ namespace AdtonesAdminWebApi.BusinessServices
             return result;
         }
 
+
+        public async Task<ReturnResult> FillUserPaymentDropdown()
+        {
+            try
+            {
+                result.body = await _sharedDal.GetUserPaymentList(0);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "SharedSelectListsService",
+                    ProcedureName = "FillUserPaymentDropdown"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> FillCampaignDropdown(int id=0)
+        {
+            try
+            {
+                result.body = await _sharedDal.GetCamapignList(id);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "SharedSelectListsService",
+                    ProcedureName = "FillCampaignDropdown"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+
+        }
 
     }
 }

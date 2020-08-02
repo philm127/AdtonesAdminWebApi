@@ -54,14 +54,15 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetCountry(IdCollectionViewModel countrymodel)
+        public async Task<ReturnResult> GetCountry(int Id)
         {
             try
             {
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
-                    result.body = await connection.QueryAsync<CountryResult>(@"SELECT Id,Name,ShortName,CountryCode,CreatedDate,Status,TaxPercentage 
-                                                                             FROM Country WHERE Id=@id",new { id=countrymodel.countryId});
+                    result.body = await connection.QueryAsync<CountryResult>(@"SELECT c.Id,c.Name,ShortName,c.CountryCode,c.CreatedDate,c.Status,TaxPercantage 
+                                                                             FROM Country AS c LEFT JOIN CountryTax AS t ON c.Id = t.CountryId 
+                                                                                WHERE c.Id=@id", new { id = Id});
                 }
 
             }

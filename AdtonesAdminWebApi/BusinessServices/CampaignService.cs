@@ -60,12 +60,33 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        
-        public async Task<ReturnResult> LoadCampaignCreditDataTable()
+        public async Task<ReturnResult> LoadCampaignDataTableById(int id)
         {
             try
             {
-                    result.body = await _campDAL.GetCampaignCreditResultSet();
+                result.body = await _campDAL.GetCampaignResultSetById(id);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CampaignService",
+                    ProcedureName = "LoadCampaignDataTableById"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> LoadCampaignCreditDataTable(int id=0)
+        {
+            try
+            {
+                    result.body = await _campDAL.GetCampaignCreditResultSet(id);
             }
             catch (Exception ex)
             {
@@ -75,6 +96,52 @@ namespace AdtonesAdminWebApi.BusinessServices
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "CampaignService",
                     ProcedureName = "LoadCampaignCreditDataTable"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> UpdateCampaignCredit(CampaignCreditResult model)
+        {
+            try
+            {
+                // Need to do this to get OperatorId
+                result.body = await _campDAL.UpdateCampaignCredit(model);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CampaignService",
+                    ProcedureName = "UpdateCampaignCredit"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> AddCampaignCredit(CampaignCreditResult model)
+        {
+            try
+            {
+                // Need to do this to get OperatorId
+                result.body = await _campDAL.InsertCampaignCredit(model);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CampaignService",
+                    ProcedureName = "UpdateCampaignCredit"
                 };
                 _logging.LogError();
                 result.result = 0;

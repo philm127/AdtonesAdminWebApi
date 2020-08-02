@@ -6,9 +6,8 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
     public interface IAdvertiserCreditService
     {
-        Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _creditmodel);
+        Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _usercredit);
         Task<ReturnResult> GetCreditDetails(int id);
         // Task<ReturnResult> UpdateCredit(UsersCreditFormModel _creditmodel);
-        Task<ReturnResult> LoadDataTable();
     }
 }

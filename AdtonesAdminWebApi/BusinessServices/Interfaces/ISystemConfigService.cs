@@ -11,6 +11,8 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> LoadSystemConfigurationDataTable();
         Task<ReturnResult> GetSystemConfig(int id);
         Task<ReturnResult> AddSystemConfig(SystemConfigResult model);
+        Task<ReturnResult> DeleteSystemConfig(int id);
         Task<ReturnResult> UpdateSystemConfig(SystemConfigResult model);
+        ReturnResult GetSystemConfigType();
     }
 }

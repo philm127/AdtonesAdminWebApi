@@ -11,21 +11,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data;
+using AdtonesAdminWebApi.Services;
+using System.Text.Json;
 
 namespace AdtonesAdminWebApi.DAL.Shared
 {
-    public class SharedSelectListsDAL : ISharedSelectListsDAL
+    public class SharedSelectListsDAL : BaseDAL, ISharedSelectListsDAL
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connStr;
-        private readonly IExecutionCommand _executers;
+        private readonly ISaveGetFiles _getFile;
 
-        public SharedSelectListsDAL(IConfiguration configuration, IExecutionCommand executers)
-
+        public SharedSelectListsDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, ISaveGetFiles getFile) 
+            : base(configuration, executers, connService)
         {
-            _configuration = configuration;
-            _connStr = _configuration.GetConnectionString("DefaultConnection");
-            _executers = executers;
+            _getFile = getFile;
         }
 
 
@@ -88,9 +86,33 @@ namespace AdtonesAdminWebApi.DAL.Shared
 
         public async Task<IEnumerable<SharedSelectListViewModel>> GetCountry(int id = 0)
         {
+            var genFile = System.IO.File.ReadAllText(_getFile.TempGetGeneralJsonFile());
+
+            PermissionModel gen = JsonSerializer.Deserialize<PermissionModel>(genFile);
+
+            var els = gen.elements.ToList();
+
+            int[] country = els.Find(x => x.name == "country").arrayId.ToArray();
+
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(SharedListQuery.GetCountryList);
+
+            if (country.Length > 0)
+            {
+                sb.Append(" WHERE Id IN @country ");
+                builder.AddParameters(new { country = country.ToArray() });
+
+            }
+
+            var select = builder.AddTemplate(sb.ToString());
             try
             {
-                return await GetSelectList(SharedListQuery.GetCountryList, id);
+                using (var connection = new SqlConnection(_connStr))
+                {
+                    connection.Open();
+                    return await connection.QueryAsync<SharedSelectListViewModel>(select.RawSql, select.Parameters);
+                }
             }
             catch
             {
@@ -114,9 +136,16 @@ namespace AdtonesAdminWebApi.DAL.Shared
 
         public async Task<IEnumerable<SharedSelectListViewModel>> GetCamapignList(int id = 0)
         {
+            var sb = new StringBuilder();
+            sb.Append(SharedListQuery.GetCampaignList);
+            if(id > 0)
+            {
+                sb.Append(" WHERE UserId = @Id ");
+            }
+
             try
             {
-                return await GetSelectList(SharedListQuery.GetCampaignList, id);
+                return await GetSelectList(sb.ToString(), id);
             }
             catch
             {
@@ -155,13 +184,19 @@ namespace AdtonesAdminWebApi.DAL.Shared
 
         private async Task<IEnumerable<SharedSelectListViewModel>> GetSelectList(string sql, int id=0)
         {
+            var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(sql);
+            sb.Append(sql);
 
             if (id != 0)
             {
                 builder.AddParameters(new { Id = id });
             }
+
+            var values = CheckGeneralFile(sb, builder,pais:"c",advs:"u");
+            sb = values.Item1;
+            builder = values.Item2;
+            var select = builder.AddTemplate(sb.ToString());
             try
             {
                 using (var connection = new SqlConnection(_connStr))
@@ -181,13 +216,16 @@ namespace AdtonesAdminWebApi.DAL.Shared
         {
             try
             {
-                return await GetSelectList(SharedListQuery.GetInvoiceList, id);
+                return await GetSelectList(SharedListQuery.GetInvoiceNumberList, id);
             }
             catch
             {
                 throw;
             }
         }
+
+
+        
 
 
         //public async Task<IEnumerable<SharedSelectListViewModel>> TESTGetSelectList(string command)

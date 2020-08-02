@@ -43,7 +43,7 @@ namespace AdtonesAdminWebApi.DAL
             var sb1 = new StringBuilder();
             sb1.Append(UserManagementQuery.UpdateUserStatus);
             sb1.Append("UserId=@userId");
-            
+
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sb1.ToString());
             builder.AddParameters(new { userId = model.UserId });
@@ -59,33 +59,26 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
 
-            operatorId = _httpAccessor.GetOperatorFromJWT();
 
-            if (operatorId != 0)
+            var operatorConnectionString = await _connService.GetOperatorConnectionByUserId(model.UserId);
+
+            var sb2 = new StringBuilder();
+            sb2.Append(UserManagementQuery.UpdateUserStatus);
+            sb2.Append(" AdtoneServerUserId=@userId");
+            var build = new SqlBuilder();
+            var sel = build.AddTemplate(sb2.ToString());
+            build.AddParameters(new { userId = model.UserId });
+            build.AddParameters(new { Activated = model.Activated });
+
+            try
             {
-                var operatorConnectionString = await _connService.GetSingleConnectionString(operatorId);
-
-                var sb2 = new StringBuilder();
-                sb2.Append(UserManagementQuery.UpdateUserStatus);
-                sb2.Append("AdtoneServerUserId=@userId");
-                var build = new SqlBuilder();
-                var sel = build.AddTemplate(sb2.ToString());
-                build.AddParameters(new { userId = model.UserId });
-                build.AddParameters(new { Activated = model.Activated });
-
-                try
-                {
-                    // TODO: make this live
-                    return await _executers.ExecuteCommand(operatorConnectionString,
-                                 conn => conn.ExecuteScalar<int>(sel.RawSql, sel.Parameters));
-                }
-                catch
-                {
-                    throw;
-                }
+                return await _executers.ExecuteCommand(operatorConnectionString,
+                             conn => conn.ExecuteScalar<int>(sel.RawSql, sel.Parameters));
             }
-            return x;
-
+            catch
+            {
+                throw;
+            }
         }
 
 

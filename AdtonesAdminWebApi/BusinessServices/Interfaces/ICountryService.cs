@@ -11,6 +11,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> LoadDataTable();
         Task<ReturnResult> AddCountry(CountryResult countrymodel);
         Task<ReturnResult> UpdateCountry(CountryResult countrymodel);
-        Task<ReturnResult>GetCountry(IdCollectionViewModel countrymodel);
+        Task<ReturnResult>GetCountry(int Id);
     }
 }

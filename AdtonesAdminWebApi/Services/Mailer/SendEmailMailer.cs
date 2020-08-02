@@ -2,8 +2,11 @@
 using MailKit.Net.Smtp;
 using MailKit;
 using MimeKit;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using MailKit.Security;
+using System.IO;
+using System.Threading.Tasks;
+using System;
+using Microsoft.AspNetCore.Hosting;
 
 namespace AdtonesAdminWebApi.Services.Mailer
 {
@@ -12,15 +15,17 @@ namespace AdtonesAdminWebApi.Services.Mailer
     /// </summary>
     public class SendEmailMailer : ISendEmailMailer
     {
+        private readonly IWebHostEnvironment env;
         private readonly IConfiguration _configuration;
 
-        public SendEmailMailer(IConfiguration configuration)
+        public SendEmailMailer(IConfiguration configuration, IWebHostEnvironment _env)
         {
+            env = _env;
             _configuration = configuration;
         }
 
 
-        public void SendEmail(SendEmailModel mail)
+        public async Task SendEmail(SendEmailModel mail)
         {
 
             var message = new MimeMessage();
@@ -46,7 +51,24 @@ namespace AdtonesAdminWebApi.Services.Mailer
                 }
             }
             message.Subject = mail.Subject;
-            message.Body = new TextPart("html") { Text = mail.Body };
+            // message.Body = new TextPart("html") { Text = mail.Body };
+            var builder = new BodyBuilder { HtmlBody = mail.Body };
+            if (mail.attachment != null)
+            {
+                var otherpath = env.ContentRootPath;
+                var filePath = Path.Combine(otherpath, mail.attachment);
+                var filename = Path.GetFileName(filePath);
+                var ms = new MemoryStream();
+
+                using (var stream = new FileStream(filePath, FileMode.Open))
+                {
+                    await stream.CopyToAsync(ms);
+                    builder.Attachments.Add(filename, ms.ToArray());
+                }
+                ms.Dispose();
+            }
+
+            message.Body = builder.ToMessageBody();
 
             var pwd = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPPassword").Value;
             var usr = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPEmail").Value;
@@ -57,8 +79,26 @@ namespace AdtonesAdminWebApi.Services.Mailer
             {
                 client.Connect(srv, port, SecureSocketOptions.StartTls);
                 client.Authenticate(usr, pwd);
-                client.Send(message);
-                client.Disconnect(true);
+                try
+                {
+                    client.Send(message);
+                }
+                catch (Exception ex)
+                {
+                    var _logging = new ErrorLogging()
+                    {
+                        ErrorMessage = ex.Message.ToString(),
+                        StackTrace = ex.StackTrace.ToString(),
+                        PageName = "Services-Mailer-SendEmailMailer",
+                        ProcedureName = "SendEmail"
+                    };
+                    _logging.LogError();
+                    // return new FormFile();
+                }
+                finally
+                {
+                    client.Disconnect(true);
+                }
             }
         }
     }

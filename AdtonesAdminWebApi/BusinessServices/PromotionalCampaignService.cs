@@ -123,14 +123,14 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
 
                 string directoryName = "/PromotionalMedia/";
-                directoryName = Path.Combine(directoryName, model.OperatorID.ToString());
+                directoryName = Path.Combine(directoryName, model.OperatorId.ToString());
 
                 string fileName = Path.GetFileName(mediaFile.FileName);
 
                 string extension = Path.GetExtension(mediaFile.FileName);
                 var onlyFileName = Path.GetFileNameWithoutExtension(mediaFile.FileName);
 
-                string outputFormat = model.OperatorID == 1 ? "wav" : model.OperatorID == 2 ? "mp3" : "wav";
+                string outputFormat = model.OperatorId == 1 ? "wav" : model.OperatorId == 2 ? "mp3" : "wav";
                 var audioFormatExtension = "." + outputFormat;
                 string newfile = string.Empty;
 
@@ -191,7 +191,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var originalFile = model.AdvertLocation;
                 var ftpFile = string.Empty;
 
-                var operatorFTPDetails = await _advertDAL.GetFtpDetails(model.OperatorID);
+                var operatorFTPDetails = await _advertDAL.GetFtpDetails(model.OperatorId);
 
                 //Transfer Advert File From Operator Server to Linux Server
                 var returnValue = await _adTransfer.CopyPromoAdToOperatorServer(model, newfile);

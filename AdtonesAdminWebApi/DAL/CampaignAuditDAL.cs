@@ -1,6 +1,7 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Model;
+using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using DocumentFormat.OpenXml.Office2010.Excel;
@@ -18,21 +19,13 @@ using System.Threading.Tasks;
 namespace AdtonesAdminWebApi.DAL
 {
 
-    public class CampaignAuditDAL : ICampaignAuditDAL
+    public class CampaignAuditDAL : BaseDAL, ICampaignAuditDAL
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connStr;
-        private readonly IExecutionCommand _executers;
-        private readonly IConnectionStringService _connService;
         private IMemoryCache _cache;
 
         public CampaignAuditDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService,
-                                IMemoryCache cache)
+                                IMemoryCache cache) : base(configuration, executers, connService)
         {
-            _configuration = configuration;
-            _connStr = _configuration.GetConnectionString("DefaultConnection");
-            _executers = executers;
-            _connService = connService;
             _cache = cache;
         }
 
@@ -353,7 +346,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<CampaignAuditOperatorTable>> GetPromoPlayDetails(PagingSearchClass param)
+        public async Task<IEnumerable<PromoCampaignPlaylist>> GetPromoPlayDetails(PagingSearchClass param)
         {
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
@@ -446,7 +439,7 @@ namespace AdtonesAdminWebApi.DAL
                 builder.AddParameters(new { PageSize = param.pageSize });
 
                 return await _executers.ExecuteCommand(_connStr,
-                         conn => conn.Query<CampaignAuditOperatorTable>(select.RawSql, select.Parameters));
+                         conn => conn.Query<PromoCampaignPlaylist>(select.RawSql, select.Parameters));
 
             }
             catch

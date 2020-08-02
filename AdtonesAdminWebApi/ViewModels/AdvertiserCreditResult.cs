@@ -20,5 +20,6 @@ namespace AdtonesAdminWebApi.ViewModels
         public decimal TotalPaid { get; set; }
         public decimal RemainingAmount { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public string CountryName { get; set; }
     }
 }

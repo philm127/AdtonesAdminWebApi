@@ -8,10 +8,11 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface IAdvertiserCreditDAL
     {
-        Task<IEnumerable<AdvertiserCreditResult>> LoadUserCreditResultSet();
+        
         Task<int> AddUserCredit(AdvertiserCreditFormModel _creditmodel);
         Task<int> UpdateUserCredit(AdvertiserCreditFormModel _creditmodel);
         Task<AdvertiserCreditFormModel> GetUserCreditDetail(int id);
         Task<decimal> GetCreditBalance(int id);
+        Task<bool> CheckUserCreditExist(int userId);
     }
 }

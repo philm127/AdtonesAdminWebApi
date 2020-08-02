@@ -1,0 +1,29 @@
+{
+  "pageName": "General",
+  "elements": [
+    {
+      "name": "country",
+      "visible": true,
+      "enabled": true,
+      "type": "",
+      "route": "",
+      "arrayId": []
+    },
+    {
+      "name": "operator",
+      "visible": true,
+      "enabled": true,
+      "type": "",
+      "route": "",
+      "arrayId": []
+    },
+    {
+      "name": "advertiser",
+      "visible": true,
+      "enabled": true,
+      "type": "",
+      "route": "",
+      "arrayId": []
+    }
+  ]
+}

@@ -19,8 +19,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         
 
-        public static string GetAdvertCategoryDataTable => @"SELECT AdvertCategoryId,ac.Name AS CategoryName,ac.CountryId, ISNULL(c.Name,'-') AS CountryName, ac.CreatedDate
-                                                        FROM AdvertCategories AS ac INNER JOIN Country AS c ON c.Id = ac.CountryId;";
+        public static string GetAdvertCategoryDataTable => @"SELECT AdvertCategoryId,ad.Name AS CategoryName,ad.CountryId, ISNULL(c.Name,'-') AS CountryName, ad.CreatedDate
+                                                        FROM AdvertCategories AS ad INNER JOIN Country AS c ON c.Id = ad.CountryId
+                                                        LEFT JOIN Operators AS op ON op.CountryId=ad.CountryId";
 
 
         public static string UpdateAdvertStatus => @"UPDATE Advert SET Status=@Status,UpdatedBy=@UpdatedBy, UpdatedDateTime=GETDATE() WHERE ";
@@ -37,6 +38,18 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string RejectAdvertReason => @"INSERT INTO AdvertRejections(UserId,AdvertId,RejectionReason,CreatedDate,AdtoneServerAdvertRejectionId)
                                                                     VALUES(@UserId,@AdvertId,@RejectionReason,GETDATE(),@AdtoneServerAdvertRejectionId);
+                                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+
+        public static string DeleteAdvertCategory => @"DELETE FROM AdvertCategories WHERE ";
+
+
+        public static string UpdateAdvertCategory => @"UPDATE AdvertCategories SET CountryId=@countryId, Name=@name, UpdatedDate=GETDATE()
+                                                                                                                                WHERE ";
+
+
+        public static string AddAdvertCategory => @"INSERT INTO AdvertCategories (CountryId,Name,CreatedDate,UpdatedDate,AdtoneServerAdvertCategoryId)
+                                                        VALUES(@countryId,@name,GETDATE(),GETDATE(),@Id);
                                                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
     }
 }

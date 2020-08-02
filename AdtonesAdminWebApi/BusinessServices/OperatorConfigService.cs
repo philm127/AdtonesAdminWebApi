@@ -27,8 +27,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> LoadOperatorConfigurationDataTable()
         {
-            var select_query = @"SELECT OperatorConfigurationId,con.OperatorId,Days,con.IsActive,AddedDate AS CreatedDate,op.OperatorName
-                                FROM dbo.OperatorConfigurations AS con INNER JOIN Operators AS op ON op.OperatorId=con.OperatorId";
+            var select_query = @"SELECT OperatorConfigurationId,con.OperatorId,Days,con.IsActive,AddedDate AS CreatedDate,op.OperatorName,c.Name AS CountryName
+                                FROM dbo.OperatorConfigurations AS con INNER JOIN Operators AS op ON op.OperatorId=con.OperatorId
+                                INNER JOIN Country AS c ON c.Id=op.CountryId";
 
             try
             {
@@ -83,7 +84,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             return result;
         }
-
 
 
         public async Task<ReturnResult> AddOperatorConfig(OperatorConfigurationResult model)

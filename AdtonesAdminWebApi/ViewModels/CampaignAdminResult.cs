@@ -33,6 +33,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string OperatorName { get; set; }
         public string MobileNumber { get; set; }
         public string Organisation { get; set; }
+        public string CountryName { get; set; }
 
     }
 }

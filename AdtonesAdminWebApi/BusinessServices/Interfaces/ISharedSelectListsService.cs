@@ -18,5 +18,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> GetUserCreditList();
         Task<ReturnResult> GetUserDetailCreditList();
         Task<ReturnResult> GetUsersnRoles();
+        Task<ReturnResult> FillUserPaymentDropdown();
+        Task<ReturnResult> FillCampaignDropdown(int id=0);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace AdtonesAdminWebApi.Services.Mailer
 
         public string Body { get; set; }
 
-        public string[] attachment { get; set; }
+        public string attachment { get; set; }
 
         public bool isBodyHTML { get; set; }
         public string Link { get; set; }

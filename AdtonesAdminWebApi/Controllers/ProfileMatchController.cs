@@ -37,10 +37,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns>body contains ProfileMatchInformationFormModel</returns>
-        [HttpGet("v1/GetProfileMatchInfoById")]
-        public async Task<ReturnResult> GetProfileMatchInfoById(IdCollectionViewModel model)
+        [HttpGet("v1/GetProfileMatchInfoById/{id}")]
+        public async Task<ReturnResult> GetProfileMatchInfoById(int id)
         {
-            return await _profileService.GetProfileInfo(model.id);
+            return await _profileService.GetProfileInfo(id);
         }
 
 
@@ -73,10 +73,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns>body contains nothing</returns>
-        [HttpDelete("v1/DeleteProfileMatchLabel")]
-        public async Task<ReturnResult> DeleteProfileMatchLabel(IdCollectionViewModel model)
+        [HttpDelete("v1/DeleteProfileMatchLabel/{id}")]
+        public async Task<ReturnResult> DeleteProfileMatchLabel(int id)
         {
-            return await _profileService.DeleteProfileLabel(model.id);
+            return await _profileService.DeleteProfileLabel(id);
         }
 
 

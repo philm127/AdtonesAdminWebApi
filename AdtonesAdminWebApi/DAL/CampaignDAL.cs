@@ -7,63 +7,76 @@ using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL
 {
 
 
-    public class CampaignDAL : ICampaignDAL
+    public class CampaignDAL : BaseDAL, ICampaignDAL
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connStr;
-        private readonly IExecutionCommand _executers;
-        private readonly IConnectionStringService _connService;
         private readonly IHttpContextAccessor _httpAccessor;
 
         public CampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, 
-                            IHttpContextAccessor httpAccessor)
+                            IHttpContextAccessor httpAccessor) : base(configuration, executers, connService)
         {
-            _configuration = configuration;
-            _connStr = _configuration.GetConnectionString("DefaultConnection");
-            _executers = executers;
-            _connService = connService;
             _httpAccessor = httpAccessor;
         }
 
 
         public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(int id=0)
         {
-            var roleName = _httpAccessor.GetRoleFromJWT();
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(CampaignQuery.GetCampaignResultSet);
+
+            if (id > 0)
+            {
+                sb.Append(" WHERE camp.UserId=@Id ");
+                sb.Append(" AND camp.Status IN(1,2,3,4) ");
+                builder.AddParameters(new { Id = id });
+            }
+
+            var tst = sb.ToString();
+            var values = CheckGeneralFile(sb, builder,pais:"op",ops:"op",advs:"camp");
+
+            sb = values.Item1;
+            builder = values.Item2;
+            var tst2 = sb.ToString();
+            sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
+            var tst3 = sb.ToString();
+            var select = builder.AddTemplate(sb.ToString());
+            
+            try
+            {
+                // builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.Query<CampaignAdminResult>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetById(int id)
+        {
 
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
 
-            if (roleName.ToLower().Contains("operator"))
-            {
                 sb.Append(CampaignQuery.GetCampaignResultSet);
-                sb.Append(" WHERE u.OperatorId=@Id ");
-                sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
+                sb.Append(" WHERE camp.CampaignProfileId=@Id ");
                 builder.AddParameters(new { Id = id });
-            }
-            else if (id == 0)
-            {
-                sb.Append(CampaignQuery.GetCampaignResultSet);
-                sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
-            }
-            else if ( id > 0 )
-            {
-                sb.Append(CampaignQuery.GetCampaignResultSet);
-                sb.Append(" WHERE camp.UserId=@Id ");
-                sb.Append(" AND camp.Status IN(1,2,3,4) ");
-                sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
-                builder.AddParameters(new { Id = id });
-            }
 
 
-                var select = builder.AddTemplate(sb.ToString());
-            
+            var select = builder.AddTemplate(sb.ToString());
+
             try
             {
                 // builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:SiteEmailAddress") });
@@ -78,15 +91,61 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<CampaignCreditResult>> GetCampaignCreditResultSet()
+        public async Task<IEnumerable<CampaignCreditResult>> GetCampaignCreditResultSet(int id=0)
         {
+            var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(CampaignQuery.GetCampaignCreditResultSet);
+            sb.Append(CampaignQuery.GetCampaignCreditResultSet);
+            if (id > 0)
+            {
+                sb.Append(" WHERE CampaignCreditPeriodId=@Id ");
+                builder.AddParameters(new { Id = id });
+            }
+
+            var values = CheckGeneralFile(sb, builder, pais: "op", ops: "op");
+            sb = values.Item1;
+            builder = values.Item2;
+            
             try
             {
+                sb.Append(" ORDER BY CreatedDate DESC;");
+                var select = builder.AddTemplate(sb.ToString());
 
                 return await _executers.ExecuteCommand(_connStr,
                                 conn => conn.Query<CampaignCreditResult>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> InsertCampaignCredit(CampaignCreditResult model)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.ExecuteScalar<int>(CampaignQuery.InsertCampaignCredit,model));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> UpdateCampaignCredit(CampaignCreditResult model)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(CampaignQuery.UpdateCampaignCredit);
+            builder.AddParameters(new { Id = model.CampaignCreditPeriodId });
+            builder.AddParameters(new { CreditPeriod = model.CreditPeriod });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -208,5 +267,7 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
+
+        
     }
 }

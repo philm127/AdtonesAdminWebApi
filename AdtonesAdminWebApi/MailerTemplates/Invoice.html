@@ -1,0 +1,39 @@
+﻿
+<table width="580" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+
+    <tr>
+        <td>
+            Dear @Model.Fname,
+
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Please find attached your invoice (@Model.InvoiceNumber). Kindly remit payment on or before @Html.Raw(HttpUtility.HtmlDecode(string.Format(new CustomDateProvider(), "{0}", Model.DueDate))).
+        </td>
+
+    </tr>
+    <tr>
+        <td>
+            Thank you for trusting us with your campaign.
+        </td>
+    </tr>
+    <tr>
+        <td>
+            For payment,kindly click here(@Model.PaymentLink)
+        </td>
+    </tr>
+          
+    <tr>
+        <td>
+            Sincerely,
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Adtones Team<br />
+            support@adtones.com
+        </td>
+    </tr>
+</table>
+

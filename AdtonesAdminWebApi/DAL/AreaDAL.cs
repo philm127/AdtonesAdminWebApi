@@ -1,36 +1,44 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
+using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL
 {
 
 
-    public class AreaDAL : IAreaDAL
+    public class AreaDAL : BaseDAL, IAreaDAL
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connStr;
-        private readonly IExecutionCommand _executers;
 
-        public AreaDAL(IConfiguration configuration, IExecutionCommand executers)
+        public AreaDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService) 
+            : base(configuration, executers, connService)
         {
-            _configuration = configuration;
-            _connStr = _configuration.GetConnectionString("DefaultConnection");
-            _executers = executers;
         }
 
 
         public async Task<IEnumerable<AreaResult>> LoadAreaResultSet()
         {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(AreaQuery.LoadAreaDataTable);
+            var values = CheckGeneralFile(sb, builder,pais:"ad");
+            sb = values.Item1;
+            builder = values.Item2;
+            sb.Append(" ORDER BY ad.AreaId DESC;");
+            var select = builder.AddTemplate(sb.ToString());
+
             try
             {
 
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.Query<AreaResult>(AreaQuery.LoadAreaDataTable));
+                                conn => conn.Query<AreaResult>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -134,5 +142,33 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
         }
+
+        //private (StringBuilder sbuild, SqlBuilder build) CheckGeneralFile(StringBuilder sb, SqlBuilder builder, string co)
+        //{
+        //    var genFile = System.IO.File.ReadAllText(_getFile.TempGetGeneralJsonFile());
+
+        //    PermissionModel gen = JsonSerializer.Deserialize<PermissionModel>(genFile);
+
+        //    var els = gen.elements.ToList();
+
+        //    int[] country = els.Find(x => x.name == "country").arrayId.ToArray();
+        //    // operators plural as operator is a key word
+        //    int[] operators = els.Find(x => x.name == "operator").arrayId.ToArray();
+        //    int[] advertiser = els.Find(x => x.name == "advertiser").arrayId.ToArray();
+
+        //    if (country.Length > 0)
+        //    {
+        //        sb.Append($" AND {co}.CountryId IN @country ");
+        //        builder.AddParameters(new { country = country.ToArray() });
+
+        //    }
+        //    //if (operators.Length > 0)
+        //    //    sb.Append(" AND ad.OperatorId IN @operator ");
+        //    //if (advertiser.Length > 0)
+        //    //    sb.Append(" AND ad.UserId IN @advertiser ");
+
+        //    return (sb, builder);
+
+        //}
     }
 }

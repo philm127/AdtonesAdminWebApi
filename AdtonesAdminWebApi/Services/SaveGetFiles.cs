@@ -15,6 +15,8 @@ namespace AdtonesAdminWebApi.Services
         bool DeleteFileByPath(string filepath);
         bool DeleteFileByName(string dir, string filename);
         Task<bool> SaveFileToAdtones(string dir, IFormFile data, string filename = null);
+        string TempGetGeneralJsonFile(string name = null);
+        Task<IFormFile> GetIformFileFromPath(string path);
     }
 
 
@@ -161,6 +163,43 @@ namespace AdtonesAdminWebApi.Services
         }
 
 
+        public async Task<IFormFile> GetIformFileFromPath(string path)
+        {
+            // path = "https://my.adtones.com/Invoice/Adtones_invoice_A54928820.pdf";// + pdfModel.InvoiceNumber + ".pdf");
+            path = "Invoice/Adtones_invoice_A54928820.pdf";
+            var otherpath = env.ContentRootPath;
+            var filePath = Path.Combine(otherpath,path);
+            var ms = new MemoryStream();
+            try
+            {
+               
+                using (var stream = new FileStream(filePath, FileMode.Open))
+                {
+                    await stream.CopyToAsync(ms);
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "Services-SaveFiles",
+                    ProcedureName = "GetIformFileFromPath"
+                };
+                _logging.LogError();
+                // return new FormFile();
+            }
+            var res = new FileStreamResult(ms, "doc/pdf");
+            using (var fs = res.FileStream)
+            {
+                return new FormFile(fs, 0, fs.Length, "name", res.FileDownloadName);
+            }
+
+        }
+
+
         //public (string fileType, byte[] archiveData, string archiveName) FetechFiles(string filepath,string filetype)
         //{
         //    var otherpath = env.ContentRootPath;
@@ -175,7 +214,18 @@ namespace AdtonesAdminWebApi.Services
 
         //}
 
-
+        public string TempGetGeneralJsonFile(string name = null)
+        {
+            var directoryName = string.Empty;
+            var dir = "\\TempGenPermissions\\general.json";
+            var otherpath = env.ContentRootPath;
+            if(name == "op")
+                directoryName = "C:\\Development\\Adtones-Admin\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\TempGenPermissions\\generalOp.json";//Path.Combine(otherpath, dir);
+            else
+                directoryName = "C:\\Development\\Adtones-Admin\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\TempGenPermissions\\general.json";
+            
+            return directoryName;
+        }
 
     }
 }

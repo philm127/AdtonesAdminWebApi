@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
-    public interface IInvoiceService
+    public interface IFinanceTablesService
     {
         Task<ReturnResult> LoadInvoiceDataTable();
-        Task<ReturnResult> SendInvoice(IdCollectionViewModel model);
+        Task<ReturnResult> LoadOutstandingInvoiceDataTable();
+        Task<ReturnResult> LoadUserCreditDataTable();
     }
 }

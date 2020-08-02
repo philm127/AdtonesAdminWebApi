@@ -23,4 +23,12 @@ namespace AdtonesAdminWebApi.ViewModels
         public string MSISDN { get; set; }
         public string DTMFKey { get; set; }
     }
+
+    public class PromoCampaignPlaylist
+    {
+        public string MSISDN { get; set; }
+        public string DTMFKey { get; set; }
+        public double PlayLength { get; set; }
+        public DateTime StartTime { get; set; }
+    }
 }

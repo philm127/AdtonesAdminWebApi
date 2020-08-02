@@ -11,8 +11,10 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     {
         Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(int id=0);
         
-        Task<IEnumerable<CampaignCreditResult>> GetCampaignCreditResultSet();
-
+        Task<IEnumerable<CampaignCreditResult>> GetCampaignCreditResultSet(int id=0);
+        Task<int> UpdateCampaignCredit(CampaignCreditResult model);
+        Task<int> InsertCampaignCredit(CampaignCreditResult model);
+        Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetById(int id);
         Task<CampaignProfile> GetCampaignProfileDetail(int id = 0);
         Task<int> ChangeCampaignProfileStatus(CampaignProfile model);
         Task<int> ChangeCampaignProfileStatusOperator(CampaignProfile model);

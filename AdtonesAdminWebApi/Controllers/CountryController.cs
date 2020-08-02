@@ -42,10 +42,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns>body contains CountryResult</returns>
-        [HttpGet("v1/GetCountry")]
-        public async Task<ReturnResult> GetCountry(IdCollectionViewModel model)
+        [HttpGet("v1/GetCountry/{id}")]
+        public async Task<ReturnResult> GetCountry(int id)
         {
-            var tst = await _countryService.GetCountry(model);
+            var tst = await _countryService.GetCountry(id);
             return tst;
         }
 
@@ -96,10 +96,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns>body contains AreaResult</returns>
-        [HttpGet("v1/GetAreaById")]
-        public async Task<ReturnResult> GetAreaById([FromBody]IdCollectionViewModel model)
+        [HttpGet("v1/GetAreaById/{id}")]
+        public async Task<ReturnResult> GetAreaById(int id)
         {
-            return await _areaService.GetArea(model.id);
+            return await _areaService.GetArea(id);
         }
 
 
@@ -132,10 +132,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns>body is empty</returns>
-        [HttpDelete("v1/DeleteArea")]
-        public async Task<ReturnResult> DeleteArea([FromBody]IdCollectionViewModel model)
+        [HttpDelete("v1/DeleteAreaById/{id}")]
+        public async Task<ReturnResult> DeleteAreaById(int id)
         {
-            return await _areaService.DeleteArea(model.id);
+            return await _areaService.DeleteArea(id);
         }
 
 

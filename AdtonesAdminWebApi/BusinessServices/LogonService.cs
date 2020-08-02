@@ -174,7 +174,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 emailModel.Subject = "Email Verification";
                 try
                 {
-                    _mailer.SendEmail(emailModel);
+                    await _mailer.SendEmail(emailModel);
                 }
                 catch (Exception ex)
                 {

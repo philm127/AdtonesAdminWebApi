@@ -80,12 +80,12 @@ namespace AdtonesAdminWebApi.Controllers
         /// <param name="some">some contains currencyId among other simple Id's</param>
         /// <returns>body contains List SharedSelectListViewModel
         /// or a single one if id entered</returns>
-        [HttpGet("v1/GetCurrencyList")]
-        public async Task<ReturnResult> GetCurrencyList([FromBodyAttribute]IdCollectionViewModel some)
+        [HttpGet("v1/GetCurrencyList/{id}")]
+        public async Task<ReturnResult> GetCurrencyList(int id)
         {
             //_sharedList.CurrentUserId = int.Parse(User.FindFirst("userId")?.Value);
             // _sharedList.RoleName = User.FindFirst(ClaimTypes.Role)?.Value;
-            return await _sharedList.GetCurrencyList(some.currencyId);
+            return await _sharedList.GetCurrencyList(id);
         }
 
 
@@ -133,6 +133,27 @@ namespace AdtonesAdminWebApi.Controllers
         public async Task<ReturnResult> GetUsersnRoles()
         {
             return await _sharedList.GetUsersnRoles();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List SharedSelectListViewModel</returns>
+        [HttpGet("v1/FillUserPaymentDropdown")]
+        public async Task<ReturnResult> FillUserPaymentDropdown()
+        {
+            return await _sharedList.FillUserPaymentDropdown();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List SharedSelectListViewModel</returns>
+        [HttpGet("v1/FillCampaignDropdown/{id}")]
+        public async Task<ReturnResult> FillCampaignDropdown(int id=0)
+        {
+            return await _sharedList.FillCampaignDropdown(id);
         }
 
 

@@ -6,7 +6,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
     {
         public static string GetCampaignResultSet => @"SELECT camp.CampaignProfileId,camp.UserId,u.Email,CONCAT(u.FirstName,'',u.LastName) AS UserName,op.OperatorName
                                                 ,camp.ClientId, ISNULL(cl.Name,'-') AS ClientName,CampaignName,TotalBudget,camp.CreatedDateTime AS CreatedDate
-                                                ,camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,camp.TotalBudget,u.Organisation,
+                                                ,camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,camp.TotalBudget,u.Organisation,ctry.Name AS CountryName,
                                                 CASE WHEN bill.Id>0 THEN camp.Status ELSE 8 END AS Status,play.AvgBidValue,play.TotalSpend,
                                                 (camp.TotalBudget - play.TotalSpend) AS FundsAvailable,play.ct AS finaltotalplays,con.MobileNumber
                                                 FROM CampaignProfile AS camp LEFT JOIN Users As u ON u.UserId=camp.UserId
@@ -30,15 +30,24 @@ namespace AdtonesAdminWebApi.DAL.Queries
 		                                                ) AS play
                                                 ON camp.CampaignProfileId=play.CampaignProfileId
                                                 LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
-                                                LEFT JOIN Contacts AS con ON con.UserId=camp.UserId ";
+                                                LEFT JOIN Contacts AS con ON con.UserId=camp.UserId
+                                                LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId";
 
 
 
         public static string GetCampaignCreditResultSet => @"SELECT CampaignCreditPeriodId,ccp.UserId,CONCAT(usr.FirstName,' ',usr.LastName) AS UserName,
                                                             ccp.CampaignProfileId,camp.CampaignName,CreditPeriod,ccp.CreatedDate
                                                     FROM CampaignCreditPeriods AS ccp LEFT JOIN Users AS usr ON ccp.UserId=usr.UserId
-                                                    LEFT JOIN CampaignProfile AS camp ON camp.CampaignProfileId=ccp.CampaignProfileId
-                                                    ORDER BY CreatedDate DESC;";
+                                                    LEFT JOIN CampaignProfile AS camp ON camp.CampaignProfileId=ccp.CampaignProfileId 
+                                                    LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId";
+
+
+        public static string UpdateCampaignCredit => @"UPDATE CampaignCreditPeriods SET CreditPeriod=@CreditPeriod 
+                                                                                WHERE CampaignCreditPeriodId=@Id;";
+
+
+        public static string InsertCampaignCredit => @"INSERT INTO CampaignCreditPeriods(CreditPeriod,UserId,CampaignProfileId)
+                                                                VALUES(@CreditPeriod,@UserId,@CampaignProfileId);";
 
 
         public static string GetCampaignProfileById => @"SELECT CampaignProfileId,UserId,ClientId,CampaignName,CampaignDescription,

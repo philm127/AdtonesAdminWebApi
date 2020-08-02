@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
-    public interface IUserPaymentService
+    public interface IAdvertiserPaymentService
     {
-        Task<ReturnResult> LoadPaymentDataTable();
-        Task<ReturnResult> FillCampaignDropdown();
-        Task<ReturnResult> FillUserPaymentDropdown();
         Task<ReturnResult> GetOutstandingBalance(int id);
         Task<ReturnResult> GetInvoiceDetails(int id);
-        Task<ReturnResult> ReceivePayment(AdvertiserCreditPaymentFormModel model);
+        Task<ReturnResult> SendInvoice(IdCollectionViewModel model);
+        Task<ReturnResult> ReceivePayment(AdvertiserCreditFormModel model);
     }
 }

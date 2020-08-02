@@ -105,7 +105,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         public async Task<ReturnResult> GetOperator(int id)
         {
             var select_query = @"SELECT op.OperatorId,OperatorName,co.Name AS CountryName,cu.CurrencyCode,AdtoneServerOperatorId,
-	                                IsActive,EmailCost,SmsCost,op.CurrencyId
+	                                IsActive,EmailCost,SmsCost,op.CurrencyId,op.CountryId
                                     FROM Operators AS op LEFT JOIN Country AS co ON op.CountryId=co.Id
                                     LEFT JOIN Currencies AS cu ON op.CurrencyId=cu.CurrencyId WHERE OperatorId=@Id";
             try

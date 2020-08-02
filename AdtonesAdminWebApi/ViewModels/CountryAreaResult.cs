@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.ViewModels
 {
+    
     public class CountryResult
     {
         public int Id { get; set; }
@@ -13,7 +14,7 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public string ShortName { get; set; }
         public string CountryCode { get; set; }
-        public decimal TaxPercentage { get; set; }
+        public decimal TaxPercantage { get; set; }
 
         public DateTime? CreatedDate { get; set; }
         public int Status { get; set; }
@@ -25,5 +26,16 @@ namespace AdtonesAdminWebApi.ViewModels
         public IFormFile file { get; set; }
     }
 
-    
+
+    public class AreaResult
+    {
+        public int AreaId { get; set; }
+        public string AreaName { get; set; }
+
+        public int? CountryId { get; set; }
+        public string CountryName { get; set; }
+        public bool IsActive { get; set; }
+    }
+
+
 }

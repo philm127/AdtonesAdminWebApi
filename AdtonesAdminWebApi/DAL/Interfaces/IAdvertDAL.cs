@@ -8,7 +8,13 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     public interface IAdvertDAL
     {
         Task<IEnumerable<UserAdvertResult>> GetAdvertResultSet(int id = 0);
+        Task<IEnumerable<UserAdvertResult>> GetAdvertResultSetById(int id = 0);
         Task<IEnumerable<AdvertCategoryResult>> GetAdvertCategoryList();
+        Task<AdvertCategoryResult> GetAdvertCategoryDetails(int id);
+        Task<int> UpdateAdvertCategory(AdvertCategoryResult model);
+        Task<int> InsertAdvertCategoryOperator(AdvertCategoryResult model, int catId);
+        Task<int> InsertAdvertCategory(AdvertCategoryResult model);
+        Task<int> RemoveAdvertCategory(IdCollectionViewModel model);
         Task<UserAdvertResult> GetAdvertDetail(int id = 0);
         Task<int> ChangeAdvertStatus(UserAdvertResult command);
         Task<int> ChangeAdvertStatusOperator(UserAdvertResult model, int userId);

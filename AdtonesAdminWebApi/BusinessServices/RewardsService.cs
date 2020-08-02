@@ -143,5 +143,33 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> DeleteReward(int id)
+        {
+            var delete_query = @"DELETE FROM Rewards WHERE RewardId=@Id;";
+
+            try
+            {
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await connection.OpenAsync();
+                    var x = await connection.ExecuteScalarAsync<int>(delete_query, new { Id = id });
+                }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "RewardService",
+                    ProcedureName = "DeleteReward"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
     }
 }

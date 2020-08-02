@@ -59,7 +59,7 @@ namespace AdtonesAdminWebApi.DAL
         /// <returns>IEnumerable List of strings</returns>
         public async Task<IEnumerable<string>> GetConnectionStrings(int Id=0)
         {
-            var test = true;
+            var test = _configuration.GetValue<bool>("Environment:Test");
             if (test)
             {
                 List<string> str = null;
@@ -68,15 +68,62 @@ namespace AdtonesAdminWebApi.DAL
             }
             else
             {
-                StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings WHERE OperatorId=@Id");
+                StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings");
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
                     if (Id > 0)
+                    {
+                        sb.Append(" WHERE OperatorId=@Id");
                         return await connection.QueryAsync<string>(sb.ToString(), new { Id = Id });
+                    }
                     else
                         return await connection.QueryAsync<string>(sb.ToString());
+                }
+            }
+        }
+
+
+        public async Task<IEnumerable<string>> GetConnectionStringsByCountry(int Id)
+        {
+            var test = _configuration.GetValue<bool>("Environment:Test");
+            if (test)
+            {
+                List<string> str = null;
+                str.Add(_configuration.GetConnectionString("TestProvoConnection"));
+                return str;
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings WHERE CountryId=@Id");
+
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await connection.OpenAsync();
+
+                    return await connection.QueryAsync<string>(sb.ToString(), new { Id = Id });
+                }
+            }
+        }
+
+
+        public async Task<string> GetOperatorConnectionByUserId(int id)
+        {
+            var test = _configuration.GetValue<bool>("Environment:Test");
+            if (test)
+            {
+                return _configuration.GetConnectionString("TestProvoConnection");
+            }
+            else
+            {
+                string select_query = @"SELECT ConnectionString FROM CountryConnectionStrings AS conn 
+                                        INNER JOIN Contacts AS ct ON ct.CountryId=conn.CountryId WHERE ct.UserId=@userId";
+
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await connection.OpenAsync();
+                    return await connection.QueryFirstOrDefaultAsync<string>(select_query, new { userId = id });
                 }
             }
         }

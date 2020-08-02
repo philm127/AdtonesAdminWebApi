@@ -88,16 +88,15 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     await connection.OpenAsync();
                     prof = await connection.QueryFirstOrDefaultAsync<ProfileMatchInformationFormModel>(@"SELECT p.Id, p.ProfileName,p.IsActive,
-                                                                                                    c.Name,p.ProfileType
+                                                                                                    p.ProfileType,p.CountryId
                                                                                                     FROM ProfileMatchInformations p
-                                                                                                    LEFT JOIN Country c ON p.CountryId=c.Id
                                                                                                     WHERE p.Id=@id", new { id });
                 }
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    label = await connection.QueryAsync<ProfileMatchLabelFormModel>(@"SELECT Id,ProfileLabel,ProfileMatchInformationId,CreatedDate
+                    label = await connection.QueryAsync<ProfileMatchLabelFormModel>(@"SELECT Id,ProfileLabel,ProfileMatchInformationId,FORMAT(CreatedDate, 'd', 'en-gb') as CreatedDate
                                                                                                     FROM ProfileMatchLabels
                                                                                                     WHERE ProfileMatchInformationId=@id", new { prof.Id });
                 }
