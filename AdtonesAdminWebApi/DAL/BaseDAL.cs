@@ -2,11 +2,12 @@
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+
 
 namespace AdtonesAdminWebApi.DAL
 {
@@ -26,7 +27,7 @@ namespace AdtonesAdminWebApi.DAL
             _connService = connService;
         }
 
-
+        
         /// <summary>
         /// Takes the arrays from general permissions to allow access by country, operator, advertisers or all 3.
         /// </summary>
@@ -39,16 +40,17 @@ namespace AdtonesAdminWebApi.DAL
         /// <returns>A Tuple of an updated StringBuilder and an updated Dapper Query Builder</returns>
         public (StringBuilder sbuild, SqlBuilder build) CheckGeneralFile(StringBuilder sb, SqlBuilder builder, string pais = null, string ops = null, string advs = null, string test = null)
         {
-
-            var directoryName = string.Empty;
-            //var dir = "\\TempGenPermissions\\general.json";
-            //var otherpath = _env.ContentRootPath;
-            if (test == "op")
-                directoryName = System.IO.File.ReadAllText("C:\\Development\\Adtones-Admin\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\TempGenPermissions\\generalOp.json");//Path.Combine(otherpath, dir));
+            //IWebHostEnvironment _env;
+            var genFile = string.Empty;
+            string genLoc = string.Empty;
+            if(test == "op")
+                genLoc = _configuration.GetValue<string>("Environment:GeneralTestOpJson");
             else
-                directoryName = System.IO.File.ReadAllText("C:\\Development\\Adtones-Admin\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\TempGenPermissions\\general.json");
-
-            PermissionModel gen = JsonSerializer.Deserialize<PermissionModel>(directoryName);
+                genLoc = _configuration.GetValue<string>("Environment:GeneralTestJson").ToString();
+            
+            genFile = System.IO.File.ReadAllText(genLoc);
+           
+            PermissionModel gen = JsonSerializer.Deserialize<PermissionModel>(genFile);
 
             var els = gen.elements.ToList();
 
