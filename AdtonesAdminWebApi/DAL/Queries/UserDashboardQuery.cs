@@ -47,10 +47,11 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         GROUP BY bill3.UserId) billit
                                                     ON item.UserId = billit.UserId
                                                     LEFT JOIN Contacts AS cont ON cont.UserId=item.UserId
-                                                    LEFT JOIN Country AS co ON cont.CountryId=co.Id;";
+                                                    LEFT JOIN Country AS co ON cont.CountryId=co.Id
+                                                    LEFT JOIN Operators AS op ON op.CountryId=co.Id";
 
 
-        // Operators version of Advertisers table. INNER JOINS on Advert for only their adverts and does not select Role.
+        // Operators version of Advertisers table. INNER JOINS on Advert for only their adverts, adds mobileNumber and does not select Role.
         public static string OperatorAdvertiserResultQuery => @"SELECT item.UserId,item.RoleId,item.Email,item.FirstName,item.LastName,
                                                           ISNULL(camp.NoOfactivecampaign, 0) AS NoOfactivecampaign,con.MobileNumber,
                                                            ISNULL(ad.NoOfunapprovedadverts, 0) AS NoOfunapprovedadverts,
@@ -75,7 +76,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                     WHERE Status IN (4, 3, 2, 1) GROUP BY UserId) camp
                                                             ON item.UserId = camp.UserId
                                                             LEFT JOIN
-                                                                (SELECT COUNT(AdvertId) AS NoOfunapprovedadverts,UserId FROM Advert WHERE Status = 4 GROUP BY UserId) ad
+                                                                (SELECT COUNT(AdvertId) AS NoOfunapprovedadverts,UserId,OperatorId FROM Advert WHERE Status = 4 GROUP BY UserId,OperatorId) ad
                                                             ON item.UserId = ad.UserId
                                                             LEFT JOIN
                                                                 (SELECT COUNT(bill3.UserId) AS outStandingInvoice,bill3.UserId
@@ -98,6 +99,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 FROM Users AS u LEFT JOIN Operators AS o ON u.OperatorId=o.OperatorId
                                                 LEFT JOIN Country AS c ON o.CountryId=c.Id
                                                 WHERE RoleId=6 ORDER BY u.DateCreated DESC";
+
+
 
 
         public static string SubscriberResultQuery => @"SELECT u.UserId,u.Activated,u.DateCreated,FirstName,LastName,p.MSISDN,u.OperatorName,u.Email,u.Activated

@@ -17,7 +17,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> RemoveAdvertCategory(IdCollectionViewModel model);
         Task<UserAdvertResult> GetAdvertDetail(int id = 0);
         Task<int> ChangeAdvertStatus(UserAdvertResult command);
-        Task<int> ChangeAdvertStatusOperator(UserAdvertResult model, int userId);
+        Task<int> ChangeAdvertStatusOperator(UserAdvertResult model, int userId, int adId);
         Task<FtpDetailsModel> GetFtpDetails(int operatorId);
         Task<int> UpdateMediaLoaded(UserAdvertResult advert);
         Task<int> RejectAdvertReason(UserAdvertResult model);

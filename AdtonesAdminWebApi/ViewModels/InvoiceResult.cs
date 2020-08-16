@@ -17,7 +17,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string ClientName { get; set; }
         public string CampaignName { get; set; }
         public int CampaignProfileId { get; set; }
-        public string CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
         public int Status { get; set; }
         public string Description { get; set; }
 
@@ -33,7 +33,7 @@ namespace AdtonesAdminWebApi.ViewModels
        
         public string rStatus { get; set; }
 
-        public string SettledDate { get; set; }
+        public DateTime SettledDate { get; set; }
 
         public string PaymentMethod { get; set; }
 

@@ -11,8 +11,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string CheckIfUserExists => @"SELECT COUNT(1) FROM UsersCredit WHERE UserId=@userId";
 
-        public static string UpdateUserCredit => @"UPDATE UsersCredit SET UserId=@UserId,AssignCredit=@AssignCredit,AvailableCredit=@AvailableCredit,
-                                                UpdatedDate=GETDATE(),CurrencyId=@CurrencyId
+        public static string UpdateUserCredit => @"UPDATE UsersCredit SET AssignCredit=AssignCredit + @AssignCredit,AvailableCredit=AvailableCredit +  @AssignCredit,
+                                                UpdatedDate=GETDATE()
                                                 WHERE Id = @Id";
 
 
@@ -29,6 +29,14 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         public static string GetTotalBilledByUser => @"SELECT sum(FundAmount) FROM Billing WHERE PaymentMethodId=1 AND UserId=@UserId GROUP BY UserId";
+
+
+        public static string UpdateCampaignCredit => @"UPDATE CampaignCreditPeriods SET CreditPeriod=@CreditPeriod WHERE ";
+
+
+        public static string InsertCampaignCredit => @"INSERT INTO CampaignCreditPeriods(CreditPeriod,UserId,CampaignProfileId,UpdatedDate,CreatedDate,AdtoneServerCampaignCreditPeriodId)
+                                                                VALUES(@CreditPeriod,@UserId,@CampaignProfileId, GETDATE(),GETDATE(),@AdtoneServerCampaignCreditPeriodId);
+                                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
     }
 

@@ -33,7 +33,6 @@ namespace AdtonesAdminWebApi.DAL
         /// <returns>string value of a ConnectionString</returns>
         public async Task<string> GetSingleConnectionString(int Id = 0)
         {
-            /// TODO: This needs to be sorted in a better manner
             var test = _configuration.GetValue<bool>("Environment:Test");
             if (test)
                 return _configuration.GetConnectionString("TestProvoConnection");
@@ -90,10 +89,13 @@ namespace AdtonesAdminWebApi.DAL
             var test = _configuration.GetValue<bool>("Environment:Test");
             if (test)
             {
-                List<string> str = null;
-                str.Add(_configuration.GetConnectionString("TestProvoConnection"));
+                var str = new List<string>()
+                    {
+                        _configuration.GetConnectionString("TestProvoConnection")
+                    };
                 return str;
             }
+
             else
             {
                 StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings WHERE CountryId=@Id");

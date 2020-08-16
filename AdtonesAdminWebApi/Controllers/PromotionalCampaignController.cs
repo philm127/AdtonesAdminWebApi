@@ -60,10 +60,22 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body success or error message</returns>
-        [HttpPost("v1/UpdatePromoCampaignStatus")]
+        [HttpPut("v1/UpdatePromoCampaignStatus")]
         public async Task<ReturnResult> UpdatePromoCampaignStatus(IdCollectionViewModel model)
         {
             return await _campService.UpdatePromotionalCampaignStatus(model);
+        }
+
+
+        /// <summary>
+        /// Gets an available list of BatchId's to be used in adding a new Promo Batch
+        /// takes in operator id to search provisioning DB
+        /// </summary>
+        /// <returns>body contains SharedSelectList of BatchId</returns>
+        [HttpGet("v1/GetAvailableBatchId/{id}")]
+        public async Task<ReturnResult> GetAvailableBatchId(int id)
+        {
+            return await _campService.GetPromoBatchIdList(id);
         }
     }
 }

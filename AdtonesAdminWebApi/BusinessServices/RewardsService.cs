@@ -1,9 +1,7 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
+using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
-using Dapper;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
 
@@ -11,31 +9,24 @@ namespace AdtonesAdminWebApi.BusinessServices
 {
     public class RewardsService : IRewardsService
     {
-        private readonly IConfiguration _configuration;
+        
         ReturnResult result = new ReturnResult();
+        private readonly IRewardDAL _rewardDAL;
 
-
-        public RewardsService(IConfiguration configuration)
+        public RewardsService(IRewardDAL rewardDAL)
 
         {
-            _configuration = configuration;
+            _rewardDAL = rewardDAL;
         }
 
 
         public async Task<ReturnResult> LoadRewardsDataTable()
         {
-            var select_query = @"SELECT RewardId,RewardName,CONVERT(DECIMAL(18,2),replace(RewardValue, ',', '')) AS RewardValue,
-                                                    r.AddedDate AS CreatedDate,r.OperatorId,op.OperatorName
-                                                      FROM Rewards AS r LEFT JOIN Operators AS op ON r.OperatorId=op.OperatorId
-                                                      ORDER BY r.AddedDate DESC";
-
+            
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryAsync<RewardResult>(select_query);
-                }
+
+                result.body = await _rewardDAL.LoadRewardResultSet();
             }
             catch (Exception ex)
             {
@@ -55,18 +46,10 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> GetReward(int id)
         {
-            var select_query = @"SELECT RewardId,RewardName,CONVERT(DECIMAL(18,2),replace(RewardValue, ',', '')) AS RewardValue,
-                                                    r.AddedDate,r.UpdatedDate AS CreatedDate,r.OperatorId,op.OperatorName
-                                                      FROM Rewards AS r LEFT JOIN Operators AS op ON r.OperatorId=op.OperatorId
-                                                       WHERE RewardId=@Id";
 
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<RewardResult>(select_query, new { Id = id });
-                }
+                result.body = await _rewardDAL.GetRewardById(id);
             }
             catch (Exception ex)
             {
@@ -86,17 +69,10 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> AddReward(RewardResult model)
         {
-            var insert_query = @"INSERT INTO Rewards(OperatorId,RewardName,RewardValue,AddedDate,UpdatedDate)
-                                        VALUES(@OperatorId,@RewardName,@RewardValue,GETDATE(),GETDATE());
-                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    var x = await connection.ExecuteScalarAsync<int>(insert_query, model);
-                }
+                var x = await _rewardDAL.AddReward(model);
             }
             catch (Exception ex)
             {
@@ -116,16 +92,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> UpdateReward(RewardResult model)
         {
-            var update_query = @"UPDATE Rewards SET RewardValue = @RewardValue,UpdatedDate = @UpdatedDate 
-                                            WHERE RewardId = @RewardId)";
-
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    var x = await connection.ExecuteScalarAsync<int>(update_query, model);
-                }
+                var x = await _rewardDAL.UpdateReward(model);
             }
             catch (Exception ex)
             {
@@ -145,15 +114,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> DeleteReward(int id)
         {
-            var delete_query = @"DELETE FROM Rewards WHERE RewardId=@Id;";
-
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    var x = await connection.ExecuteScalarAsync<int>(delete_query, new { Id = id });
-                }
+                var x = await _rewardDAL.DeleteRewardById(id);
             }
             catch (Exception ex)
             {

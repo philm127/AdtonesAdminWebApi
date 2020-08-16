@@ -28,7 +28,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-       
+
 
         public async Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _usercredit)
         {
@@ -39,20 +39,14 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var query = string.Empty;
                 if (await _userDAL.CheckUserCreditExist(_usercredit.UserId))
                 {
-                    x = await _userDAL.AddUserCredit(_usercredit);
+                    // Unsure why I put this in I'm sure a good reason but out for now
+                    // var available = await CalculateNewCredit(_usercredit.UserId);
+                    //_usercredit.AvailableCredit = _usercredit.AssignCredit + available;
+                    x = await _userDAL.UpdateUserCredit(_usercredit);
                 }
                 else
                 {
-                    var available = await CalculateNewCredit(_usercredit.UserId);
-                    _usercredit.AvailableCredit = _usercredit.AssignCredit + available;
-                    x = await _userDAL.UpdateUserCredit(_usercredit);
-                }
-
-                if (x != 1)
-                {
-                    result.result = 0;
-                    result.error = "Credit was not added successfully";
-                    return result;
+                    x = await _userDAL.AddUserCredit(_usercredit);
                 }
             }
             catch (Exception ex)
@@ -142,6 +136,52 @@ namespace AdtonesAdminWebApi.BusinessServices
         //    return result;
 
         //}
+
+
+        public async Task<ReturnResult> UpdateCampaignCredit(CampaignCreditResult model)
+        {
+            try
+            {
+                // Need to do this to get OperatorId
+                result.body = await _userDAL.UpdateCampaignCredit(model);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertiserPaymentService",
+                    ProcedureName = "UpdateCampaignCredit"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> AddCampaignCredit(CampaignCreditResult model)
+        {
+            try
+            {
+                // Need to do this to get OperatorId
+                result.body = await _userDAL.InsertCampaignCredit(model);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertiserPaymentService",
+                    ProcedureName = "UpdateCampaignCredit"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
 
 
 

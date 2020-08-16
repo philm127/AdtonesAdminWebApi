@@ -12,6 +12,14 @@ namespace AdtonesAdminWebApi.OperatorSpecific
     {
         private const int ProvisionBatchSize = 1500;
         ReturnResult result = new ReturnResult();
+
+        private readonly ISavePUToDatabase _putDB;
+
+        public ExpressoProcessPromoUser(ISavePUToDatabase putDB)
+        {
+            _putDB = putDB;
+        }
+
         public async Task<ReturnResult> ProcPromotionalUser(HashSet<string> promoMsisdns, PromotionalUserFormModel model)
         {
             try
@@ -62,8 +70,8 @@ namespace AdtonesAdminWebApi.OperatorSpecific
                 var provisionResults = await ExpressoOperator.ExpressoProvisionBatch(requests);
 
                 // Saving records to Operator's DB.
-                SavePUToDatabase pu = new SavePUToDatabase();
-                await pu.DoSaveToDatabase(provisionResults,
+
+                await _putDB.DoSaveToDatabase(provisionResults,
                     (source, table) => // this is a converter method that transforms all ProvisionRequests to a List of DataRows.
                                     source
                                     //.Where(ExpressoOperator.IsSuccess)   //TODO!!! uncomment to save ONLY NEWLY ONBOARDED (code==0001). 

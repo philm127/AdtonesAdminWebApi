@@ -35,21 +35,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
 
-        public static string GetCampaignCreditResultSet => @"SELECT CampaignCreditPeriodId,ccp.UserId,CONCAT(usr.FirstName,' ',usr.LastName) AS UserName,
-                                                            ccp.CampaignProfileId,camp.CampaignName,CreditPeriod,ccp.CreatedDate
-                                                    FROM CampaignCreditPeriods AS ccp LEFT JOIN Users AS usr ON ccp.UserId=usr.UserId
-                                                    LEFT JOIN CampaignProfile AS camp ON camp.CampaignProfileId=ccp.CampaignProfileId 
-                                                    LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId";
-
-
-        public static string UpdateCampaignCredit => @"UPDATE CampaignCreditPeriods SET CreditPeriod=@CreditPeriod 
-                                                                                WHERE CampaignCreditPeriodId=@Id;";
-
-
-        public static string InsertCampaignCredit => @"INSERT INTO CampaignCreditPeriods(CreditPeriod,UserId,CampaignProfileId)
-                                                                VALUES(@CreditPeriod,@UserId,@CampaignProfileId);";
-
-
         public static string GetCampaignProfileById => @"SELECT CampaignProfileId,UserId,ClientId,CampaignName,CampaignDescription,
                                                     TotalBudget,MaxBid,TotalCredit,SpendToDate,AvailableCredit,PlaysToDate,
                                                     CancelledToDate,SmsToDate,EmailToDate,EmailFileLocation,Active,NumberOfPlays,
@@ -74,6 +59,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string CheckCampaignBillingExists => @"SELECT COUNT(1) FROM Billing WHERE CampaignProfileId=@Id;";
 
 
-
+        public static string UpdateCampaignMatchStatus => @"UPDATE CampaignMatches SET Status=@Status WHERE MSCampaignProfileId=@Id";
     }
 }

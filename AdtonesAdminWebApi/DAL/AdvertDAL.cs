@@ -39,7 +39,7 @@ namespace AdtonesAdminWebApi.DAL
                 sb = values.Item1;
                 builder = values.Item2;
             
-            sb.Append(" ORDER BY ad.AdvertId DESC;");
+            sb.Append(" ORDER BY ad.CreatedDateTime DESC, ad.Status DESC;");
 
             var select = builder.AddTemplate(sb.ToString());
             try
@@ -296,7 +296,7 @@ namespace AdtonesAdminWebApi.DAL
         /// <param name="model"></param>
         /// <param name="userId">UserId obtained from operator provisioning server using AdtonesDServerUserId</param>
         /// <returns></returns>
-        public async Task<int> ChangeAdvertStatusOperator(UserAdvertResult model,int userId)
+        public async Task<int> ChangeAdvertStatusOperator(UserAdvertResult model,int userId, int adId)
         {
             var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
             var sb = new StringBuilder();
@@ -307,7 +307,7 @@ namespace AdtonesAdminWebApi.DAL
             var select = builder.AddTemplate(sb.ToString());
             try
             {
-                builder.AddParameters(new { AdvertId = model.AdvertId });
+                builder.AddParameters(new { AdvertId = adId });
                 builder.AddParameters(new { UpdatedBy = userId });
                 builder.AddParameters(new { Status = model.Status });
 
@@ -367,7 +367,7 @@ namespace AdtonesAdminWebApi.DAL
             {
                 builder.AddParameters(new { AdvertId = model.AdvertId });
                 builder.AddParameters(new { UserId = model.UpdatedBy });
-                builder.AddParameters(new { RejectReason = model.RejectionReason });
+                builder.AddParameters(new { RejectionReason = model.RejectionReason });
                 builder.AddParameters(new { AdtoneServerAdvertRejectionId = 0});
 
                 return await _executers.ExecuteCommand(_connStr,
@@ -388,7 +388,7 @@ namespace AdtonesAdminWebApi.DAL
             {
                 builder.AddParameters(new { AdvertId = adId });
                 builder.AddParameters(new { UserId = uid });
-                builder.AddParameters(new { RejectReason = model.RejectionReason });
+                builder.AddParameters(new { RejectionReason = model.RejectionReason });
                 builder.AddParameters(new { AdtoneServerAdvertRejectionId = rejId });
 
                 return await _executers.ExecuteCommand(connString,

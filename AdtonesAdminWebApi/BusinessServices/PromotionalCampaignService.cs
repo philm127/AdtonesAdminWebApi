@@ -21,27 +21,29 @@ namespace AdtonesAdminWebApi.BusinessServices
         public IConnectionStringService _connService { get; }
         private readonly IConfiguration _configuration;
         private readonly IExpressoProcessPromoUser _operatorExpresso;
-        private readonly ISafaricomProcessPromoUser _operatorSafaricom;
+        // private readonly ISafaricomProcessPromoUser _operatorSafaricom;
         private readonly ISaveGetFiles _saveFile;
         private readonly IAdvertDAL _advertDAL;
         private readonly IAdTransferService _adTransfer;
+        private readonly IConvertSaveMediaFile _convFile;
         private readonly IPromotionalCampaignDAL _provisionServer;
 
         ReturnResult result = new ReturnResult();
 
         public PromotionalCampaignService(IWebHostEnvironment webHostEnvironment, IConnectionStringService connService, IPromotionalCampaignDAL provisionServer,
-                                        IConfiguration configuration, IExpressoProcessPromoUser operatorExpresso, ISafaricomProcessPromoUser operatorSafaricom,
-                                        ISaveGetFiles saveFile, IAdvertDAL advertDAL, IAdTransferService adTransfer)
+                                        IConfiguration configuration, IExpressoProcessPromoUser operatorExpresso, IConvertSaveMediaFile convFile,
+                                        ISaveGetFiles saveFile, IAdvertDAL advertDAL, IAdTransferService adTransfer) // ISafaricomProcessPromoUser operatorSafaricom,
         {
             _webHostEnvironment = webHostEnvironment;
             _provisionServer = provisionServer;
             _connService = connService;
             _configuration = configuration;
             _operatorExpresso = operatorExpresso;
-            _operatorSafaricom = operatorSafaricom;
+            // _operatorSafaricom = operatorSafaricom;
             _saveFile = saveFile;
             _advertDAL = advertDAL;
             _adTransfer = adTransfer;
+            _convFile = convFile;
         }
 
 
@@ -77,10 +79,10 @@ namespace AdtonesAdminWebApi.BusinessServices
                     {
                         var res = await _operatorExpresso.ProcPromotionalUser(promoMsisdns, model);
                     }
-                    else if (model.OperatorId == (int)Enums.OperatorTableId.Safaricom)
-                    {
-                        var res = await _operatorSafaricom.ProcPromotionalUser(promoMsisdns, model);
-                    }
+                    //else if (model.OperatorId == (int)Enums.OperatorTableId.Safaricom)
+                    //{
+                    //    var res = await _operatorSafaricom.ProcPromotionalUser(promoMsisdns, model);
+                    //}
                     else
                     {
                         result.error = " Operator implementation is under process.";
@@ -109,7 +111,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> AddPromotionalCampaign(PromotionalCampaignResult model)
         {
-            bool exists = await _provisionServer.GetPromoCampaignBatchIdCheckForExisting(model.BatchID.ToString());
+            model.Status = 1;
+
+            bool exists = await _provisionServer.GetPromoCampaignBatchIdCheckForExisting(model);
 
             if (exists)
             {
@@ -122,25 +126,25 @@ namespace AdtonesAdminWebApi.BusinessServices
             if (mediaFile != null && mediaFile.Length != 0)
             {
 
-                string directoryName = "/PromotionalMedia/";
-                directoryName = Path.Combine(directoryName, model.OperatorId.ToString());
-
-                string fileName = Path.GetFileName(mediaFile.FileName);
-
                 string extension = Path.GetExtension(mediaFile.FileName);
                 var onlyFileName = Path.GetFileNameWithoutExtension(mediaFile.FileName);
-
-                string outputFormat = model.OperatorId == 1 ? "wav" : model.OperatorId == 2 ? "mp3" : "wav";
+                // string outputFormat = model.OperatorId == 1 ? "wav" : model.OperatorId == 2 ? "mp3" : "wav";
+                string outputFormat = "wav";
                 var audioFormatExtension = "." + outputFormat;
+
+                string fileName = Path.GetFileName(mediaFile.FileName);
+                string directoryName = "PromotionalMedia";
+                directoryName = Path.Combine(directoryName, model.OperatorId.ToString());
                 string newfile = string.Empty;
+              
 
                 if (extension != audioFormatExtension)
                 {
                     // Put this to return either the filename or filepath from service
-                    string tempDirectoryName = "/PromotionalMedia/Temp/";
+                    string tempDirectoryName = "PromotionalMedia/Temp";
                     string tempFile = await _saveFile.SaveFileToSite(tempDirectoryName, mediaFile);
 
-                    newfile = ConvertSaveMediaFile.ConvertAndSaveMediaFile(tempDirectoryName + tempFile, extension, outputFormat, onlyFileName, directoryName);
+                    newfile = _convFile.ConvertAndSaveMediaFile(tempDirectoryName + tempFile, extension, outputFormat, onlyFileName, directoryName);
                     model.AdvertLocation = Path.Combine(directoryName, newfile);
                 }
                 else
@@ -148,11 +152,11 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                     newfile = await _saveFile.SaveFileToSite(directoryName, mediaFile);
 
-                    string archiveDirectoryName = "/PromotionalMedia/Archive/";
+                    string archiveDirectoryName = "PromotionalMedia/Archive";
 
-                    string apath = await _saveFile.SaveFileToSite(archiveDirectoryName, mediaFile);
+                    string apath = await _saveFile.SaveOriginalFileToSite(archiveDirectoryName, mediaFile);
 
-                    model.AdvertLocation = $"{directoryName}/{newfile}";
+                    model.AdvertLocation = $"/{directoryName}/{newfile}";
                 }
 
                 int promoId = 0;
@@ -193,9 +197,21 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 var operatorFTPDetails = await _advertDAL.GetFtpDetails(model.OperatorId);
 
-                //Transfer Advert File From Operator Server to Linux Server
-                var returnValue = await _adTransfer.CopyPromoAdToOperatorServer(model, newfile);
-                if (returnValue)
+                // Transfer Advert File From Operator Server to Linux Server
+                var test = _configuration.GetValue<bool>("Environment:TestOperatorServer");
+                if (!test)
+                {
+                    var returnValue = await _adTransfer.CopyPromoAdToOperatorServer(model, newfile);
+                    if (returnValue)
+                    {
+                        if (operatorFTPDetails != null)
+                            model.AdvertLocation = operatorFTPDetails.FtpRoot + "/" + model.AdvertLocation.Split('/')[3];
+
+                        opPromoId = await _provisionServer.AddPromotionalCampaignToOperator(model);
+                        ftpFile = model.AdvertLocation;
+                    }
+                }
+                else
                 {
                     if (operatorFTPDetails != null)
                         model.AdvertLocation = operatorFTPDetails.FtpRoot + "/" + model.AdvertLocation.Split('/')[3];
@@ -229,6 +245,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
+                // Updates both main and provisioning server
                 result.body = await _provisionServer.UpdatePromotionalCampaignStatus(model);
             }
             catch (Exception ex)
@@ -262,6 +279,28 @@ namespace AdtonesAdminWebApi.BusinessServices
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "PromotionalCampaignService",
                     ProcedureName = "LoadPromoCampaignDataTable"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> GetPromoBatchIdList(int operatorId)
+        {
+            try
+            {
+                result.body = await _provisionServer.GetPromoBatchIdList(operatorId);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "PromotionalCampaignService",
+                    ProcedureName = "GetPromoBatchIdList"
                 };
                 _logging.LogError();
                 result.result = 0;
@@ -314,8 +353,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             return strList;
         }
-    
-        
 
     }
 }

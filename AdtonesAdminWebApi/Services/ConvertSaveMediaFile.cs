@@ -9,12 +9,23 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace AdtonesAdminWebApi.Services
 {
-    public static class ConvertSaveMediaFile
+    
+    public interface IConvertSaveMediaFile
     {
-        public static IWebHostEnvironment env { get; private set; }
-        public static string ConvertAndSaveMediaFile(string audioFilePath, string extension, string outputFormat, string onlyFileName, string directoryName)
+        string ConvertAndSaveMediaFile(string audioFilePath, string extension, string outputFormat, string onlyFileName, string directoryName);
+    }
+    public class ConvertSaveMediaFile : IConvertSaveMediaFile
+    {
+        private readonly IWebHostEnvironment _env;
+
+        public ConvertSaveMediaFile(IWebHostEnvironment env)
         {
-            var otherpath = env.ContentRootPath;
+            _env = env;
+        }
+
+        public string ConvertAndSaveMediaFile(string audioFilePath, string extension, string outputFormat, string onlyFileName, string directoryName)
+        {
+            var otherpath = _env.ContentRootPath;
             try
             {
                 string inputFormat = extension.Replace(".", "");

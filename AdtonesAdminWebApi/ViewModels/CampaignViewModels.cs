@@ -37,16 +37,6 @@ namespace AdtonesAdminWebApi.ViewModels
 
     }
 
-    public class CampaignCreditResult
-    {
-        public int CampaignCreditPeriodId { get; set; }
-        public int UserId { get; set; }
-        public string UserName { get; set; }
-        public int CampaignProfileId { get; set; }
-        public string CampaignName { get; set; }
-        public int CreditPeriod { get; set; }
-        public DateTime? CreatedDate { get; set; }
-    }
 
     public class CampaignProfile
     {
@@ -172,6 +162,13 @@ namespace AdtonesAdminWebApi.ViewModels
         public int? CurrencyId { get; set; }
 
         public int OperatorId { get; set; }
+    }
+
+
+    public class CampaignBudgetModel
+    {
+        public float MaxHourlyBudget { get; set; }
+        public float MaxBid { get; set; }
     }
 
 

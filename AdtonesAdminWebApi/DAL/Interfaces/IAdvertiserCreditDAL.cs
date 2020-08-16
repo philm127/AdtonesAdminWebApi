@@ -14,5 +14,8 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<AdvertiserCreditFormModel> GetUserCreditDetail(int id);
         Task<decimal> GetCreditBalance(int id);
         Task<bool> CheckUserCreditExist(int userId);
+
+        Task<int> UpdateCampaignCredit(CampaignCreditResult model);
+        Task<int> InsertCampaignCredit(CampaignCreditResult model);
     }
 }

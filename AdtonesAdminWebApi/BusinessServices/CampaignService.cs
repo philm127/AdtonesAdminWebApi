@@ -15,6 +15,7 @@ namespace AdtonesAdminWebApi.BusinessServices
     public class CampaignService : ICampaignService
     {
         private readonly IConfiguration _configuration;
+
         public IConnectionStringService _connService { get; }
         // private readonly ISaveFiles _saveFile;
         ReturnResult result = new ReturnResult();
@@ -82,73 +83,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> LoadCampaignCreditDataTable(int id=0)
-        {
-            try
-            {
-                    result.body = await _campDAL.GetCampaignCreditResultSet(id);
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CampaignService",
-                    ProcedureName = "LoadCampaignCreditDataTable"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> UpdateCampaignCredit(CampaignCreditResult model)
-        {
-            try
-            {
-                // Need to do this to get OperatorId
-                result.body = await _campDAL.UpdateCampaignCredit(model);
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CampaignService",
-                    ProcedureName = "UpdateCampaignCredit"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> AddCampaignCredit(CampaignCreditResult model)
-        {
-            try
-            {
-                // Need to do this to get OperatorId
-                result.body = await _campDAL.InsertCampaignCredit(model);
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CampaignService",
-                    ProcedureName = "UpdateCampaignCredit"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
-            return result;
-        }
-
+        
 
         /// <summary>
         /// Changed for the actual campaign directly
@@ -172,6 +107,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 result.body = await _campDAL.ChangeCampaignProfileStatus(_campProfile);
                 var x = await _campDAL.ChangeCampaignProfileStatusOperator(_campProfile);
+                var y = await _campDAL.UpdateCampaignMatch(_campProfile);
+
+
             }
             catch (Exception ex)
             {
@@ -192,8 +130,8 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// <summary>
         /// Changed when advert status changed, called by Adverts changed status
         /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
+        /// <param name="campaignId"></param>
+        /// <returns>True or False</returns>
         public async Task<bool> ChangeCampaignStatus(int campaignId)
         {
             try

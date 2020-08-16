@@ -9,13 +9,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using AdtonesAdminWebApi.Services;
-
 using AdtonesAdminWebApi.OperatorSpecific;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Shared;
 using AdtonesAdminWebApi.DAL;
 using AdtonesAdminWebApi.UserMatchServices;
 using AdtonesAdminWebApi.Services.Mailer;
+using System.Collections.Generic;
 
 namespace AdtonesAdminWebApi
 {
@@ -31,6 +31,14 @@ namespace AdtonesAdminWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add CORS policy
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
+            });
 
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddMemoryCache();
@@ -88,6 +96,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IPermissionManagementDAL, PermissionManagementDAL>();
             services.AddScoped<IManagementReportDAL, ManagementReportDAL>();
             services.AddScoped<IFinanceTablesDAL, FinanceTablesDAL>();
+            services.AddScoped<IRewardDAL, RewardDAL>();
 
             #endregion
 
@@ -95,8 +104,8 @@ namespace AdtonesAdminWebApi
             // DAL Query Execution.
             services.AddTransient<IExecutionCommand, ExecutionCommand>();
 
+            #region Special Services
 
-            // Special Services
             services.AddScoped<ISaveGetFiles, SaveGetFiles>();
             services.AddTransient<IUserMatchInterface, UserMatchTableProcess>();
             services.AddTransient<IAdTransferService, AdTransferService>();
@@ -104,11 +113,16 @@ namespace AdtonesAdminWebApi
             services.AddTransient<ILiveAgentService, LiveAgentService>();
             services.AddTransient<ISoapApiService, SoapApiService>();
             services.AddTransient<ISendEmailMailer, SendEmailMailer>();
+            services.AddTransient<IPrematchProcess, PrematchProcess>();
+            services.AddTransient<IConvertSaveMediaFile, ConvertSaveMediaFile>();
             // services.AddTransient<IGeneralPemissionAssignment, GeneralPemissionAssignment> ();
+
+            #endregion
 
             // Client Specific Services
             services.AddScoped<IExpressoProcessPromoUser, ExpressoProcessPromoUser>();
             services.AddScoped<ISafaricomProcessPromoUser, SafaricomProcessPromoUser>();
+            services.AddScoped<ISavePUToDatabase, SavePUToDatabase>();
 
 
             #region Authentication
@@ -152,16 +166,18 @@ namespace AdtonesAdminWebApi
 
             // app.UseHttpsRedirection();
 
-
             app.UseRouting();
 
+            // REST Headers
+            app.UseCors("CorsPolicy");
+            // app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
+            
             app.UseAuthentication();
 
             app.UseAuthorization();
-            // REST Headers
-            app.UseCors(
-                options => options.SetIsOriginAllowed(x => _ = true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()
-            );
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {

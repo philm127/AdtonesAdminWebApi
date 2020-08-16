@@ -35,6 +35,40 @@ namespace AdtonesAdminWebApi.OperatorSpecific
             return await ExpressoProvisionBatch(new List<ProvisionModelRequest> { request });
         }
 
+
+        public static async Task<List<ProvisionModel>> TESTExpressoProvisionBatch(IEnumerable<ProvisionModelRequest> requestBatch)
+        {
+            try
+            {
+                //var provisionURL = ConfigurationManager.AppSettings["ExpressoProvisionUrl"];
+                //var client = new RestClient(provisionURL);
+                //var request = new RestRequest(Method.POST);
+                //request.AddHeader("Connection", "keep-alive");
+                //request.AddHeader("Cache-Control", "no-cache");
+                //request.AddHeader("Content-Type", "application/json");
+                //request.AddJsonBody(requestBatch.ToList());
+                //var response = await client.ExecutePostTaskAsync<List<ProvisionModel>>(request);
+                //if (response.ErrorException != null || !string.IsNullOrEmpty(response.ErrorMessage))
+                //    throw new ExpressoException(response.ErrorMessage, response.ErrorException);
+
+                var response = new List<ProvisionModel>();
+                foreach(var rBatch in requestBatch)
+                {
+                    var rsBatch = new ProvisionModel();
+                    rsBatch.code = "200";
+                    rsBatch.isdn = rBatch.isdn;
+                    rsBatch.success = true;
+                    response.Add(rsBatch);
+                }
+
+                return response;//.Data;
+            }
+            catch (Exception e)
+            {
+                throw new ExpressoException(e.Message, e);
+            }
+        }
+
         public static async Task<List<ProvisionModel>> ExpressoProvisionBatch(IEnumerable<ProvisionModelRequest> requestBatch)
         {
             try

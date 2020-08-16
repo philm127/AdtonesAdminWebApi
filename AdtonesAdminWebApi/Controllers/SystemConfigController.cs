@@ -51,7 +51,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// <param name="model"></param>
         /// <returns>body contains SystemConfigResult</returns>
         [HttpGet("v1/GetConfigTypeList")]
-        public async Task<ReturnResult> GetConfigTypeList()
+        public ReturnResult GetConfigTypeList()
         {
             return _configService.GetSystemConfigType();
         }

@@ -26,6 +26,11 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                             @CampaignprofileId);";
 
 
+
+        public static string UpdateUserCredit => @"UPDATE UsersCredit SET AvailableCredit=AvailableCredit +  @AssignCredit,UpdatedDate=GETDATE()
+                                                            WHERE UserId = @Id";
+
+
     }
 
 }

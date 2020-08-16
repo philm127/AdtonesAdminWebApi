@@ -138,39 +138,6 @@ namespace AdtonesAdminWebApi.Controllers
         /// <summary>
         /// 
         /// </summary>
-        /// <returns>body contains List CampaignCreditResult</returns>
-        [HttpGet("v1/GetCampaignCreditDataTable/{id}")]
-        public async Task<ReturnResult> GetCampaignCreditDataTable(int id=0)
-        {
-            return await _campService.LoadCampaignCreditDataTable(id);
-        }
-        
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>body contains empty result</returns>
-        [HttpPut("v1/UpdateCampaignCredit")]
-        public async Task<ReturnResult> UpdateCampaignCredit(CampaignCreditResult model)
-        {
-            return await _campService.UpdateCampaignCredit(model);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>body contains empty result</returns>
-        [HttpPost("v1/InsertCampaignCredit")]
-        public async Task<ReturnResult> InsertCampaignCredit(CampaignCreditResult model)
-        {
-            return await _campService.AddCampaignCredit(model);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <returns>body contains List CampaignAdminResult</returns>
         [HttpGet("v1/GetCampaignDataTable/{id}")]
         public async Task<ReturnResult> GetCampaignDataTable(int id=0)
@@ -187,6 +154,17 @@ namespace AdtonesAdminWebApi.Controllers
         public async Task<ReturnResult> GetCampaignDataTableByCampId(int id)
         {
             return await _campService.LoadCampaignDataTableById(id);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains empty result</returns>
+        [HttpPut("v1/UpdateCampaignStatus")]
+        public async Task<ReturnResult> UpdateCampaignStatus(IdCollectionViewModel model)
+        {
+            return await _campService.UpdateCampaignStatus(model);
         }
 
 

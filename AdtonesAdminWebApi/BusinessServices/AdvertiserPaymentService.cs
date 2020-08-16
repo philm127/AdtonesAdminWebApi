@@ -42,6 +42,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+
         /// <summary>
         /// Starts the sending of an invoice process
         /// </summary>
@@ -78,9 +79,9 @@ namespace AdtonesAdminWebApi.BusinessServices
                                 "(" + DateTime.Parse(pdfModel.SettledDate.ToString(), new CultureInfo("en-US")).Year + ")";
 
                 /// TODO: When tested sort path and attatchment
-                var path = "Invoice/Adtones_invoice_" + pdfModel.InvoiceNumber + ".pdf";
+                var attachment = "Invoice/Adtones_invoice_" + pdfModel.InvoiceNumber + ".pdf";
 
-                var attachment = "Invoice/Adtones_invoice_A54928820.pdf";// await _getFiles.GetIformFileFromPath(path); //new FormFile(memory, 0, memory.Length); //File(memory, GetContentType(path), Path.GetFileName(path));
+                //var attachment = "Invoice/Adtones_invoice_A54928820.pdf";// await _getFiles.GetIformFileFromPath(path); //new FormFile(memory, 0, memory.Length); //File(memory, GetContentType(path), Path.GetFileName(path));
 
                 // Build the body out
                 string paymentMethod = pdfModel.Description;
@@ -122,7 +123,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 string completedDatetime = DateTime.Now.ToString();
 
                 var emailModel = new SendEmailModel();
-                emailModel.SingleTo = "philm127@gmail.com";
+                emailModel.SingleTo = pdfModel.Email;
                 emailModel.Body = body;
                 emailModel.From = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SiteEmailAddress").Value;
                 emailModel.Subject = subject;
@@ -238,6 +239,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 var x = await _invDAL.InsertPaymentFromUser(model);
+                var updated = await _invDAL.UpdateUserCredit(model);
             }
             catch (Exception ex)
             {
@@ -252,23 +254,20 @@ namespace AdtonesAdminWebApi.BusinessServices
                 result.result = 0;
             }
 
-            model.AssignCredit = model.Amount;
-
-            var updated = await _credService.AddCredit(model);
             return result;
         }
 
 
 
 
-        private async Task<decimal> OutstandingBalance(int campaignId)
+        private async Task<decimal> OutstandingBalance(int billingId)
         {
             try
             {
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    return await connection.QueryFirstOrDefaultAsync<decimal>(GetOutstandingBalance(), new { Id = campaignId });
+                    return await connection.QueryFirstOrDefaultAsync<decimal>(GetOutstandingBalance(), new { Id = billingId });
                 }
             }
             catch (Exception ex)

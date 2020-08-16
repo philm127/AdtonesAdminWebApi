@@ -11,11 +11,21 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.OperatorSpecific
 {
-    public class SavePUToDatabase
+    
+    public interface ISavePUToDatabase
+    {
+        Task<bool> DoSaveToDatabase<T>(IEnumerable<T> source, Func<IEnumerable<T>, DataTable, List<DataRow>> rowConverter, int operatorId);
+    }
+    public class SavePUToDatabase : ISavePUToDatabase
     {
 
         ReturnResult result = new ReturnResult();
-        private IConnectionStringService _connService;
+        private readonly IConnectionStringService _connService;
+
+        public SavePUToDatabase(IConnectionStringService connService)
+        {
+            _connService = connService;
+        }
 
         public async Task<bool> DoSaveToDatabase<T>(IEnumerable<T> source, Func<IEnumerable<T>, DataTable, List<DataRow>> rowConverter, int operatorId)
         {

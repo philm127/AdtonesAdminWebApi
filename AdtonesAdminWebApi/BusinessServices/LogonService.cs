@@ -380,7 +380,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     await connection.OpenAsync();
-                    res = await connection.ExecuteAsync(@"INSERT INTO UpdatePasswordHistory(UserId,PasswordHash,DateCreated)
+                    res = await connection.ExecuteAsync(@"INSERT INTO UserPasswordHistories(UserId,PasswordHash,DateCreated)
                                                                         VALUES(@Userid,@PasswordHash,GETDATE())",
                                                                         new { UserId = userId, PasswordHash = password });
                 }
@@ -415,7 +415,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 userPasswordHistory = await connection.QueryAsync<string>(@"SELECT TOP (@top) PasswordHash 
                                                                                 FROM UserPasswordHistories  
-                                                                                WHERE UserId=@userId ORDER BY CreatedDate DESC",
+                                                                                WHERE UserId=@userId ORDER BY DateCreated DESC",
                                                                           new { userId = userId, top = PASSWORD_HISTORY_LIMIT });
             }
 

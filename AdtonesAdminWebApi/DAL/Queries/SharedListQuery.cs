@@ -41,8 +41,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     WHERE u.Activated=1 AND u.RoleId=3 AND u.VerificationStatus=1";
 
 
-        public static string GetInvoiceNumberList => @"SELECT Id AS Value,InvoiceNumber AS Text FROM Billing WHERE PaymentMethod=1
-                                                    AND CampaignProfileId=@Id ORDER BY Id DEC";
+        public static string GetInvoiceNumberList => @"SELECT Id AS Value,InvoiceNumber AS Text FROM Billing WHERE PaymentMethodId=1
+                                                    AND CampaignProfileId=@Id ORDER BY Id DESC";
 
 
         

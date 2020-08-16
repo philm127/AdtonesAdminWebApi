@@ -36,4 +36,15 @@ namespace AdtonesAdminWebApi.ViewModels
         public string DeliveryServerConnectionString { get; set; }
         public string DeliveryServerIpAddress { get; set; }
     }
+
+    public class PromotionalCampaignAdditionModel
+    {
+        public string BatchID { get; set; }
+        public int OperatorId { get; set; }
+        public IFormFile Files { get; set; }
+        public string CampaignName { get; set; }
+        public int MaxDaily { get; set; }
+        public int MaxWeekly { get; set; }
+        public string AdvertName { get; set; }
+    }
 }

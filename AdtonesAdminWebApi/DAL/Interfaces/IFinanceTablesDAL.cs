@@ -10,5 +10,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<IEnumerable<InvoiceResult>> LoadInvoiceResultSet();
         Task<IEnumerable<OutstandingInvoiceResult>> LoadOutstandingInvoiceResultSet();
         Task<IEnumerable<AdvertiserCreditResult>> LoadUserCreditResultSet();
+        Task<IEnumerable<CampaignCreditResult>> LoadCampaignCreditResultSet(int id = 0);
     }
 }

@@ -223,7 +223,7 @@ namespace AdtonesAdminWebApi.DAL
 
                     if (searchList.NumberTo3 != null && (searchList.NumberFrom3 == null || searchList.NumberFrom3 <= searchList.NumberTo3))
                     {
-                        sb.Append(" AND PlayLengthTicks <= @totalcostto");
+                        sb.Append(" AND TotalCost <= @totalcostto");
                         builder.AddParameters(new { totalcostto = searchList.NumberTo3 });
                     }
 

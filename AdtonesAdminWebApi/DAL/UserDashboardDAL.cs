@@ -8,29 +8,38 @@ using System.Threading.Tasks;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Enums;
 using AdtonesAdminWebApi.DAL.Queries;
+using System.Text;
 
 namespace AdtonesAdminWebApi.DAL
 {
-    public class UserDashboardDAL : IUserDashboardDAL
+    public class UserDashboardDAL : BaseDAL, IUserDashboardDAL
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connStr;
-        private readonly IExecutionCommand _executers;
 
-        public UserDashboardDAL(IConfiguration configuration, IExecutionCommand executers)
-        {
-            _configuration = configuration;
-            _connStr = _configuration.GetConnectionString("DefaultConnection");
-            _executers = executers;
-        }
+        public UserDashboardDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
+            : base(configuration, executers, connService)
+        { }
 
 
         public async Task<IEnumerable<AdvertiserDashboardResult>> GetAdvertiserDashboard(int operatorId=0)
         {
+            var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(UserDashboardQuery.AdvertiserResultQuery);
-            if(operatorId > 0)
+            
+            if (operatorId > 0)
+            {
+                sb.Append(UserDashboardQuery.OperatorAdvertiserResultQuery);
                 builder.AddParameters(new { operatorId = operatorId });
+            }
+            else
+            {
+                sb.Append(UserDashboardQuery.AdvertiserResultQuery);
+                var values = CheckGeneralFile(sb, builder, pais: "cont", ops: "op", advs: "item");
+                sb = values.Item1;
+                builder = values.Item2;
+            }
+
+            var select = builder.AddTemplate(sb.ToString());
+
 
             try
             {

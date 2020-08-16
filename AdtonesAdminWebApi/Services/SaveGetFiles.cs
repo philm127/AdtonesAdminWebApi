@@ -12,6 +12,7 @@ namespace AdtonesAdminWebApi.Services
     public interface ISaveGetFiles
     {
         Task<string> SaveFileToSite(string dir, IFormFile data);
+        Task<string> SaveOriginalFileToSite(string dir, IFormFile data);
         bool DeleteFileByPath(string filepath);
         bool DeleteFileByName(string dir, string filename);
         Task<bool> SaveFileToAdtones(string dir, IFormFile data, string filename = null);
@@ -43,7 +44,40 @@ namespace AdtonesAdminWebApi.Services
                 if (!Directory.Exists(directoryName))
                     Directory.CreateDirectory(directoryName);
 
-                var filePath = Path.Combine(otherpath + dir, data.FileName);
+                var filePath = Path.Combine(directoryName, fileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await data.CopyToAsync(fileStream);
+                }
+                return fileName;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "Common-SaveFiles",
+                    ProcedureName = "SaveFileToSite"
+                };
+                _logging.LogError();
+                return "failed";
+            }
+        }
+
+
+        public async Task<string> SaveOriginalFileToSite(string dir, IFormFile data)
+        {
+            try
+            {
+                var otherpath = env.ContentRootPath;
+                var fileName = System.IO.Path.GetFileName(data.FileName);
+                var directoryName = Path.Combine(otherpath, dir);
+
+                if (!Directory.Exists(directoryName))
+                    Directory.CreateDirectory(directoryName);
+
+                var filePath = Path.Combine(directoryName, fileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await data.CopyToAsync(fileStream);
@@ -222,8 +256,10 @@ namespace AdtonesAdminWebApi.Services
             if(name == "op")
                 directoryName = "C:\\Development\\Adtones-Admin\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\TempGenPermissions\\generalOp.json";//Path.Combine(otherpath, dir);
             else
-                directoryName = "C:\\Development\\Adtones-Admin\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\TempGenPermissions\\general.json";
-            
+                // directoryName = "C:\\Development\\Adtones-Admin\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\AdtonesAdminWebApi\\TempGenPermissions\\general.json";
+                directoryName = "C:\\inetpub\\adminapi\\TempGenPermissions\\general.json";
+
+
             return directoryName;
         }
 

@@ -5,6 +5,7 @@ using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using System.Threading.Tasks;
 using AdtonesAdminWebApi.Model;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 
 namespace AdtonesAdminWebApi.Controllers
 {

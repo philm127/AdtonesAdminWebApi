@@ -10,21 +10,12 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL
 {
-    public class PromotionalCampaignDAL : IPromotionalCampaignDAL
+    public class PromotionalCampaignDAL : BaseDAL, IPromotionalCampaignDAL
     {
-        private readonly IConfiguration _configuration;
-        private readonly IExecutionCommand _executers;
-        private readonly string _mainConnStr;
-        private readonly IConnectionStringService _connService;
 
-        public PromotionalCampaignDAL(IConfiguration configuration, IExecutionCommand executers,
-            IConnectionStringService connService)
-        {
-            _configuration = configuration;
-            _executers = executers;
-            _mainConnStr = _configuration.GetConnectionString("DefaultConnection");
-            _connService = connService;
-        }
+        public PromotionalCampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
+            : base(configuration, executers, connService)
+        { }
 
 
         public async Task<IEnumerable<string>> GetMsisdnCheckForExisting(int operatorId)
@@ -57,12 +48,12 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<bool> GetPromoCampaignBatchIdCheckForExisting(string batch)
+        public async Task<bool> GetPromoCampaignBatchIdCheckForExisting(PromotionalCampaignResult model)
         {
             try
             {
-                return await _executers.ExecuteCommand(_mainConnStr,
-                             conn => conn.ExecuteScalar<bool>(PromotionalCampaignQuery.CheckIfBatchInCampaignsExists, new { id = batch }));
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<bool>(PromotionalCampaignQuery.CheckIfBatchInCampaignsExists, new { id = model.BatchID, op = model.OperatorId }));
             }
             catch
             {
@@ -81,8 +72,8 @@ namespace AdtonesAdminWebApi.DAL
                 builder.AddParameters(new { Id = model.id });
                 builder.AddParameters(new { Status = model.status });
 
-                var x = await _executers.ExecuteCommand(_mainConnStr,
-                                    conn => conn.ExecuteScalar<int>(select.RawSql + " CampaignProfileId=@Id", select.Parameters));
+                var x = await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(select.RawSql + " ID=@Id", select.Parameters));
 
                 var y = await _executers.ExecuteCommand(operatorConnectionString,
                                     conn => conn.ExecuteScalar<int>(select.RawSql + " AdtoneServerPromotionalCampaignId=@Id", select.Parameters));
@@ -99,11 +90,11 @@ namespace AdtonesAdminWebApi.DAL
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(PromotionalCampaignQuery.GetPromoCampaignResultSet);
-            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
+            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:siteAddress") });// adtonesSiteAddress") });
             try
             {
 
-                return await _executers.ExecuteCommand(_mainConnStr,
+                return await _executers.ExecuteCommand(_connStr,
                                 conn => conn.Query<PromotionalCampaignResult>(select.RawSql, select.Parameters));
             }
             catch
@@ -118,7 +109,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
 
-                return await _executers.ExecuteCommand(_mainConnStr,
+                return await _executers.ExecuteCommand(_connStr,
                                 conn => conn.ExecuteScalar<int>(PromotionalCampaignQuery.AddPromoCampaign, model));
             }
             catch
@@ -150,13 +141,13 @@ namespace AdtonesAdminWebApi.DAL
             var select = builder.AddTemplate(PromotionalCampaignQuery.AddPromoAdvert);
             try
             {
-                builder.AddParameters(new { CampaigID = model.ID });
+                builder.AddParameters(new { CampaignID = model.ID });
                 builder.AddParameters(new { AdvertName = model.AdvertName });
                 builder.AddParameters(new { AdvertLocation = model.AdvertLocation });
                 builder.AddParameters(new { AdtoneServerPromotionalAdvertId = model.AdtoneServerPromotionalCampaignId });
 
-                return await _executers.ExecuteCommand(_mainConnStr,
-                                    conn => conn.ExecuteScalar<int>(select.RawSql + " CampaignProfileId=@Id", select.Parameters));
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -172,13 +163,28 @@ namespace AdtonesAdminWebApi.DAL
             var select = builder.AddTemplate(PromotionalCampaignQuery.AddPromoAdvert);
             try
             {
-                builder.AddParameters(new { CampaigID = model.ID });
+                builder.AddParameters(new { CampaignID = model.ID });
                 builder.AddParameters(new { AdvertName = model.AdvertName });
                 builder.AddParameters(new { AdvertLocation = model.AdvertLocation });
                 builder.AddParameters(new { AdtoneServerPromotionalAdvertId = model.AdtoneServerPromotionalCampaignId });
 
                 return await _executers.ExecuteCommand(operatorConnectionString,
-                                    conn => conn.ExecuteScalar<int>(select.RawSql + " CampaignProfileId=@Id", select.Parameters));
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetPromoBatchIdList(int id)
+        {
+            try
+            {
+                var operatorConnectionString = await _connService.GetSingleConnectionString(id);
+                return await _executers.ExecuteCommand(operatorConnectionString,
+                                conn => conn.Query<SharedSelectListViewModel>(PromotionalCampaignQuery.GetBatchIdForPromocampaign));
             }
             catch
             {

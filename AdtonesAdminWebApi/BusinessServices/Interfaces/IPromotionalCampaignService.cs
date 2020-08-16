@@ -12,5 +12,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> AddPromotionalCampaign(PromotionalCampaignResult model);
         Task<ReturnResult> LoadPromoCampaignDataTable();
         Task<ReturnResult> UpdatePromotionalCampaignStatus(IdCollectionViewModel model);
+        Task<ReturnResult> GetPromoBatchIdList(int operatorId);
     }
 }

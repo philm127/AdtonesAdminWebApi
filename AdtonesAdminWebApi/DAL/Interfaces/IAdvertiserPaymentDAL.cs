@@ -9,5 +9,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     {
         Task<InvoicePDFEmailModel> GetInvoiceToPDF(int billingId, int UsersCreditPaymentID);
         Task<int> InsertPaymentFromUser(AdvertiserCreditFormModel model);
+        Task<int> UpdateUserCredit(AdvertiserCreditFormModel _creditmodel);
+
     }
 }

@@ -8,6 +8,6 @@ namespace AdtonesAdminWebApi.OperatorSpecific
 {
     public interface ISafaricomProcessPromoUser
     {
-        Task<ReturnResult> ProcPromotionalUser(HashSet<string> promoMsisdns, PromotionalUserFormModel model);
+        // Task<ReturnResult> ProcPromotionalUser(HashSet<string> promoMsisdns, PromotionalUserFormModel model);
     }
 }

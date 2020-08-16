@@ -9,5 +9,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _usercredit);
         Task<ReturnResult> GetCreditDetails(int id);
         // Task<ReturnResult> UpdateCredit(UsersCreditFormModel _creditmodel);
+        Task<ReturnResult> AddCampaignCredit(CampaignCreditResult model);
+        Task<ReturnResult> UpdateCampaignCredit(CampaignCreditResult model);
     }
 }

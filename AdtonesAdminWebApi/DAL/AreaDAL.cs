@@ -109,7 +109,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(AreaQuery.AddArea);
-            builder.AddParameters(new { AreaName = areamodel.AreaName.Trim().ToLower() });
+            builder.AddParameters(new { AreaName = areamodel.AreaName.Trim() });
             builder.AddParameters(new { CountryId = areamodel.CountryId });
 
             try

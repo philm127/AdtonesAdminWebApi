@@ -63,16 +63,46 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List CampaignCreditResult</returns>
+        [HttpGet("v1/GetCampaignCreditPeriodData/{id}")]
+        public async Task<ReturnResult> GetCampaignCreditPeriodData(int id = 0)
+        {
+            return await _invoiceService.LoadCampaignCreditPeriodTable(id);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains empty result</returns>
+        [HttpPut("v1/UpdateCampaignCredit")]
+        public async Task<ReturnResult> UpdateCampaignCredit(CampaignCreditResult model)
+        {
+            return await _creditService.UpdateCampaignCredit(model);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains empty result</returns>
+        [HttpPost("v1/InsertCampaignCredit")]
+        public async Task<ReturnResult> InsertCampaignCredit(CampaignCreditResult model)
+        {
+            return await _creditService.AddCampaignCredit(model);
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="model"></param>
         /// <returns>body contains a decimal value</returns>
-        [HttpGet("v1/GetOutstandingBalance")]
-        public async Task<ReturnResult> GetOutstandingBalance(IdCollectionViewModel model)
+        [HttpGet("v1/GetOutstandingBalance/{id}")]
+        public async Task<ReturnResult> GetOutstandingBalance(int id)
         {
-            return await _paymentService.GetOutstandingBalance(model.id);
+            return await _paymentService.GetOutstandingBalance(id);
         }
 
 
@@ -81,10 +111,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns>body contains List SharedSelectListViewModel</returns>
-        [HttpGet("v1/GetInvoiceDropdown")]
-        public async Task<ReturnResult> GetInvoiceDropdown(IdCollectionViewModel model)
+        [HttpGet("v1/GetInvoiceDropdown/{id}")]
+        public async Task<ReturnResult> GetInvoiceDropdown(int id)
         {
-            return await _paymentService.GetInvoiceDetails(model.id);
+            return await _paymentService.GetInvoiceDetails(id);
         }
 
         

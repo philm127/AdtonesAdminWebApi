@@ -31,12 +31,12 @@ namespace AdtonesAdminWebApi.ViewModels
         public string TypeName { get; set; }
         public DateTime DateFrom { get; set; }
         public DateTime DateTo { get; set; }
-        public int? NumberFrom { get; set; }
-        public int? NumberTo { get; set; }
-        public int? NumberFrom2 { get; set; }
-        public int? NumberTo2 { get; set; }
-        public int? NumberFrom3 { get; set; }
-        public int? NumberTo3 { get; set; }
+        public double? NumberFrom { get; set; }
+        public double? NumberTo { get; set; }
+        public double? NumberFrom2 { get; set; }
+        public double? NumberTo2 { get; set; }
+        public double? NumberFrom3 { get; set; }
+        public double? NumberTo3 { get; set; }
         public string Client { get; set; }
         public string fullName { get; set; }
         public string Payment { get; set; }

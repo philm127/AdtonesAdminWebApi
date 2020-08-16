@@ -10,6 +10,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
     {
         public static string UpdateMediaLocation => "UPDATE CampaignMatches SET MEDIA_URL=@media WHERE MSCampaignProfileId=@campaignProfileId";
 
+        public static string GetBudgetUpdateAmount => "SELECT MaxHourlyBudget, MaxBid FROM CampaignProfile WHERE CampaignProfileId=@Id";
 
+        public static string UpdateBucketAmount => "Update CampaignProfile SET BucketCount=@BucketCount WHERE CampaignProfileId=@Id";
     }
 }

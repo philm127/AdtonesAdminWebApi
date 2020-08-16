@@ -41,7 +41,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
-                    PageName = "InvoiceService",
+                    PageName = "FinancialTableService",
                     ProcedureName = "LoadData"
                 };
                 _logging.LogError();
@@ -63,7 +63,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
-                    PageName = "InvoiceService",
+                    PageName = "FinancialTableService",
                     ProcedureName = "LoadData"
                 };
                 _logging.LogError();
@@ -99,9 +99,28 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-       
+        public async Task<ReturnResult> LoadCampaignCreditPeriodTable(int id = 0)
+        {
+            try
+            {
+                result.body = await _invDAL.LoadCampaignCreditResultSet(id);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "FinancialTableService",
+                    ProcedureName = "LoadCampaignCreditPeriodTable"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
 
-        
+
 
         public bool UpdateUserCredit(int userid, decimal receivedamount)
         {

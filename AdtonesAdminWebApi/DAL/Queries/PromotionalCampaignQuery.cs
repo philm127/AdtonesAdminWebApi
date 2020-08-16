@@ -19,7 +19,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
 
-        public static string UpdatePromotionalCampaignStatus => @"UPDATE PromotionalCampaigns SET Status=@Status,IsAdminApproval=true WHERE ";
+        public static string UpdatePromotionalCampaignStatus => @"UPDATE PromotionalCampaigns SET Status=@Status WHERE ";
 
 
         public static string CheckExistingMSISDN => @"SELECT DISTINCT(msisdn) 
@@ -32,10 +32,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string CheckIfBatchExists => @"SELECT COUNT(1) FROM PromotionalUsers WHERE BatchId=@id";
 
 
-        public static string CheckIfBatchInCampaignsExists => @"SELECT COUNT(1) FROM PromotionalCampaigns WHERE BatchID=@id;";
+        public static string CheckIfBatchInCampaignsExists => @"SELECT COUNT(1) FROM PromotionalCampaigns WHERE BatchID=@id AND OperatorId=@op;";
 
 
-        public static string GetBatchIdForPromocampaign => @"SELECT DISTINCT(BatchID) AS Value, DISTINCT(BatchID) AS Text FROM PromotionalUsers
+        public static string GetBatchIdForPromocampaign => @"SELECT DISTINCT BatchID AS Value, BatchID AS Text FROM PromotionalUsers
                                                         Where Status=1 AND BatchID NOT IN( SELECT BatchID FROM PromotionalCampaigns)";
 
 

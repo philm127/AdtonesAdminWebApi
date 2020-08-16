@@ -91,68 +91,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<CampaignCreditResult>> GetCampaignCreditResultSet(int id=0)
-        {
-            var sb = new StringBuilder();
-            var builder = new SqlBuilder();
-            sb.Append(CampaignQuery.GetCampaignCreditResultSet);
-            if (id > 0)
-            {
-                sb.Append(" WHERE CampaignCreditPeriodId=@Id ");
-                builder.AddParameters(new { Id = id });
-            }
-
-            var values = CheckGeneralFile(sb, builder, pais: "op", ops: "op");
-            sb = values.Item1;
-            builder = values.Item2;
-            
-            try
-            {
-                sb.Append(" ORDER BY CreatedDate DESC;");
-                var select = builder.AddTemplate(sb.ToString());
-
-                return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.Query<CampaignCreditResult>(select.RawSql, select.Parameters));
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-
-        public async Task<int> InsertCampaignCredit(CampaignCreditResult model)
-        {
-            try
-            {
-                return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.ExecuteScalar<int>(CampaignQuery.InsertCampaignCredit,model));
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-
-        public async Task<int> UpdateCampaignCredit(CampaignCreditResult model)
-        {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(CampaignQuery.UpdateCampaignCredit);
-            builder.AddParameters(new { Id = model.CampaignCreditPeriodId });
-            builder.AddParameters(new { CreditPeriod = model.CreditPeriod });
-
-            try
-            {
-                return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
+        
 
         public async Task<CampaignProfile> GetCampaignProfileDetail(int id = 0)
         {
@@ -209,6 +148,30 @@ namespace AdtonesAdminWebApi.DAL
             var sb = new StringBuilder();
             sb.Append(CampaignQuery.UpdateCampaignProfileStatus);
             sb.Append(" AdtoneServerCampaignProfileId=@Id;");
+
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(sb.ToString());
+            try
+            {
+                builder.AddParameters(new { Id = model.CampaignProfileId });
+                builder.AddParameters(new { Status = model.Status });
+
+                return await _executers.ExecuteCommand(operatorConnectionString,
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> UpdateCampaignMatch(CampaignProfile model)
+        {
+            var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
+
+            var sb = new StringBuilder();
+            sb.Append(CampaignQuery.UpdateCampaignMatchStatus);
 
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sb.ToString());

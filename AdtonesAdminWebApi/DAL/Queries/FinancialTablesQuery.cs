@@ -23,34 +23,30 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         LEFT JOIN Users AS usr ON ucp.UserId=usr.UserId";
 
 
-        public static string GetOutstandingInvoiceResultSet => @"SELECT bil.Id AS BillingId, cp.UserId, bil.CampaignProfileId,fa.FundAmount AS CreditAmount,
-                                                                ISNULL(up.Amount,0) AS PaidAmount,(fa.FundAmount - ISNULL(up.Amount,0)) AS OutStandingAmount,
-                                                                ISNULL(cl.Name, '-') AS ClientName, u.Organisation,u.Email,
-                                                                CONCAT(u.FirstName,'',u.LastName) AS FullName,cp.CampaignName,
-                                                                ISNULL(descpay.Description, '-') AS Description,bil.InvoiceNumber,bil.PaymentDate AS CreatedDate,
-                                                                CASE WHEN up.Amount>0 THEN 1 ELSE 0 END AS Status
-                                                                FROM
-                                                                    (SELECT Id,CampaignProfileId,ClientId,InvoiceNumber,PaymentDate 
-                                                                      FROM Billing WHERE PaymentMethodId=1 
-                                                                        AND Id IN
-                                                                            (SELECT MAX(Id) FROM Billing GROUP BY CampaignProfileId)) AS bil
-                                                                INNER JOIN
-                                                                    (SELECT CampaignProfileId,SUM(ISNULL(FundAmount,0.00)) AS FundAmount 
-                                                                       FROM Billing GROUP BY CampaignProfileId) AS fa
-                                                                ON fa.CampaignProfileId=bil.CampaignProfileId
+        public static string GetOutstandingInvoiceResultSet => @"SELECT bil.Id AS BillingId,bil.UserId,bil.CampaignProfileId,bil.InvoiceNumber,
+                                                                bil.FundAmount AS CreditAmount,ISNULL(ucp.Amount,0) AS PaidAmount,ucp.Description,
+                                                                bil.TotalAmount,bil.PaymentDate AS CreatedDate,ISNULL(cl.Name, '-') AS ClientName,
+                                                                ISNULL(u.Organisation, '-') AS Organisation,u.Email,
+                                                                CONCAT(u.FirstName,'',u.LastName) AS FullName,(bil.FundAmount - ISNULL(ucp.Amount,0)) AS OutStandingAmount,
+                                                                CASE WHEN ISNULL(ucp.Amount,0)>0 THEN 1 ELSE 0 END AS Status,cp.CampaignName
+                                                                FROM Billing AS bil LEFT JOIN Client AS cl ON cl.Id=bil.ClientId
+                                                                INNER JOIN Users AS u ON bil.UserId=u.UserId
                                                                 LEFT JOIN
-                                                                    (SELECT CampaignProfileId,SUM(ISNULL(Amount,0.00)) AS Amount 
-                                                                       FROM UsersCreditPayment GROUP BY CampaignProfileId) AS up
-                                                                ON up.CampaignProfileId=bil.CampaignProfileId
-                                                                LEFT JOIN Client AS cl ON cl.Id=bil.ClientId
+                                                                    ( SELECT ucpO.UserId,ucpO.BillingId,SUM(ISNULL(ucpO.Amount,0)) AS Amount,ucpO.CampaignProfileId,
+                                                                        ucpD.Description 
+                                                                        FROM UsersCreditPayment AS ucpO
+                                                                        INNER JOIN
+                                                                            ( SELECT BillingId,ISNULL(Description, '-') AS Description FROM UsersCreditPayment 
+                                                                                WHERE Id IN
+                                                                                    (SELECT MAX(Id) FROM UsersCreditPayment GROUP BY BillingId )
+                                                                             ) AS ucpD
+                                                                        ON ucpD.BillingId=ucpO.BillingId
+                                                                        GROUP BY ucpO.UserId,ucpO.BillingId,ucpO.CampaignProfileId,ucpD.Description
+                                                                    ) AS ucp
+                                                                ON ucp.BillingId=bil.Id
                                                                 INNER JOIN CampaignProfile AS cp ON cp.CampaignProfileId=bil.CampaignProfileId
-                                                                INNER JOIN Users AS u ON cp.UserId=u.UserId
-                                                                LEFT JOIN
-                                                                    (SELECT CampaignProfileId,Description FROM UsersCreditPayment 
-                                                                        WHERE Id IN
-                                                                            (SELECT MAX(Id) FROM UsersCreditPayment GROUP BY CampaignProfileId)) AS descpay
-                                                                ON descpay.CampaignProfileId=bil.CampaignProfileId
-                                                                WHERE (fa.FundAmount - ISNULL(up.Amount,0))>0";
+                                                                WHERE PaymentMethodId=1
+                                                                AND bil.FundAmount > ISNULL(Amount,0)";
 
 
 
@@ -86,6 +82,14 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                             CampaignprofileId)
                                                           VALUES(@UserId,@BillingId,@Amount,@Description,@Status,GETDATE(),GETDATE(),
                                                             @CampaignprofileId);";
+
+
+        public static string GetCampaignCreditPeriodData => @"SELECT ccp.CampaignCreditPeriodId,ccp.UserId,ccp.CampaignProfileId,ccp.CreditPeriod,
+                                                                ccp.CreatedDate,CONCAT(u.FirstName,' ',u.LastName) AS UserName, cp.CampaignName
+                                                                FROM CampaignCreditPeriods AS ccp INNER JOIN Users AS u ON u.UserId=ccp.UserId
+                                                                INNER JOIN CampaignProfile AS cp ON cp.CampaignProfileId=ccp.CampaignProfileId
+                                                                LEFT JOIN Contacts AS con ON con.UserId=ccp.UserId
+                                                                LEFT JOIN Operators AS op ON op.CountryId=con.CountryId";
 
 
     }

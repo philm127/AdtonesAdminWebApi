@@ -50,7 +50,7 @@ namespace AdtonesAdminWebApi.DAL
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(FinancialTablesQuery.GetOutstandingInvoiceResultSet);
-            var values = CheckGeneralFile(sb, builder, pais: "cp");
+            var values = CheckGeneralFile(sb, builder, pais: "cp",advs:"bil");
             sb = values.Item1;
             builder = values.Item2;
             sb.Append(" ORDER BY bil.Id DESC;");
@@ -61,6 +61,35 @@ namespace AdtonesAdminWebApi.DAL
 
                 return await _executers.ExecuteCommand(_connStr,
                                 conn => conn.Query<OutstandingInvoiceResult>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<CampaignCreditResult>> LoadCampaignCreditResultSet(int id = 0)
+        {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(FinancialTablesQuery.GetCampaignCreditPeriodData);
+            if (id > 0)
+            {
+                sb.Append(" WHERE CampaignCreditPeriodId=@Id ");
+                builder.AddParameters(new { Id = id });
+            }
+            var values = CheckGeneralFile(sb, builder, pais: "con", ops:"op", advs:"ccp");
+            sb = values.Item1;
+            builder = values.Item2;
+            sb.Append(" ORDER BY ccp.CreatedDate DESC;");
+            var select = builder.AddTemplate(sb.ToString());
+
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.Query<CampaignCreditResult>(select.RawSql, select.Parameters));
             }
             catch
             {

@@ -1,5 +1,6 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
+using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -56,6 +57,56 @@ namespace AdtonesAdminWebApi.DAL
                                                                     commandType: CommandType.StoredProcedure);
             }
             
+        }
+
+
+        public async Task<CampaignBudgetModel> GetBudgetAmounts(int campaignId, string conn)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(UserMatchQuery.GetBudgetUpdateAmount);
+            try
+            {
+                builder.AddParameters(new { Id = campaignId });
+
+                return await _executers.ExecuteCommand(conn,
+                                    conn => conn.QueryFirstOrDefault<CampaignBudgetModel>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> UpdateBucketCount(int campaignId, string conn, int bucketCount)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(UserMatchQuery.UpdateBucketAmount);
+            try
+            {
+                builder.AddParameters(new { Id = campaignId });
+                builder.AddParameters(new { BucketCount = bucketCount });
+
+                return await _executers.ExecuteCommand(conn,
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task PrematchUserProcess(int campaignId, string conn)
+        {
+            using (var connection = new SqlConnection(conn))
+            {
+                await connection.OpenAsync();
+                await connection.ExecuteAsync("NAME OF SP",
+                                                                    new { CampaignProfileId = campaignId },
+                                                                    commandType: CommandType.StoredProcedure);
+            }
+
         }
 
     }

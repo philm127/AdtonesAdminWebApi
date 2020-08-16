@@ -12,10 +12,11 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<bool> GetPromoUserBatchIdCheckForExisting(PromotionalUserFormModel model);
         Task<int> UpdatePromotionalCampaignStatus(IdCollectionViewModel model);
         Task<IEnumerable<PromotionalCampaignResult>> GetPromoCampaignResultSet();
-        Task<bool> GetPromoCampaignBatchIdCheckForExisting(string batch);
+        Task<bool> GetPromoCampaignBatchIdCheckForExisting(PromotionalCampaignResult model);
         Task<int> AddPromotionalCampaign(PromotionalCampaignResult model);
         Task<int> AddPromotionalCampaignToOperator(PromotionalCampaignResult model);
         Task<int> AddPromotionalAdvertToOperator(PromotionalCampaignResult model);
         Task<int> AddPromotionalAdvert(PromotionalCampaignResult model);
+        Task<IEnumerable<SharedSelectListViewModel>> GetPromoBatchIdList(int id);
     }
 }

@@ -64,5 +64,20 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
+
+        public async Task<int> UpdateUserCredit(AdvertiserCreditFormModel _creditmodel)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<int>(AdvertiserPaymentQuery.UpdateUserCredit,
+                                                                                    new { Id = _creditmodel.UserId, AssignCredit = _creditmodel.Amount }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
     }
 }

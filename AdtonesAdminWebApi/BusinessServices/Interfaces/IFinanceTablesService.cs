@@ -11,5 +11,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> LoadInvoiceDataTable();
         Task<ReturnResult> LoadOutstandingInvoiceDataTable();
         Task<ReturnResult> LoadUserCreditDataTable();
+        Task<ReturnResult> LoadCampaignCreditPeriodTable(int id = 0);
     }
 }
