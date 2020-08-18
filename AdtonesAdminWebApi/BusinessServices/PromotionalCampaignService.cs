@@ -112,130 +112,151 @@ namespace AdtonesAdminWebApi.BusinessServices
         public async Task<ReturnResult> AddPromotionalCampaign(PromotionalCampaignResult model)
         {
             model.Status = 1;
-
-            bool exists = await _provisionServer.GetPromoCampaignBatchIdCheckForExisting(model);
-
-            if (exists)
+            try
             {
-                result.error = "BatchID exists for this operator.";
-                result.result = 0;
-                return result;
-            }
+                bool exists = await _provisionServer.GetPromoCampaignBatchIdCheckForExisting(model);
 
-            var mediaFile = model.Files;
-            if (mediaFile != null && mediaFile.Length != 0)
-            {
-
-                string extension = Path.GetExtension(mediaFile.FileName);
-                var onlyFileName = Path.GetFileNameWithoutExtension(mediaFile.FileName);
-                // string outputFormat = model.OperatorId == 1 ? "wav" : model.OperatorId == 2 ? "mp3" : "wav";
-                string outputFormat = "wav";
-                var audioFormatExtension = "." + outputFormat;
-
-                string fileName = Path.GetFileName(mediaFile.FileName);
-                string directoryName = "PromotionalMedia";
-                directoryName = Path.Combine(directoryName, model.OperatorId.ToString());
-                string newfile = string.Empty;
-              
-
-                if (extension != audioFormatExtension)
+                if (exists)
                 {
-                    // Put this to return either the filename or filepath from service
-                    string tempDirectoryName = "PromotionalMedia/Temp";
-                    string tempFile = await _saveFile.SaveFileToSite(tempDirectoryName, mediaFile);
-
-                    newfile = _convFile.ConvertAndSaveMediaFile(tempDirectoryName + tempFile, extension, outputFormat, onlyFileName, directoryName);
-                    model.AdvertLocation = Path.Combine(directoryName, newfile);
-                }
-                else
-                {
-
-                    newfile = await _saveFile.SaveFileToSite(directoryName, mediaFile);
-
-                    string archiveDirectoryName = "PromotionalMedia/Archive";
-
-                    string apath = await _saveFile.SaveOriginalFileToSite(archiveDirectoryName, mediaFile);
-
-                    model.AdvertLocation = $"/{directoryName}/{newfile}";
+                    result.error = "BatchID exists for this operator.";
+                    result.result = 0;
+                    return result;
                 }
 
-                int promoId = 0;
-                int opPromoId = 0;
-                try
+                var mediaFile = model.Files;
+                if (mediaFile != null && mediaFile.Length != 0)
                 {
-                    // Updates both main and provisioning DB returns id from the promo server.
-                    promoId = await _provisionServer.AddPromotionalCampaign(model);
-                    if (promoId > 0)
+
+                    string extension = Path.GetExtension(mediaFile.FileName);
+                    var onlyFileName = Path.GetFileNameWithoutExtension(mediaFile.FileName);
+                    // string outputFormat = model.OperatorId == 1 ? "wav" : model.OperatorId == 2 ? "mp3" : "wav";
+                    string outputFormat = "wav";
+                    var audioFormatExtension = "." + outputFormat;
+
+                    string fileName = Path.GetFileName(mediaFile.FileName);
+                    string directoryName = "PromotionalMedia";
+                    directoryName = Path.Combine(directoryName, model.OperatorId.ToString());
+                    string newfile = string.Empty;
+
+
+                    if (extension != audioFormatExtension)
                     {
-                        model.AdtoneServerPromotionalCampaignId = promoId;
+                        // Put this to return either the filename or filepath from service
+                        string tempDirectoryName = "PromotionalMedia/Temp";
+                        string tempFile = await _saveFile.SaveFileToSite(tempDirectoryName, mediaFile);
+
+                        newfile = _convFile.ConvertAndSaveMediaFile(tempDirectoryName + tempFile, extension, outputFormat, onlyFileName, directoryName);
+                        model.AdvertLocation = Path.Combine(directoryName, newfile);
                     }
                     else
                     {
+
+                        newfile = await _saveFile.SaveFileToSite(directoryName, mediaFile);
+
+                        string archiveDirectoryName = "PromotionalMedia/Archive";
+
+                        string apath = await _saveFile.SaveOriginalFileToSite(archiveDirectoryName, mediaFile);
+
+                        model.AdvertLocation = $"{directoryName}/{newfile}";
+                    }
+
+                    int promoId = 0;
+                    int opPromoId = 0;
+                    try
+                    {
+                        // Updates both main and provisioning DB returns id from the promo server.
+                        promoId = await _provisionServer.AddPromotionalCampaign(model);
+                        if (promoId > 0)
+                        {
+                            model.AdtoneServerPromotionalCampaignId = promoId;
+                        }
+                        else
+                        {
+                            result.result = 0;
+                            result.error = "Failed to insert into Database.";
+                            return result;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        var _logging = new ErrorLogging()
+                        {
+                            ErrorMessage = ex.Message.ToString(),
+                            StackTrace = ex.StackTrace.ToString(),
+                            PageName = "PromotionalCampaignService",
+                            ProcedureName = "AddPromotionalCampaign - Add To Db"
+                        };
+                        _logging.LogError();
                         result.result = 0;
                         result.error = "Failed to insert into Database.";
                         return result;
                     }
-                }
-                catch (Exception ex)
-                {
-                    var _logging = new ErrorLogging()
+                    try
                     {
-                        ErrorMessage = ex.Message.ToString(),
-                        StackTrace = ex.StackTrace.ToString(),
-                        PageName = "PromotionalCampaignService",
-                        ProcedureName = "AddPromotionalCampaign - Add To Db"
-                    };
-                    _logging.LogError();
-                    result.result = 0;
-                    result.error = "Failed to insert into Database.";
-                    return result;
-                }
+                        // To use with adverts.
+                        var originalFile = model.AdvertLocation;
+                        var ftpFile = string.Empty;
 
-                // To use with adverts.
-                var originalFile = model.AdvertLocation;
-                var ftpFile = string.Empty;
+                        var operatorFTPDetails = await _advertDAL.GetFtpDetails(model.OperatorId);
 
-                var operatorFTPDetails = await _advertDAL.GetFtpDetails(model.OperatorId);
+                        // Transfer Advert File From Operator Server to Linux Server
+                        var returnValue = await _adTransfer.CopyPromoAdToOperatorServer(model, newfile);
+                        if (returnValue)
+                        {
+                            if (operatorFTPDetails != null)
+                                model.AdvertLocation = operatorFTPDetails.FtpRoot + "/" + model.AdvertLocation.Split('/')[1];
 
-                // Transfer Advert File From Operator Server to Linux Server
-                var test = _configuration.GetValue<bool>("Environment:TestOperatorServer");
-                if (!test)
-                {
-                    var returnValue = await _adTransfer.CopyPromoAdToOperatorServer(model, newfile);
-                    if (returnValue)
+                            opPromoId = await _provisionServer.AddPromotionalCampaignToOperator(model);
+                            ftpFile = model.AdvertLocation;
+                        }
+
+
+                        model.ID = promoId;
+                        model.AdvertLocation = originalFile;
+                        model.AdtoneServerPromotionalCampaignId = null;
+                        var advertId = await _provisionServer.AddPromotionalAdvert(model);
+
+                        model.ID = opPromoId;
+                        model.AdvertLocation = ftpFile;
+                        model.AdtoneServerPromotionalCampaignId = advertId;
+                        var opAdvertId = _provisionServer.AddPromotionalAdvertToOperator(model);
+
+                        return result;
+                    }
+                    catch (Exception ex)
                     {
-                        if (operatorFTPDetails != null)
-                            model.AdvertLocation = operatorFTPDetails.FtpRoot + "/" + model.AdvertLocation.Split('/')[3];
-
-                        opPromoId = await _provisionServer.AddPromotionalCampaignToOperator(model);
-                        ftpFile = model.AdvertLocation;
+                        var _logging = new ErrorLogging()
+                        {
+                            ErrorMessage = ex.Message.ToString(),
+                            StackTrace = ex.StackTrace.ToString(),
+                            PageName = "PromotionalCampaignService",
+                            ProcedureName = "AddPromotionalCampaign - Add Advert"
+                        };
+                        _logging.LogError();
+                        result.result = 0;
+                        result.error = ex.Message.ToString();
+                        return result;
                     }
                 }
                 else
                 {
-                    if (operatorFTPDetails != null)
-                        model.AdvertLocation = operatorFTPDetails.FtpRoot + "/" + model.AdvertLocation.Split('/')[3];
-
-                    opPromoId = await _provisionServer.AddPromotionalCampaignToOperator(model);
-                    ftpFile = model.AdvertLocation;
+                    result.error = " No valid Media file loaded.";
+                    result.result = 0;
+                    return result;
                 }
-
-                model.ID = promoId;
-                model.AdvertLocation = originalFile;
-                model.AdtoneServerPromotionalCampaignId = null;
-                var advertId = await _provisionServer.AddPromotionalAdvert(model);
-
-                model.ID = opPromoId;
-                model.AdvertLocation = ftpFile;
-                model.AdtoneServerPromotionalCampaignId = advertId;
-                var opAdvertId = _provisionServer.AddPromotionalAdvertToOperator(model);
-
-                return result;
             }
-            else
+            catch (Exception ex)
             {
-                result.error = " No valid Media file loaded.";
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "PromotionalCampaignService",
+                    ProcedureName = "AddPromotionalCampaign - Whole process"
+                };
+                _logging.LogError();
                 result.result = 0;
+                result.error = ex.Message.ToString();
                 return result;
             }
         }

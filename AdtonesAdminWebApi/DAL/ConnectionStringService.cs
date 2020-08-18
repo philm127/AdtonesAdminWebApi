@@ -171,5 +171,19 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
+
+        public async Task<int> GetOperatorIdFromAdtoneId(int Id, int operatorId)
+        {
+
+            var conn = await GetSingleConnectionString(operatorId);
+            StringBuilder sb = new StringBuilder("SELECT OperatorId FROM Operators WHERE AdtoneServerOperatorId=@Id");
+
+            using (var connection = new SqlConnection(conn))
+            {
+                await connection.OpenAsync();
+                return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = Id });
+            }
+        }
+
     }
 }

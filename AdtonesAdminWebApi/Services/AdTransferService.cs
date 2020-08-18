@@ -1,11 +1,8 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
-using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.Services
@@ -47,7 +44,7 @@ namespace AdtonesAdminWebApi.Services
                         var port = Convert.ToInt32(getFTPdetails.Port);
                         var username = getFTPdetails.UserName;
                         var password = getFTPdetails.Password;
-                        var localRoot = Path.Combine(otherpath, dir); ;//System.Web.HttpContext.Current.Server.MapPath("~/Media"); ///TODO:
+                        var localRoot = Path.Combine(otherpath, dir); //System.Web.HttpContext.Current.Server.MapPath("~/Media"); ///TODO:
                         var ftpRoot = getFTPdetails.FtpRoot;
 
                         // Test FTP Details
@@ -120,7 +117,7 @@ namespace AdtonesAdminWebApi.Services
                         var port = Convert.ToInt32(getFTPdetails.Port);
                         var username = getFTPdetails.UserName;
                         var password = getFTPdetails.Password;
-                        var localRoot = Path.Combine(otherpath,model.AdvertLocation);
+                        var localRoot = Path.Combine(otherpath, mediaFile);
                         var ftpRoot = getFTPdetails.FtpRoot;
 
                         using (var client = new Renci.SshNet.SftpClient(host, port, username, password))
@@ -128,7 +125,7 @@ namespace AdtonesAdminWebApi.Services
                             client.Connect();
                             if (client.IsConnected)
                             {
-                                var SourceFile = Path.Combine(otherpath, model.AdvertLocation);
+                                var SourceFile = localRoot;
                                 var DestinationFile = ftpRoot + "/" + fileName;
                                 var filestream = new FileStream(SourceFile, FileMode.Open);
                                 client.UploadFile(filestream, DestinationFile, null);

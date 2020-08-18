@@ -40,17 +40,7 @@ namespace AdtonesAdminWebApi.OperatorSpecific
         {
             try
             {
-                //var provisionURL = ConfigurationManager.AppSettings["ExpressoProvisionUrl"];
-                //var client = new RestClient(provisionURL);
-                //var request = new RestRequest(Method.POST);
-                //request.AddHeader("Connection", "keep-alive");
-                //request.AddHeader("Cache-Control", "no-cache");
-                //request.AddHeader("Content-Type", "application/json");
-                //request.AddJsonBody(requestBatch.ToList());
-                //var response = await client.ExecutePostTaskAsync<List<ProvisionModel>>(request);
-                //if (response.ErrorException != null || !string.IsNullOrEmpty(response.ErrorMessage))
-                //    throw new ExpressoException(response.ErrorMessage, response.ErrorException);
-
+                
                 var response = new List<ProvisionModel>();
                 foreach(var rBatch in requestBatch)
                 {

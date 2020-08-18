@@ -122,6 +122,8 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> AddPromotionalCampaignToOperator(PromotionalCampaignResult model)
         {
             var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
+            var operatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId, model.OperatorId);
+            model.OperatorId = operatorId;
             try
             {
 

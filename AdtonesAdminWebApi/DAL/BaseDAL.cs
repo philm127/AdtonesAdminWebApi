@@ -40,7 +40,6 @@ namespace AdtonesAdminWebApi.DAL
         /// <returns>A Tuple of an updated StringBuilder and an updated Dapper Query Builder</returns>
         public (StringBuilder sbuild, SqlBuilder build) CheckGeneralFile(StringBuilder sb, SqlBuilder builder, string pais = null, string ops = null, string advs = null, string test = null)
         {
-            //IWebHostEnvironment _env;
             var genFile = string.Empty;
             string genLoc = string.Empty;
             if(test == "op")

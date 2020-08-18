@@ -1,6 +1,7 @@
 ﻿
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,12 @@ namespace AdtonesAdminWebApi.OperatorSpecific
         ReturnResult result = new ReturnResult();
 
         private readonly ISavePUToDatabase _putDB;
+        private readonly IConfiguration _configuration;
 
-        public ExpressoProcessPromoUser(ISavePUToDatabase putDB)
+        public ExpressoProcessPromoUser(ISavePUToDatabase putDB, IConfiguration configuration)
         {
             _putDB = putDB;
+            _configuration = configuration;
         }
 
         public async Task<ReturnResult> ProcPromotionalUser(HashSet<string> promoMsisdns, PromotionalUserFormModel model)
@@ -65,10 +68,17 @@ namespace AdtonesAdminWebApi.OperatorSpecific
             try
             {
                 var requests = nextChunk.Select(isdn => new ProvisionModelRequest { isdn = isdn, provision = true }).ToList();
-
+                var provisionResults = new List<ProvisionModel>();
                 // calling Expresso HLR
-                var provisionResults = await ExpressoOperator.ExpressoProvisionBatch(requests);
-
+                var test = _configuration.GetValue<bool>("Environment:TestOperatorServer");
+                if (!test)
+                {
+                    provisionResults = await ExpressoOperator.ExpressoProvisionBatch(requests);
+                }
+                else
+                {
+                    provisionResults = await ExpressoOperator.TESTExpressoProvisionBatch(requests);
+                }
                 // Saving records to Operator's DB.
 
                 await _putDB.DoSaveToDatabase(provisionResults,

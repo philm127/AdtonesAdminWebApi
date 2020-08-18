@@ -86,7 +86,14 @@ namespace AdtonesAdminWebApi.DAL.Shared
 
         public async Task<IEnumerable<SharedSelectListViewModel>> GetCountry(int id = 0)
         {
-            var genFile = System.IO.File.ReadAllText(_getFile.TempGetGeneralJsonFile());
+            var genFile = string.Empty;
+            string genLoc = string.Empty;
+            //if (test == "op")
+            //    genLoc = _configuration.GetValue<string>("Environment:GeneralTestOpJson");
+            //else
+                genLoc = _configuration.GetValue<string>("Environment:GeneralTestJson").ToString();
+
+            genFile = System.IO.File.ReadAllText(genLoc);
 
             PermissionModel gen = JsonSerializer.Deserialize<PermissionModel>(genFile);
 
@@ -98,10 +105,21 @@ namespace AdtonesAdminWebApi.DAL.Shared
             var builder = new SqlBuilder();
             sb.Append(SharedListQuery.GetCountryList);
 
-            if (country.Length > 0)
+            if (country.Length > 0 && id > 0)
+            {
+                sb.Append(" WHERE Id IN @country AND Id=@Id " );
+                builder.AddParameters(new { country = country.ToArray(), Id=id });
+
+            }
+            else if (country.Length > 0 && id == 0)
             {
                 sb.Append(" WHERE Id IN @country ");
                 builder.AddParameters(new { country = country.ToArray() });
+            }
+            else if (id > 0)
+            {
+                sb.Append(" WHERE Id=@Id ");
+                builder.AddParameters(new { Id = id });
 
             }
 
