@@ -5,6 +5,7 @@ using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.UserSecrets;
@@ -23,8 +24,8 @@ namespace AdtonesAdminWebApi.DAL
     {
         private IMemoryCache _cache;
 
-        public CampaignAuditDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService,
-                                IMemoryCache cache) : base(configuration, executers, connService)
+        public CampaignAuditDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor,
+                                IMemoryCache cache) : base(configuration, executers, connService, httpAccessor)
         {
             _cache = cache;
         }

@@ -31,7 +31,16 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        
+        // <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains integer</returns>
+        [HttpPut("v1/UpdateUserPermissions")]
+        public async Task<ReturnResult> UpdateUserPermissions(PermissionChangeModel model)
+        {
+            return await _permService.UpdateUserPermissionsById(model);
+        }
+
 
     }
 }

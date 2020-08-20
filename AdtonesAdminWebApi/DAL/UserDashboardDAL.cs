@@ -9,14 +9,15 @@ using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Enums;
 using AdtonesAdminWebApi.DAL.Queries;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace AdtonesAdminWebApi.DAL
 {
     public class UserDashboardDAL : BaseDAL, IUserDashboardDAL
     {
 
-        public UserDashboardDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
-            : base(configuration, executers, connService)
+        public UserDashboardDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor)
+            : base(configuration, executers, connService, httpAccessor)
         { }
 
 

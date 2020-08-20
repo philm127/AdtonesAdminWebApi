@@ -9,24 +9,16 @@ using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Caching.Memory;
 using AdtonesAdminWebApi.ViewModels;
+using Microsoft.AspNetCore.Http;
 
 namespace AdtonesAdminWebApi.DAL
 {
-   public class PermissionManagementDAL : IPermissionManagementDAL
+   public class PermissionManagementDAL : BaseDAL, IPermissionManagementDAL
     {
-        private readonly IExecutionCommand _executers;
-        private readonly IConfiguration _configuration;
-        private readonly string _connStr;
-        private IMemoryCache cache;
-        public string _dbQuery { get; private set; }
 
-        public PermissionManagementDAL(IExecutionCommand executers,
-                            IConfiguration configuration)
-        {
-            _executers = executers;
-            _configuration = configuration;
-            _connStr = _configuration.GetConnectionString("DefaultConnection");
-        }
+        public PermissionManagementDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor)
+            : base(configuration, executers, connService, httpAccessor)
+        { }
 
 
         /// <summary>
@@ -37,6 +29,27 @@ namespace AdtonesAdminWebApi.DAL
         {
             return await _executers.ExecuteCommand(_connStr,
                              conn => conn.QueryFirstOrDefault<string>(PermissionManagementQuery.GetPermissionById, new { UserId = userId }));
+        }
+
+
+
+        public async Task<int> UpdateUserPermissions(int userId, string permissions)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(PermissionManagementQuery.UpdateUserPermissions);
+            builder.AddParameters(new { Id = userId });
+            builder.AddParameters(new { perms = permissions });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+
         }
     }
 }

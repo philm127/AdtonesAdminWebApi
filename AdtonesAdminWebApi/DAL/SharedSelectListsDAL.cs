@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Data;
 using AdtonesAdminWebApi.Services;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 
 namespace AdtonesAdminWebApi.DAL.Shared
 {
@@ -20,8 +21,8 @@ namespace AdtonesAdminWebApi.DAL.Shared
     {
         private readonly ISaveGetFiles _getFile;
 
-        public SharedSelectListsDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, ISaveGetFiles getFile) 
-            : base(configuration, executers, connService)
+        public SharedSelectListsDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, ISaveGetFiles getFile,
+                        IHttpContextAccessor httpAccessor) : base(configuration, executers, connService, httpAccessor)
         {
             _getFile = getFile;
         }

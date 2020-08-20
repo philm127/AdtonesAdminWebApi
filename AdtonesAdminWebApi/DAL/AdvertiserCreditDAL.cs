@@ -3,6 +3,7 @@ using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,8 @@ namespace AdtonesAdminWebApi.DAL
     {
         private readonly ICampaignDAL _campDAL;
 
-        public AdvertiserCreditDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, ICampaignDAL campDAL) 
-            : base(configuration, executers, connService)
+        public AdvertiserCreditDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, ICampaignDAL campDAL, 
+                            IHttpContextAccessor httpAccessor) : base(configuration, executers, connService, httpAccessor)
         {
             _campDAL = campDAL;
         }

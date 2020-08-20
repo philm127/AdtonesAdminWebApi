@@ -9,5 +9,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     public interface IPermissionManagementService
     {
         Task<ReturnResult> GetPermissionsByUser(int id);
+
+        Task<ReturnResult> UpdateUserPermissionsById(PermissionChangeModel model);
     }
 }

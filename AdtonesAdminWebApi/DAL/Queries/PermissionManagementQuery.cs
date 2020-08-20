@@ -10,5 +10,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string GetPermissionById => "SELECT Permissions FROM Users WHERE UserId=@UserId";
 
+
+        public static string UpdateUserPermissions => "UPDATE Users SET Permissions=@perms WHERE UserId=@Id";
+
     }
 }

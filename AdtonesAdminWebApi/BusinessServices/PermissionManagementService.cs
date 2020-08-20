@@ -6,6 +6,7 @@ using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+// using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,11 +43,13 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                PermissionList listStr = new PermissionList();
-                var str =  JsonSerializer.Deserialize<List<PermissionModel>>(await _permDAL.GetPermissionsByUserId(id));
-                listStr.pages = str.ToList();
-                // str.ToList().ForEach(l => listStr.Add(l));
-                result.body = listStr;// await _permDAL.GetPermissionsByUserId(id);
+                string permPreList = string.Empty;
+                var permList = new List<PermissionModel>();
+                permPreList = await _permDAL.GetPermissionsByUserId(id);
+                if(permPreList != null && permPreList.Length > 50)
+                    permList = JsonSerializer.Deserialize<List<PermissionModel>>(permPreList);
+
+                result.body = permList;
             }
             catch (Exception ex)
             {
@@ -64,7 +67,32 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        
+        public async Task<ReturnResult> UpdateUserPermissionsById(PermissionChangeModel model)
+        {
+            try
+            {
+                // PermissionList permListOfList = JsonSerializer.Deserialize<PermissionList>(model.permissions.ToString());
+                List<PermissionModel> permList = JsonSerializer.Deserialize<List<PermissionModel>>(model.permissions.ToString()); ;// permListOfList.pageData;
+                var str = JsonSerializer.Serialize(permList);
+                result.body = await _permDAL.UpdateUserPermissions(model.UserId, str);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "PermissionManagementService",
+                    ProcedureName = "UpdateUserPermissionsById"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+
 
     }
 }

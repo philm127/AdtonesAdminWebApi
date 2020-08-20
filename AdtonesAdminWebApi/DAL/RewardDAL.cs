@@ -3,6 +3,7 @@ using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using MimeKit.Encodings;
 using System.Collections.Generic;
@@ -18,8 +19,8 @@ namespace AdtonesAdminWebApi.DAL
     public class RewardDAL : BaseDAL, IRewardDAL
     {
 
-        public RewardDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService) 
-            : base(configuration, executers, connService)
+        public RewardDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor) 
+            : base(configuration, executers, connService, httpAccessor)
         {
         }
 

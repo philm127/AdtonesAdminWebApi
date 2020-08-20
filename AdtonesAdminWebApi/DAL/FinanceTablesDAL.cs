@@ -3,6 +3,7 @@ using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,8 @@ namespace AdtonesAdminWebApi.DAL
     public class FinanceTablesDAL : BaseDAL, IFinanceTablesDAL
     {
 
-        public FinanceTablesDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService) : base(configuration, executers, connService)
+        public FinanceTablesDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor) : 
+                                                base(configuration, executers, connService, httpAccessor)
         { }
 
 

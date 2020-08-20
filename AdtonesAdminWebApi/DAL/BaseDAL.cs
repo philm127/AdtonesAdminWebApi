@@ -1,13 +1,16 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-
+using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL
 {
@@ -17,17 +20,28 @@ namespace AdtonesAdminWebApi.DAL
         public readonly string _connStr;
         public readonly IExecutionCommand _executers;
         public readonly IConnectionStringService _connService;
+        private readonly IHttpContextAccessor _httpAccessor;
 
-
-        public BaseDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
+        public BaseDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
             _connService = connService;
+            _httpAccessor = httpAccessor;
         }
 
         
+
+
+        public async Task<string> GetPermissionsByUserId()
+        {
+            return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.QueryFirstOrDefault<string>(PermissionManagementQuery.GetPermissionById, 
+                                                                                                        new { UserId = _httpAccessor.GetUserIdFromJWT() }));
+        }
+
+
         /// <summary>
         /// Takes the arrays from general permissions to allow access by country, operator, advertisers or all 3.
         /// </summary>
@@ -41,44 +55,62 @@ namespace AdtonesAdminWebApi.DAL
         public (StringBuilder sbuild, SqlBuilder build) CheckGeneralFile(StringBuilder sb, SqlBuilder builder, string pais = null, string ops = null, string advs = null, string test = null)
         {
             var genFile = string.Empty;
-            string genLoc = string.Empty;
-            if(test == "op")
-                genLoc = _configuration.GetValue<string>("Environment:GeneralTestOpJson");
-            else
-                genLoc = _configuration.GetValue<string>("Environment:GeneralTestJson").ToString();
-            
-            genFile = System.IO.File.ReadAllText(genLoc);
-           
-            PermissionModel gen = JsonSerializer.Deserialize<PermissionModel>(genFile);
+            //string genLoc = string.Empty;
+            //if(test == "op")
+            //    genLoc = _configuration.GetValue<string>("Environment:GeneralTestOpJson");
+            //else
+            //    genLoc = _configuration.GetValue<string>("Environment:GeneralTestJson").ToString();
 
-            var els = gen.elements.ToList();
+            //genFile = System.IO.File.ReadAllText(genLoc);
+
+            genFile = GetPermissionsByUserId().Result;
+           
+            List<PermissionModel> gen = JsonSerializer.Deserialize<List<PermissionModel>>(genFile);
+
+            var page = gen.Find(u => u.pageName == "GeneralAccess");
+            
+            var els = page.elements.ToList();
 
             bool queryUsed = false;
 
-            int[] country = els.Find(x => x.name == "country").arrayId.ToArray();
+            
             // operators plural as operator is a key word
-            int[] operators = els.Find(x => x.name == "operator").arrayId.ToArray();
-            int[] advertiser = els.Find(x => x.name == "advertiser").arrayId.ToArray();
 
-            if (country.Length > 0 && pais != null)
-            {
-                sb.Append($" AND {pais}.CountryId IN @country ");
-                builder.AddParameters(new { country = country.ToArray() });
-                queryUsed = true;
+            var testcty = els.Find(x => x.name == "country").arrayId;
 
-            }
-            if (operators.Length > 0 && ops != null)
+            if (testcty != null)
             {
-                sb.Append($" AND [ops].OperatorId IN @operators ");
-                builder.AddParameters(new { operators = operators.ToArray() });
-                queryUsed = true;
+                int[] country = els.Find(x => x.name == "country").arrayId.ToArray();
+                if (country.Length > 0 && pais != null)
+                {
+                    sb.Append($" AND {pais}.CountryId IN @country ");
+                    builder.AddParameters(new { country = country.ToArray() });
+                    queryUsed = true;
+                }
             }
 
-            if (advertiser.Length > 0 && advs != null)
+            var testopo = els.Find(x => x.name == "operator").arrayId;
+            if (testopo != null)
             {
-                sb.Append($" AND {advs}.UserId IN @advertiser ");
-                builder.AddParameters(new { advertisers = advertiser.ToArray() });
-                queryUsed = true;
+                int[] operators = els.Find(x => x.name == "operator").arrayId.ToArray();
+                if (operators.Length > 0 && ops != null)
+                {
+                    sb.Append($" AND {ops}.OperatorId IN @operators ");
+                    builder.AddParameters(new { operators = operators.ToArray() });
+                    queryUsed = true;
+                }
+            }
+
+            var testads = els.Find(x => x.name == "advertiser").arrayId;
+            if (testads != null)
+            {
+                int[] advertiser = els.Find(x => x.name == "advertiser").arrayId.ToArray();
+                if (advertiser.Length > 0 && advs != null)
+                {
+                    sb.Append($" AND {advs}.UserId IN @advertiser ");
+                    builder.AddParameters(new { advertiser = advertiser.ToArray() });
+                    queryUsed = true;
+                }
             }
 
             // If original string does not have Where clause this will add it.

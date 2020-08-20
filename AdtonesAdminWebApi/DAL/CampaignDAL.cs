@@ -18,13 +18,10 @@ namespace AdtonesAdminWebApi.DAL
 
     public class CampaignDAL : BaseDAL, ICampaignDAL
     {
-        private readonly IHttpContextAccessor _httpAccessor;
 
         public CampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, 
-                            IHttpContextAccessor httpAccessor) : base(configuration, executers, connService)
-        {
-            _httpAccessor = httpAccessor;
-        }
+                            IHttpContextAccessor httpAccessor) : base(configuration, executers, connService, httpAccessor)
+        {}
 
 
         public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(int id=0)

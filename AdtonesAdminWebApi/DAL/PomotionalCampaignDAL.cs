@@ -2,6 +2,7 @@
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,8 @@ namespace AdtonesAdminWebApi.DAL
     public class PromotionalCampaignDAL : BaseDAL, IPromotionalCampaignDAL
     {
 
-        public PromotionalCampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
-            : base(configuration, executers, connService)
+        public PromotionalCampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor)
+            : base(configuration, executers, connService, httpAccessor)
         { }
 
 

@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.ViewModels
 {
-    
+
     public class PermissionList
     {
-        public List<PermissionModel> pages { get; set; }
+        public List<PermissionModel> pageData { get; set; }
     }
-    
+
     public class PermissionModel
     {
         public string pageName { get; set; }
@@ -32,9 +32,43 @@ namespace AdtonesAdminWebApi.ViewModels
 
         // Used in general section to set Operator,
         // Country or Advertiser restrictions
-        public int[] arrayId { get; set; }
+        public int[] arrayId { get; set; }// => arrayId.ToString().Split(',').Select(n => Convert.ToInt32(n)).ToArray();
 
         // Needed for menus to work
         public List<PermElement> elements { get; set; }
     }
+
+    public class PermissionChangeModel
+    {
+        public int UserId { get; set; }
+
+        public string permissions { get; set; }
+    }
+
+
+    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
+    //public class Element
+    //{
+    //    public string name { get; set; }
+    //    public bool visible { get; set; }
+    //    public bool enabled { get; set; }
+    //    public string route { get; set; }
+    //    public object arrayId { get; set; }
+    //    public string type { get; set; }
+    //    public List<object> elements { get; set; }
+    //}
+
+    //public class PageData
+    //{
+    //    public string pageName { get; set; }
+    //    public bool visible { get; set; }
+    //    public List<Element> elements { get; set; }
+    //}
+
+    //public class Root
+    //{
+    //    public List<PageData> pageData { get; set; }
+    //}
+
+
 }
