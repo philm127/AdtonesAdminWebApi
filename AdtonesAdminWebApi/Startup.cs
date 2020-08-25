@@ -172,7 +172,6 @@ namespace AdtonesAdminWebApi
             app.UseCors("CorsPolicy");
             // app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
-            
             app.UseAuthentication();
 
             app.UseAuthorization();

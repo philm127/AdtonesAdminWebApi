@@ -38,7 +38,6 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> UpdateUserStatus(AdvertiserDashboardResult model)
         {
             int x = 0;
-            int operatorId = 0;
 
             var sb1 = new StringBuilder();
             sb1.Append(UserManagementQuery.UpdateUserStatus);
@@ -60,7 +59,7 @@ namespace AdtonesAdminWebApi.DAL
             }
 
 
-            var operatorConnectionString = await _connService.GetOperatorConnectionByUserId(model.UserId);
+            var lst = await _connService.GetConnectionStrings();
 
             var sb2 = new StringBuilder();
             sb2.Append(UserManagementQuery.UpdateUserStatus);
@@ -72,13 +71,20 @@ namespace AdtonesAdminWebApi.DAL
 
             try
             {
-                return await _executers.ExecuteCommand(operatorConnectionString,
-                             conn => conn.ExecuteScalar<int>(sel.RawSql, sel.Parameters));
+                List<string> conns = lst.ToList();
+
+                foreach (string constr in conns)
+                {
+                    x = await _executers.ExecuteCommand(constr,
+                                    conn => conn.ExecuteScalar<int>(sel.RawSql, sel.Parameters));
+                }
+                
             }
             catch
             {
                 throw;
             }
+            return x;
         }
 
 

@@ -52,17 +52,10 @@ namespace AdtonesAdminWebApi.DAL
         /// <param name="advs">This is to allow flexibility to the virtual table name when using advertiser array</param>
         /// <param name="test">This will take op or null, op is for testing local json file for operator before we take data from table</param>
         /// <returns>A Tuple of an updated StringBuilder and an updated Dapper Query Builder</returns>
-        public (StringBuilder sbuild, SqlBuilder build) CheckGeneralFile(StringBuilder sb, SqlBuilder builder, string pais = null, string ops = null, string advs = null, string test = null)
+        public (StringBuilder sbuild, SqlBuilder build) CheckGeneralFile(StringBuilder sb, SqlBuilder builder, string pais = null, string ops = null, 
+                                string advs = null, string test = null)
         {
             var genFile = string.Empty;
-            //string genLoc = string.Empty;
-            //if(test == "op")
-            //    genLoc = _configuration.GetValue<string>("Environment:GeneralTestOpJson");
-            //else
-            //    genLoc = _configuration.GetValue<string>("Environment:GeneralTestJson").ToString();
-
-            //genFile = System.IO.File.ReadAllText(genLoc);
-
             genFile = GetPermissionsByUserId().Result;
            
             List<PermissionModel> gen = JsonSerializer.Deserialize<List<PermissionModel>>(genFile);

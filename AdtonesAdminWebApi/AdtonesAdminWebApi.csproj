@@ -5,6 +5,7 @@
     <UserSecretsId>88812aa9-acbf-4f14-aa7f-2bfa97011cf4</UserSecretsId>
 	<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
+  
 
   <ItemGroup>
     <Compile Remove="DAL\**" />
