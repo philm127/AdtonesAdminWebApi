@@ -47,7 +47,7 @@ namespace AdtonesAdminWebApi.DAL
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(TicketQuery.GetTicketComments);
             builder.AddParameters(new { questionId = id });
-            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:siteAddress") });
+            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             try
             {
 

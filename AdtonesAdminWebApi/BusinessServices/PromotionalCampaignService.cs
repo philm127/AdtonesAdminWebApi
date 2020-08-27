@@ -134,48 +134,47 @@ namespace AdtonesAdminWebApi.BusinessServices
                     var audioFormatExtension = "." + outputFormat;
 
                     string fileName = Path.GetFileName(mediaFile.FileName);
-                    string directoryName = "PromotionalMedia";
-                    directoryName = Path.Combine(directoryName, model.OperatorId.ToString());
+                    string actualDirectoryName = "PromotionalMedia";
+                    string directoryName = Path.Combine(actualDirectoryName, model.OperatorId.ToString());
                     string newfile = string.Empty;
 
 
                     if (extension != audioFormatExtension)
                     {
                         // Put this to return either the filename or filepath from service
-                        string tempDirectoryName = "PromotionalMedia/Temp";
+                        string tempDirectoryName = @"PromotionalMedia\Temp\";
                         string tempFile = await _saveFile.SaveFileToSite(tempDirectoryName, mediaFile);
 
                         newfile = _convFile.ConvertAndSaveMediaFile(tempDirectoryName + tempFile, extension, outputFormat, onlyFileName, directoryName);
-                        model.AdvertLocation = Path.Combine(directoryName, newfile);
+                        model.AdvertLocation = $"/{actualDirectoryName}/{model.OperatorId.ToString()}/{ newfile}";
                     }
                     else
                     {
 
                         newfile = await _saveFile.SaveFileToSite(directoryName, mediaFile);
 
-                        string archiveDirectoryName = "PromotionalMedia/Archive";
+                        string archiveDirectoryName = "PromotionalMedia//Archive";
 
                         string apath = await _saveFile.SaveOriginalFileToSite(archiveDirectoryName, mediaFile);
 
-                        model.AdvertLocation = $"{directoryName}/{newfile}";
+                        model.AdvertLocation = $"/{actualDirectoryName}/{model.OperatorId.ToString()}/{ newfile}";
                     }
 
                     int promoId = 0;
                     int opPromoId = 0;
+                    int advertId = 0;
                     try
                     {
-                        // Updates both main and provisioning DB returns id from the promo server.
+                        // Updates both main DB returns id for the promo server.
                         promoId = await _provisionServer.AddPromotionalCampaign(model);
-                        if (promoId > 0)
-                        {
-                            model.AdtoneServerPromotionalCampaignId = promoId;
-                        }
-                        else
-                        {
-                            result.result = 0;
-                            result.error = "Failed to insert into Database.";
-                            return result;
-                        }
+
+                        // Adds Promo Advert
+                        model.ID = promoId;
+                        model.AdtoneServerPromotionalCampaignId = null;
+                        advertId = await _provisionServer.AddPromotionalAdvert(model);
+
+                        model.AdtoneServerPromotionalCampaignId = promoId;
+
                     }
                     catch (Exception ex)
                     {
@@ -193,9 +192,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                     }
                     try
                     {
-                        // To use with adverts.
-                        var originalFile = model.AdvertLocation;
-                        var ftpFile = string.Empty;
 
                         var operatorFTPDetails = await _advertDAL.GetFtpDetails(model.OperatorId);
 
@@ -204,22 +200,14 @@ namespace AdtonesAdminWebApi.BusinessServices
                         if (returnValue)
                         {
                             if (operatorFTPDetails != null)
-                                model.AdvertLocation = operatorFTPDetails.FtpRoot + "/" + model.AdvertLocation.Split('/')[1];
+                                model.AdvertLocation = operatorFTPDetails.FtpRoot + "FTPRoot" + "/" + model.AdvertLocation.Split('/')[3];
 
                             opPromoId = await _provisionServer.AddPromotionalCampaignToOperator(model);
-                            ftpFile = model.AdvertLocation;
+
+                            model.ID = opPromoId;
+                            model.AdtoneServerPromotionalCampaignId = advertId;
+                            var opAdvertId = _provisionServer.AddPromotionalAdvertToOperator(model);
                         }
-
-
-                        model.ID = promoId;
-                        model.AdvertLocation = originalFile;
-                        model.AdtoneServerPromotionalCampaignId = null;
-                        var advertId = await _provisionServer.AddPromotionalAdvert(model);
-
-                        model.ID = opPromoId;
-                        model.AdvertLocation = ftpFile;
-                        model.AdtoneServerPromotionalCampaignId = advertId;
-                        var opAdvertId = _provisionServer.AddPromotionalAdvertToOperator(model);
 
                         return result;
                     }

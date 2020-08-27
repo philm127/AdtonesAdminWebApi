@@ -79,14 +79,14 @@ namespace AdtonesAdminWebApi.BusinessServices
                                 "(" + DateTime.Parse(pdfModel.SettledDate.ToString(), new CultureInfo("en-US")).Year + ")";
 
                 /// TODO: When tested sort path and attatchment
-                var attachment = "Invoice/Adtones_invoice_" + pdfModel.InvoiceNumber + ".pdf";
+                var attachment = "Invoice//Adtones_invoice_" + pdfModel.InvoiceNumber + ".pdf";
 
                 //var attachment = "Invoice/Adtones_invoice_A54928820.pdf";// await _getFiles.GetIformFileFromPath(path); //new FormFile(memory, 0, memory.Length); //File(memory, GetContentType(path), Path.GetFileName(path));
 
                 // Build the body out
                 string paymentMethod = pdfModel.Description;
-                var otherpath = _env.ContentRootPath;
-                otherpath = Path.Combine(otherpath, "MailerTemplates\\");
+                var otherpath = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress");
+                otherpath = Path.Combine(otherpath, "MailerTemplates");
                 string template = string.Empty;
                 var typeOfInv = 0;
 
@@ -101,13 +101,13 @@ namespace AdtonesAdminWebApi.BusinessServices
                     typeOfInv = 2;
                 }
 
-                var pathTemp = otherpath + template;
+                var pathTemp = Path.Combine(otherpath,template);
                 var reader = new StreamReader(pathTemp);
 
                 string emailContent = reader.ReadToEnd();
                 string body = string.Empty;
 
-                string link = _configuration.GetSection("AppSettings").GetSection("adtonesSiteAddress").Value;
+                string link = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress");
                 link += "/Billing/buy_credit";
 
                 if (typeOfInv == 1)

@@ -127,7 +127,6 @@
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.95.0" />
-    <PackageReference Include="CloudConvert" Version="1.0.0" />
     <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="Dapper.SqlBuilder" Version="2.0.35" />
     <PackageReference Include="MailKit" Version="2.7.0" />
@@ -148,6 +147,10 @@
 
   <ItemGroup>
     <None Include="wwwroot\index.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CloudConvert\CloudConvert.csproj" />
   </ItemGroup>
 
 

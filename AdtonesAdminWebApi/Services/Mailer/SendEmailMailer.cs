@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 namespace AdtonesAdminWebApi.Services.Mailer
 {
     /// <summary>
-    /// TODO: Need to sort whole of the mailing out
+    /// 
     /// </summary>
     public class SendEmailMailer : ISendEmailMailer
     {
@@ -55,7 +55,7 @@ namespace AdtonesAdminWebApi.Services.Mailer
             var builder = new BodyBuilder { HtmlBody = mail.Body };
             if (mail.attachment != null)
             {
-                var otherpath = env.ContentRootPath;
+                var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
                 var filePath = Path.Combine(otherpath, mail.attachment);
                 var filename = Path.GetFileName(filePath);
                 var ms = new MemoryStream();

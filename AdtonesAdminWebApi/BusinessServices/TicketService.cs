@@ -235,7 +235,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 // string filename = unixTimestamp.ToString() + "_" + userId.ToString() + extension;
 
                 /// TODO: Need to sort file saving out
-                string directoryName = "/QuestionComment/";
+                string directoryName = "QuestionComment";
 
                 var filename = await _saveFile.SaveFileToSite(directoryName, model.CommentImage);
 

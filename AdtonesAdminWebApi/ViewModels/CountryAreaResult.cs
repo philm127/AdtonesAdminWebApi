@@ -14,7 +14,7 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public string ShortName { get; set; }
         public string CountryCode { get; set; }
-        public decimal TaxPercantage { get; set; }
+        public decimal TaxPercentage { get; set; }
 
         public DateTime? CreatedDate { get; set; }
         public int Status { get; set; }
@@ -23,7 +23,7 @@ namespace AdtonesAdminWebApi.ViewModels
         // [Required(ErrorMessage = "The Term & Condition field is required.")]
         public string TermAndConditionFileName { get; set; }
 
-        public IFormFile file { get; set; }
+        public IFormFile? file { get; set; }
     }
 
 

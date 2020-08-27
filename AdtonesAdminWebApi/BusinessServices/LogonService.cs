@@ -138,8 +138,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 user = await _userDAL.GetUserByEmail(emailAddress.ToLower());
 
-                /// TODO: Remove once testing done
-                // emailAddress = "philm127@gmail.com";
                 if (user == null)
                 {
                     result.result = 0;
@@ -155,10 +153,15 @@ namespace AdtonesAdminWebApi.BusinessServices
                 // Send an email with this link
                 string email = EncryptionHelper.EncryptSingleValue(user.Email);
 
-                string url = string.Format("{0}?activationCode={1}",
-                                    _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("AdminResetPassword").Value, email);
+                var resetAddress = string.Empty;
+                if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom)
+                    resetAddress = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomOperatorAdminSiteAddress").Value + "ResetPassword";
+                else
+                    resetAddress = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("AdminResetPassword").Value;
 
-                var otherpath = _env.ContentRootPath;
+                string url = string.Format("{0}?activationCode={1}",resetAddress, email);
+
+                var otherpath = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress");
                 var template = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("ResetPasswordEmailTemplate").Value;
                 var path = otherpath + template;
                 var reader = new StreamReader(path);
@@ -224,8 +227,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                 change.PasswordHash = model.OldPassword;
                 change.Email = user.Email;
 
-                /// TODO: Remove once testing done
-                // emailAddress = "philm127@gmail.com";
                 if (user == null)
                 {
                     result.result = 0;
@@ -305,9 +306,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 User user = await _userDAL.GetUserByEmail(model.Email);
 
-
-                /// TODO: Remove once testing done
-                // emailAddress = "philm127@gmail.com";
                 if (user == null)
                 {
                     result.result = 0;

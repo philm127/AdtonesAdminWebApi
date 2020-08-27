@@ -70,7 +70,7 @@ namespace AdtonesAdminWebApi.OperatorSpecific
                 request.AddHeader("Cache-Control", "no-cache");
                 request.AddHeader("Content-Type", "application/json");
                 request.AddJsonBody(requestBatch.ToList());
-                var response = await client.ExecutePostTaskAsync<List<ProvisionModel>>(request);
+                var response = await client.ExecutePostAsync<List<ProvisionModel>>(request);
                 if (response.ErrorException != null || !string.IsNullOrEmpty(response.ErrorMessage))
                     throw new ExpressoException(response.ErrorMessage, response.ErrorException);
 

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using MadScripterWrappers;
+// using MadScripterWrappers;
 using System.Text.Json;
 using AdtonesAdminWebApi.ViewModels;
+using MadScripterWrappers;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace AdtonesAdminWebApi.Services
 {
@@ -17,15 +19,17 @@ namespace AdtonesAdminWebApi.Services
     public class ConvertSaveMediaFile : IConvertSaveMediaFile
     {
         private readonly IWebHostEnvironment _env;
+        private readonly IConfiguration _configuration;
 
-        public ConvertSaveMediaFile(IWebHostEnvironment env)
+        public ConvertSaveMediaFile(IWebHostEnvironment env, IConfiguration configuration)
         {
             _env = env;
+            _configuration = configuration;
         }
 
         public string ConvertAndSaveMediaFile(string audioFilePath, string extension, string outputFormat, string onlyFileName, string directoryName)
         {
-            var otherpath = _env.ContentRootPath;
+            var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
             try
             {
                 string inputFormat = extension.Replace(".", "");
@@ -60,7 +64,7 @@ namespace AdtonesAdminWebApi.Services
 
                     webClient.DownloadFile(downloadUrl, savePath);
 
-                    string archiveDirectoryName = Path.Combine(otherpath, "PromotionalMedia/Archive/");
+                    string archiveDirectoryName = Path.Combine(otherpath, @"PromotionalMedia/Archive/");
 
                     string archivePath = Path.Combine(archiveDirectoryName, fileName + "." + outputFormat);
 

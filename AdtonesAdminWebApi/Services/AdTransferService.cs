@@ -1,6 +1,7 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.ViewModels;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -19,19 +20,19 @@ namespace AdtonesAdminWebApi.Services
     public class AdTransferService : IAdTransferService
     {
         private readonly IAdvertDAL _advertDAL;
-        private readonly IWebHostEnvironment env;
+        private readonly IConfiguration _configuration;
 
-        public AdTransferService(IAdvertDAL advertDAL, IWebHostEnvironment _env)
+        public AdTransferService(IAdvertDAL advertDAL, IConfiguration configuration)
         {
             _advertDAL = advertDAL;
-            env = _env;
+            _configuration = configuration;
         }
 
         public async Task<string> CopyAdToOperatorServer(string conn, UserAdvertResult advert)
         {
             try
             {
-                var otherpath = env.ContentRootPath;
+                var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
                 var mediaFile = advert.MediaFile;
                 if (!string.IsNullOrEmpty(mediaFile) && advert.UploadedToMediaServer == false)
                 {
@@ -44,7 +45,7 @@ namespace AdtonesAdminWebApi.Services
                         var port = Convert.ToInt32(getFTPdetails.Port);
                         var username = getFTPdetails.UserName;
                         var password = getFTPdetails.Password;
-                        var localRoot = Path.Combine(otherpath, dir); //System.Web.HttpContext.Current.Server.MapPath("~/Media"); ///TODO:
+                        var localRoot = Path.Combine(otherpath, dir);
                         var ftpRoot = getFTPdetails.FtpRoot;
 
                         // Test FTP Details
@@ -105,7 +106,7 @@ namespace AdtonesAdminWebApi.Services
         {
             try
             {
-                var otherpath = env.ContentRootPath;
+                var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
                 var mediaFile = model.AdvertLocation;
                 if (!string.IsNullOrEmpty(mediaFile))
                 {

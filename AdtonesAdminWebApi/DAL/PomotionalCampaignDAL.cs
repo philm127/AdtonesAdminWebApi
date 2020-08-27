@@ -91,7 +91,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(PromotionalCampaignQuery.GetPromoCampaignResultSet);
-            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:siteAddress") });// adtonesSiteAddress") });
+            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             try
             {
 

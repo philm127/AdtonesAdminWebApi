@@ -33,7 +33,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     result.body = await connection.QueryAsync<CountryResult>(@"SELECT c.Id,c.Name,c.ShortName,c.CountryCode,c.CreatedDate,c.Status,
                                                                                     ISNULL(t.TaxPercantage,0) AS TaxPercentage 
-                                                                                    FROM Country AS c LEFT JOIN CountryTax AS t ON c.Id = t.CountryId
+                                                                                    FROM Country AS c INNER JOIN CountryTax AS t ON t.CountryId=c.Id
                                                                                     ORDER BY c.Id DESC");
                 }
 
@@ -60,8 +60,9 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
-                    result.body = await connection.QueryAsync<CountryResult>(@"SELECT c.Id,c.Name,ShortName,c.CountryCode,c.CreatedDate,c.Status,TaxPercantage 
-                                                                             FROM Country AS c LEFT JOIN CountryTax AS t ON c.Id = t.CountryId 
+                    result.body = await connection.QueryAsync<CountryResult>(@"SELECT c.Id,c.Name,ShortName,c.CountryCode,c.CreatedDate,c.Status,
+                                                                             t.TaxPercantage AS TaxPercentage
+                                                                             FROM Country AS c INNER JOIN CountryTax AS t ON t.CountryId=c.Id
                                                                                 WHERE c.Id=@id", new { id = Id});
                 }
 
@@ -104,20 +105,20 @@ namespace AdtonesAdminWebApi.BusinessServices
                     }
 
                     /// TODO: Need to sort file saving out
-                    string directoryName = "/TermAndCondition/";
+                    string directoryName = "TermAndCondition";
 
                     string filename = await _saveFile.SaveFileToSite(directoryName, countrymodel.file);
                     countrymodel.TermAndConditionFileName = filename;
+                }
 
-                    string insert_string = @"INSERT INTO Country(UserId,Name,ShortName,CreatedDate,UpdatedDate,Status,
-                                            TermAndConditionFileName,CountryCode,TaxPercentage)
+                string insert_string = @"INSERT INTO Country(UserId,Name,ShortName,CreatedDate,UpdatedDate,Status,
+                                            TermAndConditionFileName,CountryCode)
                                         VALUES(@UserId,@Name,@ShortName, GETDATE(), GETDATE(), @Status, 
-                                                @TermAndConditionFileName, @CountryCode,@TaxPercentage);";
+                                                @TermAndConditionFileName, @CountryCode);";
 
-                    using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                    {
-                        result.body = await connection.ExecuteAsync(insert_string, countrymodel);
-                    }
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    result.body = await connection.ExecuteAsync(insert_string, countrymodel);
                 }
             }
             catch (Exception ex)
@@ -150,7 +151,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         result.result = 0;
                         return result;
                     }
-                    string directoryName = "/TermAndCondition/";
+                    string directoryName = "TermAndCondition";
 
                     if (!string.IsNullOrEmpty(countrymodel.TermAndConditionFileName))
                     {
@@ -162,7 +163,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 string update_string = @"UPDATE Country SET UserId = @UserId, Name = @Name, ShortName = @ShortName, 
                                                             UpdatedDate = GETDATE(),Status = @Status, CountryCode = @CountryCode,
-                                                            TermAndConditionFileName = @TermAndConditionFileName,TaxPercentage=@TaxPercentage
+                                                            TermAndConditionFileName = @TermAndConditionFileName
                                                                                                                         WHERE Id=@Id;";
 
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
