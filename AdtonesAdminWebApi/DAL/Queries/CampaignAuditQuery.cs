@@ -59,7 +59,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 														WHERE ";
 
 
-		public static string GetCampaignDashboardSummariesByOperator => @"SELECT ISNULL(cp.TotalBudget,0) AS Budget, ISNULL(g.TotalPlayedCost,0) AS Spend,
+		public static string GetCampaignDashboardSummariesByOperator => @"SELECT ISNULL(CAST(cp.TotalBudget AS bigint),0) AS Budget, ISNULL(g.TotalPlayedCost,0) AS Spend,
 																	ISNULL(cp.TotalBudget,0) - ISNULL(g.TotalPlayedCost,0) AS FundsAvailable,
 																	ISNULL(g.TotalAvgCost,0) AS AvgBid,CAST(ISNULL(g.TotalSMS,0) AS bigint) AS TotalSMS,
 																	ISNULL(g.TotalSMSCost,0) AS TotalSMSCost,CAST(ISNULL(g.TotalEmail,0) AS bigint) AS TotalEmail,

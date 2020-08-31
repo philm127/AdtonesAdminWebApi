@@ -328,7 +328,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
                 if (campaignProfile.Status == 8 && adModel.Status == (int)Enums.AdvertStatus.Pending)
                 {
-                    adModel.Status = (int)Enums.AdvertStatus.CampaignPausedDueToInsufficientFunds;
+                    adModel.Status = (int)Enums.AdvertStatus.InsufficientFunds;
                 }
                 var updstatus = UpdateStatus(adModel,uid,adId);
 
@@ -372,6 +372,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                         }
                     }
                 }
+
+                var t = RemoveRejections(adModel, adId, ConnString);
 
                 return true;
             }
@@ -462,6 +464,10 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                     var boolRet = await ApproveRejectApproveAd(adModel, ConnString);
                 }
+
+                int adId = await _connService.GetAdvertIdFromAdtoneId(adModel.AdvertId, adModel.OperatorId);
+
+                var t = RemoveRejections(adModel, adId, ConnString);
 
                 return true;
             }
@@ -601,6 +607,14 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             var x = await _advertDAL.ChangeAdvertStatus(adModel);
             var y = await _advertDAL.ChangeAdvertStatusOperator(adModel, adtoneUser, adtoneAd);
+            return true;
+        }
+
+
+        private async Task<bool> RemoveRejections(UserAdvertResult adModel, int adtoneAd, string ConnString)
+        {
+            var x = await _advertDAL.DeleteAdvertRejection(adModel);
+            var y = await _advertDAL.DeleteRejectAdvertReasonOperator(ConnString, adtoneAd);
             return true;
         }
 

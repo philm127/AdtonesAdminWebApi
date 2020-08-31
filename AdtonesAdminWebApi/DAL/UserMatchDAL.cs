@@ -37,7 +37,7 @@ namespace AdtonesAdminWebApi.DAL
                 builder.AddParameters(new { media = media });
                 builder.AddParameters(new { campaignProfileId = id });
 
-                return await _executers.ExecuteCommand(_connStr,
+                return await _executers.ExecuteCommand(conn,
                                     conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
             }
             catch

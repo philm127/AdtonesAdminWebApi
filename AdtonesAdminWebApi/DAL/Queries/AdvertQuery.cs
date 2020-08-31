@@ -16,6 +16,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 LEFT JOIN Users AS usr ON usr.UserId=ad.UserId
                                                 LEFT JOIN CampaignAdverts AS cad ON cad.AdvertId=ad.AdvertId
                                                 LEFT JOIN CampaignProfile AS cprof ON cprof.CampaignProfileId=cad.CampaignProfileId";
+        
+        // where ad.AdvertId IN (94,99,101)"; // remember to change dal getadvert from and to where
 
         
 
@@ -27,7 +29,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string UpdateAdvertStatus => @"UPDATE Advert SET Status=@Status,UpdatedBy=@UpdatedBy, UpdatedDateTime=GETDATE() WHERE ";
 
 
-        public static string InsertAdvertRejection => @"INSERT INTO AdvertRejections(AdvertId,UserId,CreatedDateRejectionReason ) VALUES(@AdvertId,@UserId,GETDATE(),@RejectionReason);";
+        // public static string InsertAdvertRejection => @"INSERT INTO AdvertRejections(AdvertId,UserId,CreatedDateRejectionReason ) VALUES(@AdvertId,@UserId,GETDATE(),@RejectionReason);";
 
 
         public static string GetFtpDetails => @"SELECT OperatorFTPDetailId,Host,Port,UserName,Password,FtpRoot FROM OperatorFTPDetails WHERE OperatorId=@OperatorId";
@@ -39,6 +41,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string RejectAdvertReason => @"INSERT INTO AdvertRejections(UserId,AdvertId,RejectionReason,CreatedDate,AdtoneServerAdvertRejectionId)
                                                                     VALUES(@UserId,@AdvertId,@RejectionReason,GETDATE(),@AdtoneServerAdvertRejectionId);
                                                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+
+        public static string DeleteRejectAdvertReason => @"DELETE FROM AdvertRejections WHERE AdvertId=@AdvertId;";
 
 
         public static string DeleteAdvertCategory => @"DELETE FROM AdvertCategories WHERE ";

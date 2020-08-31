@@ -1,16 +1,12 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
-using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
-using DocumentFormat.OpenXml.Office2010.Drawing;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL
@@ -94,7 +90,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             var sb = new StringBuilder();
             sb.Append(AdvertQuery.GetAdvertResultSet);
-            sb.Append(" Where ad.AdvertId=@Id");
+            sb.Append(" WHERE ad.AdvertId=@Id");
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sb.ToString());
             try
@@ -302,7 +298,7 @@ namespace AdtonesAdminWebApi.DAL
             var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
             var sb = new StringBuilder();
             sb.Append(AdvertQuery.UpdateAdvertStatus);
-            sb.Append(" AdtoneServerAdvertId=@AdvertId;");
+            sb.Append(" AdvertId=@AdvertId;");
 
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sb.ToString());
@@ -381,7 +377,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> RejectAdvertReasonOperator(UserAdvertResult model,string connString,int uid, int rejId, int adId)
+        public async Task<int> RejectAdvertReasonOperator(UserAdvertResult model, string connString, int uid, int rejId, int adId)
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(AdvertQuery.RejectAdvertReason);
@@ -400,6 +396,45 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
         }
+
+
+        public async Task<int> DeleteAdvertRejection(UserAdvertResult model)
+        {
+
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(AdvertQuery.DeleteRejectAdvertReason);
+            try
+            {
+                builder.AddParameters(new { AdvertId = model.AdvertId });
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> DeleteRejectAdvertReasonOperator(string connString, int adId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(AdvertQuery.DeleteRejectAdvertReason);
+            try
+            {
+                builder.AddParameters(new { AdvertId = adId });
+
+                return await _executers.ExecuteCommand(connString,
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        
 
     }
 }

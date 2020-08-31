@@ -200,7 +200,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         if (returnValue)
                         {
                             if (operatorFTPDetails != null)
-                                model.AdvertLocation = operatorFTPDetails.FtpRoot + "FTPRoot" + "/" + model.AdvertLocation.Split('/')[3];
+                                model.AdvertLocation = operatorFTPDetails.FtpRoot + "/" + model.AdvertLocation.Split('/')[3];
 
                             opPromoId = await _provisionServer.AddPromotionalCampaignToOperator(model);
 

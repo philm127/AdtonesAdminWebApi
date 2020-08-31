@@ -40,7 +40,7 @@ namespace AdtonesAdminWebApi.Services
 
                     if (getFTPdetails != null)
                     {
-                        var dir = "Media";// 
+                        var dir = "Media"; 
                         var host = getFTPdetails.Host;
                         var port = Convert.ToInt32(getFTPdetails.Port);
                         var username = getFTPdetails.UserName;
@@ -63,33 +63,36 @@ namespace AdtonesAdminWebApi.Services
                         //var password = "Huawei_123";
                         //var localRoot = System.Web.HttpContext.Current.Server.MapPath("~/Media");
                         //var ftpRoot = "/mnt/Y:/share";
-
-                        using (var client = new Renci.SshNet.SftpClient(host, port, username, password))
+                        var test = _configuration.GetValue<bool>("Environment:Test");
+                        if (!test)
                         {
-                            client.Connect();
-                            if (client.IsConnected)
+                            using (var client = new Renci.SshNet.SftpClient(host, port, username, password))
                             {
-                                var SourceFile = $"{localRoot}\\{advert.UserId}\\{System.IO.Path.GetFileName(advert.MediaFileLocation)}";
-                                var DestinationFile = ftpRoot + "/" + System.IO.Path.GetFileName(advert.MediaFileLocation);
-                                var filestream = new FileStream(SourceFile, FileMode.Open);
-                                client.UploadFile(filestream, DestinationFile, null);
-                                filestream.Close();
-
-                                if (advert.OperatorId == (int)Enums.OperatorTableId.Safaricom) // Second File Transfer
+                                client.Connect();
+                                if (client.IsConnected)
                                 {
-                                    var adName = System.IO.Path.GetFileName(advert.MediaFile);
-                                    var temp = adName.Split('.')[0];
-                                    var secondAdname = Convert.ToInt64(temp) + 1;
+                                    var SourceFile = $"{localRoot}\\{advert.UserId}\\{System.IO.Path.GetFileName(advert.MediaFileLocation)}";
+                                    var DestinationFile = ftpRoot + "/" + System.IO.Path.GetFileName(advert.MediaFileLocation);
+                                    var filestream = new FileStream(SourceFile, FileMode.Open);
+                                    client.UploadFile(filestream, DestinationFile, null);
+                                    filestream.Close();
 
-                                    var SourceFile2 = $"{localRoot}\\{advert.UserId}\\SecondAudioFile\\{secondAdname}.wav";
-                                    var DestinationFile2 = ftpRoot + "/" + secondAdname + ".wav";
-                                    var filestream2 = new FileStream(SourceFile2, FileMode.Open);
-                                    client.UploadFile(filestream2, DestinationFile2, null);
-                                    filestream2.Close();
+                                    if (advert.OperatorId == (int)Enums.OperatorTableId.Safaricom) // Second File Transfer
+                                    {
+                                        var adName = System.IO.Path.GetFileName(advert.MediaFile);
+                                        var temp = adName.Split('.')[0];
+                                        var secondAdname = Convert.ToInt64(temp) + 1;
+
+                                        var SourceFile2 = $"{localRoot}\\{advert.UserId}\\SecondAudioFile\\{secondAdname}.wav";
+                                        var DestinationFile2 = ftpRoot + "/" + secondAdname + ".wav";
+                                        var filestream2 = new FileStream(SourceFile2, FileMode.Open);
+                                        client.UploadFile(filestream2, DestinationFile2, null);
+                                        filestream2.Close();
+                                    }
+                                    var x = _advertDAL.UpdateMediaLoaded(advert);
                                 }
-                                var x = _advertDAL.UpdateMediaLoaded(advert);
+                                client.Disconnect();
                             }
-                            client.Disconnect();
                         }
                     }
                 }
@@ -120,19 +123,22 @@ namespace AdtonesAdminWebApi.Services
                         var password = getFTPdetails.Password;
                         var localRoot = Path.Combine(otherpath, mediaFile);
                         var ftpRoot = getFTPdetails.FtpRoot;
-
-                        using (var client = new Renci.SshNet.SftpClient(host, port, username, password))
+                        var test = _configuration.GetValue<bool>("Environment:Test");
+                        if (!test)
                         {
-                            client.Connect();
-                            if (client.IsConnected)
+                            using (var client = new Renci.SshNet.SftpClient(host, port, username, password))
                             {
-                                var SourceFile = localRoot;
-                                var DestinationFile = ftpRoot + "/" + fileName;
-                                var filestream = new FileStream(SourceFile, FileMode.Open);
-                                client.UploadFile(filestream, DestinationFile, null);
-                                filestream.Close();
+                                client.Connect();
+                                if (client.IsConnected)
+                                {
+                                    var SourceFile = localRoot;
+                                    var DestinationFile = ftpRoot + "/" + fileName;
+                                    var filestream = new FileStream(SourceFile, FileMode.Open);
+                                    client.UploadFile(filestream, DestinationFile, null);
+                                    filestream.Close();
+                                }
+                                client.Disconnect();
                             }
-                            client.Disconnect();
                         }
                     }
                 }

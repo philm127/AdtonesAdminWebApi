@@ -14,7 +14,7 @@ namespace AdtonesAdminWebApi.Enums
         Rejected = 5,
         Draft = 6,
         InProgress = 7,
-        CampaignPausedDueToInsufficientFunds = 8,
+        InsufficientFunds = 8,
         Pending = 9
     }
 }

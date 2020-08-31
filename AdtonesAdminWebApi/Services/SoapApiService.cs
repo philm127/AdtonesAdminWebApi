@@ -148,23 +148,35 @@ namespace AdtonesAdminWebApi.Services
 
         public string DeleteSoapTone(int advertId)
         {
-            var url = safricomUrl + "DeleteTone?advertId=" + advertId;
-            var client = new RestClient(url);
-            var request = new RestRequest(Method.GET);
-            IRestResponse response = client.Execute(request);
-            return response.Content.Replace("\"", "");
+            var test = _configuration.GetValue<bool>("Environment:TestOperatorServer");
+            if (!test)
+            {
+                var url = safricomUrl + "DeleteTone?advertId=" + advertId;
+                var client = new RestClient(url);
+                var request = new RestRequest(Method.GET);
+                IRestResponse response = client.Execute(request);
+                return response.Content.Replace("\"", "");
+            }
+            else
+                return "000000";
         }
 
         public string UploadToneOnCRBTServer(int advertId)
         {
             var safariProjURL = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("SafricomProjUrl").Value;
-            //var url = safariProjURL + "AdTransfer/Index?advertId=" + advertId;
-            // var url = "http://172.29.128.103/AdTransfer/Index?advertId=1332";
-            var url = safricomUrl + "AdvertTransfer?advertId=" + advertId;
-            var client = new RestClient(url);
-            var request = new RestRequest(Method.GET);
-            IRestResponse response = client.Execute(request);
-            return response.Content.Replace("\"", "");
+            var test = _configuration.GetValue<bool>("Environment:TestOperatorServer");
+            if (!test)
+            {
+                //var url = safariProjURL + "AdTransfer/Index?advertId=" + advertId;
+                // var url = "http://172.29.128.103/AdTransfer/Index?advertId=1332";
+                var url = safricomUrl + "AdvertTransfer?advertId=" + advertId;
+                var client = new RestClient(url);
+                var request = new RestRequest(Method.GET);
+                IRestResponse response = client.Execute(request);
+                return response.Content.Replace("\"", "");
+            }
+            else
+                return "000000";
         }
         #endregion
 
