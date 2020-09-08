@@ -35,6 +35,113 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+
+        public async Task<bool> CheckIfUserExists(User model)
+        {
+            bool exists = false;
+            
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                exists = await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<bool>(UserManagementQuery.CheckUserExists, new { email = model.Email.ToLower() })); 
+            }
+            return exists;
+        }
+
+
+        public async Task<bool> CheckIfContactExists(Contacts model)
+        {
+            bool exists = false;
+
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                exists = await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<bool>(UserManagementQuery.CheckContactExists, new { mobile = model.MobileNumber }));
+            }
+            return exists;
+        }
+
+
+        public async Task<int> AddNewUser(User model)
+        {
+            int x = 0;
+            try
+            {
+                x = await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewUser, model));
+            }
+            catch
+            {
+                throw;
+            }
+
+            return x;
+        }
+
+
+        public async Task<int> AddNewUserToOperator(User model)
+        {
+            int x = 0;
+            try
+            {
+                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId);
+                List<string> conns = lst.ToList();
+
+                foreach (string constr in conns)
+                {
+                    x = await _executers.ExecuteCommand(constr,
+                         conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewUserToOperator, model));
+                }
+            }
+            catch
+            {
+                throw;
+            }
+
+            return x;
+        }
+
+
+        public async Task<int> AddNewContact(Contacts model)
+        {
+            int x = 0;
+            try
+            {
+                x = await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewContact, model));
+            }
+            catch
+            {
+                throw;
+            }
+
+            return x;
+        }
+
+
+        public async Task<int> AddNewContactToOperator(Contacts model)
+        {
+            int x = 0;
+            try
+            {
+                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.Value);
+                List<string> conns = lst.ToList();
+
+                foreach (string constr in conns)
+                {
+                    x = await _executers.ExecuteCommand(constr,
+                         conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewContact, model));
+                }
+            }
+            catch
+            {
+                throw;
+            }
+
+            return x;
+        }
+
+
         public async Task<int> UpdateUserStatus(AdvertiserDashboardResult model)
         {
             int x = 0;

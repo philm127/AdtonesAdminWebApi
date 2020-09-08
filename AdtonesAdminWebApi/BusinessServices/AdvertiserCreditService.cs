@@ -29,19 +29,24 @@ namespace AdtonesAdminWebApi.BusinessServices
 
 
 
-
+        /// <summary>
+        /// Used for both Adding New Credit and Updating Existing Credit
+        /// </summary>
+        /// <param name="_usercredit"></param>
+        /// <returns></returns>
         public async Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _usercredit)
         {
             try
             {
                 int x = 0;
+                var creditDetails = await _userDAL.GetUserCreditDetail(_usercredit.UserId);
 
-                var query = string.Empty;
-                if (await _userDAL.CheckUserCreditExist(_usercredit.UserId))
+                if (creditDetails != null)
                 {
-                    // Unsure why I put this in I'm sure a good reason but out for now
-                    // var available = await CalculateNewCredit(_usercredit.UserId);
-                    //_usercredit.AvailableCredit = _usercredit.AssignCredit + available;
+                    decimal newCredCalc = await CalculateNewCredit(_usercredit.UserId);
+                    _usercredit.Id = creditDetails.Id;
+                    _usercredit.AssignCredit = _usercredit.AssignCredit;
+                    _usercredit.AvailableCredit = _usercredit.AssignCredit + newCredCalc;
                     x = await _userDAL.UpdateUserCredit(_usercredit);
                 }
                 else

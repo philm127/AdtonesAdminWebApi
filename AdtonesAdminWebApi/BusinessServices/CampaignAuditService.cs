@@ -19,7 +19,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly ICampaignDAL _campDAL;
         private readonly IConfiguration _configuration;
         private readonly IConnectionStringService _connService;
-        private readonly CurrencyConversion _currencyConversion;
+        // private readonly CurrencyConversion _currencyConversion;
 
         ReturnResult result = new ReturnResult();
 
@@ -114,25 +114,27 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 var summaries = await _auditDAL.GetDashboardSummariesForOperator(operatorId);
-
-                var _CampaignDashboardChartResult = new CampaignDashboardChartResult
+                if (summaries != null)
                 {
-                    CampaignName = summaries.CampaignName,
-                    AdvertName = summaries.AdvertName,
-                    TotalPlayed = (int)summaries.TotalPlays,
-                    FreePlays = (int)summaries.FreePlays,
-                    TotalSpend = (double)summaries.Spend,
-                    AverageBid = (double)summaries.AvgBid,
-                    AveragePlayTime = (double)summaries.AvgPlayLength,
-                    TotalBudget = summaries.Budget,
-                    MaxPlayLength = summaries.MaxPlayLength,
-                    TotalReach = (int)summaries.TotalReach,
-                    Reach = (int)summaries.Reach,
-                    CurrencyCode = summaries.CurrencyCode
-                    //MaxPlayLengthPercantage = totalPlays == 0 ? 0 : Math.Round((double)summaries.TotalValuablePlays / totalPlays, 2),
-                };
+                    var _CampaignDashboardChartResult = new CampaignDashboardChartResult
+                    {
+                        CampaignName = summaries.CampaignName,
+                        AdvertName = summaries.AdvertName,
+                        TotalPlayed = (int)summaries.TotalPlays,
+                        FreePlays = (int)summaries.FreePlays,
+                        TotalSpend = (double)summaries.Spend,
+                        AverageBid = (double)summaries.AvgBid,
+                        AveragePlayTime = (double)summaries.AvgPlayLength,
+                        TotalBudget = summaries.Budget,
+                        MaxPlayLength = summaries.MaxPlayLength,
+                        TotalReach = (int)summaries.TotalReach,
+                        Reach = (int)summaries.Reach,
+                        CurrencyCode = summaries.CurrencyCode
+                        //MaxPlayLengthPercantage = totalPlays == 0 ? 0 : Math.Round((double)summaries.TotalValuablePlays / totalPlays, 2),
+                    };
 
-                result.body = _CampaignDashboardChartResult;
+                    result.body = _CampaignDashboardChartResult;
+                }
                 return result;
             }
             catch (Exception ex)

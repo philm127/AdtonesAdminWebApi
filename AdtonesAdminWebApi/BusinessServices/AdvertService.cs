@@ -308,7 +308,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "AdvertService",
-                    ProcedureName = "ApproveRejectArchived"
+                    ProcedureName = "ApproveRejectAdvert"
                 };
                 _logging.LogError();
                 result.result = 0;

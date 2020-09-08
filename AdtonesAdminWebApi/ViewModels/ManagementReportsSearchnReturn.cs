@@ -11,6 +11,8 @@ namespace AdtonesAdminWebApi.ViewModels
         public DateTime? DateTo { get; set; }
 
         public int[]? operators { get; set; }
+        public int? country { get; set; }
+        public int? currency { get; set; }
     }
 
 
@@ -34,13 +36,15 @@ namespace AdtonesAdminWebApi.ViewModels
         public int NumOfRemovedUser { get; set; }
         public int NumOfLiveCampaign { get; set; }
         public int NumberOfAdsProvisioned { get; set; }
-        public double TotalSpend { get; set; }
-        public double TotalCredit { get; set; }
+        public int TotalSpend { get; set; }
+        public int TotalCredit { get; set; }
         public int NumOfCancel { get; set; }
 
         public int NumOfPlayUnder6secs { get; set; }
 
         public double AveragePlaysPerUser { get; set; }
+
+        public string CurrencyCode { get; set; }
     }
 
     public class TotalCostCredit

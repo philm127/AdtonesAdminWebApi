@@ -65,6 +65,23 @@ namespace AdtonesAdminWebApi.DAL.Shared
         }
 
 
+        public async Task<IEnumerable<object>> GetUserPermissionsWRoles()
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connStr))
+                {
+                    connection.Open();
+                    return await connection.QueryAsync<object>(SharedListQuery.GetUserPermissionwRole);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<IEnumerable<SharedSelectListViewModel>> GetOperators(int id = 0)
         {
             var sb = new StringBuilder();

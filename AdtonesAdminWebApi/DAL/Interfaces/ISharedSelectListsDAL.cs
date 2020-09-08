@@ -17,6 +17,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<IEnumerable<SharedSelectListViewModel>> GetCamapignList(int id = 0);
         Task<IEnumerable<SharedSelectListViewModel>> GetUserPaymentList(int id = 0);
         Task<IEnumerable<SharedSelectListViewModel>> GetInvoiceList(int id = 0);
+        Task<IEnumerable<object>> GetUserPermissionsWRoles();
 
         Task<IEnumerable<object>> GetUsersnRoles();
     }

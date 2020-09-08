@@ -138,8 +138,8 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public DateTime UpdatedDateTime { get; set; }
 
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         public int finaltotalplays { get; set; }
 

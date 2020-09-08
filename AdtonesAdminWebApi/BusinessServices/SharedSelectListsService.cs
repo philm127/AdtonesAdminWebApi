@@ -180,7 +180,42 @@ namespace AdtonesAdminWebApi.BusinessServices
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "SharedSelectListsService",
-                    ProcedureName = "GetUserCreditList"
+                    ProcedureName = "GetUsersnRoles"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// Retrieves a list of Users who have permissions set up and their role
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ReturnResult> GetUsersWPermissions()
+        {
+            List<SharedSelectListViewModel> selectedList = new List<SharedSelectListViewModel>();
+            try
+            {
+                var dt = await _sharedDal.GetUserPermissionsWRoles();
+                foreach (dynamic item in dt)
+                {
+                    var itemModel = new SharedSelectListViewModel();
+                    itemModel.Value = item.Value.ToString();
+                    itemModel.Text = item.Text + " (" + Enum.GetName(typeof(Enums.UserRole), item.RoleId).ToString() + ")";
+                    selectedList.Add(itemModel);
+                }
+                result.body = selectedList;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "SharedSelectListsService",
+                    ProcedureName = "GetUsersWPermissions"
                 };
                 _logging.LogError();
                 result.result = 0;

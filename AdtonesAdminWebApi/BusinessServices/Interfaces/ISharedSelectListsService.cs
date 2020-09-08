@@ -20,5 +20,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> GetUsersnRoles();
         Task<ReturnResult> FillUserPaymentDropdown();
         Task<ReturnResult> FillCampaignDropdown(int id=0);
+        Task<ReturnResult> GetUsersWPermissions();
     }
 }

@@ -7,7 +7,6 @@ using AdtonesAdminWebApi.Model;
 using System;
 using Dapper;
 using AdtonesAdminWebApi.Services;
-using System.Text;
 using AdtonesAdminWebApi.DAL.Interfaces;
 
 namespace AdtonesAdminWebApi.BusinessServices
@@ -17,16 +16,16 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         private readonly ILogonService _logonService;
         private readonly IUserManagementDAL _userDAL;
+        private readonly IConnectionStringService _connService;
         ReturnResult result = new ReturnResult();
 
         
-
-
-        public UserManagementService(IConfiguration configuration, ILogonService logonService, IUserManagementDAL userDAL)
+        public UserManagementService(IConfiguration configuration, ILogonService logonService, IUserManagementDAL userDAL, IConnectionStringService connService)
         {
             _configuration = configuration;
             _logonService = logonService;
             _userDAL = userDAL;
+            _connService = connService;
         }
 
 
@@ -85,27 +84,18 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> AddContactInformation(Contacts contact)
+        private async Task<int> AddContactInformation(Contacts contact)
         {
+            var opConId = 0;
             try
             {
-                bool exists = await CheckIfContactExists(contact);
-                if (exists)
-                {
-                    result.body = "A user with that mobile number already exists.";
-                    result.result = 0;
-                    return result;
-                }
+                    bool exists = await _userDAL.CheckIfContactExists(contact);
+                    if (exists)
+                    {
+                        return -1;
+                    }
 
-                var insert_query = @"INSERT INTO Contacts(UserId,MobileNumber,FixedLine,Email,PhoneNumber,Address,CountryId,CurrencyId)
-                                                    VALUES(@UserId,@MobileNumber,@FixedLine,@Email,@PhoneNumber,@Address,@CountryId,@CurrencyId);
-                                      SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.ExecuteScalarAsync<int>(insert_query, contact);
-                }
+                opConId = await _userDAL.AddNewContact(contact);
             }
             catch (Exception ex)
             {
@@ -114,12 +104,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "UserManagementService",
-                    ProcedureName = "AddContact"
+                    ProcedureName = "AddContactInformation"
                 };
                 _logging.LogError();
-                result.result = 0;
+                return 0;
             }
-            return result;
+            return opConId;
         }
 
 
@@ -293,38 +283,79 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> AddUser(User user)
+        public async Task<ReturnResult> AddUser(User user, OperatorAdminFormModel model = null)
         {
             try
             {
-                bool exists = await CheckIfUserExists(user);
+                bool exists = await _userDAL.CheckIfUserExists(user);
                 if (exists)
                 {
                     result.body = "A user with that email already exists.";
                     result.result = 0;
                     return result;
                 }
-                int profileId = 0;
-                var insert_query = @"INSERT INTO Users(Email,FirstName,LastName,Password,DateCreated,Organisation,LastLoginTime,RoleId,
-                                                        Activated,VerificationStatus,Outstandingdays,OperatorId,IsMsisdnMatch,IsEmailVerfication,
-                                                        PhoneticAlphabet,IsMobileVerfication,OrganisationTypeId,UserMatchTableName)
-                                                    VALUES(@Email,@FirstName,@LastName,@Password,GETDATE(),@Organisation,GETDATE(),@RoleId,
-                                                            @Activated,@VerificationStatus,@Outstandingdays,@OperatorId,@IsMsisdnMatch,@IsEmailVerfication,
-                                                            @PhoneticAlphabet,@IsMobileVerfication,@OrganisationTypeId,@UserMatchTableName);
-                                      SELECT CAST(SCOPE_IDENTITY() AS INT);";
+                int mainUserId = 0;
+                int opUserId = 0;
+                
+                mainUserId = await _userDAL.AddNewUser(user);
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                if (mainUserId > 0)
                 {
-                    await connection.OpenAsync();
-                    profileId = await connection.ExecuteScalarAsync<int>(insert_query, user);
+                    user.AdtoneServerUserId = mainUserId;
+                    opUserId = await _userDAL.AddNewUserToOperator(user);
 
-                    if (!(profileId > 0))
+                    var command1 = new Contacts();
+                    int currencyId = 0;
+                    using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                    {
+                        currencyId = connection.ExecuteScalar<int>(@"SELECT CurrencyId FROM Currencies WHERE CountryId=@countryId;",
+                                                                      new { countryId = user.CountryId });
+                    }
+
+                    if (currencyId == 0)
+                    {
+                        using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                        {
+                            currencyId = connection.ExecuteScalar<int>(@"SELECT CurrencyId FROM Currencies WHERE CurrencyCode='USD';");
+                        }
+                    }
+
+                    command1.CurrencyId = currencyId;
+                    command1.UserId = mainUserId;
+                    command1.MobileNumber = model.MobileNumber;
+                    command1.FixedLine = null;
+                    command1.Email = user.Email;
+                    command1.PhoneNumber = model.PhoneNumber;
+                    command1.Address = model.Address;
+                    command1.CountryId = user.CountryId;
+
+                    var contId = await AddContactInformation(command1);
+                    if (contId == 0)
                     {
                         result.result = 0;
-                        result.error = "ProfileInfo was NOT added successfully";
+                        result.error = "Contact was not added";
                         return result;
                     }
-                    result.body = profileId;
+                    else if( contId == -1)
+                    {
+                        result.result = 0;
+                        result.error = "A contact with this mobile phone already exists";
+                        return result;
+                    }
+                    else
+                    {
+                        command1.AdtoneServerContactId = contId;
+                        command1.UserId = opUserId;
+                        var xx = await _userDAL.AddNewContactToOperator(command1);
+
+                        // For scalability added an array of app config settings to retrieve specifically in this case for
+                        // operator admin.
+                        /// TODO: Sort out E-Mail settings ideally into one service for all.
+                        var confSettings = new string[] { "OperatorAdminRegistrationEmailTemplete", "OperatorAdminUrl" };
+                        // SendEmailVerificationCode(model.FirstName, model.LastName, model.Email, model.PasswordHash, confSettings);
+                        result.body = "Operator Admin registered for Operator " + model.FirstName + " " + model.LastName;
+                    }
+                    
                 }
             }
             catch (Exception ex)
@@ -376,38 +407,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// <returns></returns>
         public async Task<ReturnResult> AddOperatorAdminUser(OperatorAdminFormModel model)
         {
-            int registeredId = 0;
-            var topRoleId = (int)Enums.UserRole.OperatorAdmin;
-
-            try
-            {
-                bool userOperatorIdExist = false;
-                var usr = new User { RoleId = topRoleId, OperatorId = model.OperatorId };
-
-                // Checks to see if an Operator Admin already exist.
-                userOperatorIdExist = await CheckIfUserExists(usr);
-
-
-                if (userOperatorIdExist)
-                {
-                    result.body = "An Operator Admin already exists.";
-                    result.result = 0;
-                    return result;
-                }
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "AddOperator-CheckExists"
-                };
-                _logging.LogError();
-                result.result = 0;
-                result.error = "Checks for unique failed";
-            }
 
             try
             {
@@ -420,7 +419,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 command.Email = model.Email;
                 command.FirstName = model.FirstName;
                 command.LastName = model.LastName;
-                command.PasswordHash = Md5Encrypt.Md5EncryptPassword(model.PasswordHash);
+                command.PasswordHash = Md5Encrypt.Md5EncryptPassword(model.Password);
                 command.Organisation = model.Organisation;
                 command.RoleId = (int)Enums.UserRole.OperatorAdmin;
                 command.Activated = model.Activated;
@@ -433,69 +432,16 @@ namespace AdtonesAdminWebApi.BusinessServices
                 command.IsMobileVerfication = true;
                 command.OrganisationTypeId = null;
                 command.UserMatchTableName = null;
+                command.Permissions = model.Permissions;
+                command.CountryId = model.CountryId;
 
 
-                var body = await AddUser(command);
+                var body = await AddUser(command,model);
                 if (body.result == 0)
                 {
                     result.result = 0;
                     result.error = body.error;
                     return result;
-                }
-
-                registeredId = (int)body.body;
-
-                if (registeredId > 0)
-                {
-                    var command1 = new Contacts();
-
-                    int currencyId = 0;
-                    using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                    {
-                        currencyId = connection.ExecuteScalar<int>(@"SELECT CurrencyId FROM Currencies WHERE CountryId=@countryId;",
-                                                                      new { countryId = model.CountryId });
-                    }
-
-                    if (currencyId == 0)
-                    {
-                        using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                        {
-                            currencyId = connection.ExecuteScalar<int>(@"SELECT CurrencyId FROM Currencies WHERE CurrencyCode='USD';");
-                        }
-                    }
-
-                    command1.CurrencyId = currencyId;
-                    command1.UserId = registeredId;
-                    command1.MobileNumber = model.MobileNumber;
-                    command1.FixedLine = null;
-                    command1.Email = model.Email;
-                    command1.PhoneNumber = model.PhoneNumber;
-                    command1.Address = model.Address;
-                    command1.CountryId = model.CountryId;
-
-                    var res = await AddContactInformation(command1);
-                    if (res.result == 0)
-                    {
-                        result.result = 0;
-                        result.error = res.error;
-                        return result;
-                    }
-
-                    if ((int)res.body > 0)
-                    {
-                        // For scalability added an array of app config settings to retrieve specifically in this case for
-                        // operator admin.
-                        /// TODO: Sort out E-Mail settings ideally into one service for all.
-                        var confSettings = new string[] { "OperatorAdminRegistrationEmailTemplete", "OperatorAdminUrl" };
-                        // SendEmailVerificationCode(model.FirstName, model.LastName, model.Email, model.PasswordHash, confSettings);
-                        result.body = "Operator Admin registered for Operator " + model.FirstName + " " + model.LastName;
-                    }
-                    else
-                    {
-                        result.result = 0;
-                        result.error = "Contact information was not added";
-                        return result;
-                    }
                 }
             }
             catch (Exception ex)
@@ -510,89 +456,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logging.LogError();
                 result.result = 0;
                 result.error = "Adding user failed";
-            }
-            return result;
-        }
-
-
-        /// <summary>
-        /// Look if possible to tie into Update ProfileInfo.
-        /// TODO: See if I can merge with Update Profile
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        public async Task<ReturnResult> UpdateOperatorAdminUser(OperatorAdminFormModel model)
-        {
-            try
-            {
-                if (model.PasswordHash != null && model.PasswordHash != "")
-                {
-                    string passwordHash = Md5Encrypt.Md5EncryptPassword(model.PasswordHash);
-                    if (await _logonService.IsPreviousPassword(model.UserId, passwordHash))
-                    {
-                        result.error = "Cannot reuse old password.";
-                        result.result = 0;
-                        return result;
-                    }
-                }
-
-                var command = new User
-                {
-                    UserId = model.UserId,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Organisation = model.Organisation
-
-                };
-
-                bool passChanged = false;
-                var password = model.PasswordHash;
-                if (model.PasswordHash == null || model.PasswordHash == "")
-                    command.PasswordHash = null;
-                else
-                {
-                    command.PasswordHash = Md5Encrypt.Md5EncryptPassword(model.PasswordHash);
-                    passChanged = true;
-                }
-                var x = await UpdateProfileForm(command);
-                if (x.result == 0)
-                    return x;
-
-                var command1 = new Contacts
-                {
-                    Id = model.Id,
-                    MobileNumber = model.MobileNumber,
-                    FixedLine = model.FixedLine,
-                    Email = model.Email,
-                    PhoneNumber = model.PhoneNumber,
-                    Address = model.Address,
-                    CountryId = model.CountryId,
-                };
-
-                var y = await UpdateContactForm(command1);
-                if (y.result == 0)
-                    return y;
-
-                /// TODO: Sort out a standard Email sending service
-                if (passChanged)
-                {
-                    // SendEmailVerificationCode(model.FirstName, model.LastName, model.Email, model.PasswordHash);
-                }
-
-                var z = await _logonService.UpdatePasswordHistory(model.UserId, model.PasswordHash);
-
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "UpdateOperatorAdminUser"
-                };
-                _logging.LogError();
-                result.result = 0;
             }
             return result;
         }
@@ -642,47 +505,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             return result;
         }
 
-
-        /// <summary>
-        /// Checks if user exists by Email only. Some others such as Operator check if there is an existing admin user.
-        /// I'm guessing only allowed one.
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        private async Task<bool> CheckIfUserExists(User model)
-        {
-            bool exists = false;
-            if (model.RoleId == 6)
-            {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    exists = connection.ExecuteScalar<bool>(@"SELECT COUNT(1) FROM Users 
-                                                                    WHERE OperatorId=@OperatorId AND RoleId=@topRoleId",
-                                                                  new { OperatorId = model.OperatorId, topRoleId = model.RoleId });
-                }
-            }
-            else
-            {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    exists = await connection.ExecuteScalarAsync<bool>(@"SELECT COUNT(1) FROM Users WHERE LOWER(Email) = @email;",
-                                                                  new { email = model.Email.ToLower() });
-                }
-            }
-            return exists;
-        }
-
-
-        private async Task<bool> CheckIfContactExists(Contacts model)
-        {
-            bool exists = false;
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                exists = await connection.ExecuteScalarAsync<bool>(@"SELECT COUNT(1) FROM Contacts WHERE MobileNumber=@mobile;",
-                                                              new { mobile = model.MobileNumber });
-            }
-            return exists;
-        }
-
+        
     }
 }

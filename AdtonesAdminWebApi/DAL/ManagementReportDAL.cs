@@ -2,41 +2,49 @@
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL
 {
-    public class ManagementReportDAL : IManagementReportDAL
+    public class ManagementReportDAL : BaseDAL, IManagementReportDAL
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connStr;
-        private readonly IExecutionCommand _executers;
-        private readonly IConnectionStringService _connService;
 
-        public ManagementReportDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService)
-        {
-            _configuration = configuration;
-            _connStr = _configuration.GetConnectionString("DefaultConnection");
-            _executers = executers;
-            _connService = connService;
-        }
+        public ManagementReportDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor)
+            : base(configuration, executers, connService, httpAccessor)
+        { }
+
 
 
         public async Task<int> GetreportInts(ManagementReportsSearch search, string query)
         {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(query);
+            builder.AddParameters(new { searchOperators = search.operators.ToArray() });
+            builder.AddParameters(new { start = search.DateFrom });
+            builder.AddParameters(new { end = search.DateTo });
+
+            if(search.country != null && search.country != 0)
+            {
+                sb.Append(" AND op.CountryId = @country ");
+                builder.AddParameters(new { country = search.country });
+            }
+            var values = CheckGeneralFile(sb, builder, pais: "op",ops:"op");
+            sb = values.Item1;
+            builder = values.Item2;
+            var select = builder.AddTemplate(sb.ToString());
+
             try
             {
+
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<int>(query, new
-                                {
-                                    operators = search.operators.ToArray(),
-                                    start = search.DateFrom,
-                                    end = search.DateTo
-                                } ));
+                                conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -66,7 +74,7 @@ namespace AdtonesAdminWebApi.DAL
                 return await _executers.ExecuteCommand(_connStr,
                                 conn => conn.Query<string>(ManagementReportQuery.GetOperatorNameById, new
                                 {
-                                    operators = search.operators.ToArray()
+                                    searchOperators = search.operators.ToArray()
                                 }));
             }
             catch
@@ -78,15 +86,30 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<SpendCredit>> GetTotalCreditCost(ManagementReportsSearch search, string query)
         {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(query);
+            builder.AddParameters(new { searchOperators = search.operators.ToArray() });
+            builder.AddParameters(new { start = search.DateFrom });
+            builder.AddParameters(new { end = search.DateTo });
+
+            if (search.country != null && search.country > 0)
+            {
+                sb.Append(" AND op.CountryId = @country ");
+                builder.AddParameters(new { country = search.country });
+            }
+            var values = CheckGeneralFile(sb, builder, pais: "op", ops: "op");
+            sb = values.Item1;
+            builder = values.Item2;
+
+            sb.Append("GROUP BY ca.CampaignProfileId,CurrencyCode,TotalCredit");
+            var select = builder.AddTemplate(sb.ToString());
+
             try
             {
+
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.Query<SpendCredit>(query, new
-                                {
-                                    operators = search.operators.ToArray(),
-                                    start = search.DateFrom,
-                                    end = search.DateTo
-                                }));
+                                conn => conn.Query<SpendCredit>(select.RawSql, select.Parameters));
             }
             catch
             {

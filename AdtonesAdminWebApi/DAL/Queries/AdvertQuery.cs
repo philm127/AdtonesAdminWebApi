@@ -5,7 +5,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
     public static class AdvertQuery
     {
         public static string GetAdvertResultSet => @"SELECT ad.AdvertId,ad.UserId,ad.ClientId,ad.AdvertName,ad.Brand,cprof.SmsBody,cprof.EmailBody,
-                                                ISNULL(cl.Name,'-') AS ClientName,ad.OperatorId,cad.CampaignProfileId,
+                                                ISNULL(cl.Name,'-') AS ClientName,ad.OperatorId,cad.CampaignProfileId,ad.UpdatedBy,
                                                 CONCAT(usr.FirstName,' ',usr.LastName) AS UserName, usr.Email,ad.CreatedDateTime AS CreatedDate,
                                                 ad.Script,ad.Status,ad.MediaFileLocation,ad.UploadedToMediaServer,SoapToneCode,
                                                 CASE WHEN ad.MediaFileLocation IS NULL THEN ad.MediaFileLocation 
@@ -15,7 +15,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 FROM Advert AS ad LEFT JOIN Client AS cl ON ad.ClientId=cl.Id
                                                 LEFT JOIN Users AS usr ON usr.UserId=ad.UserId
                                                 LEFT JOIN CampaignAdverts AS cad ON cad.AdvertId=ad.AdvertId
-                                                LEFT JOIN CampaignProfile AS cprof ON cprof.CampaignProfileId=cad.CampaignProfileId";
+                                                LEFT JOIN CampaignProfile AS cprof ON cprof.CampaignProfileId=cad.CampaignProfileId ";
         
         // where ad.AdvertId IN (94,99,101)"; // remember to change dal getadvert from and to where
 

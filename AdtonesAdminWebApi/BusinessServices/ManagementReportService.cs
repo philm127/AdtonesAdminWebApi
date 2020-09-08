@@ -4,6 +4,7 @@ using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using ClosedXML.Excel;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,16 +16,18 @@ namespace AdtonesAdminWebApi.BusinessServices
     public class ManagementReportService : IManagementReportService
     {
         private readonly IManagementReportDAL _reportDAL;
-        //private readonly CurrencyConversion _currencyConversion;
-        private readonly ICurrencyDAL _currencyRepository;
+        private readonly ICurrencyConversion _curConv;
+        private readonly ICurrencyDAL _curDAL;
+        private readonly IHttpContextAccessor _httpAccessor;
         ReturnResult result = new ReturnResult();
 
 
-        public ManagementReportService(ICurrencyDAL currencyRepository, IManagementReportDAL reportDAL)
+        public ManagementReportService(IManagementReportDAL reportDAL, ICurrencyConversion curConv, ICurrencyDAL curDAL, IHttpContextAccessor httpAccessor)
         {
             _reportDAL = reportDAL;
-            //_currencyConversion = CurrencyConversion.CreateForCurrentUser(_currencyRepository);
-            _currencyRepository = currencyRepository;
+            _curConv = curConv;
+            _curDAL = curDAL;
+            _httpAccessor = httpAccessor;
         }
 
 
@@ -44,6 +47,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 List<int> ops = _reportDAL.GetAllOperators().Result.ToList();
                 search.operators = ops.ToArray();
+            }
+
+            if (search.currency == null || search.currency == 0)
+            {
+                var currency = _curDAL.GetDisplayCurrencyCodeForUserAsync(_httpAccessor.GetUserIdFromJWT()).Result;
+                search.currency = currency.CurrencyId;
             }
 
             return search;
@@ -89,12 +98,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                 IEnumerable<SpendCredit> totCosts = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetTotalCost);
                 var costAudit = totCosts.ToList();
 
-                Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit);
+                Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit,search);
 
                 Task<int> totUser = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTotalUser);
                 Task<int> totrem = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfRemovedUser);
                 Task<int> totads = _reportDAL.GetreportInts(search, ManagementReportQuery.NumberOfAdsProvisioned);
-                Task<int> up2Aud = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfUpdateToAudit);
+                // Task<int> up2Aud = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfUpdateToAudit);
                 
                 Task<int> totCancel = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfCancel);
                 Task<int> totCam = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfLiveCampaign);
@@ -106,13 +115,14 @@ namespace AdtonesAdminWebApi.BusinessServices
                 Task<int> totLess6Plays = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfPlayUnder6);
 
 
-                await Task.WhenAll(totUser, totrem, totads, up2Aud, totCancel, totCam, totEmail, totFile, totline, totSMS, totPlays,
+                await Task.WhenAll(totUser, totrem,totads, totCancel, totCam, totEmail, totFile, totline, totSMS, totPlays, //up2Aud,
                                     totCost, totLess6Plays);
+                var currency = await _curDAL.GetCurrencyUsingCurrencyIdAsync(search.currency);
 
                 model.NumOfTotalUser = totUser.Result;
                 model.NumOfRemovedUser = totrem.Result;
                 model.NumberOfAdsProvisioned = totads.Result;
-                model.NumOfUpdateToAudit = up2Aud.Result;
+                // model.NumOfUpdateToAudit = up2Aud.Result;
                 model.NumOfCancel = totCancel.Result;
                 model.NumOfLiveCampaign = totCam.Result;
                 model.NumOfEmail = totEmail.Result;
@@ -122,8 +132,9 @@ namespace AdtonesAdminWebApi.BusinessServices
                 model.NumOfPlay = totPlays.Result;
                 model.NumOfPlayUnder6secs = totLess6Plays.Result;
                 model.AveragePlaysPerUser = (double)totPlays.Result / (double)totUser.Result;
-                model.TotalCredit = totCost.Result.TotalCredit;
-                model.TotalSpend = totCost.Result.TotalSpend;
+                model.TotalCredit = (int)totCost.Result.TotalCredit;
+                model.TotalSpend = (int)totCost.Result.TotalSpend;
+                model.CurrencyCode = GetCurrencySymbol(currency.CurrencyCode);
 
             }
             catch (Exception ex)
@@ -340,60 +351,133 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         private decimal GetCurrencyRateModel(string from, string to)
         {
-            CurrencyConversion curCon = new CurrencyConversion(this._currencyRepository);
-            return curCon.Convert(1, from, to);
+            return _curConv.Convert(1, from, to);
         }
 
 
-        private async Task<List<CurrencyListing>> GetConvertedCurrency(List<SpendCredit> creditList)
+        private async Task<List<CurrencyListing>> GetConvertedCurrency(List<SpendCredit> creditList,ManagementReportsSearch search)
         {
             string toCurrencyCode = "GBP";
-            var currency = creditList.Select(y => y.CurrencyCode).Distinct().ToList();
-            if (!currency.Contains("GBP"))
-                currency.Add("GBP");
-
             var clList = new List<CurrencyListing>();
-            foreach(string cur in currency)
+            try
             {
-                var cl = new CurrencyListing();
-
-                if (cur == "GBP")
+                var currency = creditList.Select(y => y.CurrencyCode).Distinct().ToList();
+                var currencySelectionData = await _curDAL.GetCurrencyUsingCurrencyIdAsync(search.currency);
+                toCurrencyCode = currencySelectionData.CurrencyCode;
+                
+                foreach (string cur in currency)
                 {
-                    cl.CurrencyCode = "GBP";
-                    cl.CurrencyRate = 1;
-                    clList.Add(cl);
-                }
-                else
-                {
-                    cl.CurrencyCode = cur;
+                    var cl = new CurrencyListing();
 
-                    cl.CurrencyRate = GetCurrencyRateModel(cur, toCurrencyCode);
-                    clList.Add(cl);
+                    if (cur == toCurrencyCode)
+                    {
+                        cl.CurrencyCode = toCurrencyCode;
+                        cl.CurrencyRate = 1;
+                        clList.Add(cl);
+                    }
+                    else
+                    {
+                        cl.CurrencyCode = cur;
+
+                        cl.CurrencyRate = GetCurrencyRateModel(cur, toCurrencyCode);
+                        clList.Add(cl);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "ManagementReportService",
+                    ProcedureName = "GetConvertedCurrency"
+                };
+                _logging.LogError();
+
             }
             return clList;
         }
 
 
-        private async Task<TotalCostCredit> CalculateConvertedSpendCredit(List<SpendCredit> creditList)
+        private string GetCurrencySymbol(string currencyCode)
+        {
+            switch (currencyCode)
+            {
+                case "GBP": return "£";
+                case "USD": return "$";
+                case "XOF": return "(XOF)";
+                case "EUR": return "€";
+                case "KES": return "(KES)";
+                default: return "£";
+            }
+        }
+
+
+        //private async Task<List<CurrencyListing>> GetConvertedCurrency(List<SpendCredit> creditList)
+        //{
+        //    string toCurrencyCode = "GBP";
+        //    var currency = creditList.Select(y => y.CurrencyCode).Distinct().ToList();
+        //    if (!currency.Contains("GBP"))
+        //        currency.Add("GBP");
+
+        //    var clList = new List<CurrencyListing>();
+        //    foreach (string cur in currency)
+        //    {
+        //        var cl = new CurrencyListing();
+
+        //        if (cur == "GBP")
+        //        {
+        //            cl.CurrencyCode = "GBP";
+        //            cl.CurrencyRate = 1;
+        //            clList.Add(cl);
+        //        }
+        //        else
+        //        {
+        //            cl.CurrencyCode = cur;
+
+        //            cl.CurrencyRate = GetCurrencyRateModel(cur, toCurrencyCode);
+        //            clList.Add(cl);
+        //        }
+        //    }
+        //    return clList;
+        //}
+
+
+        private async Task<TotalCostCredit> CalculateConvertedSpendCredit(List<SpendCredit> creditList, ManagementReportsSearch search)
         {
             TotalCostCredit campaignAudit = new TotalCostCredit();
-
-            if (creditList.Count > 0)
+            try
             {
-                var currencyConv = await GetConvertedCurrency(creditList);
 
-                foreach (var campaignAuditItem in creditList)
+                if (creditList.Count > 0)
                 {
+                    var currencyConv = await GetConvertedCurrency(creditList, search);
+
+                    foreach (var campaignAuditItem in creditList)
+                    {
                         var currencyRate = currencyConv.Where(kv => kv.CurrencyCode.Contains(campaignAuditItem.CurrencyCode)).Select(kv => kv.CurrencyRate).FirstOrDefault();
                         if (currencyRate == 0)
                             currencyRate = 1;
 
                         campaignAudit.TotalSpend = campaignAudit.TotalSpend + (Convert.ToDouble(Convert.ToDecimal(campaignAuditItem.TotalCost) * currencyRate));
                         campaignAudit.TotalCredit = campaignAudit.TotalCredit + (Convert.ToDouble(Convert.ToDecimal(campaignAuditItem.TotalCredit) * currencyRate));
+                    }
                 }
             }
-            
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "ManagementReportService",
+                    ProcedureName = "CalculateConvertedSpendCredit"
+                };
+                _logging.LogError();
+
+            }
+
             return campaignAudit;
         }
 

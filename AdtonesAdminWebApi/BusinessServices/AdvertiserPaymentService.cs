@@ -236,10 +236,17 @@ namespace AdtonesAdminWebApi.BusinessServices
         public async Task<ReturnResult> ReceivePayment(AdvertiserCreditFormModel model)
         {
             model.Status = 1;
+
+            var credModel = new AdvertiserCreditFormModel();
+            credModel.UserId = model.UserId;
+            credModel.AssignCredit = model.Amount;
+            
             try
             {
                 var x = await _invDAL.InsertPaymentFromUser(model);
-                var updated = await _invDAL.UpdateUserCredit(model);
+
+
+                var updated = await _credService.AddCredit(credModel);
             }
             catch (Exception ex)
             {

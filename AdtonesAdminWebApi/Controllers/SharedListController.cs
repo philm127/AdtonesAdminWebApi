@@ -55,6 +55,17 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains List SharedSelectListViewModel</returns>
+        [HttpGet("v1/GetUserPermissionList")]
+        public async Task<ReturnResult> GetUserPermissionList()
+        {
+            return await _sharedList.GetUsersWPermissions();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List SharedSelectListViewModel</returns>
         [HttpGet("v1/GetUserStatusList")]
         public ReturnResult GetUserStatusList()
         {

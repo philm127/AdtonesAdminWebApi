@@ -109,8 +109,8 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [HttpPost("v1/AddOperatorUser")]
-        public async Task<ReturnResult> AddOperatorUser([FromBodyAttribute] OperatorAdminFormModel model)
+        [HttpPost("v1/AddNewUser")]
+        public async Task<ReturnResult> AddNewUser(OperatorAdminFormModel model)
         {
             return await _userService.AddOperatorAdminUser(model);
         }

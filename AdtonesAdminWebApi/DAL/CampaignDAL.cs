@@ -36,9 +36,14 @@ namespace AdtonesAdminWebApi.DAL
                 sb.Append(" AND camp.Status IN(1,2,3,4) ");
                 builder.AddParameters(new { Id = id });
             }
+            else
+            {
+                // had to put this here as the check file picks up WHERE on inner queries
+                sb.Append(" WHERE 1=1 ");
+            }
 
             var tst = sb.ToString();
-            var values = CheckGeneralFile(sb, builder,pais:"op",ops:"op",advs:"camp");
+            var values = CheckGeneralFile(sb, builder,pais:"camp",ops:"op",advs:"camp");
 
             sb = values.Item1;
             builder = values.Item2;
@@ -140,7 +145,8 @@ namespace AdtonesAdminWebApi.DAL
         /// <returns></returns>
         public async Task<int> ChangeCampaignProfileStatusOperator(CampaignProfile model)
         {
-            var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
+            int country = (int)model.CountryId;
+            var operatorConnectionString = await _connService.GetConnectionStringsByCountry(country);
 
             var sb = new StringBuilder();
             sb.Append(CampaignQuery.UpdateCampaignProfileStatus);
@@ -153,8 +159,18 @@ namespace AdtonesAdminWebApi.DAL
                 builder.AddParameters(new { Id = model.CampaignProfileId });
                 builder.AddParameters(new { Status = model.Status });
 
-                return await _executers.ExecuteCommand(operatorConnectionString,
+                var lst = await _connService.GetConnectionStringsByCountry(country);
+                List<string> conns = lst.ToList();
+
+                int x = 0;
+
+                foreach (string constr in conns)
+                {
+
+                    x = await _executers.ExecuteCommand(constr,
                                     conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+                }
+                return x;
             }
             catch
             {

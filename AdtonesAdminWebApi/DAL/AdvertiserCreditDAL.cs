@@ -48,7 +48,7 @@ namespace AdtonesAdminWebApi.DAL
             {
                 return await _executers.ExecuteCommand(_connStr,
                              conn => conn.ExecuteScalar<int>(AdvertiserCreditQuery.UpdateUserCredit, 
-                                                                                    new { Id = _creditmodel.Id, AssignCredit = _creditmodel.AssignCredit }));
+                             new { Id = _creditmodel.Id, AssignCredit = _creditmodel.AssignCredit, AvailableCredit = _creditmodel.AvailableCredit }));
             }
             catch
             {

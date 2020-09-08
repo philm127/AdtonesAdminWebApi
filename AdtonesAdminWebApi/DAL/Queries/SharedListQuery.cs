@@ -25,6 +25,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 FROM Users AS u WHERE RoleId !=2 ORDER BY RoleId";
 
 
+        public static string GetUserPermissionwRole => @"SELECT u.UserId AS Value,RoleId, CONCAT(FirstName,' ',LastName) AS Text 
+                                                FROM Users AS u WHERE RoleId !=2 AND ((Permissions IS NOT NULL) OR (Permissions <> '0')) ORDER BY RoleId";
+
+
         public static string AddCreditUserList => @"SELECT u.UserId AS Value, CONCAT(FirstName,' ',LastName,'(',u.Email,')') AS Text 
                                                 FROM Users AS u LEFT JOIN Contacts AS c ON c.UserId=u.UserId
                                                 WHERE VerificationStatus=1

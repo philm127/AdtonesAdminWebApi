@@ -53,7 +53,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<Currency> GetDisplayCurrencyCodeForUserAsync(int userId)
         {
             Currency result;
-            if (_userIdToCur.TryGetValue(userId, out result))
+                        if (_userIdToCur.TryGetValue(userId, out result))
                 return result;
 
             var contact = await _userDAL.getContactByUserId(userId);
@@ -68,7 +68,24 @@ namespace AdtonesAdminWebApi.DAL
             return result;
 
         }
-        
+
+        public async Task<Currency> GetCurrencyUsingCurrencyIdAsync(int? currencyId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(CurrencyQuery.GetCurrencyByCurrencyId);
+            builder.AddParameters(new { currencyId = currencyId });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<Currency>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
 
         public async Task<Currency> GetCurrencyUsingCountryIdAsync(int? countryId)
         {
@@ -77,12 +94,15 @@ namespace AdtonesAdminWebApi.DAL
             return await GetCurrencyFromEitherCacheOrDbAsync(CurrencyQuery.GetCurrencyByCountry, new { CountryId = countryId.Value }, countryId.Value, _countryidToCur);
         }
 
-        public async Task<Currency> GetCurrencyUsingCurrencyIdAsync(int? currencyId)
-        {
-            if (!currencyId.HasValue)
-                return await GetCurrencyFromEitherCacheOrDbAsync(CurrencyQuery.GetCurrencyByCurrency, new { CurrencyCode = CurrencyDefaults.DefaultCurrencyCode }, 0, _curIdToCur);
-            return await GetCurrencyFromEitherCacheOrDbAsync(CurrencyQuery.GetCurrencyByCurrency, new { CurrencyCode = currencyId.Value }, currencyId.Value, _curIdToCur);
-        }
+
+        
+
+        //public async Task<Currency> GetCurrencyUsingCurrencyIdAsync(int? currencyId)
+        //{
+        //    if (!currencyId.HasValue)
+        //        return await GetCurrencyFromEitherCacheOrDbAsync(CurrencyQuery.GetCurrencyByCurrency, new { CurrencyCode = CurrencyDefaults.DefaultCurrencyCode }, 0, _curIdToCur);
+        //    return await GetCurrencyFromEitherCacheOrDbAsync(CurrencyQuery.GetCurrencyByCurrency, new { CurrencyCode = currencyId.Value }, currencyId.Value, _curIdToCur);
+        //}
 
         private async Task<Currency> GetCurrencyFromEitherCacheOrDbAsync(string sqlQuery, object param, int lookup, Dictionary<int, Currency> cacheSource)
         {

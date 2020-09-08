@@ -24,7 +24,12 @@ namespace AdtonesAdminWebApi.Services
         }
     }
 
-    public class CurrencyConversion
+    public interface ICurrencyConversion
+    {
+        decimal Convert(decimal value, string currencyFrom, string currencyTo);
+    }
+
+    public class CurrencyConversion : ICurrencyConversion
     {
         private readonly string url;
         private readonly IHttpContextAccessor _httpAccessor;
@@ -43,32 +48,32 @@ namespace AdtonesAdminWebApi.Services
         }
 
 
-        public CurrencyConversion(ICurrencyDAL repository)
-        {
-            _repository = repository;
-        }
+        //public CurrencyConversionX(ICurrencyDAL repository)
+        //{
+        //    _repository = repository;
+        //}
 
 
         public Model.Currency DisplayCurrency { get; private set; }
 
 
-        public async Task InitializeAsync(int userId)
-        {
-            DisplayCurrency = await _repository.GetDisplayCurrencyCodeForUserAsync(userId);
-        }
+        //public async Task InitializeAsync(int userId)
+        //{
+        //    DisplayCurrency = await _repository.GetDisplayCurrencyCodeForUserAsync(userId);
+        //}
 
 
-        public void Initialize(int userId)
-        {
-            DisplayCurrency = _repository.GetDisplayCurrencyCodeForUserAsync(userId).Result;
-        }
+        //public void Initialize(int userId)
+        //{
+        //    DisplayCurrency = _repository.GetDisplayCurrencyCodeForUserAsync(userId).Result;
+        //}
 
-        public static CurrencyConversion CreateForCurrentUser(ICurrencyDAL currencyRepository)
-        {
-            CurrencyConversion conversion = new CurrencyConversion(currencyRepository);
-            conversion.Initialize(Userjwt);
-            return conversion;
-        }
+        //public static CurrencyConversionX CreateForCurrentUser(ICurrencyDAL currencyRepository)
+        //{
+        //    CurrencyConversionX conversion = new CurrencyConversionX(currencyRepository);
+        //    conversion.Initialize(Userjwt);
+        //    return conversion;
+        //}
 
         //public static async Task<CurrencyConversion> CreateForCurrentUserAsync(object controller)
         //{
@@ -78,14 +83,14 @@ namespace AdtonesAdminWebApi.Services
         //}
 
 
-        [Obsolete]
-        public CurrencyModel ForeignCurrencyConversion(string amount, string currencyFrom, string currencyTo)
-        {
-            decimal dAmount;
-            if (!decimal.TryParse(amount, out dAmount))
-                return new CurrencyModel { Amount = 0.00M, Code = "FAIL", Message = "Failed to parse amount" };
-            return new CurrencyModel { Amount = Convert(dAmount, currencyFrom, currencyTo), Message = string.Empty, Code = "OK" };
-        }
+        //[Obsolete]
+        //public CurrencyModel ForeignCurrencyConversion(string amount, string currencyFrom, string currencyTo)
+        //{
+        //    decimal dAmount;
+        //    if (!decimal.TryParse(amount, out dAmount))
+        //        return new CurrencyModel { Amount = 0.00M, Code = "FAIL", Message = "Failed to parse amount" };
+        //    return new CurrencyModel { Amount = Convert(dAmount, currencyFrom, currencyTo), Message = string.Empty, Code = "OK" };
+        //}
 
         public decimal Convert(decimal value, string currencyFrom, string currencyTo)
         {
@@ -97,7 +102,7 @@ namespace AdtonesAdminWebApi.Services
                 _cachedRates[key] = rate;
             }
 
-            return Math.Round(rate * value, 2, MidpointRounding.AwayFromZero);
+            return Math.Round(rate * value, 4, MidpointRounding.AwayFromZero);
         }
 
         public decimal ConvertToDisplayCurrency(decimal value, string currencyFrom)
@@ -151,21 +156,21 @@ namespace AdtonesAdminWebApi.Services
         }
     }
 
-    public static class CurrencyConversionExtensions
-    {
-        public static decimal Convert(this decimal value, CurrencyConversion conversion, string from, string to)
-        {
-            return conversion.Convert(value, from, to);
-        }
+    //public static class CurrencyConversionExtensions
+    //{
+    //    public static decimal Convert(this decimal value, CurrencyConversionX conversion, string from, string to)
+    //    {
+    //        return conversion.Convert(value, from, to);
+    //    }
 
-        public static decimal ConvertToDisplay(this decimal value, CurrencyConversion conversion, string from)
-        {
-            return conversion.ConvertToDisplayCurrency(value, from);
-        }
+    //    public static decimal ConvertToDisplay(this decimal value, CurrencyConversionX conversion, string from)
+    //    {
+    //        return conversion.ConvertToDisplayCurrency(value, from);
+    //    }
 
-        public static decimal ConvertFromDisplay(this decimal value, CurrencyConversion conversion, string to)
-        {
-            return conversion.ConvertFromDisplayCurrency(value, to);
-        }
-    }
+    //    public static decimal ConvertFromDisplay(this decimal value, CurrencyConversionX conversion, string to)
+    //    {
+    //        return conversion.ConvertFromDisplayCurrency(value, to);
+    //    }
+    //}
 }
