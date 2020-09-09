@@ -1,9 +1,8 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
+using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Enums;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
-using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -16,13 +15,15 @@ namespace AdtonesAdminWebApi.BusinessServices
     {
 
         private readonly IConfiguration _configuration;
+        private readonly IProfileMatchInfoDAL _profDAL;
         ReturnResult result = new ReturnResult();
 
 
-        public ProfileMatchInfoService(IConfiguration configuration)
+        public ProfileMatchInfoService(IConfiguration configuration, IProfileMatchInfoDAL profDAL)
 
         {
             _configuration = configuration;
+            _profDAL = profDAL;
         }
 
 
@@ -48,14 +49,8 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                        await connection.OpenAsync();
-                        result.body = await connection.QueryAsync<ProfileMatchInformationFormModel>(@"SELECT prof.Id,prof.ProfileName,
-                                                                                        prof.ProfileType,prof.CountryId, c.Name AS CountryName,prof.IsActive 
-                                                                                        FROM ProfileMatchInformations AS prof 
-                                                                                        LEFT JOIN Country AS c ON prof.CountryId=c.Id");
-                }
+
+                result.body = await _profDAL.LoadProfileResultSet();
             }
             catch (Exception ex)
             {
@@ -84,22 +79,8 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 var prof = new ProfileMatchInformationFormModel();
                 IEnumerable<ProfileMatchLabelFormModel> label;
-                using(var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    prof = await connection.QueryFirstOrDefaultAsync<ProfileMatchInformationFormModel>(@"SELECT p.Id, p.ProfileName,p.IsActive,
-                                                                                                    p.ProfileType,p.CountryId
-                                                                                                    FROM ProfileMatchInformations p
-                                                                                                    WHERE p.Id=@id", new { id });
-                }
-
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    label = await connection.QueryAsync<ProfileMatchLabelFormModel>(@"SELECT Id,ProfileLabel,ProfileMatchInformationId,FORMAT(CreatedDate, 'd', 'en-gb') as CreatedDate
-                                                                                                    FROM ProfileMatchLabels
-                                                                                                    WHERE ProfileMatchInformationId=@id", new { prof.Id });
-                }
+                prof = await _profDAL.GetProfileById(id);
+                label = await _profDAL.GetProfileLabelById(prof.Id);
 
                 prof.profileMatchLabelFormModels = label.ToList();
                 result.body = prof;
@@ -132,24 +113,10 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var profileMatches = model.profileMatchLabelFormModels;
                 if (CheckLabelsUnique(profileMatches))
                 {
-                    if (CheckIfProfileExists(model))
-                    {
-                        result.error = model.ProfileName + " Record Exists.";
-                        result.result = 0;
-                        return result;
-                    }
-
                     var profileLabelCount = profileMatches.Count;
                     if (profileLabelCount > 0)
                     {
-                        string insert_query = @"UPDATE ProfileMatchInformations SET IsActive=@IsActive,UpdatedDate=GETDATE(),ProfileType=@ProfileType
-                                                                                                                    WHERE Id=@Id;";
-
-                        using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                        {
-                            await connection.OpenAsync();
-                            var x = await connection.QueryAsync<int>(insert_query, model);
-                        }
+                        var x = await _profDAL.UpdateProfileInfo(model);
 
                         var y = await UpdateInsertProfileLabel(profileMatches, model.Id);
                         if (y == 0)
@@ -187,7 +154,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 result.error = "ProfileInfo was NOT added successfully";
             }
             return result;
-        
+
         }
 
         /// <summary>
@@ -202,44 +169,26 @@ namespace AdtonesAdminWebApi.BusinessServices
                 int profileId = 0;
                 try
                 {
-                    if (CheckIfProfileExists(model))
+                    if (await _profDAL.CheckIfProfileInfoExists(model))
                     {
                         result.error = model.ProfileName + " Record Exists.";
                         result.result = 0;
                         return result;
                     }
+                    profileId = await _profDAL.AddProfileInfo(model);
 
-                    
-                    string insert_query = @"INSERT INTO ProfileMatchInformations(ProfileName,IsActive,CountryId,CreatedDate,UpdatedDate,
-                                                                                                            ProfileType)
-                                                            VALUES(@ProfileName,@IsActive,@CountryId,GETDATE(),GETDATE(),@ProfileType);
-                                                            SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-
-                    using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                    if (!(profileId > 0))
                     {
-                        await connection.OpenAsync();
-                        profileId = await connection.ExecuteScalarAsync<int>(insert_query, model);
-
-                        if (!(profileId > 0))
-                        {
-                            result.result = 0;
-                            result.error = "ProfileInfo was NOT added successfully";
-                            return result;
-                        }
+                        result.result = 0;
+                        result.error = "ProfileInfo was NOT added successfully";
+                        return result;
                     }
 
                     // This could be passed to the UpdateInsertProfileLabel function but as took so few lines put it here.
-                    string new_insert = @"INSERT INTO ProfileMatchLabels(ProfileMatchInformationId, ProfileLabel, CreatedDate, UpdatedDate)
-                                            VALUES(@ProfileMatchInformationId, @ProfileLabel, GETDATE(), GETDATE());";
                     foreach (var label in model.profileMatchLabelFormModels)
                     {
                         label.ProfileMatchInformationId = profileId;
-                        using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                        {
-                            await connection.OpenAsync();
-                            var y = await connection.ExecuteScalarAsync<string>(new_insert, label);
-                        }
+                        var y = await _profDAL.AddProfileInfoLabel(label);
                     }
                 }
                 catch (Exception ex)
@@ -260,27 +209,18 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             else
             {
-                result.error = "Please add at least one record.";
+                result.error = "Please add at least one profile label.";
                 result.result = 0;
                 return result;
             }
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="model">Uses the IdCollectionViewModel id as the Id</param>
-        /// <returns></returns>
         public async Task<ReturnResult> DeleteProfileLabel(int id)
         {
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    await connection.ExecuteAsync("DELETE FROM ProfileMatchLabels WHERE Id=@id", new { id = id });
-                }
+                var x = await _profDAL.DeleteProfileLabelById(id);
             }
             catch (Exception ex)
             {
@@ -305,29 +245,21 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// <param name="labellist"></param>
         /// <param name="profileId">This is to add the ProfilematchInfoId to any new labels</param>
         /// <returns></returns>
-        private async Task<int> UpdateInsertProfileLabel(List<ProfileMatchLabelFormModel> labellist,int profileId)
+        private async Task<int> UpdateInsertProfileLabel(List<ProfileMatchLabelFormModel> labellist, int profileId)
         {
             try
             {
-                string update_query = @"UPDATE ProfileMatchLabels SET ProfileLabel=@ProfileLabel,UpdatedDate=GETDATE() WHERE Id=@Id";
-                string insert_query = @"INSERT INTO ProfileMatchLabels(ProfileLabel,ProfileMatchInformationId,CreatedDate,UpdatedDate) 
-                                                VALUES(@ProfileLabel,@ProfileMatchInformationId,GETDATE(),GETDATE());";
+                var x = 0;
                 string query = string.Empty;
                 foreach (var label in labellist)
                 {
                     if (label.Id == 0)
                     {
                         label.ProfileMatchInformationId = profileId;
-                        query = insert_query;
+                        x = await _profDAL.AddProfileInfoLabel(label);
                     }
                     else
-                        query = update_query;
-
-                    using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                    {
-                        await connection.OpenAsync();
-                        var x = await connection.QueryAsync<int>(query, label);
-                    }
+                        x = await _profDAL.AddProfileInfoLabel(label);
                 }
             }
             catch (Exception ex)
@@ -354,28 +286,13 @@ namespace AdtonesAdminWebApi.BusinessServices
         private bool CheckLabelsUnique(List<ProfileMatchLabelFormModel> label)
         {
             var names = new List<string>();
-            foreach(var labelname in label)
+            foreach (var labelname in label)
             {
                 names.Add(labelname.ProfileLabel.ToLower());
             }
             bool chk = names.Distinct().Count() == names.Count();
             return chk;
         }
-
-
-        private bool CheckIfProfileExists(ProfileMatchInformationFormModel model)
-        {
-            bool profileLabelExist = false;
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                profileLabelExist = connection.ExecuteScalar<bool>(@"SELECT COUNT(1) FROM ProfileMatchInformations 
-                                                                    WHERE LOWER(ProfileName) = @profilename
-                                                                    AND CountryId=@countryId AND LOWER(ProfileType)=@profileType",
-                                                              new { profilename = model.ProfileName.Trim().ToLower(), countryId = model.CountryId, profileType = model.ProfileType.ToLower() });
-            }
-            return profileLabelExist;
-        }
-
 
     }
 }

@@ -97,6 +97,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IManagementReportDAL, ManagementReportDAL>();
             services.AddScoped<IFinanceTablesDAL, FinanceTablesDAL>();
             services.AddScoped<IRewardDAL, RewardDAL>();
+            services.AddScoped<IProfileMatchInfoDAL,ProfileMatchInfoDAL>();
 
             #endregion
 
