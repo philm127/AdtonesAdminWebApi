@@ -218,8 +218,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                var catId = await _advertDAL.InsertAdvertCategory(model);
-                result.body = await _advertDAL.InsertAdvertCategoryOperator(model,catId);
+                result.body = await _advertDAL.InsertAdvertCategory(model);
             }
             catch (Exception ex)
             {

@@ -108,6 +108,18 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<int> GetUserIdFromAdtoneIdByConnString(int Id, string conn)
+        {
+            var select_string = "SELECT UserId FROM Users WHERE AdtoneServerUserId=@Id";
+
+            using (var connection = new SqlConnection(conn))
+            {
+                await connection.OpenAsync();
+                return await connection.QueryFirstOrDefaultAsync<int>(select_string, new { Id = Id });
+            }
+        }
+
+
         public async Task<int> GetCampaignProfileIdFromAdtoneId(int Id, int operatorId)
         {
             
@@ -119,6 +131,18 @@ namespace AdtonesAdminWebApi.DAL
                     await connection.OpenAsync();
                     return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = Id });
                 }
+        }
+
+
+        public async Task<int> GetCampaignProfileIdFromAdtoneIdByConnString(int Id, string conn)
+        {
+            StringBuilder sb = new StringBuilder("SELECT CampaignProfileId FROM CampaignProfile WHERE AdtoneServerCampaignProfileId=@Id");
+
+            using (var connection = new SqlConnection(conn))
+            {
+                await connection.OpenAsync();
+                return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = Id });
+            }
         }
 
 
@@ -141,6 +165,18 @@ namespace AdtonesAdminWebApi.DAL
 
             var conn = await GetSingleConnectionString(operatorId);
             StringBuilder sb = new StringBuilder("SELECT OperatorId FROM Operators WHERE AdtoneServerOperatorId=@Id");
+
+            using (var connection = new SqlConnection(conn))
+            {
+                await connection.OpenAsync();
+                return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = Id });
+            }
+        }
+
+
+        public async Task<int> GetCountryIdFromAdtoneId(int Id, string conn)
+        {
+            StringBuilder sb = new StringBuilder("SELECT Id FROM Country WHERE AdtoneServeCountryId=@Id");
 
             using (var connection = new SqlConnection(conn))
             {

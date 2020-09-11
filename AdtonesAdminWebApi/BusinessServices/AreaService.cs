@@ -11,12 +11,12 @@ namespace AdtonesAdminWebApi.BusinessServices
     public class AreaService : IAreaService
     {
         IHttpContextAccessor _httpAccessor;
-        private readonly IAreaDAL _areaDAL;
+        private readonly ICountryAreaDAL _areaDAL;
 
         ReturnResult result = new ReturnResult();
 
 
-        public AreaService(IAreaDAL areaDAL, IHttpContextAccessor httpAccessor)
+        public AreaService(ICountryAreaDAL areaDAL, IHttpContextAccessor httpAccessor)
 
         {
             _areaDAL = areaDAL;
@@ -77,7 +77,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 var cnt = _areaDAL.AddArea(areamodel);
-                return result;
             }
             catch (Exception ex)
             {
@@ -93,6 +92,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 result.error = areamodel.AreaName + " Record was not inserted.";
                 return result;
             }
+            return result;
         }
 
 

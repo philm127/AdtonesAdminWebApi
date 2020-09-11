@@ -14,6 +14,8 @@ namespace AdtonesAdminWebApi.ViewModels
         public string CountryName { get; set; }
 
         public string CreatedDate { get; set; }
+
+        public int? AdtoneServerAdvertCategoryId { get; set; }
     }
 
     public class UserAdvertResult

@@ -147,9 +147,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> UpdateSystemConfig(SystemConfigResult model)
         {
-            var update_query = @"UPDATE SystemConfig SET SystemConfigKey = @SystemConfigKey, @SystemConfigValue=SystemConfigValue, 
-                                                                       @SystemConfigType=SystemConfigType,UpdatedDateTime=GETDATE()
-                                                                       WHERE SystemConfigId = @SystemConfigId)";
+            var update_query = @"UPDATE SystemConfig SET SystemConfigKey = @SystemConfigKey, SystemConfigValue=@SystemConfigValue, 
+                                                                       SystemConfigType=@SystemConfigType,UpdatedDateTime=GETDATE()
+                                                                       WHERE SystemConfigId = @SystemConfigId";
 
             try
             {

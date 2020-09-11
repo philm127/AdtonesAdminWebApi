@@ -20,7 +20,7 @@ namespace AdtonesAdminWebApi.DAL
         public readonly string _connStr;
         public readonly IExecutionCommand _executers;
         public readonly IConnectionStringService _connService;
-        private readonly IHttpContextAccessor _httpAccessor;
+        public readonly IHttpContextAccessor _httpAccessor;
 
         public BaseDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor)
         {

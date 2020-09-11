@@ -22,8 +22,9 @@ namespace AdtonesAdminWebApi.ViewModels
         public int? UserId { get; set; }
         // [Required(ErrorMessage = "The Term & Condition field is required.")]
         public string TermAndConditionFileName { get; set; }
-
         public IFormFile? file { get; set; }
+
+        public int? AdtoneServeCountryId { get; set; }
     }
 
 

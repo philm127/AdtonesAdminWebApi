@@ -14,6 +14,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int OperatorId { get; set; }
         public string OperatorName { get; set; }
         public string CountryName { get; set; }
+        public int? AdtoneServerOperatorConfigurationId { get; set; }
     }
 
 
@@ -32,6 +33,7 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public int CurrencyId { get; set; }
         public string CountryName { get; set; }
+        public int? AdtoneServerOperatorId { get; set; }
 
     }
 
@@ -47,6 +49,7 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public int OperatorId { get; set; }
         public string OperatorName { get; set; }
+        public int? AdtoneServerOperatorMaxAdvertId { get; set; }
     }
 
     public class OperatorResult

@@ -160,26 +160,32 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> UpdateAdvertCategory(AdvertCategoryResult model)
         {
+            var sb = new StringBuilder();
+            var sb1 = new StringBuilder();
             int x = 0;
             try
             {
+                sb.Append(AdvertQuery.UpdateAdvertCategory);
+                sb.Append(" AdvertCategoryId=@Id;");
                 x = await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(AdvertQuery.UpdateAdvertCategory + " AdvertCategoryId=@Id;",
-                                                                                                                new { Id = model.AdvertCategoryId,
-                                                                                                                countryId = model.CountryId,
-                                                                                                                name = model.CategoryName}));
+                                    conn => conn.ExecuteScalar<int>(sb.ToString(),new { Id = model.AdvertCategoryId,
+                                                                                    countryId = model.CountryId,
+                                                                                    name = model.CategoryName}));
 
                 var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.GetValueOrDefault());
                 List<string> conns = lst.ToList();
-
+                sb1.Append(AdvertQuery.UpdateAdvertCategory);
+                sb1.Append(" AdtoneServerAdvertCategoryId=@Id;");
                 foreach (string constr in conns)
                 {
+
+                    var countryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId.GetValueOrDefault(), constr);
+
                     x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(AdvertQuery.UpdateAdvertCategory + " AdtoneServerAdvertCategoryId=@Id;",
-                                                                                                            new { Id = model.AdvertCategoryId,
-                                                                                                                countryId = model.CountryId,
-                                                                                                                name = model.CategoryName
-                                                                                                            }));
+                                    conn => conn.ExecuteScalar<int>(sb1.ToString(), new { Id = model.AdvertCategoryId,
+                                                                                            countryId = countryId,
+                                                                                            name = model.CategoryName
+                                                                                        }));
                 }
             }
             catch
@@ -212,46 +218,41 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> InsertAdvertCategory(AdvertCategoryResult model)
         {
+            int x = 0;
+            int y = 0;
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(AdvertQuery.AddAdvertCategory);
             try
             {
                 builder.AddParameters(new { countryId = model.CountryId });
                 builder.AddParameters(new { name = model.CategoryName });
-                builder.AddParameters(new { Id = 0 });
+                builder.AddParameters(new { Id = model.AdtoneServerAdvertCategoryId });
 
 
-                return await _executers.ExecuteCommand(_connStr,
+                model.AdtoneServerAdvertCategoryId = await _executers.ExecuteCommand(_connStr,
                                     conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
 
-            }
-            catch
-            {
-                throw;
-            }
-        }
+
+                var builder2 = new SqlBuilder();
+                var select2 = builder2.AddTemplate(AdvertQuery.AddAdvertCategory);
+
+                    builder2.AddParameters(new { name = model.CategoryName });
+                    builder2.AddParameters(new { Id = model.AdtoneServerAdvertCategoryId });
 
 
-        public async Task<int> InsertAdvertCategoryOperator(AdvertCategoryResult model, int catId)
-        {
-            var x = 0;
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertQuery.AddAdvertCategory);
-            try
-            {
-                builder.AddParameters(new { countryId = model.CountryId });
-                builder.AddParameters(new { name = model.CategoryName });
-                builder.AddParameters(new { Id = catId });
+                    var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.GetValueOrDefault());
+                    List<string> conns = lst.ToList();
 
+                    foreach (string constr in conns)
+                    {
+                        var countryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId.GetValueOrDefault(), constr);
 
-                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.GetValueOrDefault());
-                List<string> conns = lst.ToList();
+                        builder2.AddParameters(new { countryId = countryId });
 
-                foreach (string constr in conns)
-                {
-                    x += await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
-                }
+                        y += await _executers.ExecuteCommand(constr,
+                                        conn => conn.ExecuteScalar<int>(select2.RawSql, select2.Parameters));
+                    }
+
             }
             catch
             {

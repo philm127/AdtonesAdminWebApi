@@ -29,7 +29,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string UpdateAdvertStatus => @"UPDATE Advert SET Status=@Status,UpdatedBy=@UpdatedBy, UpdatedDateTime=GETDATE() WHERE ";
 
 
-        // public static string InsertAdvertRejection => @"INSERT INTO AdvertRejections(AdvertId,UserId,CreatedDateRejectionReason ) VALUES(@AdvertId,@UserId,GETDATE(),@RejectionReason);";
+        // public static string InsertAdvertRejection => @"INSERT INTO AdvertRejections(AdvertId,UserId,CreatedDateRejectionReason) VALUES(@AdvertId,@UserId,GETDATE(),@RejectionReason);";
 
 
         public static string GetFtpDetails => @"SELECT OperatorFTPDetailId,Host,Port,UserName,Password,FtpRoot FROM OperatorFTPDetails WHERE OperatorId=@OperatorId";
@@ -49,8 +49,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string DeleteAdvertCategory => @"DELETE FROM AdvertCategories WHERE ";
 
 
-        public static string UpdateAdvertCategory => @"UPDATE AdvertCategories SET CountryId=@countryId, Name=@name, UpdatedDate=GETDATE()
-                                                                                                                                WHERE ";
+        public static string UpdateAdvertCategory => @"UPDATE AdvertCategories SET CountryId=@countryId, Name=@name, UpdatedDate=GETDATE() WHERE ";
 
 
         public static string AddAdvertCategory => @"INSERT INTO AdvertCategories (CountryId,Name,CreatedDate,UpdatedDate,AdtoneServerAdvertCategoryId)

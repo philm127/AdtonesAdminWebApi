@@ -111,11 +111,14 @@ namespace AdtonesAdminWebApi.DAL
 
             try
             {
-                var x = await _executers.ExecuteCommand(_connStr,
-                                conn => conn.ExecuteScalar<int>(sb.ToString(), new { Id = model.RewardId, RewardValue = model.RewardValue}));
+                int x = await _executers.ExecuteCommand(_connStr,
+                                conn => conn.ExecuteScalar<int>(sb.ToString(), new { Id = model.RewardId, RewardValue = model.RewardValue }));
 
-                return await _executers.ExecuteCommand(conns,
+                if (conns != null && conns.Length > 0)
+                    return await _executers.ExecuteCommand(conns,
                                 conn => conn.ExecuteScalar<int>(sbOp.ToString(), new { Id = model.RewardId, RewardValue = model.RewardValue }));
+
+                return x;
             }
             catch
             {
@@ -136,11 +139,13 @@ namespace AdtonesAdminWebApi.DAL
 
             try 
             {
-                var x = await _executers.ExecuteCommand(_connStr,
+                model.AdtoneServerRewardId = await _executers.ExecuteCommand(_connStr,
                                 conn => conn.ExecuteScalar<int>(sb.ToString(), new { OperatorId = model.OperatorId, RewardName = model.RewardName, RewardValue = model.RewardValue, AdtoneServerRewardId = model.AdtoneServerRewardId }));
 
+                model.OperatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId, model.OperatorId);
+
                 return await _executers.ExecuteCommand(conns,
-                                conn => conn.ExecuteScalar<int>(sb.ToString(), new { OperatorId = model.OperatorId, RewardName = model.RewardName, RewardValue = model.RewardValue, AdtoneServerRewardId = x }));
+                                conn => conn.ExecuteScalar<int>(sb.ToString(), new { OperatorId = model.OperatorId, RewardName = model.RewardName, RewardValue = model.RewardValue, AdtoneServerRewardId = model.AdtoneServerRewardId }));
             }
             catch
             {

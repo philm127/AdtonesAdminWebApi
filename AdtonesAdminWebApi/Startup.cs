@@ -80,7 +80,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ISharedSelectListsDAL, SharedSelectListsDAL>();
             services.AddScoped<ITicketDAL, TicketDAL>();
             services.AddScoped<IAdvertDAL, AdvertDAL>();
-            services.AddScoped<IAreaDAL, AreaDAL>();
+            services.AddScoped<ICountryAreaDAL, CountryAreaDAL>();
             services.AddScoped<ICampaignDAL, CampaignDAL>();
             services.AddScoped<IUserDashboardDAL, UserDashboardDAL>();
             services.AddScoped<IPromotionalCampaignDAL, PromotionalCampaignDAL>();
@@ -98,6 +98,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IFinanceTablesDAL, FinanceTablesDAL>();
             services.AddScoped<IRewardDAL, RewardDAL>();
             services.AddScoped<IProfileMatchInfoDAL,ProfileMatchInfoDAL>();
+            services.AddScoped<IOperatorDAL, OperatorDAL>();
 
             #endregion
 

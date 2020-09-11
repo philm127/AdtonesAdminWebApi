@@ -129,17 +129,18 @@ namespace AdtonesAdminWebApi.DAL
 
             try
             {
-                var x = await _executers.ExecuteCommand(_connStr,
+                model.AdtoneServerCampaignCreditPeriodId = await _executers.ExecuteCommand(_connStr,
                                 conn => conn.ExecuteScalar<int>(AdvertiserCreditQuery.InsertCampaignCredit, model));
 
-
-                model.AdtoneServerCampaignCreditPeriodId = x;
                 var lst = await _connService.GetConnectionStringsByCountry(countryId);
                 List<string> conns = lst.ToList();
 
                 foreach (string constr in conns)
                 {
-                    x = await _executers.ExecuteCommand(constr,
+                    model.UserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.UserId, constr);
+                    model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+
+                    var x = await _executers.ExecuteCommand(constr,
                                     conn => conn.ExecuteScalar<int>(AdvertiserCreditQuery.InsertCampaignCredit, model));
                 }
             }

@@ -205,6 +205,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> UpdateCompanyDetails(CompanyDetails company)
         {
+            if (company.Id == 0)
+                return await AddCompanyDetails(company);
+
             var update_query = @"UPDATE CompanyDetails SET CompanyName=@CompanyName,Address=@Address,AdditionalAddress=@AdditionalAddress,
                                  Town=@Town,PostCode=@PostCode,CountryId=@CountryId WHERE Id=@Id";
 
@@ -234,8 +237,8 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> AddCompanyDetails(CompanyDetails company)
         {
-            var update_query = @"INSERT INTO CompanyDetails(CompanyName,Address,AdditionalAddress,Town,PostCodeCountryId)
-                                                VALUES(@CompanyName,@Address,@AdditionalAddress,@Town,@PostCode,@CountryId)";
+            var update_query = @"INSERT INTO CompanyDetails(CompanyName,Address,AdditionalAddress,Town,PostCode,CountryId,UserId)
+                                                VALUES(@CompanyName,@Address,@AdditionalAddress,@Town,@PostCode,@CountryId,@UserId)";
 
             try
             {

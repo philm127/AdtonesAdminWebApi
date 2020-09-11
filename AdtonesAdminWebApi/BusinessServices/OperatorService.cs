@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
+using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
@@ -16,31 +17,24 @@ namespace AdtonesAdminWebApi.BusinessServices
     {
         private readonly IConfiguration _configuration;
         private readonly IUserManagementService _userService;
+        private readonly IOperatorDAL _opDAL;
         ReturnResult result = new ReturnResult();
 
 
-        public OperatorService(IConfiguration configuration, IUserManagementService userService)
+        public OperatorService(IConfiguration configuration, IUserManagementService userService, IOperatorDAL opDAL)
 
         {
             _configuration = configuration;
             _userService = userService;
+            _opDAL = opDAL;
         }
 
 
         public async Task<ReturnResult> LoadOperatorDataTable()
         {
-            var select_query = @"SELECT OperatorId,OperatorName,ISNULL(co.Name, '-') AS CountryName,op.IsActive,
-                                EmailCost,SmsCost,cu.CurrencyCode AS Currency
-                                FROM Operators AS op LEFT JOIN Country co ON op.CountryId=co.Id
-                                LEFT JOIN Currencies cu ON cu.CurrencyId = op.CurrencyId";
-
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryAsync<OperatorResult>(select_query);
-                }
+                    result.body = await _opDAL.LoadOperatorResultSet();
             }
             catch (Exception ex)
             {
@@ -62,28 +56,14 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                bool exists = false;
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    exists = await connection.ExecuteScalarAsync<bool>(@"SELECT COUNT(1) FROM Operators WHERE LOWER(OperatorName) = @op;",
-                                                                  new { op = operatormodel.OperatorName.ToLower() });
-                }
-                if (exists)
+                if (await _opDAL.CheckOperatorExists(operatormodel))
                 {
                     result.error = operatormodel.OperatorName + " Record Exists.";
                     result.result = 0;
                     return result;
                 }
 
-                var insert_query = @"INSERT INTO Operators(OperatorName,CountryId,IsActive,EmailCost,SmsCost,CurrencyId)
-                                                    VALUES(@OperatorName,@CountryId,true,@EmailCost,@SmsCost,@CurrencyId);
-                                      SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.ExecuteScalarAsync<int>(insert_query, operatormodel);
-                }
+                result.body = await _opDAL.AddOperator(operatormodel);
             }
             catch (Exception ex)
             {
@@ -104,18 +84,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> GetOperator(int id)
         {
-            var select_query = @"SELECT op.OperatorId,OperatorName,co.Name AS CountryName,cu.CurrencyCode,AdtoneServerOperatorId,
-	                                IsActive,EmailCost,SmsCost,op.CurrencyId,op.CountryId
-                                    FROM Operators AS op LEFT JOIN Country AS co ON op.CountryId=co.Id
-                                    LEFT JOIN Currencies AS cu ON op.CurrencyId=cu.CurrencyId WHERE OperatorId=@Id";
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<OperatorFormModel>(select_query,
-                                                                                        new { Id = id });
-                }
+                result.body = await _opDAL.GetOperatorById(id);
             }
             catch (Exception ex)
             {
@@ -138,14 +109,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                var update_query = @"UPDATE Operators SET IsActive=@IsActive,EmailCost=@EmailCost,SmsCost=@SmsCost 
-                                                                WHERE OperatorId=@OperatorId";
-
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    var x = await connection.ExecuteScalarAsync<int>(update_query, operatormodel);
-                }
+                var x = await _opDAL.UpdateOperator(operatormodel);
             }
             catch (Exception ex)
             {
@@ -166,16 +130,10 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> LoadOperatorMaxAdvertDataTable()
         {
-            var select_query = @"SELECT OperatorMaxAdvertId,KeyName,KeyValue,Addeddate AS CreatedDate,maxad.OperatorId,op.OperatorName
-                                 FROM OperatorMaxAdverts AS maxad INNER JOIN Operators AS op ON op.OperatorId=maxad.OperatorId";
 
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryAsync<OperatorMaxAdvertsFormModel>(select_query);
-                }
+                result.body = await _opDAL.LoadOperatorMaxAdvertResultSet();
             }
             catch (Exception ex)
             {
@@ -193,33 +151,18 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> AddOperatorMaxAdverts(OperatorMaxAdvertsFormModel operatorMaxAdvertsFormModel)
+        public async Task<ReturnResult> AddOperatorMaxAdverts(OperatorMaxAdvertsFormModel model)
         {
             try
             {
-                bool exists = false;
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                if (await _opDAL.CheckMaxAdvertExists(model))
                 {
-                    exists = await connection.ExecuteScalarAsync<bool>(@"SELECT COUNT(1) FROM OperatorMaxAdverts 
-                                                                        WHERE LOWER(KeyName) = @keyname AND OperatorId=@opid;",
-                                                                  new { keyname = operatorMaxAdvertsFormModel.KeyName.ToLower(), opid = operatorMaxAdvertsFormModel.OperatorId });
-                }
-                if (exists)
-                {
-                    result.error = operatorMaxAdvertsFormModel.KeyName + " Record Exists.";
+                    result.error = model.KeyName + " Record Exists.";
                     result.result = 0;
                     return result;
                 }
 
-                var insert_query = @"INSERT INTO OperatorMaxAdverts(KeyName,KeyValue,Addeddate,Updateddate,OperatorId)
-                                                    VALUES(@KeyName,@KeyValue,GETDATE(),GETDATE(),@OperatorId);
-                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    var x = await connection.ExecuteScalarAsync<int>(insert_query, operatorMaxAdvertsFormModel);
-                }
+                var x = await _opDAL.AddOperatorMaxAdvert(model);
             }
             catch (Exception ex)
             {
@@ -240,17 +183,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> GetOperatorMaxAdvert(int id)
         {
-            var select_query = @"SELECT OperatorMaxAdvertId,KeyName,KeyValue,op.OperatorName
-                                 FROM OperatorMaxAdverts AS maxad INNER JOIN Operators AS op ON op.OperatorId=maxad.OperatorId
-                                  WHERE OperatorMaxAdvertId=@Id";
-
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    result.body = await connection.QueryFirstOrDefaultAsync<OperatorMaxAdvertsFormModel>(select_query, new { Id = id});
-                }
+                result.body = await _opDAL.GetOperatorMaxAdvertById(id);
             }
             catch (Exception ex)
             {
@@ -269,19 +204,12 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> UpdateOperatorMaxAdverts(OperatorMaxAdvertsFormModel operatorMaxAdvertsFormModel)
+        public async Task<ReturnResult> UpdateOperatorMaxAdverts(OperatorMaxAdvertsFormModel model)
         {
-
-            var update_query = @"UPDATE OperatorMaxAdverts SET KeyValue=@KeyValue,Updateddate=GETDATE() 
-                                                        WHERE OperatorMaxAdvertId=@OperatorMaxAdvertId";
 
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    var x = await connection.ExecuteScalarAsync<int>(update_query, operatorMaxAdvertsFormModel);
-                }
+               var x = await _opDAL.UpdateOperatorMaxAdvert(model);
             }
             catch (Exception ex)
             {
@@ -295,7 +223,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logging.LogError();
                 result.result = 0;
             }
-            result.body = "Operator " + operatorMaxAdvertsFormModel.OperatorName + " updated successfully.";
+            result.body = "Operator " + model.OperatorName + " updated successfully.";
             return result;
         }
 

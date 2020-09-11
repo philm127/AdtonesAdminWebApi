@@ -10,10 +10,13 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<string> GetSingleConnectionString(int Id);
         Task<IEnumerable<string>> GetConnectionStrings(int Id = 0);
         Task<int> GetUserIdFromAdtoneId(int Id, int operatorId);
+        Task<int> GetUserIdFromAdtoneIdByConnString(int Id, string conn);
         Task<int> GetCampaignProfileIdFromAdtoneId(int Id, int operatorId);
+        Task<int> GetCampaignProfileIdFromAdtoneIdByConnString(int Id, string conn);
         Task<int> GetAdvertIdFromAdtoneId(int Id, int operatorId);
         Task<string> GetOperatorConnectionByUserId(int id);
         Task<IEnumerable<string>> GetConnectionStringsByCountry(int Id);
         Task<int> GetOperatorIdFromAdtoneId(int Id, int operatorId);
+        Task<int> GetCountryIdFromAdtoneId(int Id, string conn);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
+using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
@@ -15,13 +16,14 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         ReturnResult result = new ReturnResult();
         private readonly ISaveGetFiles _saveFile;
+        private readonly ICountryAreaDAL _caDAL;
 
-
-        public CountryService(IConfiguration configuration, ISaveGetFiles saveFile)
+        public CountryService(IConfiguration configuration, ISaveGetFiles saveFile, ICountryAreaDAL caDAL)
 
         {
             _configuration = configuration;
             _saveFile = saveFile;
+            _caDAL = caDAL;
         }
 
 
@@ -29,14 +31,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    result.body = await connection.QueryAsync<CountryResult>(@"SELECT c.Id,c.Name,c.ShortName,c.CountryCode,c.CreatedDate,c.Status,
-                                                                                    ISNULL(t.TaxPercantage,0) AS TaxPercentage 
-                                                                                    FROM Country AS c INNER JOIN CountryTax AS t ON t.CountryId=c.Id
-                                                                                    ORDER BY c.Id DESC");
-                }
-
+                result.body = await _caDAL.LoadCountryResultSet();
             }
             catch (Exception ex)
             {
@@ -58,14 +53,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    result.body = await connection.QueryAsync<CountryResult>(@"SELECT c.Id,c.Name,ShortName,c.CountryCode,c.CreatedDate,c.Status,
-                                                                             t.TaxPercantage AS TaxPercentage
-                                                                             FROM Country AS c INNER JOIN CountryTax AS t ON t.CountryId=c.Id
-                                                                                WHERE c.Id=@id", new { id = Id});
-                }
-
+                result.body = await _caDAL.GetCountryById(Id); 
             }
             catch (Exception ex)
             {
@@ -87,7 +75,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                if (CheckIfCountryExists(countrymodel))
+                if (await _caDAL.CheckCountryExists(countrymodel))
                 {
                     result.error = countrymodel.Name + " Already Exists.";
                     result.result = 0;
@@ -111,15 +99,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                     countrymodel.TermAndConditionFileName = filename;
                 }
 
-                string insert_string = @"INSERT INTO Country(UserId,Name,ShortName,CreatedDate,UpdatedDate,Status,
-                                            TermAndConditionFileName,CountryCode)
-                                        VALUES(@UserId,@Name,@ShortName, GETDATE(), GETDATE(), @Status, 
-                                                @TermAndConditionFileName, @CountryCode);";
+                result.body = await _caDAL.AddCountry(countrymodel);
 
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    result.body = await connection.ExecuteAsync(insert_string, countrymodel);
-                }
             }
             catch (Exception ex)
             {
@@ -161,15 +142,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                     string filename = await _saveFile.SaveFileToSite(directoryName, countrymodel.file);
                     countrymodel.TermAndConditionFileName = filename;
                 }
-                string update_string = @"UPDATE Country SET UserId = @UserId, Name = @Name, ShortName = @ShortName, 
-                                                            UpdatedDate = GETDATE(),Status = @Status, CountryCode = @CountryCode,
-                                                            TermAndConditionFileName = @TermAndConditionFileName
-                                                                                                                        WHERE Id=@Id;";
-
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    result.body = await connection.ExecuteAsync(update_string,countrymodel);
-                }
+                
+                result.body = await _caDAL.UpdateCountry(countrymodel);
             }
             catch (Exception ex)
             {
@@ -185,24 +159,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             return result;
         }
-
-
-        private bool CheckIfCountryExists(CountryResult label)
-        {
-            bool countryExist = false;
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                countryExist = connection.ExecuteScalar<bool>(@"SELECT COUNT(1) FROM Country 
-                                                                    WHERE LOWER(Name) = @name",
-                                                                    new
-                                                                    {
-                                                                        name = label.Name.Trim().ToLower()
-                                                                    });
-            }
-            return countryExist;
-
-        }
-
 
     }
 }
