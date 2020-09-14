@@ -335,7 +335,6 @@ namespace AdtonesAdminWebApi.DAL
             builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             try
             {
-
                 return await _executers.ExecuteCommand(_connStr,
                                  conn => conn.QueryFirstOrDefault<CampaignDashboardChartResult>(select.RawSql, select.Parameters));
 

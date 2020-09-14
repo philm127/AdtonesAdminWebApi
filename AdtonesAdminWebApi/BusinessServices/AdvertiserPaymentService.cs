@@ -85,7 +85,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 // Build the body out
                 string paymentMethod = pdfModel.Description;
-                var otherpath = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress");
+                var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
                 otherpath = Path.Combine(otherpath, "MailerTemplates");
                 string template = string.Empty;
                 var typeOfInv = 0;

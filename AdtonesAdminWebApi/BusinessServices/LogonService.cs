@@ -161,9 +161,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 string url = string.Format("{0}?activationCode={1}",resetAddress, email);
 
-                var otherpath = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress");
+                var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
                 var template = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("ResetPasswordEmailTemplate").Value;
-                var path = otherpath + template;
+                var path = Path.Combine(otherpath,template);
                 var reader = new StreamReader(path);
 
 
