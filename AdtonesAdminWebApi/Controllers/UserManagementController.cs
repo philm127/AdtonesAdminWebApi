@@ -110,9 +110,9 @@ namespace AdtonesAdminWebApi.Controllers
 
 
         [HttpPost("v1/AddNewUser")]
-        public async Task<ReturnResult> AddNewUser(OperatorAdminFormModel model)
+        public async Task<ReturnResult> AddNewUser(UserAddFormModel model)
         {
-            return await _userService.AddOperatorAdminUser(model);
+            return await _userService.AddUser(model);
         }
 
 

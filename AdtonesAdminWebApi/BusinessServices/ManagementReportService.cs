@@ -98,40 +98,53 @@ namespace AdtonesAdminWebApi.BusinessServices
                 IEnumerable<SpendCredit> totCosts = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetTotalCost);
                 var costAudit = totCosts.ToList();
 
-                Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit,search);
+                Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit, search);
 
                 Task<int> totUser = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTotalUser);
                 Task<int> totrem = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfRemovedUser);
                 Task<int> totads = _reportDAL.GetreportInts(search, ManagementReportQuery.NumberOfAdsProvisioned);
-                // Task<int> up2Aud = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfUpdateToAudit);
-                
+                //// Task<int> up2Aud = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfUpdateToAudit);
+
                 Task<int> totCancel = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfCancel);
                 Task<int> totCam = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfLiveCampaign);
                 Task<int> totEmail = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfEmail);
-                Task<int> totFile = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTextFile);
-                Task<int> totline = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTextLine);
+                //Task<int> totFile = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTextFile);
+                //Task<int> totline = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTextLine);
                 Task<int> totSMS = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfSMS);
                 Task<int> totPlays = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfPlay);
                 Task<int> totLess6Plays = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfPlayUnder6);
 
 
-                await Task.WhenAll(totUser, totrem,totads, totCancel, totCam, totEmail, totFile, totline, totSMS, totPlays, //up2Aud,
-                                    totCost, totLess6Plays);
+                await Task.WhenAll(
+                    totUser,
+                    totrem,
+                    totads,
+                    totCancel,
+                    totCam,
+                    totEmail,
+                    //totFile,
+                    //totline,
+                    totSMS,
+                    totPlays,
+                    //up2Aud, 
+                    totLess6Plays,
+                    totCost
+                    );
                 var currency = await _curDAL.GetCurrencyUsingCurrencyIdAsync(search.currency);
 
                 model.NumOfTotalUser = totUser.Result;
                 model.NumOfRemovedUser = totrem.Result;
                 model.NumberOfAdsProvisioned = totads.Result;
-                // model.NumOfUpdateToAudit = up2Aud.Result;
+                //// model.NumOfUpdateToAudit = up2Aud.Result;
                 model.NumOfCancel = totCancel.Result;
                 model.NumOfLiveCampaign = totCam.Result;
                 model.NumOfEmail = totEmail.Result;
-                model.NumOfTextFile = totFile.Result;
-                model.NumOfTextLine = totline.Result;
+                //model.NumOfTextFile = totFile.Result;
+                //model.NumOfTextLine = totline.Result;
                 model.NumOfSMS = totSMS.Result;
                 model.NumOfPlay = totPlays.Result;
                 model.NumOfPlayUnder6secs = totLess6Plays.Result;
-                model.AveragePlaysPerUser = (double)totPlays.Result / (double)totUser.Result;
+                model.AveragePlaysPerUser = totUser.Result == 0 ? 0 : (double)totPlays.Result / (double)totUser.Result;
                 model.TotalCredit = (int)totCost.Result.TotalCredit;
                 model.TotalSpend = (int)totCost.Result.TotalSpend;
                 model.CurrencyCode = GetCurrencySymbol(currency.CurrencyCode);

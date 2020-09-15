@@ -35,6 +35,7 @@ namespace AdtonesAdminWebApi.DAL
                 sb.Append(" AND op.CountryId = @country ");
                 builder.AddParameters(new { country = search.country });
             }
+
             var values = CheckGeneralFile(sb, builder, pais: "op",ops:"op");
             sb = values.Item1;
             builder = values.Item2;
@@ -44,7 +45,7 @@ namespace AdtonesAdminWebApi.DAL
             {
 
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+                                conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));//, commandTimeout: 60
             }
             catch
             {
@@ -52,6 +53,8 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
+
+        
 
         public async Task<IEnumerable<int>> GetAllOperators()
         {

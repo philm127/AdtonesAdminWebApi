@@ -30,7 +30,7 @@ namespace AdtonesAdminWebApi.DAL
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(CountryAreaQuery.LoadCountryDataTable);
-            var values = CheckGeneralFile(sb, builder, pais: "c");
+            var values = CheckGeneralFile(sb, builder, pais: "t");
             sb = values.Item1;
             builder = values.Item2;
             sb.Append(" ORDER BY c.Id DESC;");

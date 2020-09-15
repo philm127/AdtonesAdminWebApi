@@ -17,6 +17,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 LEFT JOIN Client AS cl ON cl.Id=q.ClientId
                                                 LEFT JOIN CampaignProfile AS camp ON camp.CampaignProfileId=q.CampaignProfileId
                                                 LEFT JOIN QuestionSubject AS qs ON qs.SubjectId=q.SubjectId
+                                                LEFT JOIN Operators AS op ON camp.CountryId=op.CountryId
                                                 LEFT JOIN PaymentMethod AS pay ON pay.Id=q.PaymentMethodId";
 
 

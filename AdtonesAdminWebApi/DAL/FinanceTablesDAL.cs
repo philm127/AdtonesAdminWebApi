@@ -105,6 +105,7 @@ namespace AdtonesAdminWebApi.DAL
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(FinancialTablesQuery.LoadUserCreditDataTable);
+            sb.Append(" WHERE 1=1 ");
             var values = CheckGeneralFile(sb, builder, pais: "ad");
             sb = values.Item1;
             builder = values.Item2;

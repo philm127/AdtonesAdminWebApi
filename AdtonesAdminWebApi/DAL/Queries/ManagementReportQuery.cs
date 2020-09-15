@@ -22,7 +22,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string NumOfTotalUser => @"SELECT COUNT(UserId) AS NumOfTotalUser FROM Users AS u LEFT JOIN Operators AS op ON op.OperatorId=u.OperatorId 
                                                     WHERE RoleId = 2 AND Activated = 1 
-                                                    AND DateCreated>=@start AND DateCreated<=@end AND op.OperatorId IN @searchOperators";
+                                                    AND DateCreated>=@start AND DateCreated<=@end AND op.OperatorId IN @searchOperators ";
         public static string NumOfRemovedUser => @"SELECT COUNT(UserId) AS NumOfRemovedUser FROM Users AS u LEFT JOIN Operators AS op ON op.OperatorId=u.OperatorId
                                                     WHERE RoleId = 2 AND Activated = 3 AND DateCreated>=@start AND DateCreated<=@end 
                                                     AND op.OperatorId IN @searchOperators ";
@@ -69,11 +69,13 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                             WHERE ca.Status= 'cancelled'
                                             AND AddedDate>=@start AND AddedDate<=@end AND op.OperatorId IN @searchOperators ";
 
-        public static string NumOfLiveCampaign => @"SELECT COUNT(DISTINCT(ca.CampaignProfileId)) AS NumOfLiveCampaign
-                                                    FROM CampaignAudit AS ca 
-                                                    INNER JOIN CampaignProfile AS cp ON ca.CampaignProfileId=cp.CampaignProfileId
+        public static string NumOfLiveCampaign => @"SELECT COUNT(cp.CampaignProfileId) AS NumOfLiveCampaign
+                                                    FROM CampaignProfile AS cp
+                                                    INNER JOIN
+                                                    (SELECT DISTINCT(CampaignProfileId) FROM CampaignAudit WHERE AddedDate>=@start AND AddedDate<=@end) AS ca
+                                                    ON ca.CampaignProfileId=cp.CampaignProfileId
                                                     INNER JOIN Operators AS op ON op.CountryId=cp.CountryId
-                                                    WHERE AddedDate>=@start AND AddedDate<=@end AND op.OperatorId IN @searchOperators ";
+                                                    WHERE op.OperatorId IN @searchOperators ";
 
         public static string NumberOfAdsProvisioned => @"SELECT COUNT(Advertid) AS NumberOfAdsProvisioned 
                                                         FROM Advert AS ad INNER JOIN Operators AS op ON op.OperatorId=ad.OperatorId

@@ -11,7 +11,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string GetCurrencyList => "SELECT c.CurrencyId AS Value,c.CurrencyCode AS Text FROM Currencies AS c";
         
         
-        public static string GetCountryList => @"SELECT Id AS Value,Name AS Text FROM Country";
+        public static string GetCountryList => @"SELECT Id AS Value,Name AS Text FROM Country ";
 
 
         public static string GetOperators => @"SELECT c.OperatorId AS Value,c.OperatorName AS Text FROM Operators AS c WHERE IsActive=1";

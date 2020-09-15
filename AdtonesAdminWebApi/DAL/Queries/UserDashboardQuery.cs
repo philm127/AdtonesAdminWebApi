@@ -98,7 +98,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 c.Name AS CountryName,o.OperatorName,u.Activated,u.DateCreated
                                                 FROM Users AS u LEFT JOIN Operators AS o ON u.OperatorId=o.OperatorId
                                                 LEFT JOIN Country AS c ON o.CountryId=c.Id
-                                                WHERE RoleId IN(1,6) ORDER BY u.DateCreated DESC";
+                                                WHERE RoleId IN(1,6) ";
 
 
 

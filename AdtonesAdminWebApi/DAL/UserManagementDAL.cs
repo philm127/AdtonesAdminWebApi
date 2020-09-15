@@ -36,7 +36,7 @@ namespace AdtonesAdminWebApi.DAL
 
 
 
-        public async Task<bool> CheckIfUserExists(User model)
+        public async Task<bool> CheckIfUserExists(UserAddFormModel model)
         {
             bool exists = false;
             
@@ -62,7 +62,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> AddNewUser(User model)
+        public async Task<int> AddNewUser(UserAddFormModel model)
         {
             int x = 0;
             try
@@ -79,7 +79,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> AddNewUserToOperator(User model)
+        public async Task<int> AddNewUserToOperator(UserAddFormModel model)
         {
             int x = 0;
             try

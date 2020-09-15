@@ -104,42 +104,42 @@ namespace AdtonesAdminWebApi.DAL.Shared
 
         public async Task<IEnumerable<SharedSelectListViewModel>> GetCountry(int id = 0)
         {
-            //var genFile = string.Empty;
-            //string genLoc = string.Empty;
-            ////if (test == "op")
-            ////    genLoc = _configuration.GetValue<string>("Environment:GeneralTestOpJson");
-            ////else
-            //    genLoc = _configuration.GetValue<string>("Environment:GeneralTestJson").ToString();
-
-            //genFile = System.IO.File.ReadAllText(genLoc);
-
-            //PermissionModel gen = JsonSerializer.Deserialize<PermissionModel>(genFile);
-
-            //var els = gen.elements.ToList();
-
-            //int[] country = els.Find(x => x.name == "country").arrayId.ToArray();
 
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(SharedListQuery.GetCountryList);
 
-            //if (country.Length > 0 && id > 0)
-            //{
-            //    sb.Append(" WHERE Id IN @country AND Id=@Id " );
-            //    builder.AddParameters(new { country = country.ToArray(), Id=id });
+            var genFile = string.Empty;
+            genFile = GetPermissionsByUserId().Result;
 
-            //}
-            //else if (country.Length > 0 && id == 0)
-            //{
-            //    sb.Append(" WHERE Id IN @country ");
-            //    builder.AddParameters(new { country = country.ToArray() });
-            //}
-            //else if (id > 0)
-            //{
-            //    sb.Append(" WHERE Id=@Id ");
-            //    builder.AddParameters(new { Id = id });
+            List<PermissionModel> gen = JsonSerializer.Deserialize<List<PermissionModel>>(genFile);
 
-            //}
+            var page = gen.Find(u => u.pageName == "GeneralAccess");
+
+            var els = page.elements.ToList();
+
+            var testcty = els.Find(x => x.name == "country").arrayId;
+
+            if (testcty != null)
+            {
+                int[] country = els.Find(x => x.name == "country").arrayId.ToArray();
+                if (country.Length > 0 && id > 0)
+                {
+                    sb.Append($" WHERE Id=@Id AND Id IN @country ");
+                    builder.AddParameters(new { country = country.ToArray() });
+                    builder.AddParameters(new { Id = id });
+                }
+                else if (country.Length > 0 && id == 0)
+                {
+                    sb.Append(" WHERE Id IN @country ");
+                    builder.AddParameters(new { country = country.ToArray() });
+                }
+            }
+            else if (id > 0)
+            {
+                sb.Append(" WHERE Id=@Id ");
+                builder.AddParameters(new { Id = id });
+            }
 
             var select = builder.AddTemplate(sb.ToString());
             try

@@ -34,6 +34,7 @@ namespace AdtonesAdminWebApi.DAL
             else
             {
                 sb.Append(UserDashboardQuery.AdvertiserResultQuery);
+                sb.Append(" WHERE 1=1 ");
                 var values = CheckGeneralFile(sb, builder, pais: "cont", ops: "op", advs: "item");
                 sb = values.Item1;
                 builder = values.Item2;
@@ -56,10 +57,20 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<OperatorDashboardResult>> GetOperatorDashboard()
         {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
             try
             {
+                sb.Append(UserDashboardQuery.OperatorResultQuery);
+                var values = CheckGeneralFile(sb, builder, pais: "o", ops: "o");
+                sb = values.Item1;
+                builder = values.Item2;
+
+                sb.Append(" ORDER BY u.DateCreated DESC");
+
+                var select = builder.AddTemplate(sb.ToString());
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<OperatorDashboardResult>(UserDashboardQuery.OperatorResultQuery));
+                                        conn => conn.Query<OperatorDashboardResult>(select.RawSql, select.Parameters));
             }
             catch
             {

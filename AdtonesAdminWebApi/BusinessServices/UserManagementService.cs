@@ -286,33 +286,43 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> AddUser(User user, OperatorAdminFormModel model = null)
+        public async Task<ReturnResult> AddUser(UserAddFormModel model)
         {
             try
             {
-                bool exists = await _userDAL.CheckIfUserExists(user);
+                bool exists = await _userDAL.CheckIfUserExists(model);
                 if (exists)
                 {
                     result.body = "A user with that email already exists.";
                     result.result = 0;
                     return result;
                 }
+                model.PasswordHash = Md5Encrypt.Md5EncryptPassword(model.Password);
+                model.VerificationStatus = true;
+                model.Outstandingdays = 0;
+                model.IsMsisdnMatch = true;
+                model.IsEmailVerfication = true;
+                model.PhoneticAlphabet = null;
+                model.IsMobileVerfication = true;
+                model.OrganisationTypeId = null;
+                model.UserMatchTableName = null;
+
                 int mainUserId = 0;
                 int opUserId = 0;
                 
-                mainUserId = await _userDAL.AddNewUser(user);
+                mainUserId = await _userDAL.AddNewUser(model);
 
                 if (mainUserId > 0)
                 {
-                    user.AdtoneServerUserId = mainUserId;
-                    opUserId = await _userDAL.AddNewUserToOperator(user);
+                    model.AdtoneServerUserId = mainUserId;
+                    opUserId = await _userDAL.AddNewUserToOperator(model);
 
                     var command1 = new Contacts();
                     int currencyId = 0;
                     using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                     {
                         currencyId = connection.ExecuteScalar<int>(@"SELECT CurrencyId FROM Currencies WHERE CountryId=@countryId;",
-                                                                      new { countryId = user.CountryId });
+                                                                      new { countryId = model.CountryId });
                     }
 
                     if (currencyId == 0)
@@ -327,10 +337,10 @@ namespace AdtonesAdminWebApi.BusinessServices
                     command1.UserId = mainUserId;
                     command1.MobileNumber = model.MobileNumber;
                     command1.FixedLine = null;
-                    command1.Email = user.Email;
+                    command1.Email = model.Email;
                     command1.PhoneNumber = model.PhoneNumber;
                     command1.Address = model.Address;
-                    command1.CountryId = user.CountryId;
+                    command1.CountryId = model.CountryId;
 
                     var contId = await AddContactInformation(command1);
                     if (contId == 0)
@@ -408,7 +418,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public async Task<ReturnResult> AddOperatorAdminUser(OperatorAdminFormModel model)
+        public async Task<ReturnResult> AddOperatorAdminUser(UserAddFormModel model)
         {
 
             try
@@ -428,7 +438,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 command.Activated = model.Activated;
                 command.VerificationStatus = true;
                 command.Outstandingdays = 0;
-                command.OperatorId = model.OperatorId;
+                command.OperatorId = model.OperatorId.GetValueOrDefault();
                 command.IsMsisdnMatch = true;
                 command.IsEmailVerfication = true;
                 command.PhoneticAlphabet = null;
@@ -439,7 +449,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 command.CountryId = model.CountryId;
 
 
-                var body = await AddUser(command,model);
+                var body = await AddUser(model);
                 if (body.result == 0)
                 {
                     result.result = 0;

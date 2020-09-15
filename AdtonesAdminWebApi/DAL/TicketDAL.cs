@@ -3,6 +3,7 @@ using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.TicketingModels;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Text;
@@ -10,18 +11,12 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL
 {
-    public class TicketDAL : ITicketDAL
+    public class TicketDAL : BaseDAL, ITicketDAL
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connStr;
-        private readonly IExecutionCommand _executers;
 
-        public TicketDAL(IConfiguration configuration, IExecutionCommand executers)
-        {
-            _configuration = configuration;
-            _connStr = _configuration.GetConnectionString("DefaultConnection");
-            _executers = executers;
-        }
+        public TicketDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor)
+            : base(configuration, executers, connService, httpAccessor)
+        {}
 
 
         public async Task<TicketListModel> GetTicketDetails(int id=0)
@@ -64,17 +59,24 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<IEnumerable<TicketListModel>> GetTicketList(int id)
         {
             var sb = new StringBuilder();
+            var builder = new SqlBuilder();
             sb.Append(TicketQuery.GetLoadTicketDatatable);
             if (id == 0)
+            {
+                var values = CheckGeneralFile(sb, builder, pais: "camp", ops: "op");
+                sb = values.Item1;
+                builder = values.Item2;
                 sb.Append(" ORDER BY q.Id DESC;");
+            }
             else
             {
                 sb.Append(" WHERE q.UserId=@userId ");
                 sb.Append(" ORDER BY q.Id DESC;");
+                builder.AddParameters(new { userId = id });
             }
-            var builder = new SqlBuilder();
+            
             var select = builder.AddTemplate(sb.ToString());
-            builder.AddParameters(new { userId = id });
+            
             try
             {
                 return  await _executers.ExecuteCommand(_connStr,

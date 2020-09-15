@@ -18,8 +18,8 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> UpdateCompanyDetails(CompanyDetails company);
         Task<ReturnResult> UpdateUserStatus(AdvertiserDashboardResult result);
         Task<ReturnResult> AddCompanyDetails(CompanyDetails company);
-        Task<ReturnResult> AddUser(User user, OperatorAdminFormModel model = null);
-        Task<ReturnResult> AddOperatorAdminUser(OperatorAdminFormModel model);
+        Task<ReturnResult> AddUser(UserAddFormModel model);
+        Task<ReturnResult> AddOperatorAdminUser(UserAddFormModel model);
         // Task<ReturnResult> UpdateOperatorAdminUser(OperatorAdminFormModel model);
         Task<ReturnResult> GetOperatorAdmin(int userId);
 
