@@ -92,6 +92,175 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> AddNewPage(AddNewPermissionPart model)
+        {
+            List<PermissionChangeModel> perms = new List<PermissionChangeModel>();
+            try
+            {
+
+                int[] Roles = model.roles.Length > 0 ? Array.ConvertAll(model.roles, int.Parse) : new int[] { };
+
+                var page = new PermissionModel();
+                page.pageName = model.pageName;
+                page.visible = model.visible;
+                page.elements = model.elements;
+
+                var iqPerms = await _permDAL.GetPermissionsByRoleId(Roles);
+                perms = iqPerms.ToList();
+
+                foreach (var perm in perms)
+                {
+                    List<PermissionModel> pg = new List<PermissionModel>();
+                    if (perm.permissions != null && perm.permissions.Length > 0)
+                        pg = JsonSerializer.Deserialize<List<PermissionModel>>(perm.permissions);
+                    if (pg.Any(x => x.pageName == model.pageName))
+                    {
+                        result.result = 0;
+                        result.error = "The PageName already exist";
+                        return result;
+                    }
+                    else
+                        pg.Add(page);
+
+                    var str = JsonSerializer.Serialize(pg);
+
+                    var x = await _permDAL.UpdateUserPermissions(perm.UserId, str);
+                }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "PermissionManagementService",
+                    ProcedureName = "AddNewPage"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+
+            return result;
+        }
+
+
+        public async Task<ReturnResult> AddNewElement(AddNewPermissionPart model)
+        {
+            List<PermissionChangeModel> perms = new List<PermissionChangeModel>();
+            var els = new List<PermElement>();
+            els = model.elements;
+            try
+            {
+
+                int[] Roles = model.roles.Length > 0 ? Array.ConvertAll(model.roles, int.Parse) : new int[] { };
+
+                var iqPerms = await _permDAL.GetPermissionsByRoleId(Roles);
+                perms = iqPerms.ToList();
+
+                foreach (var perm in perms)
+                {
+                    List<PermissionModel> pgs = new List<PermissionModel>();
+                    if (perm.permissions != null && perm.permissions.Length > 0)
+                        pgs = JsonSerializer.Deserialize<List<PermissionModel>>(perm.permissions);
+                    if (pgs.Find(x => x.pageName == model.pageName).elements == null || pgs.Find(x => x.pageName == model.pageName).elements.Count == 0)
+                    {
+                        //List<PermElement> els = new List<PermElement>();
+                        //els.Add(el);
+                        pgs.Find(x => x.pageName == model.pageName).elements = els;
+                    }
+                    else
+                    {
+                        foreach (var pg in pgs)
+                        {
+                            if (pg.pageName == model.pageName)
+                            {
+                                var emts = new List<PermElement>();
+                                emts = pg.elements;
+                                foreach (var el in els)
+                                {
+                                    if (emts.Any(x => x.name == el.name))
+                                    {
+                                        result.result = 0;
+                                        result.error = $"{el.name} -  An element with the same nae and type already exists";
+                                        return result;
+                                    }
+                                    else
+                                    {
+                                        emts.Add(el);
+                                        pgs.Find(x => x.pageName == model.pageName).elements = emts;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    var str = JsonSerializer.Serialize(pgs);
+
+                    var x = await _permDAL.UpdateUserPermissions(perm.UserId, str);
+                }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "PermissionManagementService",
+                    ProcedureName = "AddNewPage"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+
+            return result;
+        }
+
+
+        public async Task<ReturnResult> SelectListPermissionPages()
+        {
+            // var pages = new List<string>();
+            List<PermissionModel> pg = new List<PermissionModel>();
+            List<SharedSelectListViewModel> selectedList = new List<SharedSelectListViewModel>();
+
+            try
+            {
+                var permList = await _permDAL.GetPermissionsForSelectList();
+                pg = JsonSerializer.Deserialize<List<PermissionModel>>(permList);
+
+                foreach (PermissionModel mod in pg)
+                {
+                    var itemModel = new SharedSelectListViewModel();
+                    itemModel.Value = mod.pageName;
+                    itemModel.Text = mod.pageName;
+                    selectedList.Add(itemModel);
+                    // pages.Add(mod.pageName);
+                }
+
+                
+
+                //foreach (var item in pages)
+                //{
+                //    var itemModel = new SharedSelectListViewModel();
+                //    itemModel.Value = item.ToString();
+                //    itemModel.Text = item.ToString();
+                //    selectedList.Add(itemModel);
+                //}
+                result.body = selectedList;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "PermissionManagementService",
+                    ProcedureName = "SelectListPermissionPages"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
 
 
     }

@@ -42,5 +42,35 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        // <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains integer</returns>
+        [HttpPost("v1/AddNewPage")]
+        public async Task<ReturnResult> AddNewPage(AddNewPermissionPart model)
+        {
+            return await _permService.AddNewPage(model);
+        }
+
+
+        // <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains integer</returns>
+        [HttpPost("v1/AddNewElement")]
+        public async Task<ReturnResult> AddNewElement(AddNewPermissionPart model)
+        {
+            var tst = "Arrived";
+            return await _permService.AddNewElement(model);
+        }
+
+
+        [HttpGet("v1/GetPermissionPagesList")]
+        public async Task<ReturnResult> GetPermissionPagesList()
+        {
+            return await _permService.SelectListPermissionPages();
+        }
+
+
     }
 }

@@ -11,5 +11,9 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> GetPermissionsByUser(int id);
 
         Task<ReturnResult> UpdateUserPermissionsById(PermissionChangeModel model);
+
+        Task<ReturnResult> AddNewPage(AddNewPermissionPart model);
+        Task<ReturnResult> AddNewElement(AddNewPermissionPart model);
+        Task<ReturnResult> SelectListPermissionPages();
     }
 }

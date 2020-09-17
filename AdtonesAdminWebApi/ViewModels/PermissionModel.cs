@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authorization.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,6 +44,17 @@ namespace AdtonesAdminWebApi.ViewModels
         public int UserId { get; set; }
 
         public string permissions { get; set; }
+    }
+
+
+    public class AddNewPermissionPart
+    {
+        public bool all { get; set; }
+        public string[] roles { get; set; }
+        public string[] users { get; set; }
+        public string pageName { get; set; }
+        public bool visible { get; set; }
+        public List<PermElement> elements { get; set; }
     }
 
 

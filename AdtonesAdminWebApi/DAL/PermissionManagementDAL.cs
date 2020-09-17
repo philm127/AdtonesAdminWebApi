@@ -10,6 +10,7 @@ using Dapper;
 using Microsoft.Extensions.Caching.Memory;
 using AdtonesAdminWebApi.ViewModels;
 using Microsoft.AspNetCore.Http;
+using System.Text;
 
 namespace AdtonesAdminWebApi.DAL
 {
@@ -32,6 +33,24 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<IEnumerable<PermissionChangeModel>> GetPermissionsByRoleId(int[] roles)
+        {
+            var builder = new SqlBuilder();
+            
+            var sb = new StringBuilder();
+            sb.Append(PermissionManagementQuery.GetUsersPermissionByRole);
+            if (roles.Length > 0)
+            {
+                sb.Append(" AND RoleId IN @RoleId ");
+                builder.AddParameters(new { RoleId = roles.ToArray() });
+            }
+
+            var select = builder.AddTemplate(sb.ToString());
+            
+            return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.Query<PermissionChangeModel>(select.RawSql, select.Parameters));
+        }
+
 
         public async Task<int> UpdateUserPermissions(int userId, string permissions)
         {
@@ -50,6 +69,14 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
 
+        }
+
+
+        public async Task<string> GetPermissionsForSelectList()
+        {
+
+            return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.QueryFirstOrDefault<string>(PermissionManagementQuery.PermissionsForSelectList));
         }
     }
 }

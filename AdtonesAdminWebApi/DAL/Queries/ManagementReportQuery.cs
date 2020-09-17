@@ -41,13 +41,13 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string NumOfPlay => @"SELECT COUNT(CampaignAuditId) AS NumOfPlay FROM CampaignAudit AS ca
                                             INNER JOIN CampaignProfile AS cp ON ca.CampaignProfileId=cp.CampaignProfileId
                                             INNER JOIN Operators AS op ON op.CountryId=cp.CountryId
-                                            WHERE ca.Status= 'played' AND ca.PlayLengthTicks > 6000
+                                            WHERE ca.Status= 'played' AND ca.PlayLengthTicks >= 6000
                                             AND AddedDate>=@start AND AddedDate<=@end AND op.OperatorId IN @searchOperators ";
 
         public static string NumOfPlayUnder6 => @"SELECT COUNT(CampaignAuditId) AS NumOfPlay FROM CampaignAudit AS ca
                                             INNER JOIN CampaignProfile AS cp ON ca.CampaignProfileId=cp.CampaignProfileId
                                             INNER JOIN Operators AS op ON op.CountryId=cp.CountryId
-                                            WHERE ca.Status= 'played' AND ca.PlayLengthTicks <= 6000
+                                            WHERE ca.Status= 'played' AND ca.PlayLengthTicks < 6000
                                             AND AddedDate>=@start AND AddedDate<=@end AND op.OperatorId IN @searchOperators ";
 
 
