@@ -11,5 +11,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> LoadAdvertiserDataTable();
         Task<ReturnResult> LoadOperatorDataTable();
         Task<ReturnResult> LoadSubscriberDataTable();
+        Task<ReturnResult> LoadAdminDataTable();
     }
 }

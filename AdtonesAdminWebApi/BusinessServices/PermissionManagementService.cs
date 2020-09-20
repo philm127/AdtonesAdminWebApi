@@ -43,11 +43,8 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                string permPreList = string.Empty;
                 var permList = new List<PermissionModel>();
-                permPreList = await _permDAL.GetPermissionsByUserId(id);
-                if(permPreList != null && permPreList.Length > 50)
-                    permList = JsonSerializer.Deserialize<List<PermissionModel>>(permPreList);
+                permList = await PermissionsByUser(id);
 
                 result.body = permList;
             }
@@ -216,7 +213,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> SelectListPermissionPages()
+        public async Task<ReturnResult> SelectListPermissionPages(int roleid)
         {
             // var pages = new List<string>();
             List<PermissionModel> pg = new List<PermissionModel>();
@@ -224,7 +221,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-                var permList = await _permDAL.GetPermissionsForSelectList();
+                var permList = await _permDAL.GetPermissionsForSelectList(roleid);
                 pg = JsonSerializer.Deserialize<List<PermissionModel>>(permList);
 
                 foreach (PermissionModel mod in pg)
@@ -263,5 +260,170 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+
+        public async Task<ReturnResult> Compare2Permissions(IdCollectionViewModel model)
+        {
+
+            var arrayOfDiffs = new List<string>();
+            try
+            {
+                List<PermissionModel> firstObject = await PermissionsByUser(model.userId);
+                List<PermissionModel> secondObject = await PermissionsByUser(model.id);
+
+                foreach (var page in firstObject)
+                {
+                    var pageSec = secondObject.Find(x => x.pageName == page.pageName);
+                    if (pageSec == null)
+                    {
+                        arrayOfDiffs.Add($"[Missing Page] - {page.pageName} ");
+                    }
+                    else
+                    {
+
+                        if (page.pageName == "GeneralAccess")
+                        {
+                            foreach (var els in page.elements)
+                            {
+                                var elsSec = pageSec.elements.Find(x => x.name == els.name);
+
+                                arrayOfDiffs.Add($"[PGA] - {page.pageName} ");
+                                if (els.name == "country")
+                                {
+                                    arrayOfDiffs.Add($"[Country M] - {string.Join(", ", els.arrayId)} ");
+                                    arrayOfDiffs.Add($"[Country 2nd] - {string.Join(",", elsSec.arrayId)} ");
+                                }
+                                else if (els.name == "operator")
+                                {
+                                    arrayOfDiffs.Add($"[Operator M] - {string.Join(", ", els.arrayId)} ");
+                                    arrayOfDiffs.Add($"[Operator 2nd] - {string.Join(",", elsSec.arrayId)} ");
+                                }
+                                else if (els.name == "advertiser")
+                                {
+                                    arrayOfDiffs.Add($"[Advertiser M] - {string.Join(", ", els.arrayId)} ");
+                                    arrayOfDiffs.Add($"[Advertiser 2nd] - {string.Join(",", elsSec.arrayId)} ");
+                                }
+
+                            }
+                        }
+                        else if (page.pageName == "MainMenu")
+                        {
+                            foreach (var els in page.elements)
+                            {
+                                var elsSec = pageSec.elements.Find(x => x.name == els.name);
+                                // arrayOfDiffs.Add($"[MenuHeader] - {els.name} ");
+                                if (elsSec == null)
+                                    arrayOfDiffs.Add($"[MissingHeader] - {els.name} ");
+                                else
+                                {
+                                    foreach (var submen in els.elements)
+                                    {
+                                        var submenSec = elsSec.elements.Find(x => x.name == submen.name);
+                                        // arrayOfDiffs.Add($"[SunMenu] - {submen.name} ");
+                                        if (submenSec == null)
+                                            arrayOfDiffs.Add($"[MissingSub] - {submen.name} ");
+                                        else
+                                        {
+                                            if (submen.visible != submenSec.visible)
+                                            {
+                                                arrayOfDiffs.Add($"[SubVisible] - {submen.name} [2nd Vis State] = {submenSec.visible}");
+                                            }
+                                            if (submen.route != submenSec.route)
+                                            {
+                                                arrayOfDiffs.Add($"[SubRoute] - {submen.name} [2nd Route] = {submenSec.route}");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (page.pageName == "Login")
+                        {
+                            // Prints page name where there is a difference in page visible true/false
+                            if (pageSec.visible != page.visible)
+                                arrayOfDiffs.Add($"[Page Visible] - {page.pageName} ");
+                            foreach (var els in page.elements)
+                            {
+                                var elsSec = pageSec.elements.Find(x => x.name == els.name);
+                                if (elsSec == null)
+                                    arrayOfDiffs.Add($"[MissingElement] - [Page] {page.pageName} [Element:]  {els.name}");
+                                else
+                                {
+                                    if (els.name == "defaultroute")
+                                    {
+                                        if (els.route != elsSec.route)
+                                            arrayOfDiffs.Add($"[DefaultRoute] - [Page] {page.pageName} Element: {els.name} [2nd DefRoute] = {elsSec.route}");
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Prints page name where there is a difference in page visible true/false
+                            if (pageSec.visible != page.visible)
+                                arrayOfDiffs.Add($"[Page Visible] - {page.pageName} ");
+                            foreach (var els in page.elements)
+                            {
+                                var elsSec = pageSec.elements.Find(x => x.name == els.name && x.type == els.type);
+                                if (elsSec == null)
+                                    arrayOfDiffs.Add($"[MissingElement] - [Page] {page.pageName} [Element:]  {els.name}  [Type:] {els.type}");
+                                else
+                                {
+                                    if (els.visible != elsSec.visible)
+                                    {
+                                        arrayOfDiffs.Add($"[ElementVisible] - [Page] {page.pageName} Element: {els.name} Type : {els.type}  [2nd Vis State] = {elsSec.visible}");
+                                    }
+                                    if (els.enabled != elsSec.enabled)
+                                    {
+                                        arrayOfDiffs.Add($"[ElementEnabled] - [Page] {page.pageName} Element: {els.name} Type : {els.type}  [2nd Enabled State] = {elsSec.enabled}");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "PermissionManagementService",
+                    ProcedureName = "Compare2Permissions"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+
+            result.body = arrayOfDiffs;
+            return result;
+        }
+
+
+        private async Task<List<PermissionModel>> PermissionsByUser(int id)
+        {
+            var permList = new List<PermissionModel>();
+            try
+            {
+                string permPreList = string.Empty;
+                permPreList = await _permDAL.GetPermissionsByUserId(id);
+                if (permPreList != null && permPreList.Length > 50)
+                    permList = JsonSerializer.Deserialize<List<PermissionModel>>(permPreList);
+
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "PermissionManagementService",
+                    ProcedureName = "PermissionsByUser"
+                };
+                _logging.LogError();
+                
+            }
+            return permList;
+        }
     }
 }

@@ -55,6 +55,17 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List OperatorResult</returns>
+        [HttpGet("v1/LoadAdminDataTable")]
+        public async Task<ReturnResult> LoadAdminDataTable()
+        {
+            return await _dashboardService.LoadAdminDataTable();
+        }
+
+
         [HttpGet("v1/GetSubscriberTable")]
         public async Task<ReturnResult> GetSubscriberTable()
         {

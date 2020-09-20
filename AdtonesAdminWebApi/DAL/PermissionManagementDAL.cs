@@ -72,11 +72,11 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<string> GetPermissionsForSelectList()
+        public async Task<string> GetPermissionsForSelectList(int roleid)
         {
 
             return await _executers.ExecuteCommand(_connStr,
-                             conn => conn.QueryFirstOrDefault<string>(PermissionManagementQuery.PermissionsForSelectList));
+                             conn => conn.QueryFirstOrDefault<string>(PermissionManagementQuery.PermissionsForSelectList, new { RoleId = roleid }));
         }
     }
 }

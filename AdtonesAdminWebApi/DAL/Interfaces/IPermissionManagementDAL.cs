@@ -12,6 +12,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<string> GetPermissionsByUserId(int userId);
         Task<int> UpdateUserPermissions(int userId, string permissions);
         Task<IEnumerable<PermissionChangeModel>> GetPermissionsByRoleId(int[] roles);
-        Task<string> GetPermissionsForSelectList();
+        Task<string> GetPermissionsForSelectList(int roleid);
     }
 }

@@ -79,6 +79,20 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<IEnumerable<AdminDashboardResult>> GetAdminDashboard()
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                        conn => conn.Query<AdminDashboardResult>(UserDashboardQuery.AdminResultQuery));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<IEnumerable<SubscriberDashboardResult>> GetSubscriberDashboard()
         {
             try

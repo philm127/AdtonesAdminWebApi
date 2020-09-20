@@ -280,14 +280,14 @@ namespace AdtonesAdminWebApi.BusinessServices
             ws.Range("H4" + ":" + "H5").Style.Font.Bold = true;
             ws.Column("H").Width = 20;
 
-            ws.Range("I4" + ":" + "I5").Merge().Value = "Total Spend (in GBP)";
+            ws.Range("I4" + ":" + "I5").Merge().Value = $"Total Spend (in {model.CurrencyCode})";
             ws.Range("I4" + ":" + "I5").Style.Font.FontSize = 12;
             ws.Range("I4" + ":" + "I5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
             ws.Range("I4" + ":" + "I5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
             ws.Range("I4" + ":" + "I5").Style.Font.Bold = true;
             ws.Column("I").Width = 25;
 
-            ws.Range("J4" + ":" + "J5").Merge().Value = "Total Credit (in GBP)";
+            ws.Range("J4" + ":" + "J5").Merge().Value = $"Total Credit (in {model.CurrencyCode})";
             ws.Range("J4" + ":" + "J5").Style.Font.FontSize = 12;
             ws.Range("J4" + ":" + "J5").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
             ws.Range("J4" + ":" + "J5").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);

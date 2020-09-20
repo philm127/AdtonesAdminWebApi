@@ -65,12 +65,23 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [HttpGet("v1/GetPermissionPagesList")]
-        public async Task<ReturnResult> GetPermissionPagesList()
+        [HttpGet("v1/GetPermissionPagesList/{roleid}")]
+        public async Task<ReturnResult> GetPermissionPagesList(int roleid)
         {
-            return await _permService.SelectListPermissionPages();
+            return await _permService.SelectListPermissionPages(roleid);
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model">IdCollectionModel uses userid for 1st and id for the second comparison</param>
+        /// <returns></returns>
+        [HttpPut("v1/ComparePermissionPages")]
+        public async Task<ReturnResult> ComparePermissionPages(IdCollectionViewModel model)
+        {
+            return await _permService.Compare2Permissions(model);
+        }
 
     }
 }

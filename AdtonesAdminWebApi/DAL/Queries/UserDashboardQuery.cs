@@ -16,7 +16,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                    FROM
                                                         (SELECT item.UserId, item.RoleId, item.Email, item.DateCreated, item.Activated,
                                                         item.FirstName,item.LastName
-                                                        FROM Users item Where item.VerificationStatus = 1 AND (item.RoleId = 5 OR item.RoleId = 3)) item
+                                                        FROM Users item Where item.VerificationStatus = 1 AND item.RoleId = 3) item
                                                     LEFT JOIN
                                                         (SELECT a.[UserId], b.[AssignCredit], a.[Id] 
                                                         FROM
@@ -98,7 +98,15 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 c.Name AS CountryName,o.OperatorName,u.Activated,u.DateCreated
                                                 FROM Users AS u LEFT JOIN Operators AS o ON u.OperatorId=o.OperatorId
                                                 LEFT JOIN Country AS c ON o.CountryId=c.Id
-                                                WHERE RoleId IN(1,6) ";
+                                                WHERE RoleId=6 ";
+
+
+
+        public static string AdminResultQuery => @"SELECT u.UserId,u.FirstName,u.LastName,u.Email,ISNULL(u.Organisation,'-') AS Organisation,o.CountryId,
+                                                c.Name AS CountryName,u.Activated,u.DateCreated, RoleId,MobileNumber
+                                                FROM Users AS u LEFT JOIN Contacts AS o ON u.UserId=o.UserId
+                                                LEFT JOIN Country AS c ON o.CountryId=c.Id
+                                                WHERE RoleId IN(1,4,5,7) ORDER BY u.DateCreated DESC";
 
 
 

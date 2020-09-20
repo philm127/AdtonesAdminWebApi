@@ -109,6 +109,28 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> LoadAdminDataTable()
+        {
+            try
+            {
+                result.body = await _dashboardDal.GetAdminDashboard();
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "UserDashboardService",
+                    ProcedureName = "LoadAdminDataTable"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
         public async Task<ReturnResult> LoadSubscriberDataTable()
         {
             try

@@ -15,7 +15,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string UpdateUserPermissions => "UPDATE Users SET Permissions=@perms WHERE UserId=@Id";
 
-        public static string PermissionsForSelectList => "SELECT TOP 1 Permissions AS permissions FROM Users WHERE RoleId=1 AND Activated=1 AND Permissions IS NOT NULL ORDER BY UserId ASC";
+        public static string PermissionsForSelectList => "SELECT TOP 1 Permissions AS permissions FROM Users WHERE RoleId=@RoleId AND Activated=1 AND Permissions IS NOT NULL ORDER BY UserId ASC";
 
 
 

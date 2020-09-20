@@ -22,7 +22,19 @@ namespace AdtonesAdminWebApi.ViewModels
         public System.DateTime DateCreated { get; set; }
         public string Role => $"{(UserRole)RoleId}";
     }
-    
+
+    public class AdminDashboardResult : UserDashboardData
+    {
+
+        public string MobileNumber { get; set; }
+
+        public string CountryName { get; set; }
+
+        public string Organisation { get; set; }
+
+
+    }
+
     public class AdvertiserDashboardResult : UserDashboardData
     {
         
