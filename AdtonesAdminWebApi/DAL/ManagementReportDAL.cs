@@ -54,7 +54,40 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        
+        public async Task<PlayLengthModel> GetReportPlayLengths(ManagementReportsSearch search, string query)
+        {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(query);
+            builder.AddParameters(new { searchOperators = search.operators.ToArray() });
+            builder.AddParameters(new { start = search.DateFrom });
+            builder.AddParameters(new { end = search.DateTo });
+
+            if (search.country != null && search.country != 0)
+            {
+                sb.Append(" AND op.CountryId = @country ");
+                builder.AddParameters(new { country = search.country });
+            }
+
+            var values = CheckGeneralFile(sb, builder, pais: "op", ops: "op");
+            sb = values.Item1;
+            builder = values.Item2;
+            var select = builder.AddTemplate(sb.ToString());
+
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<PlayLengthModel>(select.RawSql, select.Parameters));//, commandTimeout: 60
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+
 
         public async Task<IEnumerable<int>> GetAllOperators()
         {

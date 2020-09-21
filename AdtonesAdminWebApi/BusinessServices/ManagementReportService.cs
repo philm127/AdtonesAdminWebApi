@@ -101,6 +101,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit, search);
 
                 Task<int> totUser = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTotalUser);
+                Task<int> totAllUser = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTotalUserForever);
                 Task<int> totrem = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfRemovedUser);
                 Task<int> totads = _reportDAL.GetreportInts(search, ManagementReportQuery.NumberOfAdsProvisioned);
                 //// Task<int> up2Aud = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfUpdateToAudit);
@@ -111,12 +112,13 @@ namespace AdtonesAdminWebApi.BusinessServices
                 //Task<int> totFile = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTextFile);
                 //Task<int> totline = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTextLine);
                 Task<int> totSMS = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfSMS);
-                Task<int> totPlays = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfPlay);
-                Task<int> totLess6Plays = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfPlayUnder6);
+                Task<PlayLengthModel> totPlays = _reportDAL.GetReportPlayLengths(search, ManagementReportQuery.NumOfPlay);
+                Task<PlayLengthModel> totLess6Plays = _reportDAL.GetReportPlayLengths(search, ManagementReportQuery.NumOfPlayUnder6);
 
 
                 await Task.WhenAll(
                     totUser,
+                    totAllUser,
                     totrem,
                     totads,
                     totCancel,
@@ -132,6 +134,10 @@ namespace AdtonesAdminWebApi.BusinessServices
                     );
                 var currency = await _curDAL.GetCurrencyUsingCurrencyIdAsync(search.currency);
 
+                var under6 = totLess6Plays.Result;
+                var eqOver6 = totPlays.Result;
+                var avgPlay = (double)((under6.Playlength + eqOver6.Playlength)/1000) / (under6.NumOfPlay + eqOver6.NumOfPlay);
+
                 model.NumOfTotalUser = totUser.Result;
                 model.NumOfRemovedUser = totrem.Result;
                 model.NumberOfAdsProvisioned = totads.Result;
@@ -142,12 +148,13 @@ namespace AdtonesAdminWebApi.BusinessServices
                 //model.NumOfTextFile = totFile.Result;
                 //model.NumOfTextLine = totline.Result;
                 model.NumOfSMS = totSMS.Result;
-                model.NumOfPlay = totPlays.Result;
-                model.NumOfPlayUnder6secs = totLess6Plays.Result;
-                model.AveragePlaysPerUser = totUser.Result == 0 ? 0 : (double)totPlays.Result / (double)totUser.Result;
+                model.NumOfPlay = eqOver6.NumOfPlay;// totPlays.Result;
+                model.NumOfPlayUnder6secs = under6.NumOfPlay;// totLess6Plays.Result;
+                model.AveragePlaysPerUser = totAllUser.Result == 0 ? 0 : (double)(under6.NumOfPlay + eqOver6.NumOfPlay) / (double)totAllUser.Result;
                 model.TotalCredit = (int)totCost.Result.TotalCredit;
                 model.TotalSpend = (int)totCost.Result.TotalSpend;
                 model.CurrencyCode = GetCurrencySymbol(currency.CurrencyCode);
+                model.AveragePlayLength = (double)avgPlay;
 
             }
             catch (Exception ex)

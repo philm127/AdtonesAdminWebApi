@@ -23,6 +23,11 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string NumOfTotalUser => @"SELECT COUNT(UserId) AS NumOfTotalUser FROM Users AS u LEFT JOIN Operators AS op ON op.OperatorId=u.OperatorId 
                                                     WHERE RoleId = 2 AND Activated = 1 
                                                     AND DateCreated>=@start AND DateCreated<=@end AND op.OperatorId IN @searchOperators ";
+
+        public static string NumOfTotalUserForever => @"SELECT COUNT(UserId) AS NumOfTotalUser FROM Users AS u LEFT JOIN Operators AS op ON op.OperatorId=u.OperatorId 
+                                                    WHERE RoleId = 2 AND Activated = 1 AND op.OperatorId IN @searchOperators ";
+
+
         public static string NumOfRemovedUser => @"SELECT COUNT(UserId) AS NumOfRemovedUser FROM Users AS u LEFT JOIN Operators AS op ON op.OperatorId=u.OperatorId
                                                     WHERE RoleId = 2 AND Activated = 3 AND DateCreated>=@start AND DateCreated<=@end 
                                                     AND op.OperatorId IN @searchOperators ";
@@ -38,17 +43,19 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                   //                  AND AddedDate>=@start AND AddedDate<=@end ";
 
 
-        public static string NumOfPlay => @"SELECT COUNT(CampaignAuditId) AS NumOfPlay FROM CampaignAudit AS ca
+        public static string NumOfPlay => @"SELECT COUNT(CampaignAuditId) AS NumOfPlay,SUM(ca.PlayLengthTicks) AS Playlength 
+                                            FROM CampaignAudit AS ca
                                             INNER JOIN CampaignProfile AS cp ON ca.CampaignProfileId=cp.CampaignProfileId
                                             INNER JOIN Operators AS op ON op.CountryId=cp.CountryId
                                             WHERE ca.Status= 'played' AND ca.PlayLengthTicks >= 6000
                                             AND AddedDate>=@start AND AddedDate<=@end AND op.OperatorId IN @searchOperators ";
 
-        public static string NumOfPlayUnder6 => @"SELECT COUNT(CampaignAuditId) AS NumOfPlay FROM CampaignAudit AS ca
-                                            INNER JOIN CampaignProfile AS cp ON ca.CampaignProfileId=cp.CampaignProfileId
-                                            INNER JOIN Operators AS op ON op.CountryId=cp.CountryId
-                                            WHERE ca.Status= 'played' AND ca.PlayLengthTicks < 6000
-                                            AND AddedDate>=@start AND AddedDate<=@end AND op.OperatorId IN @searchOperators ";
+        public static string NumOfPlayUnder6 => @"SELECT COUNT(CampaignAuditId) AS NumOfPlay,SUM(ca.PlayLengthTicks) AS Playlength 
+                                                    FROM CampaignAudit AS ca
+                                                    INNER JOIN CampaignProfile AS cp ON ca.CampaignProfileId=cp.CampaignProfileId
+                                                    INNER JOIN Operators AS op ON op.CountryId=cp.CountryId
+                                                    WHERE ca.Status= 'played' AND ca.PlayLengthTicks < 6000
+                                                    AND AddedDate>=@start AND AddedDate<=@end AND op.OperatorId IN @searchOperators ";
 
 
         public static string NumOfSMS => @"SELECT COUNT(CampaignAuditId) AS NumOfSMS FROM CampaignAudit AS ca

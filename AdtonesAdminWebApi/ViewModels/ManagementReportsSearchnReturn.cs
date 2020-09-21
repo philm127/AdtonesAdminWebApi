@@ -44,6 +44,8 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public double AveragePlaysPerUser { get; set; }
 
+        public double AveragePlayLength { get; set; }
+
         public string CurrencyCode { get; set; }
     }
 
@@ -51,5 +53,11 @@ namespace AdtonesAdminWebApi.ViewModels
     {
         public double TotalSpend { get; set; }
         public double TotalCredit { get; set; }
+    }
+
+    public class PlayLengthModel
+    {
+        public int NumOfPlay { get; set; }
+        public long Playlength { get; set; }
     }
 }
