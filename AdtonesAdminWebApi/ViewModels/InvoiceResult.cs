@@ -20,7 +20,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public DateTime CreatedDate { get; set; }
         public int Status { get; set; }
         public string Description { get; set; }
-
+        public string CurrencyCode { get; set; }
     }
     
     public class InvoiceResult : InvoiceBase
@@ -38,6 +38,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string PaymentMethod { get; set; }
 
         public int UsersCreditPaymentId { get; set; }
+        public string InvoicePath { get; set; }
 
     }
 

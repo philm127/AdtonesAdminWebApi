@@ -17,15 +17,13 @@ namespace AdtonesAdminWebApi.Controllers
     {
 
         private readonly IFinanceTablesService _invoiceService;
-        private readonly IAdvertiserPaymentService _paymentService;
-        private readonly IAdvertiserCreditService _creditService;
+        private readonly IAdvertiserFinancialService _paymentService;
 
 
-        public FinancialsController(IFinanceTablesService invoiceService, IAdvertiserPaymentService paymentService, IAdvertiserCreditService creditService)
+        public FinancialsController(IFinanceTablesService invoiceService, IAdvertiserFinancialService paymentService)
         {
             _invoiceService = invoiceService;
             _paymentService = paymentService;
-            _creditService = creditService;
         }
 
 
@@ -80,7 +78,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPut("v1/UpdateCampaignCredit")]
         public async Task<ReturnResult> UpdateCampaignCredit(CampaignCreditResult model)
         {
-            return await _creditService.UpdateCampaignCredit(model);
+            return await _paymentService.UpdateCampaignCredit(model);
         }
 
 
@@ -91,7 +89,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/InsertCampaignCredit")]
         public async Task<ReturnResult> InsertCampaignCredit(CampaignCreditResult model)
         {
-            return await _creditService.AddCampaignCredit(model);
+            return await _paymentService.AddCampaignCredit(model);
         }
 
         /// <summary>
@@ -150,7 +148,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/AddCredit")]
         public async Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _creditmodel)
         {
-            var tst = await _creditService.AddCredit(_creditmodel);
+            var tst = await _paymentService.AddCredit(_creditmodel);
             return tst;
         }
 
@@ -163,7 +161,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetCreditDetails/{id}")]
         public async Task<ReturnResult> GetCreditDetails(int id)
         {
-            return await _creditService.GetCreditDetails(id);
+            return await _paymentService.GetCreditDetails(id);
         }
 
 

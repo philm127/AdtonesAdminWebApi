@@ -8,18 +8,19 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.DAL
 {
 
 
-    public class AdvertiserCreditDAL : BaseDAL, IAdvertiserCreditDAL
+    public class AdvertiserFinancialDAL : BaseDAL, IAdvertiserFinancialDAL
     {
         private readonly ICampaignDAL _campDAL;
 
-        public AdvertiserCreditDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, ICampaignDAL campDAL, 
-                            IHttpContextAccessor httpAccessor) : base(configuration, executers, connService, httpAccessor)
+        public AdvertiserFinancialDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor, ICampaignDAL campDAL)
+                        : base(configuration, executers, connService, httpAccessor)
         {
             _campDAL = campDAL;
         }
@@ -28,12 +29,55 @@ namespace AdtonesAdminWebApi.DAL
         
 
 
+        public async Task<InvoicePDFEmailModel> GetInvoiceToPDF(int billingId, int UsersCreditPaymentID)
+        {
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<InvoicePDFEmailModel>(AdvertiserFinancialQuery.GetInvoiceToPDF, 
+                                                                                new { billingId = billingId, ucpId = UsersCreditPaymentID }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> InsertPaymentFromUser(AdvertiserCreditFormModel model)
+        {
+
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(AdvertiserFinancialQuery.UpdateUserCreditPayment);
+            try
+            {
+                builder.AddParameters(new { UserId = model.UserId });
+                builder.AddParameters(new { BillingId = model.BillingId });
+                builder.AddParameters(new { Amount = model.Amount });
+                builder.AddParameters(new { Description = model.Description });
+                builder.AddParameters(new { Status = model.Status });
+                builder.AddParameters(new { CampaignprofileId = model.CampaignProfileId });
+
+
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+
+
         public async Task<int> AddUserCredit(AdvertiserCreditFormModel _creditmodel)
         {
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                             conn => conn.ExecuteScalar<int>(AdvertiserCreditQuery.AddUserCredit,_creditmodel));
+                             conn => conn.ExecuteScalar<int>(AdvertiserFinancialQuery.AddUserCredit, _creditmodel));
             }
             catch
             {
@@ -47,7 +91,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                             conn => conn.ExecuteScalar<int>(AdvertiserCreditQuery.UpdateUserCredit, 
+                             conn => conn.ExecuteScalar<int>(AdvertiserFinancialQuery.UpdateUserCredit,
                              new { Id = _creditmodel.Id, AssignCredit = _creditmodel.AssignCredit, AvailableCredit = _creditmodel.AvailableCredit }));
             }
             catch
@@ -62,8 +106,8 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                             conn => conn.ExecuteScalar<bool>(AdvertiserCreditQuery.CheckIfUserExists,
-                                                                    new {userId = userId}));
+                             conn => conn.ExecuteScalar<bool>(AdvertiserFinancialQuery.CheckIfUserExists,
+                                                                    new { userId = userId }));
             }
             catch
             {
@@ -75,7 +119,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<AdvertiserCreditDetailModel> GetUserCreditDetail(int id)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertiserCreditQuery.UserCreditDetails);
+            var select = builder.AddTemplate(AdvertiserFinancialQuery.UserCreditDetails);
             try
             {
                 builder.AddParameters(new { Id = id });
@@ -93,7 +137,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<IEnumerable<CreditPaymentHistory>> GetUserCreditPaymentHistory(int id)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertiserCreditQuery.GetPaymentHistory);
+            var select = builder.AddTemplate(AdvertiserFinancialQuery.GetPaymentHistory);
             try
             {
                 builder.AddParameters(new { userid = id });
@@ -111,11 +155,11 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<decimal> GetCreditBalance(int id)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertiserCreditQuery.GetTotalPaymentsByUser);
+            var select = builder.AddTemplate(AdvertiserFinancialQuery.GetTotalPaymentsByUser);
             builder.AddParameters(new { UserId = id });
 
             var builder2 = new SqlBuilder();
-            var select2 = builder2.AddTemplate(AdvertiserCreditQuery.GetTotalBilledByUser);
+            var select2 = builder2.AddTemplate(AdvertiserFinancialQuery.GetTotalBilledByUser);
             builder2.AddParameters(new { UserId = id });
             try
             {
@@ -148,7 +192,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 model.AdtoneServerCampaignCreditPeriodId = await _executers.ExecuteCommand(_connStr,
-                                conn => conn.ExecuteScalar<int>(AdvertiserCreditQuery.InsertCampaignCredit, model));
+                                conn => conn.ExecuteScalar<int>(AdvertiserFinancialQuery.InsertCampaignCredit, model));
 
                 var lst = await _connService.GetConnectionStringsByCountry(countryId);
                 List<string> conns = lst.ToList();
@@ -159,7 +203,7 @@ namespace AdtonesAdminWebApi.DAL
                     model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
                     var x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(AdvertiserCreditQuery.InsertCampaignCredit, model));
+                                    conn => conn.ExecuteScalar<int>(AdvertiserFinancialQuery.InsertCampaignCredit, model));
                 }
             }
             catch
@@ -173,9 +217,9 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> UpdateCampaignCredit(CampaignCreditResult model)
         {
             var sb = new StringBuilder();
-            sb.Append(AdvertiserCreditQuery.UpdateCampaignCredit);
+            sb.Append(AdvertiserFinancialQuery.UpdateCampaignCredit);
             var sbOp = new StringBuilder();
-            sbOp.Append(AdvertiserCreditQuery.UpdateCampaignCredit);
+            sbOp.Append(AdvertiserFinancialQuery.UpdateCampaignCredit);
             sb.Append(" CampaignCreditPeriodId=@Id;");
             sbOp.Append(" AdtoneServerCampaignCreditPeriodId=@Id;");
 
@@ -208,7 +252,6 @@ namespace AdtonesAdminWebApi.DAL
             }
             return 0;
         }
-
 
 
     }

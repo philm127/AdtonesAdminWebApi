@@ -1,17 +1,11 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
-using AdtonesAdminWebApi.Model;
-using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.UserSecrets;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using RestSharp.Serialization.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;

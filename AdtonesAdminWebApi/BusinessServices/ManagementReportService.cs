@@ -5,10 +5,13 @@ using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -19,15 +22,18 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly ICurrencyConversion _curConv;
         private readonly ICurrencyDAL _curDAL;
         private readonly IHttpContextAccessor _httpAccessor;
+        private IMemoryCache _cache;
         ReturnResult result = new ReturnResult();
 
 
-        public ManagementReportService(IManagementReportDAL reportDAL, ICurrencyConversion curConv, ICurrencyDAL curDAL, IHttpContextAccessor httpAccessor)
+        public ManagementReportService(IManagementReportDAL reportDAL, ICurrencyConversion curConv, ICurrencyDAL curDAL, 
+            IHttpContextAccessor httpAccessor, IMemoryCache cache)
         {
             _reportDAL = reportDAL;
             _curConv = curConv;
             _curDAL = curDAL;
             _httpAccessor = httpAccessor;
+            _cache = cache;
         }
 
 
@@ -87,6 +93,19 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         private async Task<ManagementReportModel> GetManReports(ManagementReportsSearch search)
         {
+            var searchString = System.Text.Json.JsonSerializer.Serialize(search);
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(30));
+            string key = $"MAMAGEMENT_REPORT_{searchString.ToString()}";
+            return await _cache.GetOrCreateAsync<ManagementReportModel>(key, cacheEntry =>
+            {
+                cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
+                return GetManReport(search);
+            });
+        }
+
+        private async Task<ManagementReportModel> GetManReport(ManagementReportsSearch search)
+        {
             search = SetDefaults(search);
 
             ManagementReportModel model = new ManagementReportModel();
@@ -136,7 +155,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 var under6 = totLess6Plays.Result;
                 var eqOver6 = totPlays.Result;
-                var avgPlay = (double)((under6.Playlength + eqOver6.Playlength)/1000) / (under6.NumOfPlay + eqOver6.NumOfPlay);
+                var avgPlay = (under6.NumOfPlay + eqOver6.NumOfPlay) > 0 ? (double)((under6.Playlength + eqOver6.Playlength)/1000) / (under6.NumOfPlay + eqOver6.NumOfPlay) : 0;
 
                 model.NumOfTotalUser = totUser.Result;
                 model.NumOfRemovedUser = totrem.Result;
@@ -148,8 +167,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 //model.NumOfTextFile = totFile.Result;
                 //model.NumOfTextLine = totline.Result;
                 model.NumOfSMS = totSMS.Result;
-                model.NumOfPlay = eqOver6.NumOfPlay;// totPlays.Result;
-                model.NumOfPlayUnder6secs = under6.NumOfPlay;// totLess6Plays.Result;
+                model.NumOfPlay = eqOver6.NumOfPlay;
+                model.NumOfPlayUnder6secs = under6.NumOfPlay;
                 model.AveragePlaysPerUser = totAllUser.Result == 0 ? 0 : (double)(under6.NumOfPlay + eqOver6.NumOfPlay) / (double)totAllUser.Result;
                 model.TotalCredit = (int)totCost.Result.TotalCredit;
                 model.TotalSpend = (int)totCost.Result.TotalSpend;
@@ -426,9 +445,9 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 case "GBP": return "£";
                 case "USD": return "$";
-                case "XOF": return "(XOF)";
+                case "XOF": return "CFA";
                 case "EUR": return "€";
-                case "KES": return "(KES)";
+                case "KES": return "Ksh";
                 default: return "£";
             }
         }

@@ -7,7 +7,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string GetCampaignResultSet => @"SELECT camp.CampaignProfileId,camp.UserId,u.Email,CONCAT(u.FirstName,'',u.LastName) AS UserName,op.OperatorName
                                                 ,camp.ClientId, ISNULL(cl.Name,'-') AS ClientName,CampaignName,TotalBudget,camp.CreatedDateTime AS CreatedDate
                                                 ,camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,camp.TotalBudget,u.Organisation,ctry.Name AS CountryName,
-                                                CASE WHEN bill.Id>0 THEN camp.Status ELSE 8 END AS Status,play.AvgBidValue,play.TotalSpend,
+                                                CASE WHEN bill.Id>0 THEN camp.Status ELSE 8 END AS Status,play.AvgBidValue,play.TotalSpend,bill.CurrencyCode,
                                                 (camp.TotalBudget - play.TotalSpend) AS FundsAvailable,play.ct AS finaltotalplays,con.MobileNumber
                                                 FROM CampaignProfile AS camp LEFT JOIN Users As u ON u.UserId=camp.UserId
                                                 LEFT JOIN Client AS cl ON camp.ClientId=cl.Id
@@ -17,8 +17,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
 		                                                ) AS ad 
                                                 ON ad.CampProfileId=camp.CampaignProfileId
                                                 LEFT JOIN 
-		                                                (SELECT Id,CampaignProfileId FROM Billing WHERE Id in
-			                                                (SELECT MAX(Id) FROM Billing GROUP BY CampaignProfileId)
+		                                                (SELECT Id,CampaignProfileId,CurrencyCode FROM Billing WHERE Id in
+			                                                (SELECT MAX(Id) FROM Billing GROUP BY CampaignProfileId,CurrencyCode)
 		                                                ) AS bill 
                                                 ON bill.CampaignProfileId=camp.CampaignProfileId
                                                 LEFT JOIN 

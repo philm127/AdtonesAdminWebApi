@@ -6,9 +6,15 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
-    public interface IAreaService
+    public interface ICountryAreaService
     {
         Task<ReturnResult> LoadDataTable();
+        Task<ReturnResult> AddCountry(CountryResult countrymodel);
+        Task<ReturnResult> UpdateCountry(CountryResult countrymodel);
+        Task<ReturnResult>GetCountry(int Id);
+
+
+        Task<ReturnResult> LoadAreaDataTable();
         Task<ReturnResult> AddArea(AreaResult areamodel);
         Task<ReturnResult> GetArea(int id);
         Task<ReturnResult> UpdateArea(AreaResult areamodel);

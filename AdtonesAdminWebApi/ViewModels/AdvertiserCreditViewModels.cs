@@ -29,6 +29,36 @@ namespace AdtonesAdminWebApi.ViewModels
     }
 
 
+    public class AdvertiserCreditDetailModel
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public int UserId { get; set; }
+
+        public int CurrencyId { get; set; }
+        public int CountryId { get; set; }
+
+        public decimal AssignCredit { get; set; }
+        public decimal AvailableCredit { get; set; }
+
+        public DateTime UpdatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public decimal Amount { get; set; }
+
+        public List<CreditPaymentHistory> PaymentHistory { get; set; }
+    }
+
+
+    public class CreditPaymentHistory
+    {
+        public int Id { get; set; }
+        public string InvoiceNumber { get; set; }
+        public double Amount { get; set; }
+        public DateTime CreatedDate { get; set; }
+    }
+
+
     public class AdvertiserCreditPaymentResult
     {
         public int Id { get; set; }
@@ -71,6 +101,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public decimal RemainingAmount { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string CountryName { get; set; }
+        public string CurrencyCode { get; set; }
     }
 
 

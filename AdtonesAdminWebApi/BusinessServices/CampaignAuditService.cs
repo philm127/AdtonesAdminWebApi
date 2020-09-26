@@ -135,6 +135,10 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                     result.body = _CampaignDashboardChartResult;
                 }
+                else
+                {
+                    result.result = 0;
+                }
                 return result;
             }
             catch (Exception ex)

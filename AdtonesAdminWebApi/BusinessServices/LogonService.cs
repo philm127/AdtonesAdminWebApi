@@ -466,7 +466,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         private bool PasswordExpiredAttribute(User user)
         {
 
-            int PasswordExpiresInDays = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("PasswordExpiresInDays").Value);
+            int PasswordExpiresInDays = int.Parse(_configuration.GetSection("AppSettings").GetSection("PasswordExpiresInDays").Value);
 
             TimeSpan ts = DateTime.Today - user.LastPasswordChangedDate;
 

@@ -27,8 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="BusinessServices\AdvertiserCreditService.cs" />
     <Compile Remove="BusinessServices\CountryTaxService.cs" />
     <Compile Remove="BusinessServices\ExpressoPromotionalUserService.cs" />
+    <Compile Remove="BusinessServices\Interfaces\IAdvertiserCreditService.cs" />
     <Compile Remove="BusinessServices\SafaricomPromotionalUserService.cs" />
     <Compile Remove="Controllers\AreaController.cs" />
     <Compile Remove="Controllers\RewardController.cs" />
@@ -71,30 +73,27 @@
     <Compile Include="DAL\Queries\ProfileMatchInfoQuery.cs" />
     <Compile Include="DAL\RewardDAL.cs" />
     <Compile Include="DAL\BaseDAL.cs" />
-    <Compile Include="DAL\AdvertiserPaymentDAL.cs" />
+    <Compile Include="DAL\AdvertiserFinancialDAL.cs" />
     <Compile Include="DAL\Interfaces\IFinanceTablesDAL.cs" />
-    <Compile Include="DAL\Interfaces\IAdvertiserPaymentDAL.cs" />
+    <Compile Include="DAL\Interfaces\IAdvertiserFinancialDAL.cs" />
     <Compile Include="DAL\FinanceTablesDAL.cs" />
     <Compile Include="DAL\Interfaces\IManagementReportDAL.cs" />
     <Compile Include="DAL\Interfaces\IPermissionManagementDAL.cs" />
     <Compile Include="DAL\ManagementReportDAL.cs" />
     <Compile Include="DAL\PermissionManagementDAL.cs" />
-    <Compile Include="DAL\Interfaces\IAdvertiserCreditDAL.cs" />
     <Compile Include="DAL\Interfaces\IPromotionalCampaignDAL.cs" />
     <Compile Include="DAL\PomotionalCampaignDAL.cs" />
-    <Compile Include="DAL\Queries\AdvertiserPaymentQuery.cs" />
+    <Compile Include="DAL\Queries\AdvertiserFinancialQuery.cs" />
     <Compile Include="DAL\Queries\FinancialTablesQuery.cs" />
     <Compile Include="DAL\Queries\ManagementReportQuery.cs" />
     <Compile Include="DAL\Queries\PermissionManagementQuery.cs" />
     <Compile Include="DAL\Queries\PromotionalCampaignQuery.cs" />
     <Compile Include="DAL\Queries\RewardQuery.cs" />
     <Compile Include="DAL\Queries\SharedListQuery.cs" />
-    <Compile Include="DAL\AdvertiserCreditDAL.cs" />
     <Compile Include="DAL\CampaignAuditDAL.cs" />
     <Compile Include="DAL\CurrencyDAL.cs" />
     <Compile Include="DAL\Interfaces\ICampaignAuditDAL.cs" />
     <Compile Include="DAL\Interfaces\ICurrencyDAL.cs" />
-    <Compile Include="DAL\Queries\AdvertiserCreditQuery.cs" />
     <Compile Include="DAL\Queries\CampaignAuditQuery.cs" />
     <Compile Include="DAL\Queries\CurrencyQuery.cs" />
     <Compile Include="DAL\Queries\SoapQuery.cs" />

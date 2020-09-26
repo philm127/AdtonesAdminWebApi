@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
-    public class CountryService : ICountryService
+    public class CountryAreaService : ICountryAreaService
     {
         private readonly IConfiguration _configuration;
         ReturnResult result = new ReturnResult();
         private readonly ISaveGetFiles _saveFile;
         private readonly ICountryAreaDAL _caDAL;
 
-        public CountryService(IConfiguration configuration, ISaveGetFiles saveFile, ICountryAreaDAL caDAL)
+        public CountryAreaService(IConfiguration configuration, ISaveGetFiles saveFile, ICountryAreaDAL caDAL)
 
         {
             _configuration = configuration;
@@ -159,6 +159,151 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             return result;
         }
+
+
+        #region Area
+
+        // Listing Area
+        public async Task<ReturnResult> LoadAreaDataTable()
+        {
+
+            try
+            {
+                result.body = await _caDAL.LoadAreaResultSet();
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CountryAreaService",
+                    ProcedureName = "FillAreaResult"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> AddArea(AreaResult areamodel)
+        {
+            areamodel.IsActive = true;
+            try
+            {
+                bool exists = await _caDAL.CheckAreaExists(areamodel);
+                if (exists)
+                {
+                    result.result = 0;
+                    result.error = areamodel.AreaName + " Record Exists.";
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CountryAreaService",
+                    ProcedureName = "AddArea-CheckUnique"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+
+            try
+            {
+                var cnt = _caDAL.AddArea(areamodel);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CountryAreaService",
+                    ProcedureName = "AddArea"
+                };
+                _logging.LogError();
+                result.result = 0;
+                result.error = areamodel.AreaName + " Record was not inserted.";
+                return result;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> GetArea(int id)
+        {
+            try
+            {
+                result.body = await _caDAL.GetAreaById(id);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CountryAreaService",
+                    ProcedureName = "GetArea"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> UpdateArea(AreaResult areamodel)
+        {
+            try
+            {
+                var cnt = await _caDAL.UpdateArea(areamodel);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CountryAreaService",
+                    ProcedureName = "UpdateArea"
+                };
+                _logging.LogError();
+                result.result = 0;
+                result.error = areamodel.AreaName + " Record was not updated.";
+                return result;
+            }
+        }
+
+
+        public async Task<ReturnResult> DeleteArea(int id)
+        {
+            try
+            {
+                var x = await _caDAL.DeleteAreaById(id);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CountryAreaService",
+                    ProcedureName = "DeleteArea"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        #endregion
 
     }
 }

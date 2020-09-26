@@ -11,9 +11,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         camp.CampaignName,bil.PaymentDate AS CreatedDate, camp.CampaignprofileId,
                                                         ucp.Amount AS InvoiceTotal,(Case WHEN bil.Status=3 THEN 'Fail' ELSE 'Paid' END) AS rStatus,
                                                         bil.SettledDate,(CASE WHEN bil.PaymentMethodId=1 THEN 'Cheque' ELSE pay.Description END)
-                                                        AS PaymentMethod,
+                                                        AS PaymentMethod,bil.CurrencyCode,
                                                         bil.Status AS Status,ucp.UserId,
                                                         CONCAT(usr.FirstName,' ',usr.LastName) AS FullName,
+                                                        CONCAT(@siteAddress,'//Invoice//Adtones_invoice_',bil.InvoiceNumber,'.pdf') AS InvoicePath,
                                                         usr.Email,ucp.Id AS UsersCreditPaymentId, ISNULL(usr.Organisation, '-') AS Organisation
                                                         FROM UsersCreditPayment AS ucp 
                                                         LEFT JOIN Billing AS bil ON ucp.BillingId=bil.Id 
@@ -27,8 +28,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                 bil.FundAmount AS CreditAmount,ISNULL(ucp.Amount,0) AS PaidAmount,ucp.Description,
                                                                 bil.TotalAmount,bil.PaymentDate AS CreatedDate,ISNULL(cl.Name, '-') AS ClientName,
                                                                 ISNULL(u.Organisation, '-') AS Organisation,u.Email,
-                                                                CONCAT(u.FirstName,'',u.LastName) AS FullName,(bil.FundAmount - ISNULL(ucp.Amount,0)) AS OutStandingAmount,
-                                                                CASE WHEN ISNULL(ucp.Amount,0)>0 THEN 1 ELSE 0 END AS Status,cp.CampaignName
+                                                                CONCAT(u.FirstName,'',u.LastName) AS FullName,(bil.TotalAmount - ISNULL(ucp.Amount,0)) AS OutStandingAmount,
+                                                                CASE WHEN ISNULL(ucp.Amount,0)>0 THEN 1 ELSE 0 END AS Status,cp.CampaignName,bil.CurrencyCode
                                                                 FROM Billing AS bil LEFT JOIN Client AS cl ON cl.Id=bil.ClientId
                                                                 INNER JOIN Users AS u ON bil.UserId=u.UserId
                                                                 LEFT JOIN
@@ -50,12 +51,12 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
 
-        public static string LoadUserCreditDataTable => @"SELECT u.Id,u.UserId,usrs.Email,usrs.FullName,usrs.Organisation,u.CreatedDate,
-                                                 u.AssignCredit AS Credit,u.AvailableCredit,ISNULL(bil.FundAmount,0) AS TotalUsed,ISNULL(pay.Amount,0) AS TotalPaid,
-                                                 (ISNULL(bil.FundAmount,0) - ISNULL(pay.Amount,0)) AS RemainingAmount,ISNULL(ctry.Name,'None') AS CountryName
+        public static string LoadUserCreditDataTable => @"SELECT u.Id,u.UserId,usrs.Email,usrs.FullName,usrs.Organisation,u.CreatedDate,bil.CurrencyCode,
+                                                 u.AssignCredit AS Credit,u.AvailableCredit,ISNULL(bil.TotalAmount,0) AS TotalUsed,ISNULL(pay.Amount,0) AS TotalPaid,
+                                                 (ISNULL(bil.TotalAmount,0) - ISNULL(pay.Amount,0)) AS RemainingAmount,ISNULL(ctry.Name,'None') AS CountryName
                                                  FROM UsersCredit AS u
                                                  LEFT JOIN 
-                                                 (SELECT UserId,SUM(FundAmount) AS FundAmount FROM Billing WHERE PaymentMethodId=1 GROUP BY UserId) bil
+                                                 (SELECT UserId,SUM(TotalAmount) AS TotalAmount,CurrencyCode FROM Billing WHERE PaymentMethodId=1 GROUP BY UserId,CurrencyCode) bil
                                                  ON u.UserId=bil.UserId
                                                  LEFT JOIN
                                                  (SELECT UserId,SUM(Amount) AS Amount from UsersCreditPayment GROUP BY UserId) pay

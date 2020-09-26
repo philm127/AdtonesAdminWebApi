@@ -24,6 +24,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 FROM  UsersCredit AS uc LEFT JOIN Currencies AS c ON c.CurrencyId=uc.CurrencyId
                                                 WHERE uc.UserId=@Id";
 
+        public static string GetPaymentHistory => @"SELECT ucp.Id, ucp.Amount, ucp.CreatedDate, bil.InvoiceNumber 
+                                                    FROM UsersCreditPayment AS ucp  LEFT JOIN Billing AS bil ON bil.Id=ucp.BillingId 
+                                                    WHERE ucp.UserId=@userid ORDER BY CreatedDate Desc";
+
 
         public static string GetTotalPaymentsByUser => @"SELECT sum(Amount) FROM UsersCreditPayment WHERE UserId=@UserId GROUP BY UserId";
 

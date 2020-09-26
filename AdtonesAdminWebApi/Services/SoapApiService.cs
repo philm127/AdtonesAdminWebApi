@@ -45,11 +45,11 @@ namespace AdtonesAdminWebApi.Services
             _userDAL = userDAL;
             _adDAL = adDAL;
             
-            portalAccount = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("PortalAccount").Value;
-            portalPassword = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("PortalPassword").Value;
-            portalType = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("PortalType").Value;
-            moduleCode = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("ModuleCode").Value;
-            safricomUrl = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("SafricomSoapUrl").Value;
+            portalAccount = _configuration.GetSection("AppSettings").GetSection("SoapApi").GetSection("PortalAccount").Value;
+            portalPassword = _configuration.GetSection("AppSettings").GetSection("SoapApi").GetSection("PortalPassword").Value;
+            portalType = _configuration.GetSection("AppSettings").GetSection("SoapApi").GetSection("PortalType").Value;
+            moduleCode = _configuration.GetSection("AppSettings").GetSection("SoapApi").GetSection("ModuleCode").Value;
+            safricomUrl = _configuration.GetSection("AppSettings").GetSection("SoapApi").GetSection("SafricomSoapUrl").Value;
         }
         
 
@@ -68,7 +68,7 @@ namespace AdtonesAdminWebApi.Services
                     var roleCode = "admin";
                     var toneID = advertData.SoapToneId;
                     var toneCode = advertData.SoapToneCode;
-                    string soapUIUrl = _configuration.GetSection("SoapApi").GetSection("LiveAgent").GetSection("MediaSoapUIUrl").Value;
+                    string soapUIUrl = _configuration.GetSection("AppSettings").GetSection("SoapApi").GetSection("MediaSoapUIUrl").Value;
                     var client = new RestClient(soapUIUrl);
 
                     var request = new RestRequest(Method.POST);

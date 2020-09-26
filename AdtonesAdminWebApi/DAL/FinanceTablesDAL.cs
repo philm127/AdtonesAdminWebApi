@@ -28,6 +28,7 @@ namespace AdtonesAdminWebApi.DAL
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(FinancialTablesQuery.GetInvoiceResultSet);
+            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             var values = CheckGeneralFile(sb, builder, pais: "camp");
             sb = values.Item1;
             builder = values.Item2;

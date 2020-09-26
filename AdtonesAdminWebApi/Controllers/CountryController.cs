@@ -11,14 +11,12 @@ namespace AdtonesAdminWebApi.Controllers
     [ApiController]
     public class CountryController : ControllerBase
     {
-        private readonly ICountryService _countryService;
-        private readonly IAreaService _areaService;
+        private readonly ICountryAreaService _countryService;
 
 
-        public CountryController(ICountryService countryService, IAreaService areaService)
+        public CountryController(ICountryAreaService countryService)
         {
             _countryService = countryService;
-            _areaService = areaService;
         }
 
 
@@ -87,7 +85,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAreaData")]
         public async Task<ReturnResult> GetAreaData()
         {
-            return await _areaService.LoadDataTable();
+            return await _countryService.LoadAreaDataTable();
         }
 
 
@@ -99,7 +97,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAreaById/{id}")]
         public async Task<ReturnResult> GetAreaById(int id)
         {
-            return await _areaService.GetArea(id);
+            return await _countryService.GetArea(id);
         }
 
 
@@ -111,7 +109,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/AddArea")]
         public async Task<ReturnResult> AddArea([FromBody]AreaResult model)
         {
-            return await _areaService.AddArea(model);
+            return await _countryService.AddArea(model);
         }
 
 
@@ -123,7 +121,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPut("v1/UpdateArea")]
         public async Task<ReturnResult> UpdateArea([FromBody]AreaResult model)
         {
-            return await _areaService.UpdateArea(model);
+            return await _countryService.UpdateArea(model);
         }
 
 
@@ -135,7 +133,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpDelete("v1/DeleteAreaById/{id}")]
         public async Task<ReturnResult> DeleteAreaById(int id)
         {
-            return await _areaService.DeleteArea(id);
+            return await _countryService.DeleteArea(id);
         }
 
 

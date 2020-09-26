@@ -34,6 +34,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string MobileNumber { get; set; }
         public string Organisation { get; set; }
         public string CountryName { get; set; }
+        public string CurrencyCode { get; set; }
 
     }
 

@@ -6,6 +6,7 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices
@@ -85,7 +86,11 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-                result.body = await _userDAL.GetUserCreditDetail(id);
+                var creddet = await _userDAL.GetUserCreditDetail(id);
+                var credhist = await _userDAL.GetUserCreditPaymentHistory(id);
+                creddet.PaymentHistory = credhist.ToList();
+
+                result.body = creddet;
             }
             catch (Exception ex)
             {
