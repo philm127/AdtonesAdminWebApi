@@ -8,6 +8,7 @@ using System;
 using Dapper;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.DAL.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -17,15 +18,18 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly ILogonService _logonService;
         private readonly IUserManagementDAL _userDAL;
         private readonly IConnectionStringService _connService;
+        IHttpContextAccessor _httpAccessor;
         ReturnResult result = new ReturnResult();
 
         
-        public UserManagementService(IConfiguration configuration, ILogonService logonService, IUserManagementDAL userDAL, IConnectionStringService connService)
+        public UserManagementService(IConfiguration configuration, ILogonService logonService, IUserManagementDAL userDAL, 
+            IConnectionStringService connService, IHttpContextAccessor httpAccessor)
         {
             _configuration = configuration;
             _logonService = logonService;
             _userDAL = userDAL;
             _connService = connService;
+            _httpAccessor = httpAccessor;
         }
 
 
@@ -315,7 +319,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 if (mainUserId > 0)
                 {
                     model.AdtoneServerUserId = mainUserId;
-                    opUserId = await _userDAL.AddNewUserToOperator(model);
+                    
 
                     var command1 = new Contacts();
                     int currencyId = 0;
@@ -345,18 +349,22 @@ namespace AdtonesAdminWebApi.BusinessServices
                     var contId = await AddContactInformation(command1);
                     if (contId == 0)
                     {
+                        await _userDAL.DeleteNewUser(mainUserId);
                         result.result = 0;
                         result.error = "Contact was not added";
                         return result;
                     }
                     else if( contId == -1)
                     {
+                        await _userDAL.DeleteNewUser(mainUserId);
                         result.result = 0;
                         result.error = "A contact with this mobile phone already exists";
                         return result;
                     }
                     else
                     {
+                        // Only run if successfully added new user to contacts
+                        opUserId = await _userDAL.AddNewUserToOperator(model);
                         command1.AdtoneServerContactId = contId;
                         command1.UserId = opUserId;
                         var xx = await _userDAL.AddNewContactToOperator(command1);
@@ -367,6 +375,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                         var confSettings = new string[] { "OperatorAdminRegistrationEmailTemplete", "OperatorAdminUrl" };
                         // SendEmailVerificationCode(model.FirstName, model.LastName, model.Email, model.PasswordHash, confSettings);
                         result.body = "Operator Admin registered for Operator " + model.FirstName + " " + model.LastName;
+                        var ytr = _httpAccessor.GetRoleIdFromJWT();
+                        if (ytr == (int)Enums.UserRole.SalesManager)
+                        {
+                            var tst = _httpAccessor.GetUserIdFromJWT();
+                            var x = await _userDAL.InsertManagerToSalesExec(tst, mainUserId);
+                        }
                     }
                     
                 }

@@ -74,5 +74,11 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         public static string UpdateUserPermissions => @"Update Users SET Permissions=@perm WHERE UserId=@userId";
+
+
+        public static string DeleteAddedUser => @"DELETE FROM Users WHERE UserId=@Id";
+
+        public static string InsertManagerToSalesExec => @"INSERT INTO SalesManager_SalesExec(ManId,ExecId,Active,CreatedDate,UpdatedDate)
+                                                            VALUES(@manId,@execId,1,GETDATE(),GETDATE());";
     }
 }

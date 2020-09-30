@@ -47,7 +47,10 @@ namespace AdtonesAdminWebApi.ViewModels
         public string CountryName { get; set; }
 
         public int TicketCount { get; set; }
-        
+
+        public string SalesExec { get; set; }
+        public int SUserId { get; set; }
+
     }
 
 

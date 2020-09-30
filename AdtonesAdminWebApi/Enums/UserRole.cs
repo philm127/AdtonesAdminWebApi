@@ -13,6 +13,8 @@ namespace AdtonesAdminWebApi.Enums
         UserAdmin = 4,
         AdvertAdmin = 5,
         OperatorAdmin = 6,
-        ProfileAdmin = 7
+        ProfileAdmin = 7,
+        SalesManager = 8,
+        SalesExec = 9
     }
 }

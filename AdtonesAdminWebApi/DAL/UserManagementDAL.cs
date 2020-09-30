@@ -383,6 +383,43 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        /// <summary>
+        /// If Contact form is not added for instance duplicate mobile number will also remove entry
+        /// in main table. Insert into Operator table is done after so don't need to concern with that
+        /// table
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteNewUser(int userId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(UserManagementQuery.DeleteAddedUser);
+            builder.AddParameters(new { Id = userId });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> InsertManagerToSalesExec(int manId, int execId)
+        {
+            try
+            {
+                    return await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<int>(UserManagementQuery.InsertManagerToSalesExec, new { manId = manId, execId = execId }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
 
     }
 }

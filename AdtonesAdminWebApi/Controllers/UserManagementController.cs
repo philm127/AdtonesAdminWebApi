@@ -17,13 +17,15 @@ namespace AdtonesAdminWebApi.Controllers
         private readonly IUserManagementService _userService;
         private readonly IPromotionalCampaignService _promotionalService;
         private readonly IUserDashboardService _dashboardService;
+        private readonly ISalesManagementService _salesService;
 
         public UserManagementController(IUserManagementService userService,IPromotionalCampaignService promotionalService,
-                                            IUserDashboardService dashboardService)
+                                            IUserDashboardService dashboardService, ISalesManagementService salesService)
         {
             _userService = userService;
             _promotionalService = promotionalService;
             _dashboardService = dashboardService;
+            _salesService = salesService;
         }
 
 
@@ -164,7 +166,35 @@ namespace AdtonesAdminWebApi.Controllers
             return await _userService.UpdateUserPermission(some);
         }
 
+        #region Sales Management
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="users"></param>
+        /// <returns>body contains IEnumerable<AllocationList></returns>
+        [HttpGet("v1/GetAllocatedUnallocated/{id}")]
+        public async Task<ReturnResult> GetAllocatedUnallocated(int id)
+        {
+            return await _salesService.GetAllocatedAdvertisers(id);
+        }
+
+
+        [HttpGet("v1/GetSalesExecDDList")]
+        public async Task<ReturnResult> GetSalesExecDDList()
+        {
+            return await _salesService.GetDDSalesExec();
+        }
+
+
+        [HttpPut("v1/UpdateAllocationInfo")]
+        public async Task<ReturnResult> UpdateAllocationInfo(SalesAdAllocationModel model)
+        {
+            return await _salesService.UpdateSalesExecAllocation(model);
+        }
+
+
+        #endregion
     }
 }
 

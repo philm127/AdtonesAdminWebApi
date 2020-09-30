@@ -10,6 +10,7 @@ using AdtonesAdminWebApi.Enums;
 using AdtonesAdminWebApi.DAL.Queries;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using AdtonesAdminWebApi.Services;
 
 namespace AdtonesAdminWebApi.DAL
 {
@@ -33,7 +34,15 @@ namespace AdtonesAdminWebApi.DAL
             }
             else
             {
-                sb.Append(UserDashboardQuery.AdvertiserResultQuery);
+                var ytr = _httpAccessor.GetRoleIdFromJWT();
+                if (ytr == (int)Enums.UserRole.SalesManager)
+                {
+                    sb.Append(UserDashboardQuery.SalesManagerAdvertiserResultQuery);
+                }
+                else
+                {
+                    sb.Append(UserDashboardQuery.AdvertiserResultQuery);
+                }
                 sb.Append(" WHERE 1=1 ");
                 var values = CheckGeneralFile(sb, builder, pais: "cont", ops: "op", advs: "item");
                 sb = values.Item1;
@@ -41,7 +50,6 @@ namespace AdtonesAdminWebApi.DAL
             }
 
             var select = builder.AddTemplate(sb.ToString());
-
 
             try
             {

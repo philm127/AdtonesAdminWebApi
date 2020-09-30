@@ -51,9 +51,9 @@ namespace AdtonesAdminWebApi
             // Business Services
             services.AddScoped<ISharedSelectListsService, SharedSelectListsService>();
             services.AddScoped<IUserManagementService, UserManagementService>();
-            services.AddScoped<IAdvertiserCreditService, AdvertiserCreditService>();
+            // services.AddScoped<IAdvertiserCreditService, AdvertiserCreditService>();
             services.AddScoped<IPromotionalCampaignService, PromotionalCampaignService>();
-            services.AddScoped<IAreaService, AreaService>();
+            services.AddScoped<ISalesManagementService, SalesManagementService>();
             services.AddScoped<IProfileMatchInfoService, ProfileMatchInfoService>();
             services.AddScoped<ICountryAreaService, CountryAreaService>();
             services.AddScoped<IFinanceTablesService, FinanceTablesService>();
@@ -91,7 +91,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ISoapDAL, SoapDAL>();
             services.AddScoped<ICampaignAuditDAL, CampaignAuditDAL>();
             services.AddScoped<ICurrencyDAL, CurrencyDAL>();
-            services.AddScoped<IAdvertiserCreditDAL, AdvertiserCreditDAL>();
+            // services.AddScoped<IAdvertiserCreditDAL, AdvertiserCreditDAL>();
             services.AddScoped<IAdvertiserFinancialDAL, AdvertiserFinancialDAL>();
             services.AddScoped<IPermissionManagementDAL, PermissionManagementDAL>();
             services.AddScoped<IManagementReportDAL, ManagementReportDAL>();
@@ -99,6 +99,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IRewardDAL, RewardDAL>();
             services.AddScoped<IProfileMatchInfoDAL,ProfileMatchInfoDAL>();
             services.AddScoped<IOperatorDAL, OperatorDAL>();
+            services.AddScoped<ISalesManagementDAL, SalesManagementDAL>();
 
             #endregion
 

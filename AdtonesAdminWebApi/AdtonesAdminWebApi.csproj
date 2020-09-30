@@ -65,12 +65,14 @@
 
   <ItemGroup>
     <Compile Include="DAL\Interfaces\IOperatorDAL.cs" />
+    <Compile Include="DAL\Interfaces\ISalesManagementDAL.cs" />
     <Compile Include="DAL\OperatorDAL.cs" />
     <Compile Include="DAL\Interfaces\IProfileMatchInfoDAL.cs" />
     <Compile Include="DAL\ProfileMatchInfoDAL.cs" />
     <Compile Include="DAL\Interfaces\IRewardDAL.cs" />
     <Compile Include="DAL\Queries\OperatorQuery.cs" />
     <Compile Include="DAL\Queries\ProfileMatchInfoQuery.cs" />
+    <Compile Include="DAL\Queries\SalesManagementQuery.cs" />
     <Compile Include="DAL\RewardDAL.cs" />
     <Compile Include="DAL\BaseDAL.cs" />
     <Compile Include="DAL\AdvertiserFinancialDAL.cs" />
@@ -97,6 +99,7 @@
     <Compile Include="DAL\Queries\CampaignAuditQuery.cs" />
     <Compile Include="DAL\Queries\CurrencyQuery.cs" />
     <Compile Include="DAL\Queries\SoapQuery.cs" />
+    <Compile Include="DAL\SalesManagementDAL.cs" />
     <Compile Include="DAL\SoapDAL.cs" />
     <Compile Include="DAL\Interfaces\ISoapDAL.cs" />
     <Compile Include="DAL\Interfaces\ILoginDAL.cs" />

@@ -53,7 +53,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         // Operators version of Advertisers table. INNER JOINS on Advert for only their adverts, adds mobileNumber and does not select Role.
         public static string OperatorAdvertiserResultQuery => @"SELECT item.UserId,item.RoleId,item.Email,item.FirstName,item.LastName,
-                                                          ISNULL(camp.NoOfactivecampaign, 0) AS NoOfactivecampaign,con.MobileNumber,
+                                                          ISNULL(camp.NoOfactivecampaign, 0) AS NoOfactivecampaign,cont.MobileNumber,
                                                            ISNULL(ad.NoOfunapprovedadverts, 0) AS NoOfunapprovedadverts,
                                                            ISNULL(cred.AssignCredit, 0) AS creditlimit,ISNULL(billit.outStandingInvoice, 0) AS outStandingInvoice,
                                                            item.Activated,item.DateCreated,ISNULL(tkt.TicketCount, 0) AS TicketCount
@@ -90,7 +90,53 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                 WHERE (ISNULL(bill3.totalAmount, 0) - ISNULL(uc.paidAmount, 0)) > 0
                                                                 GROUP BY bill3.UserId) billit
                                                             ON item.UserId = billit.UserId
-                                                            LEFT JOIN Contacts AS con ON con.UserId=item.UserId;";
+                                                            LEFT JOIN Contacts AS con ON cont.UserId=item.UserId;";
+
+
+        public static string SalesManagerAdvertiserResultQuery => @"SELECT item.UserId,item.RoleId,item.Email,item.FirstName,item.LastName,
+                                                          ISNULL(camp.NoOfactivecampaign, 0) AS NoOfactivecampaign,cont.MobileNumber,
+                                                           ISNULL(ad.NoOfunapprovedadverts, 0) AS NoOfunapprovedadverts,
+                                                           ISNULL(sales.SalesExec, 'UnAllocated') AS SalesExec,sales.UserId AS SUserId,
+                                                           ISNULL(cred.AssignCredit, 0) AS creditlimit,ISNULL(billit.outStandingInvoice, 0) AS outStandingInvoice,
+                                                           item.Activated,item.DateCreated,ISNULL(tkt.TicketCount, 0) AS TicketCount
+                                                           FROM
+                                                                (SELECT item.UserId, item.RoleId, item.Email, item.DateCreated, item.Activated,
+                                                                item.FirstName,item.LastName
+                                                                FROM Users AS item Where item.VerificationStatus = 1 AND item.RoleId = 3) item
+                                                            LEFT JOIN
+                                                                (SELECT CONCAT(u.FirstName,' ',u.LastName) AS SalesExec,u.UserId,sales.AdvertiserId 
+                                                                    FROM Users AS u INNER JOIN Advertisers_SalesTeam AS sales ON sales.SalesExecId=u.UserId
+                                                                    WHERE IsActive=1) AS sales
+                                                            ON sales.AdvertiserId=item.UserId
+                                                            LEFT JOIN
+                                                                (SELECT a.[UserId], b.[AssignCredit], a.[Id] 
+                                                                    FROM
+                                                                        (SELECT[UserId], MIN(Id) AS Id FROM UsersCredit GROUP BY[UserId]) a
+                                                            INNER JOIN UsersCredit b ON a.[UserId] = b.[UserId] AND a.Id = b.Id) cred
+                                                            ON item.UserId = cred.UserId
+                                                            LEFT JOIN
+                                                                (SELECT COUNT(UserId)as TicketCount, UserId FROM Question WHERE Status IN (1, 2) GROUP BY UserId) tkt
+                                                            ON item.UserId = tkt.UserId
+                                                            LEFT JOIN
+                                                                (SELECT COUNT(CampaignProfileId) AS NoOfactivecampaign,UserId FROM Campaignprofile 
+                                                                    WHERE Status IN (4, 3, 2, 1) GROUP BY UserId) camp
+                                                            ON item.UserId = camp.UserId
+                                                            LEFT JOIN
+                                                                (SELECT COUNT(AdvertId) AS NoOfunapprovedadverts,UserId,OperatorId FROM Advert WHERE Status = 4 GROUP BY UserId,OperatorId) ad
+                                                            ON item.UserId = ad.UserId
+                                                            LEFT JOIN
+                                                                (SELECT COUNT(bill3.UserId) AS outStandingInvoice,bill3.UserId
+                                                                FROM
+                                                                    (SELECT SUM(FundAmount) AS totalAmount, CampaignProfileId, UserId
+                                                                    FROM Billing WHERE PaymentMethodId = 1 GROUP BY CampaignProfileId, UserId) bill3
+                                                                LEFT JOIN
+                                                                    (SELECT sum(Amount) AS paidAmount, UserId, CampaignProfileId
+                                                                    FROM UsersCreditPayment GROUP BY CampaignProfileId, UserId) uc
+                                                                ON bill3.UserId = uc.UserId AND bill3.CampaignProfileId = uc.CampaignProfileId
+                                                                WHERE (ISNULL(bill3.totalAmount, 0) - ISNULL(uc.paidAmount, 0)) > 0
+                                                                GROUP BY bill3.UserId) billit
+                                                            ON item.UserId = billit.UserId
+                                                            LEFT JOIN Contacts AS cont ON cont.UserId=item.UserId ";
 
 
 
@@ -106,7 +152,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 c.Name AS CountryName,u.Activated,u.DateCreated, RoleId,MobileNumber
                                                 FROM Users AS u LEFT JOIN Contacts AS o ON u.UserId=o.UserId
                                                 LEFT JOIN Country AS c ON o.CountryId=c.Id
-                                                WHERE RoleId IN(1,4,5,7) ORDER BY u.DateCreated DESC";
+                                                WHERE RoleId IN(1,4,5,7,8) ORDER BY u.DateCreated DESC";
 
 
 

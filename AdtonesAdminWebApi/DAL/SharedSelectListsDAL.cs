@@ -67,12 +67,32 @@ namespace AdtonesAdminWebApi.DAL.Shared
 
         public async Task<IEnumerable<object>> GetUserPermissionsWRoles()
         {
+            var sb = new StringBuilder();
+            sb.Append(SharedListQuery.GetUserPermissionwRole);
+
+            var ytr = _httpAccessor.GetRoleIdFromJWT();
+
             try
             {
-                using (var connection = new SqlConnection(_connStr))
+                if (ytr == (int)Enums.UserRole.SalesManager)
                 {
-                    connection.Open();
-                    return await connection.QueryAsync<object>(SharedListQuery.GetUserPermissionwRole);
+                    var roleId = (int)Enums.UserRole.SalesExec;
+                    sb.Append(" AND RoleId=@roleId");
+
+                    using (var connection = new SqlConnection(_connStr))
+                    {
+                        connection.Open();
+                        return await connection.QueryAsync<object>(sb.ToString(), new { roleId = roleId });
+                    }
+                }
+                else
+                {
+                    sb.Append(" ORDER BY RoleId, LastName ");
+                    using (var connection = new SqlConnection(_connStr))
+                    {
+                        connection.Open();
+                        return await connection.QueryAsync<object>(sb.ToString());
+                    }
                 }
             }
             catch
