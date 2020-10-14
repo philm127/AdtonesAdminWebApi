@@ -14,5 +14,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> GetDashboardSummariesByOperator(int operatorId);
         Task<ReturnResult> GetPromoCampaignDashboardSummary(int campaignId);
         Task<ReturnResult> GetPromoPlayDetails(PagingSearchClass paging);
+        Task<ReturnResult> GetDashboardSummaryForSalesManager();
+        Task<ReturnResult> GetDashboardSummaryForSalesExec(int userId);
     }
 }

@@ -12,5 +12,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<IEnumerable<OperatorDashboardResult>> GetOperatorDashboard();
         Task<IEnumerable<SubscriberDashboardResult>> GetSubscriberDashboard();
         Task<IEnumerable<AdminDashboardResult>> GetAdminDashboard();
+        Task<IEnumerable<AdvertiserDashboardResult>> GetSalesExecDashboard();
+        Task<IEnumerable<AdvertiserDashboardResult>> GetAdvertiserDashboardForSales(int userId = 0);
     }
 }

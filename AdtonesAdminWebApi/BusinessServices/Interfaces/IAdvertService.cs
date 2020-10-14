@@ -6,6 +6,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     public interface IAdvertService
     {
         Task<ReturnResult> LoadAdvertCategoryDataTable();
+        Task<ReturnResult> LoadAdvertDataTableForSales(int id = 0);
         Task<ReturnResult> GetAdvertCategoryDetails(int id);
         Task<ReturnResult> DeleteAdvertCategory(IdCollectionViewModel model);
         Task<ReturnResult> AddAdvertCategory(AdvertCategoryResult model);

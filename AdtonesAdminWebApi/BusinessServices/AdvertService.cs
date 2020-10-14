@@ -76,6 +76,29 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> LoadAdvertDataTableForSales(int id = 0)
+        {
+            try
+            {
+                result.body = await _advertDAL.GetAdvertForSalesResultSet(id);
+
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "LoadAdvertDataTableForSales"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
         /// <summary>
         /// Gets a single Advert as Result list when clicked through from Campaign Page.
         /// </summary>

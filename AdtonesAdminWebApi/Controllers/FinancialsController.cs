@@ -38,6 +38,27 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        [HttpGet("v1/GetInvoicListForSales/{id}")]
+        public async Task<ReturnResult> GetInvoicListForSales(int id=0)
+        {
+            return await _invoiceService.LoadInvoiceDataTableForSales(id);
+        }
+
+
+        [HttpGet("v1/GetOutstandingInvoicListForSales/{id}")]
+        public async Task<ReturnResult> GetOutstandingInvoicListForSales(int id = 0)
+        {
+            return await _invoiceService.LoadOutstandingInvoiceForSalesDataTable(id);
+        }
+
+
+        [HttpGet("v1/GetAdvertiserCreditListForSales/{id}")]
+        public async Task<ReturnResult> GetAdvertiserCreditListForSales(int id = 0)
+        {
+            return await _invoiceService.LoadUserCreditDataTableForSales(id);
+        }
+
+
         /// <summary>
         /// 
         /// </summary>

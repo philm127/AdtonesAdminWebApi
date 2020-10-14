@@ -114,5 +114,60 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
+
+        #region SalesTeam
+
+        public async Task<IEnumerable<AdvertiserDashboardResult>> GetSalesExecDashboard()
+        {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(UserDashboardQuery.SalesExecResultQuery);
+
+            var ytr = _httpAccessor.GetRoleIdFromJWT();
+            if (ytr == (int)Enums.UserRole.SalesManager)
+            {
+                sb.Append(" WHERE adsales.SalesManId=@ManId");
+                builder.AddParameters(new { ManId = _httpAccessor.GetUserIdFromJWT() });
+            }
+            sb.Append(" GROUP BY adsales.SalesExecId,u.Email, u.DateCreated, u.Activated,u.FirstName, u.LastName ");
+            var select = builder.AddTemplate(sb.ToString());
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.Query<AdvertiserDashboardResult>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<AdvertiserDashboardResult>> GetAdvertiserDashboardForSales(int userId = 0)
+        {
+            var sb = new StringBuilder(UserDashboardQuery.SalesManagerAdvertiserResultQuery);
+            var builder = new SqlBuilder();
+            if (userId > 0)
+            {
+                sb.Append(" WHERE sales.UserId=@Sid ");
+                builder.AddParameters(new { Sid = userId });
+            }
+            var values = CheckGeneralFile(sb, builder, pais: "cont");
+
+            sb = values.Item1;
+            builder = values.Item2;
+            sb.Append(" ORDER BY item.UserId DESC;");
+
+            var select = builder.AddTemplate(sb.ToString());
+
+            return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.Query<AdvertiserDashboardResult>(select.RawSql, select.Parameters));
+        }
+
+
+
+        #endregion
+
     }
 }

@@ -48,6 +48,33 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<IEnumerable<InvoiceResult>> LoadInvoiceResultSetForSales(int id=0)
+        {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(FinancialTablesQuery.GetInvoiceForSalesResultSet);
+            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
+            if (id == 0)
+            {
+                var values = CheckGeneralFile(sb, builder, pais: "camp");
+                sb = values.Item1;
+                builder = values.Item2;
+            }
+            else
+            {
+                sb.Append(" WHERE sales.IsActive=1 ");
+                sb.Append(" AND sales.SalesExecId=@Sid ");
+                builder.AddParameters(new { Sid = id });
+            }
+            sb.Append(" ORDER BY bil.Id DESC;");
+            var select = builder.AddTemplate(sb.ToString());
+
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.Query<InvoiceResult>(select.RawSql, select.Parameters));
+        }
+
+
         public async Task<IEnumerable<OutstandingInvoiceResult>> LoadOutstandingInvoiceResultSet()
         {
             var sb = new StringBuilder();
@@ -69,6 +96,31 @@ namespace AdtonesAdminWebApi.DAL
             {
                 throw;
             }
+        }
+
+
+        public async Task<IEnumerable<OutstandingInvoiceResult>> LoadOutstandingInvoiceForSalesResultSet(int id = 0)
+        {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(FinancialTablesQuery.GetOutstandingInvoiceForSalesResultSet);
+            if (id == 0)
+            {
+                var values = CheckGeneralFile(sb, builder, pais: "cp");
+                sb = values.Item1;
+                builder = values.Item2;
+            }
+            else
+            {
+                sb.Append(" AND sales.IsActive=1 ");
+                sb.Append(" AND sales.SalesExecId=@Sid ");
+                builder.AddParameters(new { Sid = id });
+            }
+            sb.Append(" ORDER BY bil.Id DESC;");
+            var select = builder.AddTemplate(sb.ToString());
+
+            return await _executers.ExecuteCommand(_connStr,
+                            conn => conn.Query<OutstandingInvoiceResult>(select.RawSql, select.Parameters));
         }
 
 
@@ -110,6 +162,40 @@ namespace AdtonesAdminWebApi.DAL
             var values = CheckGeneralFile(sb, builder, pais: "ad");
             sb = values.Item1;
             builder = values.Item2;
+            sb.Append(" ORDER BY u.Id DESC;");
+            var select = builder.AddTemplate(sb.ToString());
+
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.Query<AdvertiserCreditResult>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<AdvertiserCreditResult>> LoadUserCreditForSalesResultSet(int id = 0)
+        {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(FinancialTablesQuery.LoadUserCreditForSalesDataTable);
+            if (id == 0)
+            {
+                sb.Append(" WHERE 1=1 ");
+                var values = CheckGeneralFile(sb, builder, pais: "ad");
+                sb = values.Item1;
+                builder = values.Item2;
+            }
+            else
+            {
+                sb.Append(" WHERE sales.IsActive=1 ");
+                sb.Append(" AND sales.SalesExecId=@Sid ");
+                builder.AddParameters(new { Sid = id });
+            }
             sb.Append(" ORDER BY u.Id DESC;");
             var select = builder.AddTemplate(sb.ToString());
 

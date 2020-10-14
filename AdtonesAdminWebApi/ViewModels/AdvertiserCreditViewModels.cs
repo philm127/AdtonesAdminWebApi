@@ -102,6 +102,8 @@ namespace AdtonesAdminWebApi.ViewModels
         public DateTime? CreatedDate { get; set; }
         public string CountryName { get; set; }
         public string CurrencyCode { get; set; }
+        public string SalesExec { get; set; }
+        public int SUserId { get; set; }
     }
 
 
@@ -124,6 +126,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int CreditPeriod { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? AdtoneServerCampaignCreditPeriodId { get; set; }
+        public string SalesExec { get; set; }
     }
 
 

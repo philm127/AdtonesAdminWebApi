@@ -98,6 +98,29 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> GetTicketListSales(int id = 0)
+        {
+            try
+            {
+                result.body = await _ticketDAL.GetTicketListForSales(id);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "TicketService",
+                    ProcedureName = "GetTicketListSales"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+
+            return result;
+        }
+
+
         public async Task<ReturnResult> GetTicketDetails(int id = 0)
         {
             

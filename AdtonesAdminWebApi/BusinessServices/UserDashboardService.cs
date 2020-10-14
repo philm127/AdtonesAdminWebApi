@@ -60,31 +60,30 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        //public async Task<ReturnResult> LoadOperatorAdvertiserDataTable(int operatorId = 0)
-        //{
-        //    if (operatorId == 0)
-        //    {
-        //        operatorId = _httpAccessor.GetOperatorFromJWT();
-        //    }
-
-        //    try
-        //    {
-        //        result.body = await _dashboardDal.GetAdvertiserDashboard(operatorId);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var _logging = new ErrorLogging()
-        //        {
-        //            ErrorMessage = ex.Message.ToString(),
-        //            StackTrace = ex.StackTrace.ToString(),
-        //            PageName = "UserDashboardService",
-        //            ProcedureName = "LoadAdvertiserDataTable"
-        //        };
-        //        _logging.LogError();
-        //        result.result = 0;
-        //    }
-        //    return result;
-        //}
+        /// <summary>
+        /// Present sales Exec data list for Sales Manager principally
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ReturnResult> LoadSalesExecDataTable()
+        {
+            try
+            {
+                result.body = await _dashboardDal.GetSalesExecDashboard();
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "UserDashboardService",
+                    ProcedureName = "LoadSalesExecDataTable"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
 
 
         public async Task<ReturnResult> LoadOperatorDataTable()
@@ -123,6 +122,28 @@ namespace AdtonesAdminWebApi.BusinessServices
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "UserDashboardService",
                     ProcedureName = "LoadAdminDataTable"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> LoadAdvertisersForSales(int userId)
+        {
+            try
+            {
+                result.body = await _dashboardDal.GetAdvertiserDashboardForSales(userId);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "UserDashboardService",
+                    ProcedureName = "LoadAdvertisersForSales"
                 };
                 _logging.LogError();
                 result.result = 0;

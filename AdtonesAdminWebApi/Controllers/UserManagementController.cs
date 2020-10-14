@@ -194,6 +194,20 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        [HttpGet("v1/GetSalesExecDataList")]
+        public async Task<ReturnResult> GetSalesExecDataList()
+        {
+            return await _dashboardService.LoadSalesExecDataTable();
+        }
+
+
+        [HttpGet("v1/GetAdvertiserDataListForSales/{id}")]
+        public async Task<ReturnResult> GetAdvertiserDataListForSales(int id)
+        {
+            return await _dashboardService.LoadAdvertisersForSales(id);
+        }
+
+
         #endregion
     }
 }

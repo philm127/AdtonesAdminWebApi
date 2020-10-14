@@ -10,6 +10,8 @@ namespace AdtonesAdminWebApi.ViewModels
         public int UserId { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
+        public string SalesExec { get; set; }
+        public int sUserId { get; set; }
         public int? ClientId { get; set; }
         public string ClientName { get; set; }
         public int AdvertId { get; set; }

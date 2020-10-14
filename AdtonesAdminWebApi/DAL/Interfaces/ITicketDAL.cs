@@ -11,6 +11,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     public interface ITicketDAL
     {
         Task<IEnumerable<TicketListModel>> GetTicketList(int id);
+        Task<IEnumerable<TicketListModel>> GetTicketListForSales(int id = 0);
         Task<TicketListModel> GetTicketDetails(int id = 0);
         Task<int> UpdateTicketStatus(TicketListModel model);
         Task<IEnumerable<TicketListModel>> GetOperatorTicketList(int operatorId);

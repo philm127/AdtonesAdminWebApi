@@ -51,6 +51,28 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> LoadInvoiceDataTableForSales(int id = 0)
+        {
+            try
+            {
+                result.body = await _invDAL.LoadInvoiceResultSetForSales(id);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "FinancialTableService",
+                    ProcedureName = "LoadInvoiceDataTableForSales"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
         public async Task<ReturnResult> LoadOutstandingInvoiceDataTable()
         {
             try
@@ -64,7 +86,29 @@ namespace AdtonesAdminWebApi.BusinessServices
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "FinancialTableService",
-                    ProcedureName = "LoadData"
+                    ProcedureName = "LoadOutstandingInvoiceResultSet"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> LoadOutstandingInvoiceForSalesDataTable(int id = 0)
+        {
+            try
+            {
+                result.body = await _invDAL.LoadOutstandingInvoiceForSalesResultSet(id);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "FinancialTableService",
+                    ProcedureName = "LoadOutstandingInvoiceForSalesDataTable"
                 };
                 _logging.LogError();
                 result.result = 0;
@@ -90,7 +134,29 @@ namespace AdtonesAdminWebApi.BusinessServices
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "FinanceTablesService",
-                    ProcedureName = "GetUserResult"
+                    ProcedureName = "LoadUserCreditDataTable"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> LoadUserCreditDataTableForSales(int id = 0)
+        {
+            try
+            {
+                result.body = await _invDAL.LoadUserCreditForSalesResultSet(id);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "FinanceTablesService",
+                    ProcedureName = "LoadUserCreditDataTableForSales"
                 };
                 _logging.LogError();
                 result.result = 0;

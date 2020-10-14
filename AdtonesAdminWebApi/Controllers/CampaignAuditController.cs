@@ -134,5 +134,27 @@ namespace AdtonesAdminWebApi.Controllers
             return await _auditService.GetPromoPlayDetails(paging);
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("v1/GetCampDashboardSummarySalesManager")]
+        public async Task<ReturnResult> GetCampDashboardSummarySalesManager()
+        {
+            return await _auditService.GetDashboardSummaryForSalesManager();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("v1/GetCampDashboardSummarySalesExec/{id}")]
+        public async Task<ReturnResult> GetCampDashboardSummarySalesExec(int id = 0)
+        {
+            return await _auditService.GetDashboardSummaryForSalesExec(id);
+        }
+
     }
 }

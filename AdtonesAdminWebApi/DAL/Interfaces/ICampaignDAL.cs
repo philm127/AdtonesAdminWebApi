@@ -18,6 +18,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<CampaignAdverts> GetCampaignAdvertDetailsByAdvertId(int Id);
         Task<bool> CheckCampaignBillingExists(int campaignId);
         Task<int> UpdateCampaignMatch(CampaignProfile model);
+        Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetBySalesExec(int id = 0);
 
     }
 }

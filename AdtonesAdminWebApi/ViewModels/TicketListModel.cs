@@ -49,6 +49,9 @@ namespace AdtonesAdminWebApi.ViewModels
         public string UpdatedName { get; set; }
 
         public IEnumerable<TicketComments> comments { get; set; }
+
+        public string SalesExec { get; set; }
+        public int SUserId { get; set; }
     }
 
     public class TicketComments

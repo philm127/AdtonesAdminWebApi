@@ -50,6 +50,7 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public string SalesExec { get; set; }
         public int SUserId { get; set; }
+        public int NoAdvertisers { get; set; }
 
     }
 

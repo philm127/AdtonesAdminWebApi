@@ -53,6 +53,40 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<IEnumerable<UserAdvertResult>> GetAdvertForSalesResultSet(int id = 0)
+        {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(AdvertQuery.GetAdvertSalesExecResultSet);
+
+            if (id > 0)
+            {
+                sb.Append(" WHERE sales.IsActive=1 ");
+                sb.Append(" AND sales.SalesExecId=@Sid ");
+                builder.AddParameters(new { Sid = id });
+            }
+            var values = CheckGeneralFile(sb, builder, pais: "ad", ops: "ad", advs: "ad");
+            sb = values.Item1;
+            builder = values.Item2;
+
+            sb.Append(" ORDER BY ad.CreatedDateTime DESC, ad.Status DESC;");
+
+            var select = builder.AddTemplate(sb.ToString());
+            try
+            {
+                builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.Query<UserAdvertResult>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+
         /// <summary>
         /// Gets a single Advert as Result list when clicked through from Campaign Page.
         /// </summary>

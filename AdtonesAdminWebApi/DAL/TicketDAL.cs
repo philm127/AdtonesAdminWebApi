@@ -89,6 +89,39 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<IEnumerable<TicketListModel>> GetTicketListForSales(int id=0)
+        {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(TicketQuery.GetTicketDatatableForSales);
+            if (id == 0)
+            {
+                var values = CheckGeneralFile(sb, builder, pais: "camp", ops: "op");
+                sb = values.Item1;
+                builder = values.Item2;
+            }
+            else
+            {
+                sb.Append(" WHERE sales.IsActive=1 ");
+                sb.Append(" AND sales.SalesExecId=@Sid ");
+                builder.AddParameters(new { Sid = id });
+                
+            }
+            sb.Append(" ORDER BY q.Id DESC;");
+            var select = builder.AddTemplate(sb.ToString());
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.Query<TicketListModel>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<IEnumerable<TicketListModel>> GetOperatorTicketList(int operatorId)
         {
             var builder = new SqlBuilder();

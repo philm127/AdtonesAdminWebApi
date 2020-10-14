@@ -39,6 +39,13 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        [HttpGet("v1/GetAdvertListForSales/{id}")]
+        public async Task<ReturnResult> GetAdvertListForSales(int id = 0)
+        {
+            return await _advertService.LoadAdvertDataTableForSales(id);
+        }
+
+
         /// <summary>
         /// The optional id refers to the selection made from advertisers screen
         /// so later will use status to only return unapproved.
@@ -143,6 +150,17 @@ namespace AdtonesAdminWebApi.Controllers
         public async Task<ReturnResult> GetCampaignDataTable(int id=0)
         {
             return await _campService.LoadCampaignDataTable(id);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List CampaignAdminResult</returns>
+        [HttpGet("v1/GetCampaignDataTableForSalesExec/{id}")]
+        public async Task<ReturnResult> GetCampaignDataTableForSalesExec(int id = 0)
+        {
+            return await _campService.LoadCampaignDataTableSalesExec(id);
         }
 
 

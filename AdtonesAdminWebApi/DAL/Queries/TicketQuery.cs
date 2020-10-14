@@ -21,6 +21,25 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 LEFT JOIN PaymentMethod AS pay ON pay.Id=q.PaymentMethodId";
 
 
+        public static string GetTicketDatatableForSales => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,ISNULL(pay.Name,'-') AS PaymentMethod,
+                                                    ISNULL(CONCAT(u.FirstName,' ',u.LastName), '-') AS UserName,qs.Name AS QuestionSubject,
+                                                    ISNULL(u.Email, '-') AS Email,ISNULL(QNumber,'-') AS QNumber,
+                                                    CASE WHEN sexcs.FirstName IS NULL THEN 'UnAllocated' 
+                                                                    ELSE CONCAT(sexcs.FirstName,' ',sexcs.LastName) END AS SalesExec,
+                                                    sexcs.UserId AS SUserId,
+                                                    ISNULL(cl.Name,'-') AS ClientName,q.CampaignProfileId,camp.CampaignName,q.CreatedDate,
+                                                    Title AS QuestionTitle,q.Status,LastResponseDateTime,LastResponseDateTimeByUser,
+                                                    ISNULL(u.Organisation,'-') AS Organisation
+                                                FROM Question AS q LEFT JOIN Users AS u ON u.UserId=q.UserId
+                                                LEFT JOIN Client AS cl ON cl.Id=q.ClientId
+                                                LEFT JOIN CampaignProfile AS camp ON camp.CampaignProfileId=q.CampaignProfileId
+                                                LEFT JOIN QuestionSubject AS qs ON qs.SubjectId=q.SubjectId
+                                                LEFT JOIN Operators AS op ON camp.CountryId=op.CountryId
+                                                LEFT JOIN PaymentMethod AS pay ON pay.Id=q.PaymentMethodId
+                                                LEFT JOIN Advertisers_SalesTeam AS sales ON q.UserId=sales.AdvertiserId 
+                                                LEFT JOIN Users AS sexcs ON sexcs.UserId=sales.SalesExecId ";
+
+
         public static string GetOperatorLoadTicketTable => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,q.ClientId,qs.Name AS QuestionSubject,
                                                     ISNULL(CONCAT(u.FirstName,' ',u.LastName), '-') AS UserName,q.Description,
                                                     ISNULL(u.Email, '-') AS Email,ISNULL(QNumber,'-') AS QNumber,

@@ -42,14 +42,11 @@ namespace AdtonesAdminWebApi.DAL
                 sb.Append(" WHERE 1=1 ");
             }
 
-            var tst = sb.ToString();
             var values = CheckGeneralFile(sb, builder,pais:"camp",ops:"op",advs:"camp");
 
             sb = values.Item1;
             builder = values.Item2;
-            var tst2 = sb.ToString();
             sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
-            var tst3 = sb.ToString();
             var select = builder.AddTemplate(sb.ToString());
             
             try
@@ -63,6 +60,31 @@ namespace AdtonesAdminWebApi.DAL
             {
                 throw;
             }
+        }
+
+
+        public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetBySalesExec(int id = 0)
+        {
+            var sb = new StringBuilder(CampaignQuery.GetCampaignResultSetForSales);
+            var builder = new SqlBuilder();
+            if (id > 0)
+            {
+                sb.Append(" WHERE sales.IsActive=1 ");
+                sb.Append(" AND sales.SalesExecId=@Sid ");
+                builder.AddParameters(new { Sid = id });
+            }
+            var values = CheckGeneralFile(sb, builder, pais: "camp", ops: "op", advs: "camp");
+
+            sb = values.Item1;
+            builder = values.Item2;
+            sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
+            
+
+            var select = builder.AddTemplate(sb.ToString());
+            // builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
+
+            return await _executers.ExecuteCommand(_connStr,
+                            conn => conn.Query<CampaignAdminResult>(select.RawSql, select.Parameters));
         }
 
 
@@ -93,7 +115,6 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        
 
         public async Task<CampaignProfile> GetCampaignProfileDetail(int id = 0)
         {

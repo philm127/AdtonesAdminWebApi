@@ -21,6 +21,8 @@ namespace AdtonesAdminWebApi.ViewModels
         public int Status { get; set; }
         public string Description { get; set; }
         public string CurrencyCode { get; set; }
+        public string SalesExec { get; set; }
+        public int SUserId { get; set; }
     }
     
     public class InvoiceResult : InvoiceBase
@@ -39,7 +41,6 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public int UsersCreditPaymentId { get; set; }
         public string InvoicePath { get; set; }
-
     }
 
     public class OutstandingInvoiceResult : InvoiceBase
