@@ -138,7 +138,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 try
                 {
-                    await _mailer.SendEmail(emailModel);
+                    await _mailer.SendBasicEmail(emailModel);
                 }
                 catch (Exception ex)
                 {

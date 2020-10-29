@@ -15,6 +15,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> GetOperatorList(int countryId = 0);
         Task<ReturnResult> GetCurrencyList(int currencyId = 0);
         Task<ReturnResult> GetAddCreditUsersList();
+        Task<ReturnResult> GetOrganisationTypeDropDown();
         Task<ReturnResult> GetUserCreditList();
         Task<ReturnResult> GetUserDetailCreditList();
         Task<ReturnResult> GetUsersnRoles();

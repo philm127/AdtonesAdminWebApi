@@ -120,6 +120,24 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<int> InsertNewAdvertiserToSalesExec(int sp, int ad)
+        {
+            var Id = await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<int>(SalesManagementQuery.GetSalesManagerId, new
+                         {
+                             Id = sp
+                         }));
+            var x = await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<int>(SalesManagementQuery.InsertNewAdToSales, new
+                         {
+                             Sid = sp,
+                             AdId = ad,
+                             ManId = Id
+                         }));
+            return x;
+        }
+
+
         public async Task<int> UpdateUserForSP(int sp, int ad)
         {
             var manId = _httpAccessor.GetUserIdFromJWT();

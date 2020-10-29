@@ -43,4 +43,12 @@ namespace AdtonesAdminWebApi.Services.Mailer
         public string PaymentMethod { get; set; }
         public DateTime? DueDate { get; set; }
     }
+
+    public class SMTPCredentials
+    {
+        public string pwd { get; set; }
+        public string usr { get; set; }
+        public string srv { get; set; }
+        public int port { get; set; }
+    }
 }

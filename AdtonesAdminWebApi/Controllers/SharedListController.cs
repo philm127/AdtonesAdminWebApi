@@ -100,6 +100,13 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        [HttpGet("v1/FillOrganisationTypeDropDown")]
+        public async Task<ReturnResult> FillOrganisationTypeDropDown()
+        {
+            return await _sharedList.GetOrganisationTypeDropDown();
+        }
+
+
         /// <summary>
         /// Gets all the selcted lists required Country, Currency and Users
         /// </summary>

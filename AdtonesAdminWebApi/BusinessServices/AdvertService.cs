@@ -348,10 +348,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 int adId = await _connService.GetAdvertIdFromAdtoneId(adModel.AdvertId, adModel.OperatorId);
                 var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(adModel.AdvertId);
                 var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
-                if (campaignProfile.Status == 8 && adModel.Status == (int)Enums.AdvertStatus.Pending)
-                {
-                    adModel.Status = (int)Enums.AdvertStatus.InsufficientFunds;
-                }
+
                 var updstatus = UpdateStatus(adModel,uid,adId);
 
                 var operatordId = adModel.OperatorId;
@@ -373,7 +370,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                         var campaigndetailsid = await _connService.GetCampaignProfileIdFromAdtoneId(campaignAdvert.CampaignProfileId, adModel.OperatorId);
                         if (campaigndetailsid != 0)
                         {
-                            //Add 08-08-2019
                             string adName = "";
                             if (adModel.MediaFileLocation == null || adModel.MediaFileLocation == "")
                             {

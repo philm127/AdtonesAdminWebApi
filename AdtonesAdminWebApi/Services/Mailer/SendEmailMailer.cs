@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System;
 using Microsoft.AspNetCore.Hosting;
+using AdtonesAdminWebApi.Enums;
 
 namespace AdtonesAdminWebApi.Services.Mailer
 {
@@ -25,7 +26,7 @@ namespace AdtonesAdminWebApi.Services.Mailer
         }
 
 
-        public async Task SendEmail(SendEmailModel mail)
+        public async Task SendBasicEmail(SendEmailModel mail, int operatorId = 0, int roleId = 0)
         {
 
             var message = new MimeMessage();
@@ -70,15 +71,16 @@ namespace AdtonesAdminWebApi.Services.Mailer
 
             message.Body = builder.ToMessageBody();
 
-            var pwd = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPPassword").Value;
-            var usr = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPEmail").Value;
-            var srv = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerAddress").Value;
-            var port = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerPort").Value);
+            var creds = GetCredentials(operatorId, roleId);
+            //var pwd = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPPassword").Value;
+            //var usr = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPEmail").Value;
+            //var srv = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerAddress").Value;
+            //var port = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerPort").Value);
 
             using SmtpClient client = new SmtpClient();
             {
-                client.Connect(srv, port, SecureSocketOptions.StartTls);
-                client.Authenticate(usr, pwd);
+                client.Connect(creds.srv, creds.port, SecureSocketOptions.StartTls);
+                client.Authenticate(creds.usr, creds.pwd); 
                 try
                 {
                     client.Send(message);
@@ -100,6 +102,27 @@ namespace AdtonesAdminWebApi.Services.Mailer
                     client.Disconnect(true);
                 }
             }
+        }
+
+
+        private SMTPCredentials GetCredentials(int operatorId, int roleId)
+        {
+            var creds = new SMTPCredentials();
+            if (operatorId == (int)Enums.OperatorTableId.Safaricom && roleId == 6)
+            {
+                creds.pwd = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSMTPPassword").Value;
+                creds.usr = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSMTPEmail").Value;
+                creds.srv = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSmtpServerAddress").Value;
+                creds.port = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSmtpServerPort").Value);
+            }
+            else
+            {
+                creds.pwd = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPPassword").Value;
+                creds.usr = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPEmail").Value;
+                creds.srv = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerAddress").Value;
+                creds.port = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerPort").Value);
+            }
+            return creds;
         }
     }
 }

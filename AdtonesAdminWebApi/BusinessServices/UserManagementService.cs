@@ -9,6 +9,8 @@ using Dapper;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using Microsoft.AspNetCore.Http;
+using System.IO;
+using AdtonesAdminWebApi.Services.Mailer;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -19,17 +21,21 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IUserManagementDAL _userDAL;
         private readonly IConnectionStringService _connService;
         IHttpContextAccessor _httpAccessor;
+        private readonly ISalesManagementDAL _salesManagement;
+        private readonly ISendEmailMailer _mailer;
         ReturnResult result = new ReturnResult();
 
         
         public UserManagementService(IConfiguration configuration, ILogonService logonService, IUserManagementDAL userDAL, 
-            IConnectionStringService connService, IHttpContextAccessor httpAccessor)
+            IConnectionStringService connService, IHttpContextAccessor httpAccessor, ISalesManagementDAL salesManagement, ISendEmailMailer mailer)
         {
             _configuration = configuration;
             _logonService = logonService;
             _userDAL = userDAL;
             _connService = connService;
             _httpAccessor = httpAccessor;
+            _salesManagement = salesManagement;
+            _mailer = mailer;
         }
 
 
@@ -290,6 +296,22 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        private UserAddFormModel SetUpAdvertiserModel(UserAddFormModel command)
+        {
+            if (!command.MailSuppression)
+            {
+                command.Activated = 0;
+                command.Outstandingdays = 0;
+                command.VerificationStatus = false;
+                command.IsMsisdnMatch = false;
+                command.IsEmailVerfication = false;
+                command.PhoneticAlphabet = null;
+                command.IsMobileVerfication = false;
+            }
+            return command;
+        }
+
+
         public async Task<ReturnResult> AddUser(UserAddFormModel model)
         {
             try
@@ -308,8 +330,11 @@ namespace AdtonesAdminWebApi.BusinessServices
                 model.IsEmailVerfication = true;
                 model.PhoneticAlphabet = null;
                 model.IsMobileVerfication = true;
-                model.OrganisationTypeId = null;
                 model.UserMatchTableName = null;
+
+                if (model.RoleId == 3 && !model.MailSuppression)
+                    model = SetUpAdvertiserModel(model);
+
 
                 int mainUserId = 0;
                 int opUserId = 0;
@@ -369,17 +394,35 @@ namespace AdtonesAdminWebApi.BusinessServices
                         command1.UserId = opUserId;
                         var xx = await _userDAL.AddNewContactToOperator(command1);
 
-                        // For scalability added an array of app config settings to retrieve specifically in this case for
-                        // operator admin.
-                        /// TODO: Sort out E-Mail settings ideally into one service for all.
-                        var confSettings = new string[] { "OperatorAdminRegistrationEmailTemplete", "OperatorAdminUrl" };
-                        // SendEmailVerificationCode(model.FirstName, model.LastName, model.Email, model.PasswordHash, confSettings);
-                        result.body = "Operator Admin registered for Operator " + model.FirstName + " " + model.LastName;
+                        CompanyDetails company = new CompanyDetails();
+                        company.Address = model.Address;
+                        company.CompanyName = model.Organisation;
+                        company.CountryId = model.CountryId;
+                        company.UserId = mainUserId;
+
+                        var res = await AddCompanyDetails(company);
+
+                        bool mailsent = false;
+
                         var ytr = _httpAccessor.GetRoleIdFromJWT();
+                        var tst = _httpAccessor.GetUserIdFromJWT();
+                        if (ytr == (int)Enums.UserRole.SalesExec && model.MailSuppression == false)
+                        {
+                            var usr = await _userDAL.GetUserById(tst);
+                            mailsent = await SendConfirmationMail(model,usr.Email);
+                        }
+                        else
+                            mailsent = await SendConfirmationMail(model);
+
+                        result.body = "Operator Admin registered for Operator " + model.FirstName + " " + model.LastName;
+                        
                         if (ytr == (int)Enums.UserRole.SalesManager)
                         {
-                            var tst = _httpAccessor.GetUserIdFromJWT();
                             var x = await _userDAL.InsertManagerToSalesExec(tst, mainUserId);
+                        }
+                        else if(ytr == (int)Enums.UserRole.SalesExec)
+                        {
+                            var x = await _salesManagement.InsertNewAdvertiserToSalesExec(tst, mainUserId);
                         }
                     }
                     
@@ -530,6 +573,71 @@ namespace AdtonesAdminWebApi.BusinessServices
                 result.result = 0;
             }
             return result;
+        }
+
+
+        private async Task<bool> SendConfirmationMail(UserAddFormModel user, string alt_email = null)
+        {
+            string url = string.Empty;
+            string template = string.Empty;
+            if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.RoleId == 6)
+                url = _configuration.GetValue<string>("AppSettings:SafaricomOperatorAdminSiteAddress").ToString();
+            else if(user.RoleId == 3)
+                url = string.Format("{0}?activationCode={1}",_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("AdvertiserVerificationUrl").ToString(), user.Email);
+            else
+                url = _configuration.GetValue<string>("AppSettings:siteAddress").ToString();
+
+            url = "<a href='" + url + "'>" + url + " </a>";
+            var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
+            if(user.RoleId == 3)
+                template = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("RegisterAdvertiserEmailTemplate").Value;
+            else
+                template = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("OperatorAdminRegistrationEmailTemplete").Value;
+
+            var path = Path.Combine(otherpath, template);
+            string emailContent = string.Empty;
+            using (var reader = new StreamReader(path)) 
+            {
+                emailContent = reader.ReadToEnd();
+            }
+            if (user.RoleId == 3)
+                emailContent = string.Format(emailContent, url);
+            else
+                emailContent = string.Format(emailContent, user.FirstName, user.LastName, url, user.Email, user.Password);
+
+            SendEmailModel emailModel = new SendEmailModel();
+            emailModel.Body = emailContent.Replace("\n", "<br/>");
+            if(alt_email != null)
+                emailModel.SingleTo = alt_email;
+            else
+                emailModel.SingleTo = user.Email;
+            if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.RoleId == 6)
+                emailModel.From = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSiteEmailAddress").Value;
+            else
+                emailModel.From = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SiteEmailAddress").Value;
+
+            emailModel.Subject = "Email Verification";
+            try
+            {
+                await _mailer.SendBasicEmail(emailModel);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "UserManagementService",
+                    ProcedureName = "SendConfirmationMail"
+                };
+                _logging.LogError();
+
+                var msg = ex.Message.ToString();
+                result.result = 0;
+                result.error = "Email failed to send";
+                return false;
+            }
+            return true;
         }
 
         

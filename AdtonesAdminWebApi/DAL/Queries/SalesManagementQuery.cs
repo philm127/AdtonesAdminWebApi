@@ -36,5 +36,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string UpdateAdToSales => @"UPDATE Advertisers_SalesTeam SET SalesExecId=@Sid, IsActive=1,UpdatedDate=GETDATE() 
                                                     WHERE AdvertiserId=@AdId";
+
+        public static string GetSalesManagerId => @"SELECT ManId FROM SalesManager_SalesExec WHERE ExecId=@Id";
     }
 }

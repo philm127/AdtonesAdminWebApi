@@ -122,6 +122,24 @@ namespace AdtonesAdminWebApi.DAL.Shared
         }
 
 
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetOrganisationTypes()
+        {
+
+            try
+            {
+                using (var connection = new SqlConnection(_connStr))
+                {
+                    connection.Open();
+                    return await connection.QueryAsync<SharedSelectListViewModel>(SharedListQuery.GetOrganisationTypes);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<IEnumerable<SharedSelectListViewModel>> GetCountry(int id = 0)
         {
 

@@ -7,6 +7,6 @@ namespace AdtonesAdminWebApi.Services.Mailer
 {
     public interface ISendEmailMailer
     {
-        Task SendEmail(SendEmailModel mail);
+        Task SendBasicEmail(SendEmailModel mail, int operatorId = 0, int roleId = 0);
     }
 }

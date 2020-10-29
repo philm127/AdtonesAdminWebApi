@@ -90,6 +90,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string UserMatchTableName { get; set; }
 
         public int AdtoneServerUserId { get; set; }
+        public bool MailSuppression { get; set; }
 
         #endregion
     }
