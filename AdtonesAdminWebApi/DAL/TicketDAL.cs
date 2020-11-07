@@ -96,13 +96,12 @@ namespace AdtonesAdminWebApi.DAL
             sb.Append(TicketQuery.GetTicketDatatableForSales);
             if (id == 0)
             {
-                var values = CheckGeneralFile(sb, builder, pais: "camp", ops: "op");
+                var values = CheckGeneralFile(sb, builder, pais: "con", ops: "op");
                 sb = values.Item1;
                 builder = values.Item2;
             }
             else
             {
-                sb.Append(" WHERE sales.IsActive=1 ");
                 sb.Append(" AND sales.SalesExecId=@Sid ");
                 builder.AddParameters(new { Sid = id });
                 

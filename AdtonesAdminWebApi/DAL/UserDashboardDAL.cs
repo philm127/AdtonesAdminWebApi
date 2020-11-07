@@ -126,10 +126,10 @@ namespace AdtonesAdminWebApi.DAL
             var ytr = _httpAccessor.GetRoleIdFromJWT();
             if (ytr == (int)Enums.UserRole.SalesManager)
             {
-                sb.Append(" WHERE adsales.SalesManId=@ManId");
+                sb.Append(" WHERE ss.ManId=@ManId");
                 builder.AddParameters(new { ManId = _httpAccessor.GetUserIdFromJWT() });
             }
-            sb.Append(" GROUP BY adsales.SalesExecId,u.Email, u.DateCreated, u.Activated,u.FirstName, u.LastName ");
+            sb.Append(" GROUP BY ss.ExecId,adsales.SalesExecId,u.Email, u.DateCreated, u.Activated,u.FirstName, u.LastName ");
             var select = builder.AddTemplate(sb.ToString());
 
             try

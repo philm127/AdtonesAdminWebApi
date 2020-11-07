@@ -102,6 +102,14 @@ namespace AdtonesAdminWebApi.DAL
                                                     UserId = userId
                                                 }));
 
+            var y = await _executers.ExecuteCommand(_connStr,
+                                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddTax, new
+                                                {
+                                                    UserId = userId,
+                                                    CountryId = model.AdtoneServeCountryId,
+                                                    TaxPercantage = model.TaxPercentage
+                                                }));
+
             var lst = await _connService.GetConnectionStrings();
             List<string> conns = lst.ToList();
 
@@ -119,6 +127,14 @@ namespace AdtonesAdminWebApi.DAL
                                     AdtoneServeCountryId = model.AdtoneServeCountryId,
                                     UserId = model.UserId
                                 }));
+
+                y = await _executers.ExecuteCommand(constr,
+                                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddTax, new
+                                                {
+                                                    UserId = model.UserId,
+                                                    CountryId = x,
+                                                    TaxPercantage = model.TaxPercentage
+                                                }));
             }
 
             return x;
@@ -141,6 +157,14 @@ namespace AdtonesAdminWebApi.DAL
                                                     Id = model.Id
                                                 }));
 
+            var y = await _executers.ExecuteCommand(_connStr,
+                                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.UpdateTax, new
+                                                {
+                                                    UserId = userId,
+                                                    CountryId = model.Id,
+                                                    TaxPercantage = model.TaxPercentage
+                                                }));
+
             var countryId = 0;
             var lst = await _connService.GetConnectionStrings();
             List<string> conns = lst.ToList();
@@ -160,6 +184,14 @@ namespace AdtonesAdminWebApi.DAL
                                     UserId = model.UserId,
                                     Id = countryId
                                 }));
+
+                y = await _executers.ExecuteCommand(constr,
+                                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.UpdateTax, new
+                                                {
+                                                    UserId = model.UserId,
+                                                    CountryId = countryId,
+                                                    TaxPercantage = model.TaxPercentage
+                                                }));
             }
 
             return x;

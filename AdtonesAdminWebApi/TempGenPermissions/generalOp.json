@@ -1,29 +1,2478 @@
-{
-  "pageName": "General",
-  "elements": [
-    {
-      "name": "country",
-      "visible": true,
-      "enabled": true,
-      "type": "",
-      "route": "",
-      "arrayId": []
-    },
-    {
-      "name": "operator",
-      "visible": true,
-      "enabled": true,
-      "type": "",
-      "route": "",
-      "arrayId": []
-    },
-    {
-      "name": "advertiser",
-      "visible": true,
-      "enabled": true,
-      "type": "",
-      "route": "",
-      "arrayId": []
-    }
-  ]
-}
+[
+  {
+    "pageName": "GeneralAccess",
+    "visible": false,
+    "elements": [
+      {
+        "name": "country",
+        "visible": true,
+        "enabled": true,
+        "type": "",
+        "route": "",
+        "description": null,
+        "arrayId": [],
+        "elements": []
+      },
+      {
+        "name": "operator",
+        "visible": true,
+        "enabled": true,
+        "type": "",
+        "route": "",
+        "description": null,
+        "arrayId": [],
+        "elements": []
+      },
+      {
+        "name": "advertiser",
+        "visible": true,
+        "enabled": true,
+        "type": "",
+        "route": "",
+        "description": null,
+        "arrayId": [],
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "MainMenu",
+    "visible": true,
+    "elements": [
+      {
+        "name": "Financials",
+        "visible": true,
+        "enabled": true,
+        "type": null,
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": [
+          {
+            "name": "Invoices",
+            "visible": true,
+            "enabled": true,
+            "type": null,
+            "route": "salesinvoicelist",
+            "description": null,
+            "arrayId": null,
+            "elements": null
+          },
+          {
+            "name": "AdvertiserCredit",
+            "visible": false,
+            "enabled": true,
+            "type": null,
+            "route": "salesadvertisercredit",
+            "description": null,
+            "arrayId": null,
+            "elements": null
+          },
+          {
+            "name": "Outstanding Invoices",
+            "visible": true,
+            "enabled": true,
+            "type": null,
+            "route": "outstandinginvoicesaleslist",
+            "description": null,
+            "arrayId": null,
+            "elements": null
+          },
+          {
+            "name": "Campaign Credit Period",
+            "visible": false,
+            "enabled": true,
+            "type": null,
+            "route": "creditperiod",
+            "description": null,
+            "arrayId": null,
+            "elements": null
+          }
+        ]
+      },
+      {
+        "name": "Tickets",
+        "visible": true,
+        "enabled": true,
+        "type": null,
+        "route": "salestickettable",
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "Advertisers",
+        "visible": true,
+        "enabled": true,
+        "type": null,
+        "route": "advertisersforsales",
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "Campaigns",
+        "visible": true,
+        "enabled": true,
+        "type": null,
+        "route": "salescampaign",
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "Adverts",
+        "visible": true,
+        "enabled": true,
+        "type": null,
+        "route": "salesadverttable",
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "Add Advertiser",
+        "visible": true,
+        "enabled": true,
+        "type": null,
+        "route": "addadvertiser",
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "AddAdvertiser",
+    "visible": true,
+    "elements": [
+      {
+        "name": "phoneNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "mobileNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "firstName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "lastName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "operatorId",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "AdvertiserList",
+    "visible": true,
+    "elements": [
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "mobileNumber",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": true,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "salesExec",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "role",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "noOfactivecampaign",
+        "visible": true,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "noOfunapprovedadverts",
+        "visible": true,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "ticketCount",
+        "visible": true,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "creditlimit",
+        "visible": true,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "outstandinginvoice",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "dateCreated",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "rStatus",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "action",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": true,
+        "enabled": false,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "name",
+        "visible": true,
+        "enabled": false,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": false,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "status",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "dateRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "responseRange",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "numberRange",
+        "visible": false,
+        "enabled": false,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "country",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "SalesExecList",
+    "visible": false,
+    "elements": [
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "mobileNumber",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "role",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "noAdvertisers",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "noOfactivecampaign",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "noOfunapprovedadverts",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "ticketCount",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "creditlimit",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "outstandinginvoice",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "dateCreated",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "rStatus",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "action",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "status",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "dateRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "country",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "AdvertsList",
+    "visible": true,
+    "elements": [
+      {
+        "name": "userName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "clientName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "salesExec",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "advertName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "brand",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "scripts",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "listen",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "smsBody",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "emailBody",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "createdDate",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "rStatus",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "action",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "client",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "name",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "status",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "dateRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "TicketList",
+    "visible": true,
+    "elements": [
+      {
+        "name": "userName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "salesExec",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "organisation",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "qNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "clientName",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "campaignName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "createdDate",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "questionTitle",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "questionSubject",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "paymentMethod",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "rStatus",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "lastResponseDatetime",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "action",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "name",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "status",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "typeName",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "country",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "dateRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "responseRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "numberRange",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "client",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "operator",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "payment",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "select22",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "MyProfile",
+    "visible": true,
+    "elements": []
+  },
+  {
+    "pageName": "ContactProfileEdit",
+    "visible": true,
+    "elements": [
+      {
+        "name": "phoneNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "mobileNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "UserProfileEdit",
+    "visible": true,
+    "elements": [
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "firstName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "lastName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "organisation",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "outstandingdays",
+        "visible": false,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "roleId",
+        "visible": false,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "CompanyProfileEdit",
+    "visible": false,
+    "elements": [
+      {
+        "name": "companyName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "address",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "ChangePassword",
+    "visible": true,
+    "elements": []
+  },
+  {
+    "pageName": "CampaignList",
+    "visible": true,
+    "elements": [
+      {
+        "name": "userName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "mobileNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "organisation",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "salesExec",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "clientName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "campaignName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "advertName",
+        "visible": false,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "finaltotalplays",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "totalBudget",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "totalSpend",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fundsAvailable",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "avgBidValue",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "createdDate",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "rStatus",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "status",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "ticketCount",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "action",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "client",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "status",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "dateRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "name",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "operator",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "numberRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "numberRange2",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "Login",
+    "visible": true,
+    "elements": [
+      {
+        "name": "defaultroute",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": "advertisersforsales",
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "DashboardPlayList",
+    "visible": true,
+    "elements": [
+      {
+        "name": "email",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "userId",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "startTime",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "endTime",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "playLength",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "advertName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "playCost",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "smsCost",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "emailCost",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "totalCost",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "sms",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "emailMsg",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "client",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "status",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "responseRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "name",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "operator",
+        "visible": false,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "numberRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "numberRange2",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "numberRange3",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "AddUser",
+    "visible": true,
+    "elements": [
+      {
+        "name": "phoneNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "mobileNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "firstName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "lastName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "operatorId",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "UserDetails",
+    "visible": true,
+    "elements": []
+  },
+  {
+    "pageName": "ContactEdit",
+    "visible": true,
+    "elements": [
+      {
+        "name": "phoneNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "mobileNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "UserEdit",
+    "visible": true,
+    "elements": [
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "firstName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "lastName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "roleId",
+        "visible": true,
+        "enabled": false,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "CompanyEdit",
+    "visible": true,
+    "elements": [
+      {
+        "name": "companyName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "address",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "EditUserPermission",
+    "visible": false,
+    "elements": []
+  },
+  {
+    "pageName": "InvoicesTable",
+    "visible": true,
+    "elements": [
+      {
+        "name": "invoiceNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "poNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "organisation",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "clientName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "salesExec",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "campaignName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "createdDate",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "invoiceTotal",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "rStatus",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "settledDate",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "paymentMethod",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "action",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "status",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "client",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "payment",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "dateRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "responseRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "name",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "numberRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "OutstandingInvoicesTable",
+    "visible": true,
+    "elements": [
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "organisation",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "salesExec",
+        "visible": false,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "clientName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "campaignName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "invoiceNumber",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "creditAmount",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "paidAmount",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "outstandingAmount",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "description",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "createdDate",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "status",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "client",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "dateRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "name",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "numberRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "AdvertiserCreditTable",
+    "visible": true,
+    "elements": [
+      {
+        "name": "add",
+        "visible": true,
+        "enabled": true,
+        "type": "addedit",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "organisation",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "credit",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "availableCredit",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "totalUsed",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "totalPaid",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "remainingAmount",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "createdDate",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "action",
+        "visible": true,
+        "enabled": true,
+        "type": "element",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "fullName",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "country",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "email",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "dateRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      },
+      {
+        "name": "numberRange",
+        "visible": true,
+        "enabled": true,
+        "type": "search",
+        "route": null,
+        "description": null,
+        "arrayId": null,
+        "elements": []
+      }
+    ]
+  },
+  {
+    "pageName": "ManageSalesAllocations",
+    "visible": true,
+    "elements": []
+  }
+]

@@ -1,0 +1,24 @@
+-------------------START-------------11/3/2020 3:00:55 PM
+Level: INFO: , Page: UserManagementService, Procedure: AddUser,InfoMsg: Pre insert into Users for: fjdjf@ru9tjk.com, StackTrace: 
+-------------------END-------------11/3/2020 3:00:55 PM
+-------------------START-------------11/3/2020 3:01:16 PM
+Level: INFO: , Page: UserManagementService, Procedure: AddUser - AddToSalesTable,TnfoMsg: Entered update advertiser_sales table, StackTrace: 
+-------------------END-------------11/3/2020 3:01:16 PM
+-------------------START-------------11/3/2020 7:30:32 PM
+Level: INFO: , Page: UserManagementService, Procedure: AddUser,TnfoMsg: Pre insert into Users for: djnng@dkjf.cim
+-------------------END-------------11/3/2020 7:30:32 PM
+-------------------START-------------11/3/2020 7:34:27 PM
+Level: INFO: , Page: UserManagementService, Procedure: AddUser,TnfoMsg: Pre insert into Users for: djnngjkl@dkjf.cim
+-------------------END-------------11/3/2020 7:34:27 PM
+-------------------START-------------11/3/2020 7:39:15 PM
+Level: INFO: , Page: UserManagementService, Procedure: AddUser,TnfoMsg: Pre insert into Users for: djnl@dkjf.cim
+-------------------END-------------11/3/2020 7:39:15 PM
+-------------------START-------------11/3/2020 7:42:19 PM
+Level: INFO: , Page: UserManagementService, Procedure: AddUser - AddToSalesTable,TnfoMsg: Entered update advertiser_sales table
+-------------------END-------------11/3/2020 7:42:19 PM
+-------------------START-------------11/3/2020 9:56:18 PM
+Level: INFO: , Page: UserManagementService, Procedure: AddUser,TnfoMsg: Pre insert into Users for: pop@oop.com
+-------------------END-------------11/3/2020 9:56:18 PM
+-------------------START-------------11/3/2020 9:56:36 PM
+Level: INFO: , Page: UserManagementService, Procedure: AddUser - AddToSalesTable,TnfoMsg: Entered update advertiser_sales table
+-------------------END-------------11/3/2020 9:56:36 PM

@@ -13,7 +13,7 @@ namespace AdtonesAdminWebApi.Services
         public string ProcedureName { get; set; }
         public string ErrorMessage { get; set; }
         public string StackTrace { get; set; }
-        public string clientName { get; set; }
+        public string LogLevel { get; set; }
 
 
         public void LogError()
@@ -32,7 +32,7 @@ namespace AdtonesAdminWebApi.Services
                 using (StreamWriter writer = new StreamWriter(filepath, true))
                 {
                     writer.WriteLine("-------------------START-------------" + DateTime.Now);
-                    writer.WriteLine("Client: " + clientName + ", Page: " + PageName + ", Procedure: " + ProcedureName + ",ErrorMsg: " + ErrorMessage + ", StackTrace: " + StackTrace);
+                    writer.WriteLine("Page: " + PageName + ", Procedure: " + ProcedureName + ",ErrorMsg: " + ErrorMessage + ", StackTrace: " + StackTrace);
                     writer.WriteLine("-------------------END-------------" + DateTime.Now);
                     writer.Flush();
                     writer.Close();
@@ -43,7 +43,43 @@ namespace AdtonesAdminWebApi.Services
                 using (StreamWriter writer = System.IO.File.CreateText(filepath))
                 {
                     writer.WriteLine("-------------------START-------------" + DateTime.Now);
-                    writer.WriteLine("Client: " + clientName + ", Page: " + PageName + ", Procedure: " + ProcedureName + ",ErrorMsg: " + ErrorMessage + ", StackTrace: " + StackTrace);
+                    writer.WriteLine("Page: " + PageName + ", Procedure: " + ProcedureName + ",ErrorMsg: " + ErrorMessage + ", StackTrace: " + StackTrace);
+                    writer.WriteLine("-------------------END-------------" + DateTime.Now);
+                    writer.Flush();
+                    writer.Close();
+                }
+            }
+        }
+
+
+        public void LogInfo()
+        {
+            /// TODO: Check the working of the file paths
+            var WebRootPath = Directory.GetCurrentDirectory();
+
+            string webroot = WebRootPath + "\\Logging\\";
+            // string MainFolderPath = "Logging\\";
+            string ResolvePath = "";
+            ResolvePath = string.Concat(webroot + "InfoLogs.txt");
+            var filepath = ResolvePath;
+
+            if (System.IO.File.Exists(filepath))
+            {
+                using (StreamWriter writer = new StreamWriter(filepath, true))
+                {
+                    writer.WriteLine("-------------------START-------------" + DateTime.Now);
+                    writer.WriteLine("Level: " + LogLevel + ", Page: " + PageName + ", Procedure: " + ProcedureName + ",TnfoMsg: " + ErrorMessage);
+                    writer.WriteLine("-------------------END-------------" + DateTime.Now);
+                    writer.Flush();
+                    writer.Close();
+                }
+            }
+            else
+            {
+                using (StreamWriter writer = System.IO.File.CreateText(filepath))
+                {
+                    writer.WriteLine("-------------------START-------------" + DateTime.Now);
+                    writer.WriteLine("Level: " + LogLevel + ", Page: " + PageName + ", Procedure: " + ProcedureName + ",InfoMsg: " + ErrorMessage);
                     writer.WriteLine("-------------------END-------------" + DateTime.Now);
                     writer.Flush();
                     writer.Close();

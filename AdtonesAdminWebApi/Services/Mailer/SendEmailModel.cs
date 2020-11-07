@@ -50,5 +50,6 @@ namespace AdtonesAdminWebApi.Services.Mailer
         public string usr { get; set; }
         public string srv { get; set; }
         public int port { get; set; }
+        public bool sslSend { get; set; }
     }
 }

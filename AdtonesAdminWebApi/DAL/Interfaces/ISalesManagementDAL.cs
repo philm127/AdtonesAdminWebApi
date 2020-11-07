@@ -14,6 +14,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> UpdateInactiveForSP(int sp, int ad);
         Task<int> InsertToSalesAd(int sp, int ad);
         Task<int> UpdateUserForSP(int sp, int ad);
-        Task<int> InsertNewAdvertiserToSalesExec(int sp, int ad);
+        Task<int> InsertNewAdvertiserToSalesExec(int sp, int ad, bool mail);
     }
 }

@@ -9,7 +9,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
     {
         public static string GetUnallocated => @"SELECT u.UserId,CONCAT(u.FirstName,' ',u.LastName) AS FullName FROM Users AS u
                                                    INNER JOIN Contacts AS con ON con.UserId=u.UserId
-                                                   WHERE RoleId=3 AND Activated=1 AND u.UserId NOT IN 
+                                                   WHERE RoleId=3 AND VerificationStatus=1 AND u.UserId NOT IN 
                                                     (SELECT AdvertiserId FROM Advertisers_SalesTeam WHERE IsActive=1) ";
 
 
@@ -30,8 +30,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                     WHERE AdvertiserId=@AdId AND SalesExecId=@Sid";
 
 
-        public static string InsertNewAdToSales => @"INSERT INTO Advertisers_SalesTeam(AdvertiserId,SalesExecId,SalesManId,IsActive,CreatedDate,UpdatedDate)
-                                                        VALUES(@AdId,@Sid, @ManId, 1, GETDATE(), GETDATE())";
+        public static string InsertNewAdToSales => @"INSERT INTO Advertisers_SalesTeam(AdvertiserId,SalesExecId,SalesManId,MailSupressed,IsActive,CreatedDate,UpdatedDate)
+                                                        VALUES(@AdId,@Sid, @ManId, @Suppress,1,GETDATE(), GETDATE())";
 
 
         public static string UpdateAdToSales => @"UPDATE Advertisers_SalesTeam SET SalesExecId=@Sid, IsActive=1,UpdatedDate=GETDATE() 

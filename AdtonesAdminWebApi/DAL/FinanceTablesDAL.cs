@@ -56,13 +56,13 @@ namespace AdtonesAdminWebApi.DAL
             builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             if (id == 0)
             {
-                var values = CheckGeneralFile(sb, builder, pais: "camp");
+                var values = CheckGeneralFile(sb, builder, pais: "con");
                 sb = values.Item1;
                 builder = values.Item2;
             }
             else
             {
-                sb.Append(" WHERE sales.IsActive=1 ");
+                sb.Append(" AND sales.IsActive=1 ");
                 sb.Append(" AND sales.SalesExecId=@Sid ");
                 builder.AddParameters(new { Sid = id });
             }
@@ -80,6 +80,7 @@ namespace AdtonesAdminWebApi.DAL
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(FinancialTablesQuery.GetOutstandingInvoiceResultSet);
+            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             var values = CheckGeneralFile(sb, builder, pais: "cp",advs:"bil");
             sb = values.Item1;
             builder = values.Item2;
@@ -104,9 +105,10 @@ namespace AdtonesAdminWebApi.DAL
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(FinancialTablesQuery.GetOutstandingInvoiceForSalesResultSet);
+            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             if (id == 0)
             {
-                var values = CheckGeneralFile(sb, builder, pais: "cp");
+                var values = CheckGeneralFile(sb, builder, pais: "con");
                 sb = values.Item1;
                 builder = values.Item2;
             }

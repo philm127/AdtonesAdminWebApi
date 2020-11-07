@@ -45,6 +45,22 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<AdvertiserCreditPaymentResult> GetToPayDetails(int billingId)
+        {
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<AdvertiserCreditPaymentResult>(AdvertiserFinancialQuery.GetPrePaymentDetails,
+                                                                                new { billingId = billingId }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<int> InsertPaymentFromUser(AdvertiserCreditFormModel model)
         {
 
@@ -172,6 +188,22 @@ namespace AdtonesAdminWebApi.DAL
                 await Task.WhenAll(credit, bill);
 
                 return credit.Result - bill.Result;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<decimal> GetCreditBalanceForInvoicePayment(int billingId)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.QueryFirstOrDefault<decimal>(AdvertiserFinancialQuery.GetOutstandingBalanceInvoice, 
+                                                                                                            new { Id = billingId }));
+
             }
             catch
             {

@@ -13,10 +13,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string AddNewUser => @"INSERT INTO Users(Email,FirstName,LastName,PasswordHash,DateCreated,Organisation,LastLoginTime,RoleId,
                                                 Activated,VerificationStatus,Outstandingdays,OperatorId,IsMsisdnMatch,IsEmailVerfication,
-                                                PhoneticAlphabet,IsMobileVerfication,OrganisationTypeId,UserMatchTableName,Permissions)
+                                                PhoneticAlphabet,IsMobileVerfication,OrganisationTypeId,UserMatchTableName,Permissions,LastPasswordChangedDate)
                                              VALUES(@Email,@FirstName,@LastName,@PasswordHash,GETDATE(),@Organisation,GETDATE(),@RoleId,
                                                     @Activated,@VerificationStatus,@Outstandingdays,@OperatorId,@IsMsisdnMatch,@IsEmailVerfication,
-                                                    @PhoneticAlphabet,@IsMobileVerfication,@OrganisationTypeId,@UserMatchTableName,@Permissions);
+                                                    @PhoneticAlphabet,@IsMobileVerfication,@OrganisationTypeId,@UserMatchTableName,@Permissions,GETDATE());
                                       SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
 
@@ -25,10 +25,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
         /// </summary>
         public static string AddNewUserToOperator => @"INSERT INTO Users(Email,FirstName,LastName,PasswordHash,DateCreated,Organisation,LastLoginTime,RoleId,
                                                 Activated,VerificationStatus,Outstandingdays,OperatorId,IsMsisdnMatch,IsEmailVerfication,
-                                                PhoneticAlphabet,IsMobileVerfication,OrganisationTypeId,UserMatchTableName,AdtoneServerUserId)
+                                                PhoneticAlphabet,IsMobileVerfication,OrganisationTypeId,UserMatchTableName,AdtoneServerUserId,LastPasswordChangedDate)
                                              VALUES(@Email,@FirstName,@LastName,@PasswordHash,GETDATE(),@Organisation,GETDATE(),@RoleId,
                                                     @Activated,@VerificationStatus,@Outstandingdays,@OperatorId,@IsMsisdnMatch,@IsEmailVerfication,
-                                                    @PhoneticAlphabet,@IsMobileVerfication,@OrganisationTypeId,@UserMatchTableName,@AdtoneServerUserId);
+                                                    @PhoneticAlphabet,@IsMobileVerfication,@OrganisationTypeId,@UserMatchTableName,@AdtoneServerUserId,GETDATE());
                                       SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
 
@@ -37,7 +37,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 SELECT CAST(SCOPE_IDENTITY() AS INT);";
         
         
-        public static string UpdateUserStatus => @"UPDATE Users SET Activated=@Activated WHERE ";
+        public static string UpdateUserStatus => @"UPDATE Users SET Activated=@Activated,LastPasswordChangedDate=GETDATE() WHERE ";
                                                                   
         public static string GetUserDetails => @"SELECT UserId,u.OperatorId,Email,FirstName,LastName,DateCreated,Organisation,op.CountryId,
                                         Activated,RoleId,OrganisationTypeId,Outstandingdays,AdtoneServerUserId,VerificationStatus,PasswordHash 

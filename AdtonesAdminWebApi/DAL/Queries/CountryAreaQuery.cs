@@ -29,9 +29,17 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                             SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
 
+        public static string AddTax => @"INSERT INTO CountryTax(UserId,CountryId,TaxPercantage,CreatedDate,UpdatedDate,Status)
+                                            VALUES(@UserId,@CountryId,@TaxPercantage, GETDATE(), GETDATE(),1);";
+
+
         public static string UpdateCountry => @"UPDATE Country SET UserId = @UserId, Name = @Name, ShortName = @ShortName, 
                                                             UpdatedDate = GETDATE(),CountryCode = @CountryCode,
                                                             TermAndConditionFileName = @TermAndConditionFileName WHERE Id=@Id;";
+
+
+        public static string UpdateTax => @"Update CountryTax SET UserId=@UserId,TaxPercantage=@TaxPercantage,
+                                            UpdatedDate=GETDATE() WHERE CountryId=@CountryId;";
 
 
         public static string LoadAreaDataTable => @"SELECT ad.AreaId, ad.AreaName,ad.CountryId,c.Name as CountryName 

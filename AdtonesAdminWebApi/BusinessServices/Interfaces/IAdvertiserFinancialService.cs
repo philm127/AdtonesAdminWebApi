@@ -8,8 +8,8 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
     public interface IAdvertiserFinancialService
     {
-        Task<ReturnResult> GetOutstandingBalance(int id);
-        Task<ReturnResult> GetInvoiceDetails(int id);
+        // Task<ReturnResult> GetOutstandingBalance(int id);
+        // Task<ReturnResult> GetInvoiceDetails(int id);
         Task<ReturnResult> SendInvoice(IdCollectionViewModel model);
         Task<ReturnResult> ReceivePayment(AdvertiserCreditFormModel model);
 
@@ -17,5 +17,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> GetCreditDetails(int id);
         Task<ReturnResult> AddCampaignCredit(CampaignCreditResult model);
         Task<ReturnResult> UpdateCampaignCredit(CampaignCreditResult model);
+        Task<ReturnResult> GetToPayDetails(int billingId);
     }
 }

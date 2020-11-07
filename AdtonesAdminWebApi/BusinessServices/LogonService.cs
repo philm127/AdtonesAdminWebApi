@@ -56,7 +56,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 if (user != null)
                 {
-                    if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && PasswordExpiredAttribute(user))
+                    if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.RoleId == (int)Enums.UserRole.OperatorAdmin && PasswordExpiredAttribute(user))
                     {
                         result.result = 0;
                         result.error = "Your Password has expired please reset it";
@@ -65,7 +65,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
 
                     // 4 is user has been blocked for too many incorrect login attempts.
-                    else if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.Activated == 4)
+                    else if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.RoleId == (int)Enums.UserRole.OperatorAdmin && user.Activated == 4)
                     {
                         DateTime date1 = user.LockOutTime.Value;
                         DateTime date2 = DateTime.Now;
@@ -81,7 +81,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         {
                             user.Activated = (int)Enums.UserStatus.Approved;
                             user.LockOutTime = null;
-                            var x = await _loginDAL.UpdateUserLockout(userForm);
+                            var x = await _loginDAL.UpdateUserLockout(user);
                         }
                     }
 
@@ -154,8 +154,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 string email = EncryptionHelper.EncryptSingleValue(user.Email);
 
                 var resetAddress = string.Empty;
-                if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom)
-                    resetAddress = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomOperatorAdminSiteAddress").Value + "ResetPassword";
+                if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.RoleId == (int)Enums.UserRole.OperatorAdmin)
+                    resetAddress = _configuration.GetSection("AppSettings").GetSection("SafaricomOperatorAdminSiteAddress").Value + "/ResetPassword";
                 else
                     resetAddress = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("AdminResetPassword").Value;
 
@@ -173,6 +173,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 SendEmailModel emailModel = new SendEmailModel();
                 emailModel.Body = emailContent.Replace("\n", "<br/>");
                 emailModel.SingleTo = emailAddress;
+                
                 emailModel.From = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SiteEmailAddress").Value;
                 emailModel.Subject = "Email Verification";
                 try
@@ -249,7 +250,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 change.PasswordHash = Md5Encrypt.Md5EncryptPassword(model.NewPassword);
 
 
-                if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom)
+                if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.RoleId == (int)Enums.UserRole.OperatorAdmin)
                 {
                     if (await IsPreviousPassword(user.UserId, change.PasswordHash))
                     {
@@ -322,7 +323,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
 
 
-                if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom)
+                if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.RoleId == (int)Enums.UserRole.OperatorAdmin)
                 {
                     if (await IsPreviousPassword(user.UserId, change.PasswordHash))
                     {
@@ -438,7 +439,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 if (user.RoleId == 6)
                 {
                     result.result = 0;
-                    result.error = "Your account has been InActive by adtones administrator.so, Please contact adtones admin.";
+                    result.error = "Your account has been made InActive by adtones administrator.so, Please contact adtones admin.";
                     return result;
                 }
                 else

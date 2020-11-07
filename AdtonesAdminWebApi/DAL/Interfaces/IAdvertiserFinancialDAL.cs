@@ -20,5 +20,8 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> UpdateCampaignCredit(CampaignCreditResult model);
         Task<int> InsertCampaignCredit(CampaignCreditResult model);
 
+        Task<AdvertiserCreditPaymentResult> GetToPayDetails(int billingId);
+        Task<decimal> GetCreditBalanceForInvoicePayment(int billingId);
+
     }
 }

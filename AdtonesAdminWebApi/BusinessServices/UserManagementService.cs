@@ -338,6 +338,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 int mainUserId = 0;
                 int opUserId = 0;
+
                 
                 mainUserId = await _userDAL.AddNewUser(model);
 
@@ -379,7 +380,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         result.error = "Contact was not added";
                         return result;
                     }
-                    else if( contId == -1)
+                    else if (contId == -1)
                     {
                         await _userDAL.DeleteNewUser(mainUserId);
                         result.result = 0;
@@ -406,23 +407,53 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                         var ytr = _httpAccessor.GetRoleIdFromJWT();
                         var tst = _httpAccessor.GetUserIdFromJWT();
-                        if (ytr == (int)Enums.UserRole.SalesExec && model.MailSuppression == false)
+                        try
                         {
-                            var usr = await _userDAL.GetUserById(tst);
-                            mailsent = await SendConfirmationMail(model,usr.Email);
+                            if (ytr == (int)Enums.UserRole.SalesExec && model.MailSuppression == true)
+                            {
+                                var usr = await _userDAL.GetUserById(tst);
+                                mailsent = await SendConfirmationMail(model, usr.Email);
+                            }
+                            else
+                                mailsent = await SendConfirmationMail(model);
                         }
-                        else
-                            mailsent = await SendConfirmationMail(model);
+                        catch (Exception ex)
+                        {
+                            var _loggingA = new ErrorLogging()
+                            {
+                                ErrorMessage = ex.Message.ToString(),
+                                StackTrace = ex.StackTrace.ToString(),
+                                PageName = "UserManagementService",
+                                ProcedureName = "AddUser - SendMail"
+                            };
+                            _loggingA.LogError();
+                        }
 
-                        result.body = "Operator Admin registered for Operator " + model.FirstName + " " + model.LastName;
-                        
-                        if (ytr == (int)Enums.UserRole.SalesManager)
+                        result.body = "User " + model.FirstName + " " + model.LastName + " was Succesfully Added";
+                        try
                         {
-                            var x = await _userDAL.InsertManagerToSalesExec(tst, mainUserId);
+                            if (ytr == (int)Enums.UserRole.SalesManager && model.RoleId == (int)Enums.UserRole.SalesExec)
+                            {
+                                var x = await _userDAL.InsertManagerToSalesExec(tst, mainUserId);
+                            }
+                            else if (ytr == (int)Enums.UserRole.SalesExec)
+                            {
+                                var x = await _salesManagement.InsertNewAdvertiserToSalesExec(tst, mainUserId, model.MailSuppression);
+                            }
                         }
-                        else if(ytr == (int)Enums.UserRole.SalesExec)
+                        catch (Exception ex)
                         {
-                            var x = await _salesManagement.InsertNewAdvertiserToSalesExec(tst, mainUserId);
+                            var _loggingC = new ErrorLogging()
+                            {
+                                ErrorMessage = ex.Message.ToString(),
+                                StackTrace = ex.StackTrace.ToString(),
+                                PageName = "UserManagementService",
+                                ProcedureName = "AddUser - AddToSalesTable"
+                            };
+                            _loggingC.LogError();
+                            result.result = 0;
+                            result.body = "There was an issue adding to the sales table";
+                            result.error = ex.Message.ToString();
                         }
                     }
                     
@@ -580,43 +611,62 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             string url = string.Empty;
             string template = string.Empty;
-            if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.RoleId == 6)
-                url = _configuration.GetValue<string>("AppSettings:SafaricomOperatorAdminSiteAddress").ToString();
-            else if(user.RoleId == 3)
-                url = string.Format("{0}?activationCode={1}",_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("AdvertiserVerificationUrl").ToString(), user.Email);
-            else
-                url = _configuration.GetValue<string>("AppSettings:siteAddress").ToString();
-
-            url = "<a href='" + url + "'>" + url + " </a>";
-            var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
-            if(user.RoleId == 3)
-                template = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("RegisterAdvertiserEmailTemplate").Value;
-            else
-                template = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("OperatorAdminRegistrationEmailTemplete").Value;
-
-            var path = Path.Combine(otherpath, template);
-            string emailContent = string.Empty;
-            using (var reader = new StreamReader(path)) 
-            {
-                emailContent = reader.ReadToEnd();
-            }
-            if (user.RoleId == 3)
-                emailContent = string.Format(emailContent, url);
-            else
-                emailContent = string.Format(emailContent, user.FirstName, user.LastName, url, user.Email, user.Password);
-
             SendEmailModel emailModel = new SendEmailModel();
-            emailModel.Body = emailContent.Replace("\n", "<br/>");
-            if(alt_email != null)
-                emailModel.SingleTo = alt_email;
-            else
-                emailModel.SingleTo = user.Email;
-            if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.RoleId == 6)
-                emailModel.From = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSiteEmailAddress").Value;
-            else
-                emailModel.From = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SiteEmailAddress").Value;
 
-            emailModel.Subject = "Email Verification";
+            try
+            {
+                if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.RoleId == (int)Enums.UserRole.OperatorAdmin)
+                    url = _configuration.GetValue<string>("AppSettings:SafaricomOperatorAdminSiteAddress").ToString();
+                else if (user.RoleId == 3 && user.MailSuppression == false)
+                    url = string.Format("{0}?activationCode={1}", _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("AdvertiserVerificationUrl").ToString(), user.Email);
+                else
+                    url = _configuration.GetValue<string>("AppSettings:siteAddress").ToString();
+
+                url = "<a href='" + url + "'>" + url + " </a>";
+                var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
+                if (user.RoleId == 3 && user.MailSuppression == false)
+                    template = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("AdvertiserVerificationEmailTemplate").Value;
+                else
+                    template = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("OperatorAdminRegistrationEmailTemplete").Value;
+
+                var path = Path.Combine(otherpath, template);
+                string emailContent = string.Empty;
+                using (var reader = new StreamReader(path))
+                {
+                    emailContent = reader.ReadToEnd();
+                }
+                if (user.RoleId == 3 && user.MailSuppression == false)
+                    emailContent = string.Format(emailContent, url);
+                else
+                    emailContent = string.Format(emailContent, user.FirstName, user.LastName, url, user.Email, user.Password);
+
+
+                emailModel.Body = emailContent.Replace("\n", "<br/>");
+                if (alt_email != null)
+                    emailModel.SingleTo = alt_email;
+                else
+                    emailModel.SingleTo = user.Email;
+                if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.RoleId == (int)Enums.UserRole.OperatorAdmin)
+                    emailModel.From = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSiteEmailAddress").Value;
+                else
+                    emailModel.From = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SiteEmailAddress").Value;
+
+                emailModel.Subject = "Email Verification";
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "UserManagementService",
+                    ProcedureName = "SendConfirmationMail = Model Build"
+                };
+                _logging.LogError();
+
+                var msg = ex.Message.ToString();
+                return false;
+            }
             try
             {
                 await _mailer.SendBasicEmail(emailModel);
@@ -633,8 +683,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logging.LogError();
 
                 var msg = ex.Message.ToString();
-                result.result = 0;
-                result.error = "Email failed to send";
                 return false;
             }
             return true;

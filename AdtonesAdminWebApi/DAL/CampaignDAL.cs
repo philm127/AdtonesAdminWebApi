@@ -73,7 +73,11 @@ namespace AdtonesAdminWebApi.DAL
                 sb.Append(" AND sales.SalesExecId=@Sid ");
                 builder.AddParameters(new { Sid = id });
             }
-            var values = CheckGeneralFile(sb, builder, pais: "camp", ops: "op", advs: "camp");
+            else
+            {
+                sb.Append(" WHERE 1=1 ");
+            }
+            var values = CheckGeneralFile(sb, builder, pais: "con", ops: "op", advs: "camp");
 
             sb = values.Item1;
             builder = values.Item2;

@@ -173,49 +173,18 @@ namespace AdtonesAdminWebApi.BusinessServices
 
 
 
-        public async Task<ReturnResult> GetOutstandingBalance(int id)
-        {
-            try
-            {
-                decimal outstanding = await OutstandingBalance(id);
-                if (outstanding == -1)
-                    result.result = 0;
-                else
-                    result.body = outstanding;
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserPaymentService",
-                    ProcedureName = "GetOutstandingBalance"
-                };
-                _logging.LogError();
-                result.result = 0;
-            }
-            return result;
-        }
-
-
         /// <summary>
-        /// Is actually a list of outstanding invoices against a campaign
+        /// Gets the items required to populate the Recieve Payment screen
         /// </summary>
-        /// <param name="id">Campaign ProfileId</param>
-        /// <returns></returns>
-        public async Task<ReturnResult> GetInvoiceDetails(int id)
+        /// <param name="billingId"></param>
+        /// <returns>A body containing AdvertiserCreditPaymentResult</returns>
+        public async Task<ReturnResult> GetToPayDetails(int billingId)
         {
             try
             {
-                decimal outstanding = await OutstandingBalance(id);
-                if (outstanding == -1)
-                    result.result = 0;
-
-                if (outstanding > 0)
-                {
-                    result.body = await _sharedDal.GetInvoiceList(id);
-                }
+                var details = await _invDAL.GetToPayDetails(billingId);
+                details.OutstandingAmount = await _invDAL.GetCreditBalanceForInvoicePayment(billingId);
+                result.body = details;
             }
             catch (Exception ex)
             {
@@ -223,16 +192,15 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserPaymentService",
-                    ProcedureName = "GetInvoiceDetails"
+                    PageName = "AdvertiserFinancialService",
+                    ProcedureName = "GetToPayDetails"
                 };
                 _logging.LogError();
                 result.result = 0;
             }
             return result;
-
         }
-
+            
 
         public async Task<ReturnResult> ReceivePayment(AdvertiserCreditFormModel model)
         {
@@ -264,32 +232,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             return result;
         }
 
-
-
-
-        private async Task<decimal> OutstandingBalance(int billingId)
-        {
-            try
-            {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    await connection.OpenAsync();
-                    return await connection.QueryFirstOrDefaultAsync<decimal>(GetOutstandingBalance(), new { Id = billingId });
-                }
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserPaymentService",
-                    ProcedureName = "OutstandingBalance"
-                };
-                _logging.LogError();
-                return -1;
-            }
-        }
 
 
         #region Advertiser Credit
@@ -374,45 +316,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        ///// <summary>
-        ///// Updates FROM the User Credit Details screen
-        ///// </summary>
-        ///// <param name="_creditmodel"></param>
-        ///// <returns></returns>
-        //public async Task<ReturnResult> UpdateCredit(UsersCreditFormModel _creditmodel)
-        //{
-        //    try
-        //    {
-        //        _creditmodel.AvailableCredit = await CalculateNewCredit(_creditmodel.UserId);
-
-        //        var update_query = @"UPDATE UsersCredit SET UserId = @UserId,AssignCredit = @AssignCredit,AvailableCredit = @AvailableCredit,
-        //                                                                                 UpdatedDate = GETDATE(),CurrencyId = @CurrencyId
-        //                                                                                 WHERE Id = @Id";
-
-
-        //        using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-        //        {
-        //            await connection.OpenAsync();
-        //            result.body = await connection.ExecuteAsync(update_query, _creditmodel);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var _logging = new ErrorLogging()
-        //        {
-        //            ErrorMessage = ex.Message.ToString(),
-        //            StackTrace = ex.StackTrace.ToString(),
-        //            PageName = "UserCreditService",
-        //            ProcedureName = "UpdateCredit"
-        //        };
-        //        _logging.LogError();
-        //        result.result = 0;
-        //    }
-        //    return result;
-
-        //}
-
-
         public async Task<ReturnResult> UpdateCampaignCredit(CampaignCreditResult model)
         {
             try
@@ -489,24 +392,155 @@ namespace AdtonesAdminWebApi.BusinessServices
             return available;
         }
 
-        private string GetOutstandingBalance()
-        {
-            return @"SELECT ISNULL((bilit.TotalAmount - ISNULL(CAST(payit.Amount AS decimal(18,2)),0)),0) AS OutstandingAmount 
-                    FROM
-                        (SELECT SUM(ISNULL(bil.FundAmount,0)) AS TotalAmount,bil.CampaignProfileId
-                        FROM Billing AS bil
-                        WHERE PaymentMethodId=1 AND CampaignProfileId=@Id
-                        GROUP BY bil.CampaignProfileId) bilit
-                    LEFT JOIN
-                        (SELECT SUM(ISNULL(ucp.Amount,0)) AS Amount,ucp.CampaignProfileId
-                        FROM UsersCreditPayment ucp
-                        WHERE CampaignProfileId=@Id
-                        GROUP BY ucp.CampaignProfileId) payit
-                    ON payit.CampaignProfileId=bilit.CampaignProfileId";
-        }
 
 
         #endregion
+
+
+
+
+        //public async Task<ReturnResult> GetOutstandingBalance(int id)
+        //{
+        //    try
+        //    {
+        //        decimal outstanding = await OutstandingBalance(id);
+        //        if (outstanding == -1)
+        //            result.result = 0;
+        //        else
+        //            result.body = outstanding;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var _logging = new ErrorLogging()
+        //        {
+        //            ErrorMessage = ex.Message.ToString(),
+        //            StackTrace = ex.StackTrace.ToString(),
+        //            PageName = "AdvertiserFinancialService",
+        //            ProcedureName = "GetOutstandingBalance"
+        //        };
+        //        _logging.LogError();
+        //        result.result = 0;
+        //    }
+        //    return result;
+        //}
+
+
+        ///// <summary>
+        ///// Is actually a list of outstanding invoices against a campaign
+        ///// </summary>
+        ///// <param name="id">Campaign ProfileId</param>
+        ///// <returns></returns>
+        //public async Task<ReturnResult> GetInvoiceDetails(int id)
+        //{
+        //    try
+        //    {
+        //        decimal outstanding = await OutstandingBalance(id);
+        //        if (outstanding == -1)
+        //            result.result = 0;
+
+        //        if (outstanding > 0)
+        //        {
+        //            result.body = await _sharedDal.GetInvoiceList(id);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var _logging = new ErrorLogging()
+        //        {
+        //            ErrorMessage = ex.Message.ToString(),
+        //            StackTrace = ex.StackTrace.ToString(),
+        //            PageName = "AdvertiserFinancialService",
+        //            ProcedureName = "GetInvoiceDetails"
+        //        };
+        //        _logging.LogError();
+        //        result.result = 0;
+        //    }
+        //    return result;
+
+        //}
+
+
+        //private async Task<decimal> OutstandingBalance(int billingId)
+        //{
+        //    try
+        //    {
+        //        using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+        //        {
+        //            await connection.OpenAsync();
+        //            return await connection.QueryFirstOrDefaultAsync<decimal>(GetOutstandingBalance(), new { Id = billingId });
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var _logging = new ErrorLogging()
+        //        {
+        //            ErrorMessage = ex.Message.ToString(),
+        //            StackTrace = ex.StackTrace.ToString(),
+        //            PageName = "AdvertiserFinancialService",
+        //            ProcedureName = "OutstandingBalance"
+        //        };
+        //        _logging.LogError();
+        //        return -1;
+        //    }
+        //}
+
+
+        ///// <summary>
+        ///// Updates FROM the User Credit Details screen
+        ///// </summary>
+        ///// <param name="_creditmodel"></param>
+        ///// <returns></returns>
+        //public async Task<ReturnResult> UpdateCredit(UsersCreditFormModel _creditmodel)
+        //{
+        //    try
+        //    {
+        //        _creditmodel.AvailableCredit = await CalculateNewCredit(_creditmodel.UserId);
+
+        //        var update_query = @"UPDATE UsersCredit SET UserId = @UserId,AssignCredit = @AssignCredit,AvailableCredit = @AvailableCredit,
+        //                                                                                 UpdatedDate = GETDATE(),CurrencyId = @CurrencyId
+        //                                                                                 WHERE Id = @Id";
+
+
+        //        using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+        //        {
+        //            await connection.OpenAsync();
+        //            result.body = await connection.ExecuteAsync(update_query, _creditmodel);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var _logging = new ErrorLogging()
+        //        {
+        //            ErrorMessage = ex.Message.ToString(),
+        //            StackTrace = ex.StackTrace.ToString(),
+        //            PageName = "UserCreditService",
+        //            ProcedureName = "UpdateCredit"
+        //        };
+        //        _logging.LogError();
+        //        result.result = 0;
+        //    }
+        //    return result;
+
+        //}
+
+
+        //private string GetOutstandingBalance()
+        //{
+        //    string sql = @"SELECT ISNULL((bilit.TotalAmount - ISNULL(CAST(payit.Amount AS decimal(18,2)),0)),0) AS OutstandingAmount 
+        //            FROM
+        //                (SELECT ISNULL(CAST(bil.TotalAmount AS decimal(18,2)),0) AS TotalAmount,Id  
+        //                FROM Billing AS bil
+        //                WHERE bil.Id=@Id) bilit
+        //            LEFT JOIN
+        //                (SELECT SUM(ISNULL(CAST(ucp.Amount AS decimal(18,2)),0)) AS Amount,BillingId  
+        //                FROM UsersCreditPayment ucp
+        //                WHERE BillingId=@Id
+        //                GROUP BY BillingId) payit
+        //            ON payit.BillingId=bilit.Id";
+
+        //    return sql;
+        //}
+
 
     }
 }

@@ -114,13 +114,14 @@ namespace AdtonesAdminWebApi.DAL
                          {
                              Sid = sp,
                              AdId = ad,
-                             ManId = manId
+                             ManId = manId,
+                             Suppress = true
                          }));
             return x;
         }
 
 
-        public async Task<int> InsertNewAdvertiserToSalesExec(int sp, int ad)
+        public async Task<int> InsertNewAdvertiserToSalesExec(int sp, int ad, bool mail)
         {
             var Id = await _executers.ExecuteCommand(_connStr,
                          conn => conn.ExecuteScalar<int>(SalesManagementQuery.GetSalesManagerId, new
@@ -132,7 +133,8 @@ namespace AdtonesAdminWebApi.DAL
                          {
                              Sid = sp,
                              AdId = ad,
-                             ManId = Id
+                             ManId = Id,
+                             Suppress = mail
                          }));
             return x;
         }

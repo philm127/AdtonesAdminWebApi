@@ -66,10 +66,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                 (SELECT a.[UserId], b.[AssignCredit], a.[Id] 
                                                                     FROM
                                                                         (SELECT[UserId], MIN(Id) AS Id FROM UsersCredit GROUP BY[UserId]) a
-                                                            INNER JOIN UsersCredit b ON a.[UserId] = b.[UserId] AND a.Id = b.Id) cred
+                                                            LEFT JOIN UsersCredit b ON a.[UserId] = b.[UserId] AND a.Id = b.Id) cred
                                                             ON item.UserId = cred.UserId
                                                             LEFT JOIN
-                                                                (SELECT COUNT(UserId)as TicketCount, UserId FROM Question WHERE Status IN (1, 2) GROUP BY UserId) tkt
+                                                                (SELECT COUNT(UserId) AS TicketCount, UserId FROM Question WHERE Status IN (1, 2) GROUP BY UserId) tkt
                                                             ON item.UserId = tkt.UserId
                                                             LEFT JOIN
                                                                 (SELECT COUNT(CampaignProfileId) AS NoOfactivecampaign,UserId FROM Campaignprofile 
@@ -102,7 +102,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                            FROM
                                                                 (SELECT item.UserId, item.RoleId, item.Email, item.DateCreated, item.Activated,
                                                                 item.FirstName,item.LastName
-                                                                FROM Users AS item Where item.VerificationStatus = 1 AND item.RoleId = 3) item
+                                                                FROM Users AS item WHERE item.VerificationStatus = 1 AND item.RoleId = 3) item
                                                             LEFT JOIN
                                                                 (SELECT CONCAT(u.FirstName,' ',u.LastName) AS SalesExec,u.UserId,sales.AdvertiserId 
                                                                     FROM Users AS u INNER JOIN Advertisers_SalesTeam AS sales ON sales.SalesExecId=u.UserId
@@ -136,7 +136,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                 WHERE (ISNULL(bill3.totalAmount, 0) - ISNULL(uc.paidAmount, 0)) > 0
                                                                 GROUP BY bill3.UserId) billit
                                                             ON item.UserId = billit.UserId
-                                                            LEFT JOIN Contacts AS cont ON cont.UserId=item.UserId ";
+                                                            INNER JOIN Contacts AS cont ON cont.UserId=item.UserId ";
 
 
 
@@ -165,12 +165,13 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
 
-        public static string SalesExecResultQuery => @"SELECT adsales.SalesExecId AS UserId,u.Email, u.DateCreated, u.Activated,
+        public static string SalesExecResultQuery => @"SELECT ss.ExecId AS UserId,u.Email, u.DateCreated, u.Activated,
                                                         u.FirstName,u.LastName,COUNT(x.UserId) As NoAdvertisers,SUM(x.NoOfactivecampaign) AS NoOfactivecampaign,
                                                         SUM(x.NoOfunapprovedadverts) AS NoOfunapprovedadverts,
                                                         SUM(x.outStandingInvoice) AS outStandingInvoice, SUM(x.TicketCount) AS TicketCount
-                                                        FROM Advertisers_SalesTeam AS adsales
-                                                        INNER JOIN Users AS u ON u.UserId=adsales.SalesExecId
+                                                        FROM SalesManager_SalesExec AS ss 
+                                                        LEFT JOIN Advertisers_SalesTeam AS adsales ON adsales.SalesExecId=ss.ExecId
+                                                        INNER JOIN Users AS u ON u.UserId=ss.ExecId
                                                         LEFT JOIN
                                                         (
                                                         SELECT item.UserId,

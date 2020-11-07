@@ -23,6 +23,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string CurrencyCode { get; set; }
         public string SalesExec { get; set; }
         public int SUserId { get; set; }
+        public string InvoicePath { get; set; }
     }
     
     public class InvoiceResult : InvoiceBase
@@ -40,7 +41,6 @@ namespace AdtonesAdminWebApi.ViewModels
         public string PaymentMethod { get; set; }
 
         public int UsersCreditPaymentId { get; set; }
-        public string InvoicePath { get; set; }
     }
 
     public class OutstandingInvoiceResult : InvoiceBase

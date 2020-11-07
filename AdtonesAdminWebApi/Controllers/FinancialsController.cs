@@ -113,28 +113,40 @@ namespace AdtonesAdminWebApi.Controllers
             return await _paymentService.AddCampaignCredit(model);
         }
 
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="model"></param>
+        ///// <returns>body contains a decimal value</returns>
+        //[HttpGet("v1/GetOutstandingBalance/{id}")]
+        //public async Task<ReturnResult> GetOutstandingBalance(int id)
+        //{
+        //    return await _paymentService.GetOutstandingBalance(id);
+        //}
+
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="id"></param>
         /// <returns>body contains a decimal value</returns>
-        [HttpGet("v1/GetOutstandingBalance/{id}")]
-        public async Task<ReturnResult> GetOutstandingBalance(int id)
+        [HttpGet("v1/GetToPayDetails/{id}")]
+        public async Task<ReturnResult> GetToPayDetails(int id)
         {
-            return await _paymentService.GetOutstandingBalance(id);
+            return await _paymentService.GetToPayDetails(id);
         }
 
 
-        /// <summary>
-        /// Is actually a list of outstanding invoices against a campaign
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns>body contains List SharedSelectListViewModel</returns>
-        [HttpGet("v1/GetInvoiceDropdown/{id}")]
-        public async Task<ReturnResult> GetInvoiceDropdown(int id)
-        {
-            return await _paymentService.GetInvoiceDetails(id);
-        }
+        ///// <summary>
+        ///// Is actually a list of outstanding invoices against a campaign
+        ///// </summary>
+        ///// <param name="model"></param>
+        ///// <returns>body contains List SharedSelectListViewModel</returns>
+        //[HttpGet("v1/GetInvoiceDropdown/{id}")]
+        //public async Task<ReturnResult> GetInvoiceDropdown(int id)
+        //{
+        //    return await _paymentService.GetInvoiceDetails(id);
+        //}
 
         
         /// <summary>
