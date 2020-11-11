@@ -7,8 +7,8 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface IConnectionStringService
     {
-        Task<string> GetSingleConnectionString(int Id);
-        Task<IEnumerable<string>> GetConnectionStrings(int Id = 0);
+        Task<string> GetConnectionStringByOperator(int Id);
+        Task<IEnumerable<string>> GetConnectionStrings();
         Task<int> GetUserIdFromAdtoneId(int Id, int operatorId);
         Task<int> GetUserIdFromAdtoneIdByConnString(int Id, string conn);
         Task<int> GetCampaignProfileIdFromAdtoneId(int Id, int operatorId);

@@ -30,7 +30,7 @@ namespace AdtonesAdminWebApi.OperatorSpecific
         public async Task<bool> DoSaveToDatabase<T>(IEnumerable<T> source, Func<IEnumerable<T>, DataTable, List<DataRow>> rowConverter, int operatorId)
         {
             
-            var operatorConnectionString = await _connService.GetSingleConnectionString(operatorId);
+            var operatorConnectionString = await _connService.GetConnectionStringByOperator(operatorId);
             try
             {
                 // creating inmemory table

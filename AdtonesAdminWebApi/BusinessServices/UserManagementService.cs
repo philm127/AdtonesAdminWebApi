@@ -375,14 +375,14 @@ namespace AdtonesAdminWebApi.BusinessServices
                     var contId = await AddContactInformation(command1);
                     if (contId == 0)
                     {
-                        await _userDAL.DeleteNewUser(mainUserId);
+                        // await _userDAL.DeleteNewUser(mainUserId);
                         result.result = 0;
                         result.error = "Contact was not added";
                         return result;
                     }
                     else if (contId == -1)
                     {
-                        await _userDAL.DeleteNewUser(mainUserId);
+                        // await _userDAL.DeleteNewUser(mainUserId);
                         result.result = 0;
                         result.error = "A contact with this mobile phone already exists";
                         return result;
@@ -390,18 +390,34 @@ namespace AdtonesAdminWebApi.BusinessServices
                     else
                     {
                         // Only run if successfully added new user to contacts
-                        opUserId = await _userDAL.AddNewUserToOperator(model);
-                        command1.AdtoneServerContactId = contId;
-                        command1.UserId = opUserId;
-                        var xx = await _userDAL.AddNewContactToOperator(command1);
+                        try
+                        {
+                            opUserId = await _userDAL.AddNewUserToOperator(model);
+                            command1.AdtoneServerContactId = contId;
+                            command1.UserId = opUserId;
+                            var xx = await _userDAL.AddNewContactToOperator(command1);
 
-                        CompanyDetails company = new CompanyDetails();
-                        company.Address = model.Address;
-                        company.CompanyName = model.Organisation;
-                        company.CountryId = model.CountryId;
-                        company.UserId = mainUserId;
+                            CompanyDetails company = new CompanyDetails();
+                            company.Address = model.Address;
+                            company.CompanyName = model.Organisation;
+                            company.CountryId = model.CountryId;
+                            company.UserId = mainUserId;
 
-                        var res = await AddCompanyDetails(company);
+                            var res = await AddCompanyDetails(company);
+                        }
+                        catch (Exception ex)
+                        {
+                            var _loggingA = new ErrorLogging()
+                            {
+                                ErrorMessage = ex.Message.ToString(),
+                                StackTrace = ex.StackTrace.ToString(),
+                                PageName = "UserManagementService",
+                                ProcedureName = "AddUser - UpdateOperator"
+                            };
+                            _loggingA.LogError();
+                            result.error = ex.Message.ToString();
+                            result.result = 0;
+                        }
 
                         bool mailsent = false;
 
@@ -427,6 +443,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                                 ProcedureName = "AddUser - SendMail"
                             };
                             _loggingA.LogError();
+                            result.body = "User " + model.FirstName + " " + model.LastName + " was Succesfully Added. But Email failed";
                         }
 
                         result.body = "User " + model.FirstName + " " + model.LastName + " was Succesfully Added";

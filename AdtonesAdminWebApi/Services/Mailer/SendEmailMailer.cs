@@ -73,38 +73,45 @@ namespace AdtonesAdminWebApi.Services.Mailer
             }
 
             message.Body = builder.ToMessageBody();
-
-            var creds = GetCredentials(operatorId, roleId);
-            //var pwd = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPPassword").Value;
-            //var usr = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPEmail").Value;
-            //var srv = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerAddress").Value;
-            //var port = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerPort").Value);
-
-            using SmtpClient client = new SmtpClient();
+            try
             {
-                client.Connect(creds.srv, creds.port, SecureSocketOptions.StartTls);//, SecureSocketOptions.StartTls);// creds.sslSend);
-                client.AuthenticationMechanisms.Remove("XOAUTH2");
-                client.Authenticate(creds.usr, creds.pwd); 
-                try
+
+                var creds = GetCredentials(operatorId, roleId);
+                //var pwd = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPPassword").Value;
+                //var usr = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPEmail").Value;
+                //var srv = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerAddress").Value;
+                //var port = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerPort").Value);
+
+                using SmtpClient client = new SmtpClient();
                 {
-                    client.Send(message);
-                }
-                catch (Exception ex)
-                {
-                    var _logging = new ErrorLogging()
+                    client.Connect(creds.srv, creds.port, SecureSocketOptions.StartTls);//, SecureSocketOptions.StartTls);// creds.sslSend);
+                    client.AuthenticationMechanisms.Remove("XOAUTH2");
+                    client.Authenticate(creds.usr, creds.pwd);
+                    try
                     {
-                        ErrorMessage = ex.Message.ToString(),
-                        StackTrace = ex.StackTrace.ToString(),
-                        PageName = "Services-Mailer-SendEmailMailer",
-                        ProcedureName = "SendEmail"
-                    };
-                    _logging.LogError();
-                    // return new FormFile();
+                        client.Send(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        var _logging = new ErrorLogging()
+                        {
+                            ErrorMessage = ex.Message.ToString(),
+                            StackTrace = ex.StackTrace.ToString(),
+                            PageName = "Services-Mailer-SendEmailMailer",
+                            ProcedureName = "SendEmail"
+                        };
+                        _logging.LogError();
+                        // return new FormFile();
+                    }
+                    finally
+                    {
+                        client.Disconnect(true);
+                    }
                 }
-                finally
-                {
-                    client.Disconnect(true);
-                }
+            }
+            catch
+            {
+                throw;
             }
         }
 

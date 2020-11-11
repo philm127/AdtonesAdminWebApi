@@ -330,7 +330,7 @@ namespace AdtonesAdminWebApi.DAL
         /// <returns></returns>
         public async Task<int> ChangeAdvertStatusOperator(UserAdvertResult model,int userId, int adId)
         {
-            var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
+            var operatorConnectionString = await _connService.GetConnectionStringByOperator(model.OperatorId);
             var sb = new StringBuilder();
             sb.Append(AdvertQuery.UpdateAdvertStatus);
             sb.Append(" AdvertId=@AdvertId;");

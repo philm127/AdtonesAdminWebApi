@@ -13,6 +13,9 @@ namespace AdtonesAdminWebApi.ViewModels
         public int[]? operators { get; set; }
         public int? country { get; set; }
         public int? currency { get; set; }
+
+        public int singleOperator { get; set; }
+        public string connstring { get; set; }
     }
 
 
@@ -33,13 +36,15 @@ namespace AdtonesAdminWebApi.ViewModels
         public int NumOfSMS { get; set; }
         public int NumOfEmail { get; set; }
         public int NumOfTotalUser { get; set; }
+        public int NumOfUserForever { get; set; }
         public int NumOfRemovedUser { get; set; }
         public int NumOfLiveCampaign { get; set; }
         public int NumberOfAdsProvisioned { get; set; }
         public int TotalSpend { get; set; }
         public int TotalCredit { get; set; }
         public int NumOfCancel { get; set; }
-
+        public long TotalPlayLength { get; set; }
+        public int TotalPlays { get; set; }
         public int NumOfPlayUnder6secs { get; set; }
 
         public double AveragePlaysPerUser { get; set; }
@@ -55,9 +60,22 @@ namespace AdtonesAdminWebApi.ViewModels
         public double TotalCredit { get; set; }
     }
 
-    public class PlayLengthModel
+    public class CampaignTableManReport
     {
-        public int NumOfPlay { get; set; }
+        public int NumOfPlaySixOver { get; set; }
+        public int NumOfPlayUnderSix { get; set; }
+        public int TotalPlays { get; set; }
         public long Playlength { get; set; }
+        public int NumOfSMS { get; set; }
+        public int NumOfEmail { get; set; }
+        public int NumCancelled { get; set; }
     }
+
+
+    public class ManRepUsers
+    {
+        public int TotalNumOfUsers { get; set; }
+        public int NumOfRemovedUser { get; set; }
+    }
+
 }

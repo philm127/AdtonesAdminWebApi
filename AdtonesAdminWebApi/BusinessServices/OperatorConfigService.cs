@@ -103,7 +103,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     model.AdtoneServerOperatorConfigurationId = await connection.ExecuteScalarAsync<int>(insert_query, model);
                 }
 
-                var constr = await _connService.GetSingleConnectionString(model.OperatorId);
+                var constr = await _connService.GetConnectionStringByOperator(model.OperatorId);
 
 
                 using (var connection = new SqlConnection(constr))
@@ -147,7 +147,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     var x = await connection.ExecuteScalarAsync<int>(sb.ToString(), model);
                 }
 
-                var constr = await _connService.GetSingleConnectionString(model.OperatorId);
+                var constr = await _connService.GetConnectionStringByOperator(model.OperatorId);
 
                 using (var connection = new SqlConnection(constr))
                 {

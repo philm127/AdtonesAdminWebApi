@@ -89,7 +89,7 @@ namespace AdtonesAdminWebApi.DAL
 
             if (userModel.OperatorId != 0)
             {
-                var operatorConnectionString = await _connService.GetSingleConnectionString(userModel.OperatorId);
+                var operatorConnectionString = await _connService.GetConnectionStringByOperator(userModel.OperatorId);
                 var sb2 = new StringBuilder();
                 sb2.Append(LoginQuery.UpdateLockout);
                 sb2.Append("AdtoneServerUserId=@userId");

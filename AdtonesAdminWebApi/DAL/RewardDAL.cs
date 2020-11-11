@@ -71,7 +71,7 @@ namespace AdtonesAdminWebApi.DAL
         {
 
             var rewardDetail = await GetRewardById(id);
-            var conns = await _connService.GetSingleConnectionString(rewardDetail.OperatorId);
+            var conns = await _connService.GetConnectionStringByOperator(rewardDetail.OperatorId);
 
             var sb = new StringBuilder();
             var sbOp = new StringBuilder();
@@ -99,7 +99,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> UpdateReward(RewardResult model)
         {
             var rewardDetail = await GetRewardById(model.RewardId);
-            var conns = await _connService.GetSingleConnectionString(rewardDetail.OperatorId);
+            var conns = await _connService.GetConnectionStringByOperator(rewardDetail.OperatorId);
 
             var sb = new StringBuilder();
             var sbOp = new StringBuilder();
@@ -130,7 +130,7 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> AddReward(RewardResult model)
         {
-            var conns = await _connService.GetSingleConnectionString(model.OperatorId);
+            var conns = await _connService.GetConnectionStringByOperator(model.OperatorId);
 
             var sb = new StringBuilder();
             var sbOp = new StringBuilder();

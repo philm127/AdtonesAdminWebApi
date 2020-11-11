@@ -214,7 +214,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 var x = await _invDAL.InsertPaymentFromUser(model);
 
-                var updated = await AddCredit(credModel);
             }
             catch (Exception ex)
             {
@@ -227,6 +226,13 @@ namespace AdtonesAdminWebApi.BusinessServices
                 };
                 _logging.LogError();
                 result.result = 0;
+            }
+
+            var updated = await AddCredit(credModel);
+
+            if (model.Amount >= model.OutstandingAmount)
+            {
+                int x = await _invDAL.UpdateInvoiceSettledDate(model.BillingId);
             }
 
             return result;

@@ -30,7 +30,7 @@ namespace AdtonesAdminWebApi.DAL
         /// </summary>
         /// <param name="OperatorId">used as a named and default parameter</param>
         /// <returns>string value of a ConnectionString</returns>
-        public async Task<string> GetSingleConnectionString(int Id = 0)
+        public async Task<string> GetConnectionStringByOperator(int Id = 0)
         {
 
             StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings WHERE OperatorId=@Id");
@@ -49,20 +49,13 @@ namespace AdtonesAdminWebApi.DAL
         /// </summary>
         /// <param name="Id">uses OperatorId</param>
         /// <returns>IEnumerable List of strings</returns>
-        public async Task<IEnumerable<string>> GetConnectionStrings(int Id = 0)
+        public async Task<IEnumerable<string>> GetConnectionStrings()
         {
 
             StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings");
 
             using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
-                await connection.OpenAsync();
-                if (Id > 0)
-                {
-                    sb.Append(" WHERE OperatorId=@Id");
-                    return await connection.QueryAsync<string>(sb.ToString(), new { Id = Id });
-                }
-                else
                     return await connection.QueryAsync<string>(sb.ToString());
             }
         }
@@ -97,7 +90,7 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> GetUserIdFromAdtoneId(int Id, int operatorId)
         {
-                var conn = await GetSingleConnectionString(operatorId);
+                var conn = await GetConnectionStringByOperator(operatorId);
             var select_string = "SELECT UserId FROM Users WHERE AdtoneServerUserId=@Id";
 
                 using (var connection = new SqlConnection(conn))
@@ -123,7 +116,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> GetCampaignProfileIdFromAdtoneId(int Id, int operatorId)
         {
             
-                var conn = await GetSingleConnectionString(operatorId);
+                var conn = await GetConnectionStringByOperator(operatorId);
                 StringBuilder sb = new StringBuilder("SELECT CampaignProfileId FROM CampaignProfile WHERE AdtoneServerCampaignProfileId=@Id");
 
                 using (var connection = new SqlConnection(conn))
@@ -149,7 +142,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> GetAdvertIdFromAdtoneId(int Id, int operatorId)
         {
 
-            var conn = await GetSingleConnectionString(operatorId);
+            var conn = await GetConnectionStringByOperator(operatorId);
             StringBuilder sb = new StringBuilder("SELECT AdvertId FROM Advert WHERE AdtoneServerAdvertId=@Id");
 
             using (var connection = new SqlConnection(conn))
@@ -163,7 +156,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> GetOperatorIdFromAdtoneId(int Id, int operatorId)
         {
 
-            var conn = await GetSingleConnectionString(operatorId);
+            var conn = await GetConnectionStringByOperator(operatorId);
             StringBuilder sb = new StringBuilder("SELECT OperatorId FROM Operators WHERE AdtoneServerOperatorId=@Id");
 
             using (var connection = new SqlConnection(conn))

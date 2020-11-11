@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Threading;
+using System.Collections.Concurrent;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -23,31 +25,37 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly ICurrencyDAL _curDAL;
         private readonly IHttpContextAccessor _httpAccessor;
         private IMemoryCache _cache;
+        private readonly IConnectionStringService _connService;
         ReturnResult result = new ReturnResult();
 
 
         public ManagementReportService(IManagementReportDAL reportDAL, ICurrencyConversion curConv, ICurrencyDAL curDAL, 
-            IHttpContextAccessor httpAccessor, IMemoryCache cache)
+            IHttpContextAccessor httpAccessor, IMemoryCache cache, IConnectionStringService connService)
         {
             _reportDAL = reportDAL;
             _curConv = curConv;
             _curDAL = curDAL;
             _httpAccessor = httpAccessor;
             _cache = cache;
+            _connService = connService;
         }
 
 
         private ManagementReportsSearch SetDefaults(ManagementReportsSearch search)
         {
             var today = DateTime.Today;
-            var tomorrow = today.AddDays(1);
+            var tomorrow = today.AddDays(2);
             var old = today.AddDays(-5000);
 
             if (search.DateTo == null || search.DateTo < old || search.DateTo < search.DateFrom)
                 search.DateTo = tomorrow;
+            else
+                search.DateTo.Value.Add(new TimeSpan(0, 0, 0));
 
             if (search.DateFrom == null || search.DateFrom < old || search.DateFrom > search.DateTo)
                 search.DateFrom = old;
+            else
+                search.DateFrom.Value.Add(new TimeSpan(0, 0, 0));
 
             if (search.operators == null || search.operators.Length == 0)
             {
@@ -96,7 +104,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             var searchString = System.Text.Json.JsonSerializer.Serialize(search);
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(30));
-            string key = $"MAMAGEMENT_REPORT_{searchString.ToString()}";
+            string key = $"MAMAGEMENT_REPORT_{searchString.ToString() + _httpAccessor.GetUserIdFromJWT().ToString()}";
             return await _cache.GetOrCreateAsync<ManagementReportModel>(key, cacheEntry =>
             {
                 cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
@@ -104,76 +112,75 @@ namespace AdtonesAdminWebApi.BusinessServices
             });
         }
 
+
         private async Task<ManagementReportModel> GetManReport(ManagementReportsSearch search)
         {
             search = SetDefaults(search);
 
             ManagementReportModel model = new ManagementReportModel();
+            //List<ManagementReportModel> models = new List<ManagementReportModel>();
 
             try
             {
+                //foreach (var op in search.operators)
+                //{
+                //    var constring = await _connService.GetConnectionStringByOperator(op);
+                //    if (constring != null && constring.Length > 10)
+                //    {
 
-                // Separated this out as conversion likely to take more time than the initial fetch.
-                IEnumerable<SpendCredit> totCosts = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetTotalCost);
-                var costAudit = totCosts.ToList();
+                /// Temp holding
+                var op = 1;
+                var constring = "fconn";
+                        // sets the times correct for the server
+                        //if (op == (int)Enums.OperatorTableId.Safaricom)
+                        //{
+                search.DateFrom = search.DateFrom.Value.AddHours(-2);
+                            search.DateTo = search.DateTo.Value.AddHours(22);
+                       // }
 
-                Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit, search);
+                        // Separated this out as conversion likely to take more time than the initial fetch.
+                        IEnumerable<SpendCredit> totCosts = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetTotalCost,op,constring);
+                        var costAudit = totCosts.ToList();
 
-                Task<int> totUser = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTotalUser);
-                Task<int> totAllUser = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTotalUserForever);
-                Task<int> totrem = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfRemovedUser);
-                Task<int> totads = _reportDAL.GetreportInts(search, ManagementReportQuery.NumberOfAdsProvisioned);
-                //// Task<int> up2Aud = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfUpdateToAudit);
+                        Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit, search);
 
-                Task<int> totCancel = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfCancel);
-                Task<int> totCam = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfLiveCampaign);
-                Task<int> totEmail = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfEmail);
-                //Task<int> totFile = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTextFile);
-                //Task<int> totline = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfTextLine);
-                Task<int> totSMS = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfSMS);
-                Task<PlayLengthModel> totPlays = _reportDAL.GetReportPlayLengths(search, ManagementReportQuery.NumOfPlay);
-                Task<PlayLengthModel> totLess6Plays = _reportDAL.GetReportPlayLengths(search, ManagementReportQuery.NumOfPlayUnder6);
+                        Task<ManRepUsers> totUser = _reportDAL.GetManReportsForUsers(search, ManagementReportQuery.TotalUsers, op, constring);
+                        Task<int> totads = _reportDAL.GetreportInts(search, ManagementReportQuery.NumberOfAdsProvisioned, op, constring);
+                        Task<int> totCam = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfLiveCampaign, op, constring);
+                        Task<CampaignTableManReport> totPlays = _reportDAL.GetReportPlayLengths(search, ManagementReportQuery.NumOfPlay, op, constring);
 
 
-                await Task.WhenAll(
-                    totUser,
-                    totAllUser,
-                    totrem,
-                    totads,
-                    totCancel,
-                    totCam,
-                    totEmail,
-                    //totFile,
-                    //totline,
-                    totSMS,
-                    totPlays,
-                    //up2Aud, 
-                    totLess6Plays,
-                    totCost
-                    );
-                var currency = await _curDAL.GetCurrencyUsingCurrencyIdAsync(search.currency);
+                        await Task.WhenAll(
+                                            totUser,
+                                            totads,
+                                            totCam,
+                                            totPlays,
+                                            totCost
+                                            );
+                        var currency = await _curDAL.GetCurrencyUsingCurrencyIdAsync(search.currency);
 
-                var under6 = totLess6Plays.Result;
-                var eqOver6 = totPlays.Result;
-                var avgPlay = (under6.NumOfPlay + eqOver6.NumOfPlay) > 0 ? (double)((under6.Playlength + eqOver6.Playlength)/1000) / (under6.NumOfPlay + eqOver6.NumOfPlay) : 0;
+                        var eqOver6 = totPlays.Result;
+                        var usrs = totUser.Result;
 
-                model.NumOfTotalUser = totUser.Result;
-                model.NumOfRemovedUser = totrem.Result;
-                model.NumberOfAdsProvisioned = totads.Result;
-                //// model.NumOfUpdateToAudit = up2Aud.Result;
-                model.NumOfCancel = totCancel.Result;
-                model.NumOfLiveCampaign = totCam.Result;
-                model.NumOfEmail = totEmail.Result;
-                //model.NumOfTextFile = totFile.Result;
-                //model.NumOfTextLine = totline.Result;
-                model.NumOfSMS = totSMS.Result;
-                model.NumOfPlay = eqOver6.NumOfPlay;
-                model.NumOfPlayUnder6secs = under6.NumOfPlay;
-                model.AveragePlaysPerUser = totAllUser.Result == 0 ? 0 : (double)(under6.NumOfPlay + eqOver6.NumOfPlay) / (double)totAllUser.Result;
-                model.TotalCredit = (int)totCost.Result.TotalCredit;
-                model.TotalSpend = (int)totCost.Result.TotalSpend;
-                model.CurrencyCode = GetCurrencySymbol(currency.CurrencyCode);
-                model.AveragePlayLength = (double)avgPlay;
+                        model.NumOfTotalUser += usrs.TotalNumOfUsers;
+                        model.NumOfRemovedUser += usrs.NumOfRemovedUser;
+                        model.NumberOfAdsProvisioned += totads.Result;
+                        model.NumOfCancel += eqOver6.NumCancelled;
+                        model.NumOfLiveCampaign += totCam.Result;
+                        model.NumOfEmail += eqOver6.NumOfEmail;
+                        model.NumOfSMS += eqOver6.NumOfSMS;
+                        model.TotalPlays += eqOver6.TotalPlays;
+                        model.TotalPlayLength += eqOver6.Playlength;
+                        model.NumOfPlay += eqOver6.NumOfPlaySixOver;
+                        model.NumOfPlayUnder6secs += eqOver6.NumOfPlayUnderSix;
+                        model.TotalCredit += (int)totCost.Result.TotalCredit;
+                        model.TotalSpend += (int)totCost.Result.TotalSpend;
+                        model.CurrencyCode = GetCurrencySymbol(currency.CurrencyCode);
+                //    }
+                //}
+
+                model.AveragePlayLength = (double)((model.TotalPlayLength) / 1000) / (model.TotalPlays);
+                model.AveragePlaysPerUser += model.NumOfTotalUser == 0 ? 0 : (double)(model.TotalPlays) / (double)model.NumOfTotalUser;
 
             }
             catch (Exception ex)
@@ -186,7 +193,125 @@ namespace AdtonesAdminWebApi.BusinessServices
                     ProcedureName = "GetQueries"
                 };
                 _logging.LogError();
-                
+
+            }
+            return model;
+        }
+
+
+        private async Task<ManagementReportModel> GetManReportTestAsync(ManagementReportsSearch search)
+        {
+            search = SetDefaults(search);
+
+            var model = new ManagementReportModel();
+            var models = new List<ManagementReportModel>();
+            CancellationTokenSource cts = new CancellationTokenSource();
+            ParallelOptions options = new ParallelOptions
+            { CancellationToken = cts.Token };
+
+            Parallel.ForEach(search.operators,
+            options,
+            () => model,
+            (item, loopState, localCount) =>
+            {
+                cts.Token.ThrowIfCancellationRequested();
+                ManagementReportModel distance = GetManReportAsync(search, item).Result;
+                return distance;
+            },
+            (tempResult) =>
+            {
+                if (tempResult != null)
+                {
+                    models.Add(tempResult);
+                    model.NumOfTotalUser += tempResult.NumOfTotalUser;
+                    model.NumOfRemovedUser += tempResult.NumOfRemovedUser;
+                    model.NumberOfAdsProvisioned += tempResult.NumberOfAdsProvisioned;
+                    model.NumOfCancel += tempResult.NumOfCancel;
+                    model.NumOfLiveCampaign += tempResult.NumOfLiveCampaign;
+                    model.NumOfEmail += tempResult.NumOfEmail;
+                    model.NumOfSMS += tempResult.NumOfSMS;
+                    model.TotalPlays += tempResult.TotalPlays;
+                    model.TotalPlayLength += tempResult.TotalPlayLength;
+                    model.NumOfPlay += tempResult.NumOfPlay;
+                    model.NumOfPlayUnder6secs += tempResult.NumOfPlayUnder6secs;
+                    model.TotalCredit += (int)tempResult.TotalCredit;
+                    model.TotalSpend += (int)tempResult.TotalSpend;
+                    model.CurrencyCode = tempResult.CurrencyCode;
+                }
+            });
+
+            model.AveragePlayLength = (double)((model.TotalPlayLength) / 1000) / (model.TotalPlays);
+            model.AveragePlaysPerUser += model.NumOfTotalUser == 0 ? 0 : (double)(model.TotalPlays) / (double)model.NumOfTotalUser;
+
+            return model;
+        }
+
+
+        private async Task<ManagementReportModel> GetManReportAsync(ManagementReportsSearch search, int op)
+        {
+            ManagementReportModel model = new ManagementReportModel();
+
+            try
+            {
+                    var constring = await _connService.GetConnectionStringByOperator(op);
+                if (constring != null && constring.Length > 10)
+                {
+                    search.connstring = constring;
+                    search.singleOperator = op;
+
+                    // Separated this out as conversion likely to take more time than the initial fetch.
+                    IEnumerable<SpendCredit> totCosts = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetTotalCost,op,constring);
+                    var costAudit = totCosts.ToList();
+
+                    Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit, search);
+                    Task<ManRepUsers> totUser = _reportDAL.GetManReportsForUsers(search, ManagementReportQuery.TotalUsers, op, constring);
+                    Task<int> totads = _reportDAL.GetreportInts(search, ManagementReportQuery.NumberOfAdsProvisioned, op, constring);
+                    Task<int> totCam = _reportDAL.GetreportInts(search, ManagementReportQuery.NumOfLiveCampaign, op, constring);
+                    Task<CampaignTableManReport> totPlays = _reportDAL.GetReportPlayLengths(search, ManagementReportQuery.NumOfPlay, op, constring);
+
+                    await Task.WhenAll(
+                        totUser,
+                        totads,
+                        totCam,
+                        totPlays,
+                        totCost
+                        );
+                    var currency = await _curDAL.GetCurrencyUsingCurrencyIdAsync(search.currency);
+                    var eqOver6 = totPlays.Result;
+                    var usrs = totUser.Result;
+
+                    model.NumOfTotalUser += usrs.TotalNumOfUsers;
+                    model.NumOfRemovedUser += usrs.NumOfRemovedUser;
+                    model.NumberOfAdsProvisioned += totads.Result;
+                    model.NumOfCancel += eqOver6.NumCancelled;
+                    model.NumOfLiveCampaign += totCam.Result;
+                    model.NumOfEmail += eqOver6.NumOfEmail;
+                    model.NumOfSMS += eqOver6.NumOfSMS;
+                    model.TotalPlays += eqOver6.TotalPlays;
+                    model.TotalPlayLength += eqOver6.Playlength;
+                    model.NumOfPlay += eqOver6.NumOfPlaySixOver;
+                    model.NumOfPlayUnder6secs += eqOver6.NumOfPlayUnderSix;
+                    model.TotalCredit += (int)totCost.Result.TotalCredit;
+                    model.TotalSpend += (int)totCost.Result.TotalSpend;
+                    model.CurrencyCode = GetCurrencySymbol(currency.CurrencyCode);
+                }
+                else
+                {
+                    model = null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "ManagementReportService",
+                    ProcedureName = "GetQueries"
+                };
+                _logging.LogError();
+
             }
             return model;
         }
@@ -453,36 +578,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        //private async Task<List<CurrencyListing>> GetConvertedCurrency(List<SpendCredit> creditList)
-        //{
-        //    string toCurrencyCode = "GBP";
-        //    var currency = creditList.Select(y => y.CurrencyCode).Distinct().ToList();
-        //    if (!currency.Contains("GBP"))
-        //        currency.Add("GBP");
-
-        //    var clList = new List<CurrencyListing>();
-        //    foreach (string cur in currency)
-        //    {
-        //        var cl = new CurrencyListing();
-
-        //        if (cur == "GBP")
-        //        {
-        //            cl.CurrencyCode = "GBP";
-        //            cl.CurrencyRate = 1;
-        //            clList.Add(cl);
-        //        }
-        //        else
-        //        {
-        //            cl.CurrencyCode = cur;
-
-        //            cl.CurrencyRate = GetCurrencyRateModel(cur, toCurrencyCode);
-        //            clList.Add(cl);
-        //        }
-        //    }
-        //    return clList;
-        //}
-
-
+        
         private async Task<TotalCostCredit> CalculateConvertedSpendCredit(List<SpendCredit> creditList, ManagementReportsSearch search)
         {
             TotalCostCredit campaignAudit = new TotalCostCredit();
@@ -519,6 +615,37 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             return campaignAudit;
         }
+
+        //private async Task<List<CurrencyListing>> GetConvertedCurrency(List<SpendCredit> creditList)
+        //{
+        //    string toCurrencyCode = "GBP";
+        //    var currency = creditList.Select(y => y.CurrencyCode).Distinct().ToList();
+        //    if (!currency.Contains("GBP"))
+        //        currency.Add("GBP");
+
+        //    var clList = new List<CurrencyListing>();
+        //    foreach (string cur in currency)
+        //    {
+        //        var cl = new CurrencyListing();
+
+        //        if (cur == "GBP")
+        //        {
+        //            cl.CurrencyCode = "GBP";
+        //            cl.CurrencyRate = 1;
+        //            clList.Add(cl);
+        //        }
+        //        else
+        //        {
+        //            cl.CurrencyCode = cur;
+
+        //            cl.CurrencyRate = GetCurrencyRateModel(cur, toCurrencyCode);
+        //            clList.Add(cl);
+        //        }
+        //    }
+        //    return clList;
+        //}
+
+
 
     }
 }

@@ -34,6 +34,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                           VALUES(@UserId,@BillingId,@Amount,@Description,@Status,GETDATE(),GETDATE(),
                                                             @CampaignprofileId);";
 
+        public static string UpdateInvoiceSettledDate => @"UPDATE Billing SET SettledDate=GETDATE() WHERE Id=@Id";
+
 
         public static string GetOutstandingBalanceCampaign => @"SELECT ISNULL((bilit.TotalAmount - ISNULL(CAST(payit.Amount AS decimal(18,2)),0)),0) AS OutstandingAmount 
                                                         FROM

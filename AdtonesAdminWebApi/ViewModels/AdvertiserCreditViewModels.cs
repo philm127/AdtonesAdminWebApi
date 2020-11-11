@@ -22,6 +22,7 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public int BillingId { get; set; }
         public decimal Amount { get; set; }
+        public decimal OutstandingAmount { get; set; }
         public string Description { get; set; }
         public int CampaignProfileId { get; set; }
         public int Status { get; set; } = 0;

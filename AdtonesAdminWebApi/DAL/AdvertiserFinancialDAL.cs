@@ -101,6 +101,21 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
+        public async Task<int> UpdateInvoiceSettledDate(int billingId)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(AdvertiserFinancialQuery.UpdateInvoiceSettledDate,
+                                                                                                            new { Id = billingId }));
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
 
         public async Task<int> UpdateUserCredit(AdvertiserCreditFormModel _creditmodel)
         {

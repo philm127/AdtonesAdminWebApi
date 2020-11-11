@@ -245,7 +245,7 @@ namespace AdtonesAdminWebApi.DAL
                                                                                 }));
 
                 var operatorId = 0;
-                var constr = await _connService.GetSingleConnectionString(model.OperatorId);
+                var constr = await _connService.GetConnectionStringByOperator(model.OperatorId);
 
                 operatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId, model.OperatorId);
                 x = await _executers.ExecuteCommand(constr,
@@ -307,7 +307,7 @@ namespace AdtonesAdminWebApi.DAL
                                                                                                             KeyValue = model.KeyValue
                                                                                                         }));
 
-                var constr = await _connService.GetSingleConnectionString(model.OperatorId);
+                var constr = await _connService.GetConnectionStringByOperator(model.OperatorId);
                 x = await _executers.ExecuteCommand(constr,
                                                             conn => conn.ExecuteScalar<int>(sb2.ToString(), new
                                                                                                         {

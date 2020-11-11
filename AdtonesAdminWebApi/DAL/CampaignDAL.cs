@@ -206,7 +206,7 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> UpdateCampaignMatch(CampaignProfile model)
         {
-            var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
+            var operatorConnectionString = await _connService.GetConnectionStringByOperator(model.OperatorId);
 
             var sb = new StringBuilder();
             sb.Append(CampaignQuery.UpdateCampaignMatchStatus);

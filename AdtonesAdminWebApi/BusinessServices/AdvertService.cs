@@ -268,7 +268,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 adModel.PrevStatus = model.PrevStatus;
                 adModel.UpdatedBy = model.UpdatedBy;
                 adModel.RejectionReason = model.RejectionReason;
-                var ConnString = await _connService.GetSingleConnectionString(adModel.OperatorId);
+                var ConnString = await _connService.GetConnectionStringByOperator(adModel.OperatorId);
 
                 if (adModel.Status == (int)Enums.AdvertStatus.Live && adModel.PrevStatus != (int)Enums.AdvertStatus.Pending)
                 {

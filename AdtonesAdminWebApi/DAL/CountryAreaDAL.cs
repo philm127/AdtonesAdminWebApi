@@ -115,26 +115,22 @@ namespace AdtonesAdminWebApi.DAL
 
             foreach (string constr in conns)
             {
-                model.UserId = await _connService.GetUserIdFromAdtoneIdByConnString(userId, constr);
+                if (constr != null && constr.Length > 10)
+                {
+                    model.UserId = await _connService.GetUserIdFromAdtoneIdByConnString(userId, constr);
 
-                x = await _executers.ExecuteCommand(constr,
-                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddCountry, new
-                                {
-                                    Name = model.Name.Trim(),
-                                    ShortName = model.ShortName.ToUpper().Trim(),
-                                    TermAndConditionFileName = model.TermAndConditionFileName,
-                                    CountryCode = model.CountryCode.Trim(),
-                                    AdtoneServeCountryId = model.AdtoneServeCountryId,
-                                    UserId = model.UserId
-                                }));
+                    x = await _executers.ExecuteCommand(constr,
+                                    conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddCountry, new
+                                    {
+                                        Name = model.Name.Trim(),
+                                        ShortName = model.ShortName.ToUpper().Trim(),
+                                        TermAndConditionFileName = model.TermAndConditionFileName,
+                                        CountryCode = model.CountryCode.Trim(),
+                                        AdtoneServeCountryId = model.AdtoneServeCountryId,
+                                        UserId = model.UserId
+                                    }));
+                }
 
-                y = await _executers.ExecuteCommand(constr,
-                                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddTax, new
-                                                {
-                                                    UserId = model.UserId,
-                                                    CountryId = x,
-                                                    TaxPercantage = model.TaxPercentage
-                                                }));
             }
 
             return x;
@@ -171,27 +167,22 @@ namespace AdtonesAdminWebApi.DAL
 
             foreach (string constr in conns)
             {
-                model.UserId = await _connService.GetUserIdFromAdtoneIdByConnString(userId, constr);
-                countryId = await _connService.GetCountryIdFromAdtoneId(model.Id, constr);
+                if (constr != null && constr.Length > 10)
+                {
+                    model.UserId = await _connService.GetUserIdFromAdtoneIdByConnString(userId, constr);
+                    countryId = await _connService.GetCountryIdFromAdtoneId(model.Id, constr);
 
-                x = await _executers.ExecuteCommand(constr,
-                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.UpdateCountry, new
-                                {
-                                    Name = model.Name.Trim(),
-                                    ShortName = model.ShortName.ToUpper().Trim(),
-                                    TermAndConditionFileName = model.TermAndConditionFileName,
-                                    CountryCode = model.CountryCode.Trim(),
-                                    UserId = model.UserId,
-                                    Id = countryId
-                                }));
-
-                y = await _executers.ExecuteCommand(constr,
-                                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.UpdateTax, new
-                                                {
-                                                    UserId = model.UserId,
-                                                    CountryId = countryId,
-                                                    TaxPercantage = model.TaxPercentage
-                                                }));
+                    x = await _executers.ExecuteCommand(constr,
+                                    conn => conn.ExecuteScalar<int>(CountryAreaQuery.UpdateCountry, new
+                                    {
+                                        Name = model.Name.Trim(),
+                                        ShortName = model.ShortName.ToUpper().Trim(),
+                                        TermAndConditionFileName = model.TermAndConditionFileName,
+                                        CountryCode = model.CountryCode.Trim(),
+                                        UserId = model.UserId,
+                                        Id = countryId
+                                    }));
+                }
             }
 
             return x;
@@ -274,8 +265,11 @@ namespace AdtonesAdminWebApi.DAL
 
             foreach (string constr in conns)
             {
-                x = await _executers.ExecuteCommand(constr,
+                if (constr != null && constr.Length > 10)
+                {
+                    x = await _executers.ExecuteCommand(constr,
                              conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+                }
             }
             return x;
         }
@@ -296,13 +290,16 @@ namespace AdtonesAdminWebApi.DAL
 
             foreach (string constr in conns)
             {
-                countryId = await _connService.GetCountryIdFromAdtoneId(areamodel.CountryId.GetValueOrDefault(), constr);
-                x = await _executers.ExecuteCommand(_connStr,
-                             conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddArea, new
-                             {
-                                 AreaName = areamodel.AreaName.Trim(),
-                                 CountryId = countryId
-                             }));
+                if (constr != null && constr.Length > 10)
+                {
+                    countryId = await _connService.GetCountryIdFromAdtoneId(areamodel.CountryId.GetValueOrDefault(), constr);
+                    x = await _executers.ExecuteCommand(_connStr,
+                                 conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddArea, new
+                                 {
+                                     AreaName = areamodel.AreaName.Trim(),
+                                     CountryId = countryId
+                                 }));
+                }
 
             }
             return x;

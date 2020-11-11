@@ -23,5 +23,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<AdvertiserCreditPaymentResult> GetToPayDetails(int billingId);
         Task<decimal> GetCreditBalanceForInvoicePayment(int billingId);
 
+        Task<int> UpdateInvoiceSettledDate(int billingId);
+
     }
 }

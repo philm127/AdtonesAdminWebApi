@@ -21,7 +21,7 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<string>> GetMsisdnCheckForExisting(int operatorId)
         {
-            var operatorConnectionString = await _connService.GetSingleConnectionString(operatorId);
+            var operatorConnectionString = await _connService.GetConnectionStringByOperator(operatorId);
             try
             {
                 return await _executers.ExecuteCommand(operatorConnectionString,
@@ -36,7 +36,7 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<bool> GetPromoUserBatchIdCheckForExisting(PromotionalUserFormModel model)
         {
-            var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
+            var operatorConnectionString = await _connService.GetConnectionStringByOperator(model.OperatorId);
             try
             {
                 return await _executers.ExecuteCommand(operatorConnectionString,
@@ -65,7 +65,7 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> UpdatePromotionalCampaignStatus(IdCollectionViewModel model)
         {
-            var operatorConnectionString = await _connService.GetSingleConnectionString(model.operatorId);
+            var operatorConnectionString = await _connService.GetConnectionStringByOperator(model.operatorId);
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(PromotionalCampaignQuery.UpdatePromotionalCampaignStatus);
             try
@@ -122,7 +122,7 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> AddPromotionalCampaignToOperator(PromotionalCampaignResult model)
         {
-            var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
+            var operatorConnectionString = await _connService.GetConnectionStringByOperator(model.OperatorId);
             var operatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId, model.OperatorId);
             model.OperatorId = operatorId;
             try
@@ -161,7 +161,7 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> AddPromotionalAdvertToOperator(PromotionalCampaignResult model)
         {
-            var operatorConnectionString = await _connService.GetSingleConnectionString(model.OperatorId);
+            var operatorConnectionString = await _connService.GetConnectionStringByOperator(model.OperatorId);
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(PromotionalCampaignQuery.AddPromoAdvert);
             try
@@ -185,7 +185,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             try
             {
-                var operatorConnectionString = await _connService.GetSingleConnectionString(id);
+                var operatorConnectionString = await _connService.GetConnectionStringByOperator(id);
                 return await _executers.ExecuteCommand(operatorConnectionString,
                                 conn => conn.Query<SharedSelectListViewModel>(PromotionalCampaignQuery.GetBatchIdForPromocampaign));
             }

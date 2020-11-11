@@ -21,11 +21,14 @@ namespace AdtonesAdminWebApi.DAL
 
 
 
-        public async Task<int> GetreportInts(ManagementReportsSearch search, string query)
+        public async Task<int> GetreportInts(ManagementReportsSearch search, string query, int ops, string conn)
         {
+            var op = new int[1];
+            op[0] = ops;
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(query);
+            //builder.AddParameters(new { searchOperators = op.ToArray() });
             builder.AddParameters(new { searchOperators = search.operators.ToArray() });
             builder.AddParameters(new { start = search.DateFrom });
             builder.AddParameters(new { end = search.DateTo });
@@ -54,11 +57,50 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<PlayLengthModel> GetReportPlayLengths(ManagementReportsSearch search, string query)
+        public async Task<ManRepUsers> GetManReportsForUsers(ManagementReportsSearch search, string query, int ops, string conn)
         {
+            var op = new int[1];
+            op[0] = ops;
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(query);
+            //builder.AddParameters(new { searchOperators = op.ToArray() });
+             builder.AddParameters(new { searchOperators = search.operators.ToArray() });
+            // builder.AddParameters(new { start = search.DateFrom });
+            // builder.AddParameters(new { end = search.DateTo });
+
+            if (search.country != null && search.country != 0)
+            {
+                sb.Append(" AND op.CountryId = @country ");
+                builder.AddParameters(new { country = search.country });
+            }
+
+            var values = CheckGeneralFile(sb, builder, pais: "op", ops: "op");
+            sb = values.Item1;
+            builder = values.Item2;
+            var select = builder.AddTemplate(sb.ToString());
+
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<ManRepUsers>(select.RawSql, select.Parameters));//, commandTimeout: 60
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<CampaignTableManReport> GetReportPlayLengths(ManagementReportsSearch search, string query, int ops, string conn)
+        {
+            int[] op = new int[1];
+            op[0] = ops;// search.singleOperator.ToString().ToCharArray().Select(Convert.ToInt32).ToArray();
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(query);
+            //builder.AddParameters(new { searchOperators = op.ToArray() });
             builder.AddParameters(new { searchOperators = search.operators.ToArray() });
             builder.AddParameters(new { start = search.DateFrom });
             builder.AddParameters(new { end = search.DateTo });
@@ -78,7 +120,7 @@ namespace AdtonesAdminWebApi.DAL
             {
 
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<PlayLengthModel>(select.RawSql, select.Parameters));//, commandTimeout: 60
+                                conn => conn.QueryFirstOrDefault<CampaignTableManReport>(select.RawSql, select.Parameters));//, commandTimeout: 60
             }
             catch
             {
@@ -120,14 +162,17 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<SpendCredit>> GetTotalCreditCost(ManagementReportsSearch search, string query)
+        public async Task<IEnumerable<SpendCredit>> GetTotalCreditCost(ManagementReportsSearch search, string query, int ops, string conn)
         {
+            var op = new int[1];
+            op[0] = ops;
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(query);
+            //builder.AddParameters(new { searchOperators = op.ToArray() });
             builder.AddParameters(new { searchOperators = search.operators.ToArray() });
-            builder.AddParameters(new { start = search.DateFrom });
-            builder.AddParameters(new { end = search.DateTo });
+            // builder.AddParameters(new { start = search.DateFrom });
+            // builder.AddParameters(new { end = search.DateTo });
 
             if (search.country != null && search.country > 0)
             {

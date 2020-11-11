@@ -182,8 +182,11 @@ namespace AdtonesAdminWebApi.DAL
 
                 foreach (string constr in conns)
                 {
-                    x = await _executers.ExecuteCommand(constr,
+                    if (constr != null && constr.Length > 10)
+                    {
+                        x = await _executers.ExecuteCommand(constr,
                                     conn => conn.ExecuteScalar<int>(sel.RawSql, sel.Parameters));
+                    }
                 }
                 
             }
