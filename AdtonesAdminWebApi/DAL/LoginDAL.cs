@@ -64,6 +64,19 @@ namespace AdtonesAdminWebApi.DAL
             return x;
         }
 
+        public async Task<int> UpdateLastLoggedIn(int userId)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<int>(LoginQuery.UpdateLoggedIn, new { Id = userId }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
 
         public async Task<int> UpdateUserLockout(User userModel)
         {

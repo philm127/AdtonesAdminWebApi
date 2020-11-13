@@ -635,7 +635,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 if (user.OperatorId == (int)Enums.OperatorTableId.Safaricom && user.RoleId == (int)Enums.UserRole.OperatorAdmin)
                     url = _configuration.GetValue<string>("AppSettings:SafaricomOperatorAdminSiteAddress").ToString();
                 else if (user.RoleId == 3 && user.MailSuppression == false)
-                    url = string.Format("{0}?activationCode={1}", _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("AdvertiserVerificationUrl").ToString(), user.Email);
+                    url = string.Format("{0}?activationCode={1}", _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("AdvertiserVerificationUrl").Value, user.Email);
                 else
                     url = _configuration.GetValue<string>("AppSettings:siteAddress").ToString();
 

@@ -10,6 +10,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     public interface IManagementReportService
     {
         Task<ReturnResult> GetReportData(ManagementReportsSearch search);
-        Task<XLWorkbook> GenerateExcelReport(ManagementReportsSearch search);
+        // Task<XLWorkbook> GenerateExcelReport(ManagementReportsSearch search);
     }
 }

@@ -34,50 +34,50 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [HttpPut("v1/GenerateManReport")]
-        public async Task<IActionResult> GenerateManReport(ManagementReportsSearch search)
-        {
-            string fileName = "Management_Report.xlsx";// + DateTime.Now.ToString("yyyy -MM-dd HH':'mm':'ss") + ".xlsx";
-            var wb = await _manService.GenerateExcelReport(search);
-            byte[] filebyte;
-            try
-            {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    wb.SaveAs(memoryStream);
-                    filebyte = memoryStream.ToArray();
-                    //string s = Convert.ToBase64String(filebyte);
-                    //var FileName = ContentDispositionHeaderValue.Parse(fileName.Trim('"'));
+        //[HttpPut("v1/GenerateManReport")]
+        //public async Task<IActionResult> GenerateManReport(ManagementReportsSearch search)
+        //{
+        //    string fileName = "Management_Report.xlsx";// + DateTime.Now.ToString("yyyy -MM-dd HH':'mm':'ss") + ".xlsx";
+        //    var wb = await _manService.GenerateExcelReport(search);
+        //    byte[] filebyte;
+        //    try
+        //    {
+        //        using (MemoryStream memoryStream = new MemoryStream())
+        //        {
+        //            wb.SaveAs(memoryStream);
+        //            filebyte = memoryStream.ToArray();
+        //            //string s = Convert.ToBase64String(filebyte);
+        //            //var FileName = ContentDispositionHeaderValue.Parse(fileName.Trim('"'));
 
-                    //var result = new HttpResponseMessage(HttpStatusCode.OK)
-                    //{
-                    //    Content = new ByteArrayContent(memoryStream.ToArray())
-                    //};
-                    //result.Content.Headers.ContentDisposition =
-                    //    new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
-                    //    {
-                    //        FileName = fileName
-                    //    };
-                    //result.Content.Headers.ContentType =
-                    //    new MediaTypeHeaderValue("application/vnd.ms-excel");
+        //            //var result = new HttpResponseMessage(HttpStatusCode.OK)
+        //            //{
+        //            //    Content = new ByteArrayContent(memoryStream.ToArray())
+        //            //};
+        //            //result.Content.Headers.ContentDisposition =
+        //            //    new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+        //            //    {
+        //            //        FileName = fileName
+        //            //    };
+        //            //result.Content.Headers.ContentType =
+        //            //    new MediaTypeHeaderValue("application/vnd.ms-excel");
 
-                    return File(filebyte, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
-                }
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CampaignAuditController",
-                    ProcedureName = "GenerateManReport"
-                };
-                _logging.LogError();
-                return null;
-            }
+        //            return File(filebyte, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var _logging = new ErrorLogging()
+        //        {
+        //            ErrorMessage = ex.Message.ToString(),
+        //            StackTrace = ex.StackTrace.ToString(),
+        //            PageName = "CampaignAuditController",
+        //            ProcedureName = "GenerateManReport"
+        //        };
+        //        _logging.LogError();
+        //        return null;
+        //    }
 
-        }
+        //}
 
 
         /// <summary>

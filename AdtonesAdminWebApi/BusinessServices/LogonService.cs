@@ -94,6 +94,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     {
                         var jwt = new AuthService(_configuration);
                         user.Token = jwt.GenerateSecurityToken(user);
+                        var updateLastLoginTime = _loginDAL.UpdateLastLoggedIn(user.UserId);
                     }
                     else
                     {
