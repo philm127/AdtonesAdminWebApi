@@ -159,7 +159,7 @@ namespace AdtonesAdminWebApi.DAL
 
                 foreach (string constr in conns)
                 {
-                    operatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId, model.OperatorId);
+                    operatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
                     x = await _executers.ExecuteCommand(constr,
                                                     conn => conn.ExecuteScalar<int>(OperatorQuery.UpdateOperator, new
                                                                                                                 {
@@ -247,7 +247,7 @@ namespace AdtonesAdminWebApi.DAL
                 var operatorId = 0;
                 var constr = await _connService.GetConnectionStringByOperator(model.OperatorId);
 
-                operatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId, model.OperatorId);
+                operatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
                 x = await _executers.ExecuteCommand(constr,
                                 conn => conn.ExecuteScalar<int>(OperatorQuery.AddOperatorMaxAdvert, new
                                                                                 {

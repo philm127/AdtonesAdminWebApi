@@ -3,6 +3,7 @@ using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -71,8 +72,9 @@ namespace AdtonesAdminWebApi.DAL
                 return await _executers.ExecuteCommand(_connStr,
                              conn => conn.ExecuteScalar<int>(LoginQuery.UpdateLoggedIn, new { Id = userId }));
             }
-            catch
+            catch (Exception ex)
             {
+                var msg = ex.Message.ToString();
                 throw;
             }
         }

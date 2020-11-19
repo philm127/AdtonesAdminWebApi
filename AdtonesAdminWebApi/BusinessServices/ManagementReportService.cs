@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.Threading;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Configuration;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -26,11 +27,12 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IHttpContextAccessor _httpAccessor;
         private IMemoryCache _cache;
         private readonly IConnectionStringService _connService;
+        private readonly IConfiguration _config;
         ReturnResult result = new ReturnResult();
 
 
         public ManagementReportService(IManagementReportDAL reportDAL, ICurrencyConversion curConv, ICurrencyDAL curDAL, 
-            IHttpContextAccessor httpAccessor, IMemoryCache cache, IConnectionStringService connService)
+            IHttpContextAccessor httpAccessor, IMemoryCache cache, IConnectionStringService connService, IConfiguration config)
         {
             _reportDAL = reportDAL;
             _curConv = curConv;
@@ -38,6 +40,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _httpAccessor = httpAccessor;
             _cache = cache;
             _connService = connService;
+            _config = config;
         }
 
 
@@ -46,16 +49,22 @@ namespace AdtonesAdminWebApi.BusinessServices
             var today = DateTime.Today;
             var tomorrow = today.AddDays(2);
             var old = today.AddDays(-5000);
+            TimeSpan ts = new TimeSpan(0, 0, 0);
 
             if (search.DateTo == null || search.DateTo < old || search.DateTo < search.DateFrom)
-                search.DateTo = tomorrow;
+                search.ToDate = tomorrow.Date.ToString();
             else
-                search.DateTo.Value.AddDays(1).Add(new TimeSpan(0, 0, 0));
+            {
+                search.ToDate = search.DateTo.Value.AddDays(1).Date.ToString();// + ts; //;//.AddHours(-3);
+                // search.DateTo = search.DateTo.Value.Date + ts;
+            }
 
             if (search.DateFrom == null || search.DateFrom < old || search.DateFrom > search.DateTo)
-                search.DateFrom = old;
+                search.FromDate = old.Date.ToString();
             else
-                search.DateFrom.Value.Add(new TimeSpan(0, 0, 0));
+            {
+                search.FromDate = search.DateFrom.Value.Date.ToString();// + ts;
+            }
 
             if (search.operators == null || search.operators.Length == 0)
             {
@@ -252,28 +261,65 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         private async Task<ManagementReportModel> GetManReportTestAsync(ManagementReportsSearch search)
         {
-            search = SetDefaults(search);
-
             var model = new ManagementReportModel();
             var models = new List<ManagementReportModel>();
-            CancellationTokenSource cts = new CancellationTokenSource();
-            ParallelOptions options = new ParallelOptions
-            { CancellationToken = cts.Token };
+            search = SetDefaults(search);
+            try
+            {
 
-            Parallel.ForEach(search.operators,
-            options,
-            () => model,
-            (item, loopState, localCount) =>
-            {
-                cts.Token.ThrowIfCancellationRequested();
-                ManagementReportModel distance = GetManReportAsync(search, item).Result;
-                return distance;
-            },
-            (tempResult) =>
-            {
-                if (tempResult != null)
+                //Task<ManagementReportModel> totSaf = GetManReportAsync(search, 1);
+                //Task<ManagementReportModel> totExpress = GetManReportAsync(search, 2);
+
+                //ManagementReportModel totSaf = new ManagementReportModel();
+                //ManagementReportModel totExpress = new ManagementReportModel();
+
+                //totSaf = await GetManReportAsync(search, 1);
+                //totExpress = await GetManReportAsync(search, 2);
+
+                if (search.operators.Contains(1) && search.operators.Contains(2))
                 {
-                    // models.Add(tempResult);
+                    Task<ManagementReportModel> totSaf = GetManReportAsync(search, 1);
+                    Task<ManagementReportModel> totExpress = GetManReportAsync(search, 2);
+                    //models.Add(await GetManReportAsync(search, 1));
+                    //models.Add(await GetManReportAsync(search, 2));
+                    await Task.WhenAll(totSaf, totExpress);
+                    models.Add(totSaf.Result);
+                    models.Add(totExpress.Result);
+
+                }
+                else if (search.operators.Contains(1) && search.operators.Contains(2) == false)
+                {
+                    //await Task.WhenAll(totSaf);
+                    //models.Add(totSaf.Result);
+                    models.Add(await GetManReportAsync(search, 1));
+                }
+                if (search.operators.Contains(1) == false && search.operators.Contains(2))
+                {
+                    //await Task.WhenAll(totExpress);
+                    //models.Add(totExpress.Result);
+                    models.Add(await GetManReportAsync(search, 2));
+                }
+
+                //CancellationTokenSource cts = new CancellationTokenSource();
+                //ParallelOptions options = new ParallelOptions
+                //{ CancellationToken = cts.Token };
+
+                //Parallel.ForEach(search.operators,
+                //options,
+                //() => model,
+                //(item, loopState, localCount) =>
+                //{
+                //    cts.Token.ThrowIfCancellationRequested();
+                //    ManagementReportModel distance = GetManReportAsync(search, item).Result;
+                //    return distance;
+                //},
+                //(tempResult) =>
+                //{
+                //    if (tempResult != null)
+                //    {
+                // models.Add(tempResult);
+                foreach (var tempResult in models)
+                {
                     /// Users
                     model.TotalUsers += tempResult.TotalUsers;
                     model.TotalListened += tempResult.TotalListened;
@@ -311,18 +357,42 @@ namespace AdtonesAdminWebApi.BusinessServices
                     model.TotalSpend += (int)tempResult.TotalSpend;
                     model.AmountSpent += (int)tempResult.AmountSpent;
                     model.AmountCredit += (int)tempResult.AmountCredit;
-                    model.CurrencyCode = model.CurrencyCode;
+                    model.CurrencyCode = tempResult.CurrencyCode;
+
+                    /// Rewards 
+                    model.TotRewardUsers = tempResult.TotRewardUsers;
+                    model.NumRewardUsers = tempResult.NumRewardUsers;
+                    model.TotalRewards = tempResult.TotalRewards;
+                    model.NumRewards = tempResult.NumRewards;
+                    // }
+                    // });
                 }
-            });
 
-            model.TotalAvgPlayLength = (double)((model.TotalPlayLength) / 1000) / (model.TotalPlays);
-            model.NumAvgPlayLength = (double)((model.PeriodPlayLength) / 1000) / (model.NumPlays);
+                model.TotalAvgPlayLength = model.TotalPlayLength == 0 ? 0 : (double)((model.TotalPlayLength) / 1000) / (model.TotalPlays);
+                model.NumAvgPlayLength = model.PeriodPlayLength == 0 ? 0 : (double)((model.PeriodPlayLength) / 1000) / (model.NumPlays);
 
-            model.TotalAvgPlays = model.TotalUsers == 0 ? 0 : (double)(model.TotalPlays) / (double)model.TotalUsers;
-            model.TotalAvgPlaysListened = model.TotalListened == 0 ? 0 : (double)(model.TotalPlays) / (double)model.TotalListened;
+                model.TotalAvgPlays = model.TotalUsers == 0 ? 0 : (double)(model.TotalPlays) / (double)model.TotalUsers;
+                model.TotalAvgPlaysListened = model.TotalListened == 0 ? 0 : (double)(model.TotalPlays) / (double)model.TotalListened;
 
-            model.NumAvgPlays = model.TotalUsers == 0 ? 0 : (double)(model.Num6Over + model.NumUnder6) / (double)model.TotalUsers;
-            model.NumAvgPlaysListened = model.NumListened == 0 ? 0 : (double)(model.NumPlays) / (double)model.NumListened;
+                model.NumAvgPlays = model.TotalUsers == 0 ? 0 : (double)(model.Num6Over + model.NumUnder6) / (double)model.TotalUsers;
+                model.NumAvgPlaysListened = model.NumListened == 0 ? 0 : (double)(model.NumPlays) / (double)model.NumListened;
+
+                model.TotAvgRewards = model.TotalRewards == 0 ? 0 : (decimal)(model.TotalRewards) / (decimal)model.TotRewardUsers;
+                model.NumAvgRewards = model.NumRewards == 0 ? 0 : (decimal)(model.NumRewards) / (decimal)model.NumRewardUsers;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "ManagementReportService",
+                    ProcedureName = "GetManReportsTestAsync"
+                };
+                _logging.LogError();
+                //                return Model;
+
+            }
 
             return model;
         }
@@ -334,102 +404,214 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-                var constring = await _connService.GetConnectionStringByOperator(op);
+                string constring = string.Empty;
+                //if (op == 2)
+                //    constring = _config.GetConnectionString("DefaultConnection");
+                //else
+                    constring = await _connService.GetConnectionStringByOperator(op);
+
                 if (constring != null && constring.Length > 10)
                 {
-                    search.connstring = constring;
-                    search.singleOperator = op;
+                    //var _logging = new ErrorLogging()
+                    //{
+                    //    ErrorMessage = op.ToString(),
+                    //    StackTrace = constring,
+                    //    PageName = "ManagementReportService",
+                    //    ProcedureName = "GetManReportAsync"
+                    //};
+                    //_logging.LogInfo();
+                    // search.connstring = constring;
+                    // search.singleOperator = op;
+                    try
+                    {
+                        string rewardTot = string.Empty;
+                        if (op == 1)
+                        {
+                            rewardTot = ManagementReportQuery.TotalSafRewards;
+                        }
+                        else if (op == 2)
+                        {
+                            rewardTot = ManagementReportQuery.TotalExpRewards;
+                        }
+                        // Separated this out as conversion likely to take more time than the initial fetch.
+                        /// Spend & Credit
+                        IEnumerable<SpendCredit> amtsSpent = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetAmountSpent, op, constring,false);
+                        var spentAudit = amtsSpent.ToList();
+                        Task<TotalCostCredit> amtSpent = CalculateConvertedSpendCredit(spentAudit, search);
 
-                    // Separated this out as conversion likely to take more time than the initial fetch.
-                    /// Spend & Credit
-                    IEnumerable<SpendCredit> totCosts = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetTotalCost, op, constring);
-                    var costAudit = totCosts.ToList();
-                    Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit, search);
+                        IEnumerable<SpendCredit> amtsCredit = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetAmountCredit, op, constring,false);
+                        var creditAudit = amtsCredit.ToList();
+                        Task<TotalCostCredit> amtCredit = CalculateConvertedSpendCredit(creditAudit, search);
 
-                    IEnumerable<SpendCredit> amtsSpent = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetAmountSpent, op, constring);
-                    var spentAudit = amtsSpent.ToList();
-                    Task<TotalCostCredit> amtSpent = CalculateConvertedSpendCredit(spentAudit, search);
+                        try
+                        {
+                            IEnumerable<SpendCredit> totCosts = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetTotalCost, op, constring, true);
+                            var costAudit = totCosts.ToList();
+                            Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit, search);
 
-                    IEnumerable<SpendCredit> amtsCredit = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetAmountCredit, op, constring);
-                    var creditAudit = amtsCredit.ToList();
-                    Task<TotalCostCredit> amtCredit = CalculateConvertedSpendCredit(creditAudit, search);
+                            try
+                            {
+                                /// Subscribers
+                                Task<ManRepUsers> totUser = _reportDAL.GetManReportsForUsers(search, ManagementReportQuery.TotalUsers, op, constring);
+                                Task<TwoDigitsManRep> totListen = _reportDAL.GetreportDoubleInts(search, ManagementReportQuery.TotalListened, op, constring);
+                                
+                                try
+                                {
+                                    /// Campaigns & Adverts
+                                    Task<TwoDigitsManRep> totads = _reportDAL.GetreportDoubleInts(search, ManagementReportQuery.TotalAdsProvisioned, op, constring);
+                                    Task<TwoDigitsManRep> totCam = _reportDAL.GetreportDoubleInts(search, ManagementReportQuery.TotalLiveCampaign, op, constring);
+                                    
+                                    try
+                                    {
+                                        /// Plays
+                                        Task<CampaignTableManReport> totPlays = _reportDAL.GetReportPlayLengths(search, ManagementReportQuery.TotalPlayStuff, op, constring);
+                                        try
+                                        {
+                                            Task<RewardsManModel> totRewards = _reportDAL.GetReportRewards(search, rewardTot, op, constring);
 
-                    /// Subscribers
-                    Task<ManRepUsers> totUser = _reportDAL.GetManReportsForUsers(search, ManagementReportQuery.TotalUsers, op, constring);
-                    Task<TwoDigitsManRep> totListen = _reportDAL.GetreportDoubleInts(search, ManagementReportQuery.TotalListened, op, constring);
-                    // Task<int> numListen = _reportDAL.GetreportInts(search, ManagementReportQuery.NumListened, op, constring);
 
-                    /// Campaigns & Adverts
-                    // Task<int> numads = _reportDAL.GetreportInts(search, ManagementReportQuery.NumberOfAdsProvisioned, op, constring);
-                    Task<TwoDigitsManRep> totads = _reportDAL.GetreportDoubleInts(search, ManagementReportQuery.TotalAdsProvisioned, op, constring);
-                    Task<TwoDigitsManRep> totCam = _reportDAL.GetreportDoubleInts(search, ManagementReportQuery.TotalLiveCampaign, op, constring);
-                    // Task<int> numCam = _reportDAL.GetreportInts(search, ManagementReportQuery.NumLiveCampaign, op, constring);
-
-                    /// Plays
-                    Task<CampaignTableManReport> totPlays = _reportDAL.GetReportPlayLengths(search, ManagementReportQuery.TotalPlayStuff, op, constring);
-                    // Task<CampaignTableManReport> numPlays = _reportDAL.GetReportPlayLengths(search, ManagementReportQuery.NumOfPlayStuff, op, constring);
-
-
-                    await Task.WhenAll(
+                                            await Task.WhenAll(
+                                                amtSpent,
+                                                totCost,
                                                 totUser,
                                                 totListen,
-                                                // numListen,
                                                 totads,
-                                                // numads,
                                                 totCam,
-                                                // numCam,
                                                 totPlays,
-                                                // numPlays,
-                                                totCost,
                                                 amtCredit,
-                                                amtSpent
-                                                );
-                    var currency = await _curDAL.GetCurrencyUsingCurrencyIdAsync(search.currency);
+                                                totRewards);
 
-                    // var eqOver6 = totPlays.Result;
-                    var numPlay = totPlays.Result;
-                    var usrs = totUser.Result;
-                    var camps = totCam.Result;
-                    var ads = totads.Result;
-                    var listen = totListen.Result;
-                    /// Users
-                    model.TotalUsers = usrs.TotalUsers;
-                    model.TotalListened = listen.TotalItem;
-                    model.TotalRemovedUser = usrs.TotalRemovedUser;
-                    model.AddedUsers = usrs.AddedUsers;
-                    model.NumListened = listen.NumItem;
+                                            var currency = await _curDAL.GetCurrencyUsingCurrencyIdAsync(search.currency);
 
-                    /// Campaigns & Adverts
-                    model.TotalAdverts = ads.TotalItem;
-                    model.AdvertsProvisioned = ads.NumItem;
-                    model.TotalCampaigns = camps.TotalItem;
-                    model.CampaignsAdded = camps.NumItem;
-                    model.TotalCancelled = numPlay.TotCancelled;
-                    model.NumCancelled = numPlay.NumCancelled;
-                    /// Plays
-                    model.TotalEmail = numPlay.TotOfEmail;
-                    model.TotalSMS = numPlay.TotOfSMS;
-                    //model.TotalPlays = eqOver6.TotalPlays;
-                    model.TotalPlayLength = numPlay.TotPlaylength;
-                    model.Total6Over = numPlay.TotOfPlaySixOver;
-                    model.TotalUnder6 = numPlay.TotOfPlayUnderSix;
+                                            // var eqOver6 = totPlays.Result;
+                                            var numPlay = totPlays.Result;
+                                            var usrs = totUser.Result;
+                                            var camps = totCam.Result;
+                                            var ads = totads.Result;
+                                            var listen = totListen.Result;
+                                            var rewardsTot = totRewards.Result;
+                                            /// Users
+                                            model.TotalUsers = usrs.TotalUsers;
+                                            model.TotalListened = listen.TotalItem;
+                                            model.TotalRemovedUser = usrs.TotalRemovedUser;
+                                            model.AddedUsers = usrs.AddedUsers;
+                                            model.NumListened = listen.NumItem;
 
-                    model.NumEmail = numPlay.NumOfEmail;
-                    model.NumSMS = numPlay.NumOfSMS;
-                    //model.TotalPlays = eqOver6.TotalPlays;
-                    model.PeriodPlayLength = numPlay.Playlength;
-                    model.Num6Over = numPlay.NumOfPlaySixOver;
-                    model.NumUnder6 = numPlay.NumOfPlayUnderSix;
-                    // Total Plays
-                    model.TotalPlays = numPlay.TotalPlays;
-                    model.NumPlays = numPlay.Plays;
+                                            /// Campaigns & Adverts
+                                            model.TotalAdverts = ads.TotalItem;
+                                            model.AdvertsProvisioned = ads.NumItem;
+                                            model.TotalCampaigns = camps.TotalItem;
+                                            model.CampaignsAdded = camps.NumItem;
+                                            model.TotalCancelled = numPlay.TotCancelled;
+                                            model.NumCancelled = numPlay.NumCancelled;
+                                            /// Plays
+                                            model.TotalEmail = numPlay.TotOfEmail;
+                                            model.TotalSMS = numPlay.TotOfSMS;
+                                            //model.TotalPlays = eqOver6.TotalPlays;
+                                            model.TotalPlayLength = numPlay.TotPlaylength;
+                                            model.Total6Over = numPlay.TotOfPlaySixOver;
+                                            model.TotalUnder6 = numPlay.TotOfPlayUnderSix;
 
-                    /// Credit & Spend
-                    model.TotalCredit = (int)totCost.Result.TotalCredit;
-                    model.TotalSpend = (int)totCost.Result.TotalSpend;
-                    model.AmountSpent = (int)amtSpent.Result.TotalSpend;
-                    model.AmountCredit = (int)amtCredit.Result.TotalCredit;
-                    model.CurrencyCode = GetCurrencySymbol(currency.CurrencyCode);
+                                            model.NumEmail = numPlay.NumOfEmail;
+                                            model.NumSMS = numPlay.NumOfSMS;
+                                            //model.TotalPlays = eqOver6.TotalPlays;
+                                            model.PeriodPlayLength = numPlay.Playlength;
+                                            model.Num6Over = numPlay.NumOfPlaySixOver;
+                                            model.NumUnder6 = numPlay.NumOfPlayUnderSix;
+                                            // Total Plays
+                                            model.TotalPlays = numPlay.TotalPlays;
+                                            model.NumPlays = numPlay.Plays;
+
+                                            /// Credit & Spend
+                                            model.TotalCredit = (int)totCost.Result.TotalCredit;
+                                            model.TotalSpend = (int)totCost.Result.TotalSpend;
+                                            model.AmountSpent = (int)amtSpent.Result.TotalSpend;
+                                            model.AmountCredit = (int)amtCredit.Result.TotalCredit;
+                                            model.CurrencyCode = GetCurrencySymbol(currency.CurrencyCode);
+
+                                            /// Rewards
+                                            model.TotalRewards = rewardsTot.IsRewardReceivedTot;
+                                            model.TotRewardUsers = rewardsTot.UserProfileIdTot;
+                                            model.NumRewards = rewardsTot.IsRewardReceivedNum;
+                                            model.NumRewardUsers = rewardsTot.UserProfileIdNum;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            var _logging = new ErrorLogging()
+                                            {
+                                                ErrorMessage = ex.Message.ToString(),
+                                                StackTrace = ex.StackTrace.ToString(),
+                                                PageName = "ManagementReportService",
+                                                ProcedureName = "Rewards"
+                                            };
+                                            _logging.LogError();
+
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        var _logging = new ErrorLogging()
+                                        {
+                                            ErrorMessage = ex.Message.ToString(),
+                                            StackTrace = ex.StackTrace.ToString(),
+                                            PageName = "ManagementReportService",
+                                            ProcedureName = "Plays"
+                                        };
+                                        _logging.LogError();
+
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    var _logging = new ErrorLogging()
+                                    {
+                                        ErrorMessage = ex.Message.ToString(),
+                                        StackTrace = ex.StackTrace.ToString(),
+                                        PageName = "ManagementReportService",
+                                        ProcedureName = "Campaigns"
+                                    };
+                                    _logging.LogError();
+
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                var _logging = new ErrorLogging()
+                                {
+                                    ErrorMessage = ex.Message.ToString(),
+                                    StackTrace = ex.StackTrace.ToString(),
+                                    PageName = "ManagementReportService",
+                                    ProcedureName = "Subscribers"
+                                };
+                                _logging.LogError();
+
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            var _logging = new ErrorLogging()
+                            {
+                                ErrorMessage = ex.Message.ToString(),
+                                StackTrace = ex.StackTrace.ToString(),
+                                PageName = "ManagementReportService",
+                                ProcedureName = "Money - Spent"
+                            };
+                            _logging.LogError();
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        var _logging = new ErrorLogging()
+                        {
+                            ErrorMessage = ex.Message.ToString(),
+                            StackTrace = ex.StackTrace.ToString(),
+                            PageName = "ManagementReportService",
+                            ProcedureName = "Money"
+                        };
+                        _logging.LogError();
+
+                    }
                 }
                 else
                 {
@@ -444,7 +626,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "ManagementReportService",
-                    ProcedureName = "GetQueries"
+                    ProcedureName = "GetManreportAsync"
                 };
                 _logging.LogError();
 

@@ -27,32 +27,46 @@ namespace AdtonesAdminWebApi.Services
             ResolvePath = string.Concat(webroot + "ErrorLogs.txt");
             var filepath = ResolvePath;
 
-            if (System.IO.File.Exists(filepath))
+            //if (System.IO.File.Exists(filepath))
+            //{
+            using (StreamWriter w = File.AppendText(filepath))
             {
-                using (StreamWriter writer = new StreamWriter(filepath, true))
-                {
-                    writer.WriteLine("-------------------START-------------" + DateTime.Now);
-                    writer.WriteLine("Page: " + PageName + ", Procedure: " + ProcedureName + ",ErrorMsg: " + ErrorMessage + ", StackTrace: " + StackTrace);
-                    writer.WriteLine("-------------------END-------------" + DateTime.Now);
-                    writer.Flush();
-                    writer.Close();
-                }
+                Log(PageName,ProcedureName,ErrorMessage,LogLevel,StackTrace, w);
+                //Log("Test2", w);
             }
-            else
-            {
-                using (StreamWriter writer = System.IO.File.CreateText(filepath))
-                {
-                    writer.WriteLine("-------------------START-------------" + DateTime.Now);
-                    writer.WriteLine("Page: " + PageName + ", Procedure: " + ProcedureName + ",ErrorMsg: " + ErrorMessage + ", StackTrace: " + StackTrace);
-                    writer.WriteLine("-------------------END-------------" + DateTime.Now);
-                    writer.Flush();
-                    writer.Close();
-                }
-            }
+            //using (StreamWriter writer = new StreamWriter(filepath, true))
+            //    {
+            //        writer.WriteLine("-------------------START-------------" + DateTime.Now);
+            //        writer.WriteLine("Page: " + PageName + ", Procedure: " + ProcedureName + ",ErrorMsg: " + ErrorMessage + ", StackTrace: " + StackTrace);
+            //        writer.WriteLine("-------------------END-------------" + DateTime.Now);
+            //        writer.Flush();
+            //        writer.Close();
+            //    }
+            //}
+            //else
+            //{
+            //    using (StreamWriter writer = System.IO.File.CreateText(filepath))
+            //    {
+            //        writer.WriteLine("-------------------START-------------" + DateTime.Now);
+            //        writer.WriteLine("Page: " + PageName + ", Procedure: " + ProcedureName + ",ErrorMsg: " + ErrorMessage + ", StackTrace: " + StackTrace);
+            //        writer.WriteLine("-------------------END-------------" + DateTime.Now);
+            //        writer.Flush();
+            //        writer.Close();
+            //    }
+            //}
+        }
+
+        public static void Log(string PageName,string ProcedureName,string ErrorMessage,string LogLevel,string StackTrace, TextWriter w)
+        {
+            w.WriteLine("-------------------START-------------" + DateTime.Now);
+            w.WriteLine($"Page: {PageName}, Procedure: {ProcedureName},ErrorMsg: {ErrorMessage}");
+            w.WriteLine($"LogLevel: {LogLevel}");
+            w.WriteLine($" StackTrace  : {StackTrace}");
+            w.WriteLine("------------END-------------------");
         }
 
 
-        public void LogInfo()
+        public async void LogInfo()
         {
             /// TODO: Check the working of the file paths
             var WebRootPath = Directory.GetCurrentDirectory();

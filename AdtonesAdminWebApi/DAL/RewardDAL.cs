@@ -142,7 +142,7 @@ namespace AdtonesAdminWebApi.DAL
                 model.AdtoneServerRewardId = await _executers.ExecuteCommand(_connStr,
                                 conn => conn.ExecuteScalar<int>(sb.ToString(), new { OperatorId = model.OperatorId, RewardName = model.RewardName, RewardValue = model.RewardValue, AdtoneServerRewardId = model.AdtoneServerRewardId }));
 
-                model.OperatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId, model.OperatorId);
+                model.OperatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
 
                 return await _executers.ExecuteCommand(conns,
                                 conn => conn.ExecuteScalar<int>(sb.ToString(), new { OperatorId = model.OperatorId, RewardName = model.RewardName, RewardValue = model.RewardValue, AdtoneServerRewardId = model.AdtoneServerRewardId }));

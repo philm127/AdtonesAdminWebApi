@@ -153,7 +153,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> GetOperatorIdFromAdtoneId(int Id, int operatorId)
+        public async Task<int> GetOperatorIdFromAdtoneId(int operatorId)
         {
 
             var conn = await GetConnectionStringByOperator(operatorId);
@@ -162,7 +162,7 @@ namespace AdtonesAdminWebApi.DAL
             using (var connection = new SqlConnection(conn))
             {
                 await connection.OpenAsync();
-                return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = Id });
+                return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = operatorId });
             }
         }
 

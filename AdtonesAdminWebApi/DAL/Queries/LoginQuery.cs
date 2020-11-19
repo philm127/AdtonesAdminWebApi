@@ -16,9 +16,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string UpdateLockout => @"UPDATE Users SET Activated=@activated, LockOutTime=@lockOutTime WHERE;";
 
-        public static string UpdatePassword => @"Update Users SET PasswordHash=@PasswordHash, LastPasswordChangedDate=GETDATE() WHERE Email=@Email";
+        public static string UpdatePassword => @"UPDATE Users SET PasswordHash=@PasswordHash, LastPasswordChangedDate=GETDATE() WHERE Email=@Email";
 
-        public static string UpdateLoggedIn => @"UPADATE Users SET LastLoginTime=GETDATE() WHERE UserId=@Id";
+        public static string UpdateLoggedIn => @"UPDATE Users SET LastLoginTime=GETDATE() WHERE UserId=@Id";
 
 
     }

@@ -123,7 +123,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> AddPromotionalCampaignToOperator(PromotionalCampaignResult model)
         {
             var operatorConnectionString = await _connService.GetConnectionStringByOperator(model.OperatorId);
-            var operatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId, model.OperatorId);
+            var operatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
             model.OperatorId = operatorId;
             try
             {

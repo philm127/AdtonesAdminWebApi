@@ -16,6 +16,9 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public int singleOperator { get; set; }
         public string connstring { get; set; }
+
+        public string FromDate { get; set; }
+        public string ToDate { get; set; }
     }
 
 
@@ -123,6 +126,13 @@ namespace AdtonesAdminWebApi.ViewModels
         public long PeriodPlayLength { get; set; }
         public int TotalPlays { get; set; }
         public int NumPlays { get; set; }
+
+        public int TotalRewards { get; set; }
+        public int TotRewardUsers { get; set; }
+        public int NumRewards { get; set; }
+        public int NumRewardUsers { get; set; }
+        public decimal TotAvgRewards { get; set; }
+        public decimal NumAvgRewards { get; set; }
         public string CurrencyCode { get; set; }
     }
 
@@ -130,5 +140,14 @@ namespace AdtonesAdminWebApi.ViewModels
     {
         public int TotalItem { get; set; }
         public int NumItem { get; set; }
+    }
+
+    public class RewardsManModel
+    {
+        public int IsRewardReceivedTot { get; set; }
+        public int UserProfileIdTot { get; set; }
+
+        public int IsRewardReceivedNum { get; set; }
+        public int UserProfileIdNum { get; set; }
     }
 }
