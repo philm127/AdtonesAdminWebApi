@@ -336,11 +336,12 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     FROM UserProfile AS p
                                                     LEFT JOIN (
                                                                 SELECT SUM(CAST(IsRewardReceived as integer)) AS IsRewardReceived,UserProfileId
-                                                                FROM UserProfileAdvertsReceiveds GROUP BY UserProfileId) AS x
+                                                                FROM UserProfileAdvertsReceiveds WHERE IsRewardReceived=1 GROUP BY UserProfileId) AS x
 												    ON x.UserProfileId=p.UserProfileId
                                                     LEFT JOIN (
                                                                 SELECT SUM(CAST(IsRewardReceived as integer)) AS IsRewardReceived,UserProfileId
                                                                 FROM UserProfileAdvertsReceiveds WHERE DateTimePlayed BETWEEN @start AND @end
+                                                                    AND IsRewardReceived=1
 												                    GROUP BY UserProfileId) AS y
                                                     ON y.UserProfileId=p.UserProfileId
                                                     INNER JOIN Users u ON u.UserId=p.UserId
