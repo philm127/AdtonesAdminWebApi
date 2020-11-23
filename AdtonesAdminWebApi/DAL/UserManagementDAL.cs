@@ -79,6 +79,23 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<int> GetOperatorIdByUserId(int userId)
+        {
+            int x = 0;
+            try
+            {
+                x = await _executers.ExecuteCommand(_connStr,
+                         conn => conn.ExecuteScalar<int>(UserManagementQuery.GetOperatorIdFromUserId, new { Id = userId }));
+            }
+            catch
+            {
+                throw;
+            }
+
+            return x;
+        }
+
+
         public async Task<int> AddNewUserToOperator(UserAddFormModel model)
         {
             int x = 0;

@@ -73,5 +73,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string AddAdvertCategory => @"INSERT INTO AdvertCategories (CountryId,Name,CreatedDate,UpdatedDate,AdtoneServerAdvertCategoryId)
                                                         VALUES(@countryId,@name,GETDATE(),GETDATE(),@Id);
                                                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+
+        public static string UpdateAdvertFromBilling => @"UPDATE Advert SET UpdatedDateTime=GETDATE(), IsAdminApproval=1, NextStatus=0 WHERE AdvertId=@Id";
     }
 }

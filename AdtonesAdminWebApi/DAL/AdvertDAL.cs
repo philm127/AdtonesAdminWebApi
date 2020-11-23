@@ -469,7 +469,29 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        
+        public async Task<int> UpdateAdvertForBilling(int advertId, int operatorId)
+        {
+            int adId = 0;
+            try
+            {
+                var x = await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(AdvertQuery.UpdateAdvertFromBilling, new { Id = advertId }));
+
+                var constr = await _connService.GetConnectionStringByOperator(operatorId);
+
+                adId = await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>("SELECT AdvertId FROM Advert WHERE AdtoneServerAdvertId=@Id", new { Id = advertId }));
+
+                return await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>(AdvertQuery.UpdateAdvertFromBilling, new { Id = adId }));
+            }
+            catch
+            {
+                throw;
+            }
+
+            return adId;
+        }
 
     }
 }

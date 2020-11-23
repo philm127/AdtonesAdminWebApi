@@ -95,5 +95,13 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         public static string UpdateCampaignMatchStatus => @"UPDATE CampaignMatches SET Status=@Status WHERE MSCampaignProfileId=@Id";
+
+
+        public static string GetAdvertIdFromCampaignAd => @"SELECT AdvertId FROM CampaignAdvert WHERE CampaignProfileId=@Id";
+
+        public static string UpdateCampaignMatchFromBilling => @"UPDATE CampaignMatches SET UpdatedDateTime=GETDATE(), Status=@Status, NextStatus=0 WHERE MSCampaignProfileId=@Id";
+
+
+        public static string UpdateCampaignBilling => @"UPDATE CampaignProfile SET UpdatedDateTime=GETDATE(), Status=@Status, TotalCredit=TotalCredit + @TotalCredit,TotalBudget = TotalBudget + @TotalBudget WHERE CampaignProfileId=@Id";
     }
 }
