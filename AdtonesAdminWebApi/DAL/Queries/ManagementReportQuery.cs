@@ -13,13 +13,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 WHERE CreatedDateTime BETWEEN @start AND @end AND op.OperatorId=@searchOperators ";
 
 
-        //public static string GetAmountSpent => @"SELECT cp.CampaignProfileId,ISNULL(SUM(cp.TotalCost),0) AS TotalCost,0 AS TotalCredit,CurrencyCode 
-        //                                        FROM CampaignProfile AS ca
-        //                                        LEFT JOIN CampaignAudit AS cp ON cp.CampaignProfileId=ca.CampaignProfileId
-        //                                        INNER JOIN Operators AS op ON op.CountryId=ca.CountryId
-        //                                        WHERE cp.AddedDate BETWEEN @start AND @end
-        //                                        AND op.OperatorId=@searchOperators ";
-
 
         public static string GetAmountSpent => @"SELECT cp.CampaignProfileId,ISNULL(SUM(cp.TotalCost),0) AS TotalCost,0 AS TotalCredit,CurrencyCode 
                                                     FROM CampaignProfile AS ca INNER JOIN (
@@ -49,12 +42,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     INNER JOIN Operators AS op ON op.CountryId=ca.CountryId
                                                     AND op.OperatorId=@searchOperators ";
 
-
-        //public static string GetTotalCost => @"SELECT cp.CampaignProfileId,ISNULL(SUM(TotalCost),0) AS TotalCost,ISNULL(TotalCredit,0) AS TotalCredit,CurrencyCode 
-        //                                        FROM CampaignProfile AS cp
-        //                                        LEFT JOIN CampaignAudit AS ca ON cp.CampaignProfileId=ca.CampaignProfileId
-        //                                        INNER JOIN Operators AS op ON op.CountryId=cp.CountryId
-        //                                        WHERE op.OperatorId=@searchOperators ";
 
         public static string GetTotalCost => @"SELECT cp.CampaignProfileId,ISNULL(TotalCost,0) AS TotalCost,ISNULL(TotalCredit,0) AS TotalCredit,CurrencyCode 
                                                     FROM CampaignProfile AS cp LEFT JOIN (
@@ -92,22 +79,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 WHERE RoleId = 2  
                                                 AND u.OperatorId=@searchOperators ";
 
-        //public static string TotalListened => @"SELECT COUNT(y.UserId) AS TotalItem,COUNT(z.UserId) AS NumItem FROM
-        //                                        Users AS u
-        //                                        INNER JOIN
-        //                                            (SELECT up.UserId FROM UserProfile AS up
-	       //                                             WHERE up.UserProfileId IN ( " + ListenedUnionDistinct + @")
-        //                                             ) AS y
-        //                                        ON y.UserId=u.UserId
-        //                                        LEFT JOIN
-        //                                            (SELECT up.UserId FROM UserProfile AS up
-	       //                                             WHERE up.UserProfileId IN (" + ListenedDateUnionDistinct + @")
-        //                                                ) AS z
-        //                                        ON z.UserId=u.UserId
-        //                                        INNER JOIN Operators AS op ON op.OperatorId=u.OperatorId 
-        //                                        WHERE u.RoleId=2 
-        //                                        AND u.OperatorId=@searchOperators ";
-
+        
 
         public static string TotalListened => @"SELECT COUNT(y.UserId) AS TotalItem,COUNT(z.UserId) AS NumItem FROM
                                                 Users AS u
@@ -173,26 +145,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         ) as x";
 
         
-        //public static string TotalPlayStuff => @"SELECT ISNULL(SUM(CASE WHEN ca.PlayLengthTicks >= 6000 THEN 1 ELSE 0 END),0) AS TotOfPlaySixOver,
-        //                                    ISNULL(SUM(CASE WHEN ca.PlayLengthTicks < 6000 THEN 1 ELSE 0 END),0) AS TotOfPlayUnderSix,
-        //                                    ISNULL(SUM(ISNULL(ca.PlayLengthTicks,0)),0) AS TotPlaylength,
-        //                                    ISNULL(SUM(CASE WHEN (ca.PlayLengthTicks >= 6000 AND ca.SMSCost != 0) THEN 1 ELSE 0 END),0) AS TotOfSMS,
-        //                                    ISNULL(SUM(CASE WHEN (ca.PlayLengthTicks >= 6000 AND ca.EmailCost != 0) THEN 1 ELSE 0 END),0) AS TotOfEmail,
-        //                                    ISNULL(SUM(CASE WHEN ca.Status= 'cancelled' THEN 1 ELSE 0 END),0) AS TotCancelled,
-
-        //                                    ISNULL(SUM(CASE WHEN ca.PlayLengthTicks>=6000 AND StartTime 
-        //                                                        BETWEEN @start AND @end THEN 1 ELSE 0 END),0) AS NumOfPlaySixOver,
-        //                                    ISNULL(SUM(CASE WHEN ca.PlayLengthTicks < 6000 AND StartTime BETWEEN @start AND @end THEN 1 ELSE 0 END),0) AS NumOfPlayUnderSix,
-        //                                    ISNULL(SUM(CASE WHEN ca.PlayLengthTicks> 0 AND StartTime BETWEEN @start AND @end THEN ca.PlayLengthTicks ELSE 0 END),0) AS Playlength,
-        //                                    ISNULL(SUM(CASE WHEN (ca.PlayLengthTicks >= 6000 AND ca.SMSCost != 0 AND StartTime BETWEEN @start AND @end) THEN 1 ELSE 0 END),0) AS NumOfSMS,
-        //                                    ISNULL(SUM(CASE WHEN (ca.PlayLengthTicks >= 6000 AND ca.EmailCost != 0 AND StartTime BETWEEN @start AND @end) THEN 1 ELSE 0 END),0) AS NumOfEmail,
-        //                                    ISNULL(SUM(CASE WHEN ca.Status= 'cancelled' AND StartTime BETWEEN @start AND @end THEN 1 ELSE 0 END),0) AS NumCancelled
-
-        //                                    FROM CampaignAudit AS ca
-        //                                    INNER JOIN CampaignProfile AS cp ON ca.CampaignProfileId=cp.CampaignProfileId
-        //                                    INNER JOIN Operators AS op ON op.CountryId=cp.CountryId
-        //                                    WHERE op.OperatorId=@searchOperators ";
-
+        
 
         public static string TotalPlayStuff => @"SELECT
                                                     ISNULL(SUM(TotOfPlaySixOver),0) AS TotOfPlaySixOver,
@@ -281,15 +234,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     ISNULL(SUM(CASE WHEN Status= 'cancelled' AND StartTime BETWEEN @start AND @end THEN 1 ELSE 0 END),0) AS NumCancelled";
 
 
-        //public static string TotalLiveCampaign => @"SELECT ISNULL(SUM(CASE WHEN cp.CampaignProfileId>0 THEN 1 ELSE 0 END),0) AS TotalItem,
-        //                                            ISNULL(SUM(CASE WHEN CreatedDateTime BETWEEN @start AND @end THEN 1 ELSE 0 END),0) AS NumItem
-        //                                            FROM CampaignProfile AS cp
-        //                                            INNER JOIN
-        //                                            (SELECT DISTINCT(CampaignProfileId) FROM CampaignAudit) AS ca
-        //                                            ON ca.CampaignProfileId=cp.CampaignProfileId
-        //                                            INNER JOIN Operators AS op ON op.CountryId=cp.CountryId
-        //                                            WHERE op.OperatorId=@searchOperators ";
-
+        
 
         public static string TotalLiveCampaign => @"SELECT ISNULL(SUM(CASE WHEN cp.CampaignProfileId>0 THEN 1 ELSE 0 END),0) AS TotalItem,
                                                     ISNULL(SUM(CASE WHEN CreatedDateTime BETWEEN @start AND @end THEN 1 ELSE 0 END),0) AS NumItem
@@ -322,14 +267,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         ) as x";
 
 
-        //public static string NumRewardsSaf => @"SELECT ISNULL(SUM(CAST(IsRewardReceived as integer)),0) AS TotalItem,
-        //                                        ISNULL(COUNT(DISTINCT  r.UserProfileId),0) AS NumItem
-        //                                        FROM UserProfileAdvertsReceiveds r
-        //                                        INNER JOIN UserProfile p ON p.UserProfileId=r.UserProfileId
-        //                                        INNER JOIN Users u ON u.UserId=p.UserId
-        //                                        INNER JOIN Operators AS op ON op.OperatorId=u.OperatorId
-        //                                        WHERE DateTimePlayed BETWEEN @start AND @end AND u.OperatorId=@searchOperators ";
-
+       
 
         public static string TotalSafRewards => @"SELECT SUM(x.IsRewardReceived) AS IsRewardReceivedTot,COUNT(DISTINCT x.UserProfileId) as UserProfileIdTot,
                                                     SUM(y.IsRewardReceived) AS IsRewardReceivedNum,COUNT(DISTINCT y.UserProfileId) as UserProfileIdNum
@@ -349,14 +287,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     WHERE u.OperatorId=@searchOperators ";
 
 
-        //public static string NumRewardsExp => @"SELECT ISNULL(COUNT(r.UserId),0) AS TotalItem,
-        //                                        ISNULL(COUNT(DISTINCT  r.UserId),0) AS NumItem
-        //                                        FROM ClaimRewardAudit r
-        //                                        INNER JOIN Users u ON u.UserId=r.UserId
-        //                                        INNER JOIN Operators AS op ON op.OperatorId=u.OperatorId
-        //                                        WHERE EntryDateTimeUtc BETWEEN @start AND @end AND u.OperatorId=@searchOperators ";
-
-
+       
         public static string TotalExpRewards => @"SELECT SUM(x.TotalItem) AS IsRewardReceivedTot,COUNT(DISTINCT x.UserId) as UserProfileIdTot,
                                                    SUM(y.TotalItem) AS IsRewardReceivedNum,COUNT(DISTINCT y.UserId) as UserProfileIdNum
                                                     FROM Users As u
@@ -386,15 +317,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string GetOperatorNameById => @"SELECT OperatorName FROM Operators WHERE OperatorId IN @searchOperators;";
 
 
-
-
-        //public static string NumListened => @"SELECT COUNT(DISTINCT ca.UserProfileId) AS TotalListened FROM CampaignAudit AS ca
-        //                                         INNER JOIN UserProfile AS up ON up.UserProfileId=ca.UserProfileId
-        //                                         INNER JOIN Users AS  u ON u.UserId=up.UserId
-        //                                         INNER JOIN Operators AS op ON op.OperatorId=u.OperatorId
-        //                                         WHERE PlayLengthTicks>1
-        //                                         AND StartTime BETWEEN @start AND @end
-        //                                         AND u.OperatorId IN @searchOperators ";
 
 
 
