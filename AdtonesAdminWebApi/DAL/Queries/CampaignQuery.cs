@@ -11,11 +11,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 (camp.TotalBudget - play.TotalSpend) AS FundsAvailable,play.ct AS finaltotalplays,con.MobileNumber
                                                 FROM CampaignProfile AS camp LEFT JOIN Users As u ON u.UserId=camp.UserId
                                                 LEFT JOIN Client AS cl ON camp.ClientId=cl.Id
-                                                LEFT JOIN 
-		                                                (SELECT AdvertId,AdvertName,CampProfileId FROM Advert WHERE AdvertId in
-			                                                (SELECT MAX(AdvertId) FROM Advert GROUP BY CampProfileId)
-		                                                ) AS ad 
-                                                ON ad.CampProfileId=camp.CampaignProfileId
+                                                LEFT JOIN CampaignAdverts AS campAd ON campAd.CampaignProfileId=camp.CampaignProfileId
+												LEFT JOIN Advert AS ad ON ad.AdvertId=campAd.AdvertId
                                                 LEFT JOIN 
 		                                                (SELECT Id,CampaignProfileId,CurrencyCode FROM Billing WHERE Id in
 			                                                (SELECT MAX(Id) FROM Billing GROUP BY CampaignProfileId,CurrencyCode)
@@ -44,11 +41,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     END AS SalesExec,sexcs.UserId AS sUserId
                                                 FROM CampaignProfile AS camp LEFT JOIN Users As u ON u.UserId=camp.UserId
                                                 LEFT JOIN Client AS cl ON camp.ClientId=cl.Id
-                                                LEFT JOIN 
-		                                                (SELECT AdvertId,AdvertName,CampProfileId FROM Advert WHERE AdvertId in
-			                                                (SELECT MAX(AdvertId) FROM Advert GROUP BY CampProfileId)
-		                                                ) AS ad 
-                                                ON ad.CampProfileId=camp.CampaignProfileId
+                                                LEFT JOIN CampaignAdverts AS campAd ON campAd.CampaignProfileId=camp.CampaignProfileId
+												LEFT JOIN Advert AS ad ON ad.AdvertId=campAd.AdvertId
                                                 LEFT JOIN 
 		                                                (SELECT Id,CampaignProfileId,CurrencyCode FROM Billing WHERE Id in
 			                                                (SELECT MAX(Id) FROM Billing GROUP BY CampaignProfileId,CurrencyCode)
