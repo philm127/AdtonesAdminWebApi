@@ -377,7 +377,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         ISNULL(SUM(CASE WHEN CreatedDateTime BETWEEN @start AND @end 
                                                                                 THEN 1 ELSE 0 END),0) AS NumItem 
                                                         FROM Advert AS ad INNER JOIN Operators AS op ON op.OperatorId=ad.OperatorId
-                                                        WHERE ad.OperatorId=@searchOperators ";
+                                                        INNER JOIN CampaignAudit AS aud ON aud.AdvertId=ad.AdvertId
+                                                        WHERE ad.SoapToneCode != null ad.OperatorId=@searchOperators ";
 
 
         public static string GetAllOperators => @"SELECT OperatorId FROM Operators;";

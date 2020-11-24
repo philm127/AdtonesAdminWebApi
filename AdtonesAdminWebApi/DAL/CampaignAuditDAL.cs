@@ -48,6 +48,7 @@ namespace AdtonesAdminWebApi.DAL
 
 
         /// <summary>
+        /// Called by operator individual campaign
         /// called by GetCampaignDashboardSummariesForOperator if it doesn't have the result set in cache
         /// </summary>
         /// <param name="id">camapign Id</param>
@@ -96,6 +97,7 @@ namespace AdtonesAdminWebApi.DAL
 
 
         /// <summary>
+        /// Actually called by the operator
         /// called by GetDashboardSummariesForOperator if it doesn't have the result set in cache
         /// </summary>
         /// <param name="id">operatorId</param>
