@@ -7,6 +7,8 @@ using AdtonesAdminWebApi.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.ComponentModel;
+using System.Data;
 using System.Threading.Tasks;
 
 
@@ -39,11 +41,17 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// Populate the datatable
         /// </summary>
         /// <returns></returns>
-        public async Task<ReturnResult> LoadCampaignDataTable(int id=0)
+        public async Task<ReturnResult> LoadCampaignDataTable(int id=0)                  
         {
             try
             {
-                    result.body = await _campDAL.GetCampaignResultSet(id);
+                    var model = await _campDAL.GetCampaignResultSet(id);
+                    var provModel = await _campDAL.GetCampaignResultSetProv(id);
+
+                PropertyDescriptorCollection props = TypeDescriptor.GetProperties(typeof(CampaignAdminResult));
+                DataTable dt = new DataTable();
+                foreach (PropertyDescriptor p in props)
+                    dt.Columns.Add(p.Name, p.PropertyType);
             }
             catch (Exception ex)
             {

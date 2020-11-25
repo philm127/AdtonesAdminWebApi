@@ -63,6 +63,51 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public int[] GetOperatorFromPermissionForProv()
+        {
+            return GetOperatorFromPermission();
+        }
+
+
+        public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetProv(int operatorId, int id = 0)
+        { 
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(CampaignQuery.GetCampaignResultSet);
+
+            if (id > 0)
+            {
+                sb.Append(" WHERE camp.UserId=@Id ");
+                sb.Append(" AND camp.Status IN(1,2,3,4) ");
+                builder.AddParameters(new { Id = id });
+            }
+            else
+            {
+                // had to put this here as the check file picks up WHERE on inner queries
+                sb.Append(" WHERE 1=1 ");
+            }
+
+            var values = CheckGeneralFile(sb, builder, pais: "camp");
+
+            sb = values.Item1;
+            builder = values.Item2;
+            sb.Append(" ORDER BY camp.CampaignProfileId DESC;");
+            var select = builder.AddTemplate(sb.ToString());
+
+            try
+            {
+                // builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.Query<CampaignAdminResult>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetBySalesExec(int id = 0)
         {
             var sb = new StringBuilder(CampaignQuery.GetCampaignResultSetForSales);

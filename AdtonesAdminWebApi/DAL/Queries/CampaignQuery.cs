@@ -31,8 +31,70 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId ";
 
 
+		public static string GetCampaignResultSetFromProv => @"SELECT camp.CampaignProfileId,ct,AvgBidValue,TotalSpend
+										FROM CampaignProfile AS camp
+										INNER JOIN (
+												SELECT DISTINCT CampaignProfileId,SUM(ct) AS ct,CAST(AVG(AvgBidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+												SUM(CAST(ISNULL(ToTalSpend,0) AS NUMERIC(36,2))) AS TotalSpend 
+												FROM 
+												(
+													SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit 
+													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+													UNION ALL
+													SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit2 
+													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
 
-        public static string GetCampaignResultSetForSales => @"SELECT camp.CampaignProfileId,camp.UserId,u.Email,CONCAT(u.FirstName,' ',u.LastName) AS UserName,op.OperatorName
+													UNION ALL
+													SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit3 
+													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+
+													UNION ALL
+														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit4 
+													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+
+													UNION ALL
+														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit5 
+													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+
+													UNION ALL
+														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit6 
+													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+
+													UNION ALL
+														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit7 
+													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+
+													UNION ALL
+														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit8 
+													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+
+													UNION ALL
+														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit9 
+													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+
+													UNION ALL
+														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit10 
+													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+													) as x
+												GROUP BY CampaignProfileId ) AS play
+												ON camp.CampaignProfileId=play.CampaignProfileId
+                                                LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
+                                                LEFT JOIN Contacts AS con ON con.UserId=camp.UserId
+                                                LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId ";
+
+
+
+		public static string GetCampaignResultSetForSales => @"SELECT camp.CampaignProfileId,camp.UserId,u.Email,CONCAT(u.FirstName,' ',u.LastName) AS UserName,op.OperatorName
                                                 ,camp.ClientId, ISNULL(cl.Name,'-') AS ClientName,CampaignName,TotalBudget,camp.CreatedDateTime AS CreatedDate
                                                 ,camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,camp.TotalBudget,u.Organisation,ctry.Name AS CountryName,
                                                 CASE WHEN bill.Id>0 THEN camp.Status ELSE 8 END AS Status,play.AvgBidValue,play.TotalSpend,bill.CurrencyCode,

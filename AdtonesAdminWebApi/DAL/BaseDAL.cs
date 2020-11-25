@@ -120,5 +120,28 @@ namespace AdtonesAdminWebApi.DAL
             return (sb, builder);
         }
 
+
+
+        public int[] GetOperatorFromPermission()
+        {
+            var genFile = string.Empty;
+            genFile = GetPermissionsByUserId().Result;
+
+            List<PermissionModel> gen = JsonSerializer.Deserialize<List<PermissionModel>>(genFile);
+
+            var page = gen.Find(u => u.pageName == "GeneralAccess");
+
+            var els = page.elements.ToList();
+
+            var testopo = els.Find(x => x.name == "operator").arrayId;
+            if (testopo == null)
+            {
+                var oops = new int[0];
+                return oops;
+            }
+            else
+                return testopo;
+        }
+
     }
 }
