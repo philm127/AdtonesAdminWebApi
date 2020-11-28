@@ -45,13 +45,13 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                    var model = await _campDAL.GetCampaignResultSet(id);
-                    var provModel = await _campDAL.GetCampaignResultSetProv(id);
+                    result.body = await _campDAL.GetCampaignResultSet(id);
+                //    var provModel = await _campDAL.GetCampaignResultSetProv(id);
 
-                PropertyDescriptorCollection props = TypeDescriptor.GetProperties(typeof(CampaignAdminResult));
-                DataTable dt = new DataTable();
-                foreach (PropertyDescriptor p in props)
-                    dt.Columns.Add(p.Name, p.PropertyType);
+                //PropertyDescriptorCollection props = TypeDescriptor.GetProperties(typeof(CampaignAdminResult));
+                //DataTable dt = new DataTable();
+                //foreach (PropertyDescriptor p in props)
+                //    dt.Columns.Add(p.Name, p.PropertyType);
             }
             catch (Exception ex)
             {
