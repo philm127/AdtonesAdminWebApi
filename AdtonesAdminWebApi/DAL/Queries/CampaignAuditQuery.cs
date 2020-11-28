@@ -22,7 +22,30 @@ namespace AdtonesAdminWebApi.DAL.Queries
 														LEFT JOIN CampaignProfile AS cp ON cp.UserId = u.UserId
 														LEFT JOIN Client AS c ON c.Id = cp.ClientId
 														LEFT JOIN 
-															" + GetCampaignDashboardSummariesFROMCampaignAudit + @"
+															(  SELECT ca.CampaignProfileId,CONVERT(numeric(16,2), SUM(ca.TotalCost)) AS TotalPlayedCost,
+																CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgCost,
+																SUM(CASE WHEN ca.SMS IS NOT NULL THEN 1 ELSE 0 END) AS TotalSMS,
+																CONVERT(numeric(16,2), SUM(ISNULL(ca.SMSCost,0.00))) AS TotalSMSCost,
+																SUM(CASE WHEN ca.Email IS NOT NULL THEN 1 ELSE 0 END) AS TotalEmail,
+																CONVERT(NUMERIC(16,2), SUM(ISNULL(ca.EmailCost,0.00))) AS TotalEmailCost,
+																count(*) AS TotalPlayTracks 
+																FROM CampaignAudit AS ca
+																WHERE ca.PlayLengthTicks >= 6000 AND ca.Proceed = 1
+																GROUP BY ca.CampaignProfileId
+															) AS g ON g.CampaignProfileId = cp.CampaignProfileId
+														LEFT JOIN 
+															( SELECT ca.CampaignProfileId, COUNT(DISTINCT ca.UserProfileId) AS UniqueListenrs
+																FROM CampaignAudit AS ca
+																WHERE ca.PlayLengthTicks >= 6000 AND ca.Proceed = 1
+																GROUP BY ca.CampaignProfileId
+															) AS r ON r.CampaignProfileId = cp.CampaignProfileId
+														LEFT JOIN 
+															(  SELECT ca.CampaignProfileId, COUNT(*) AS TotalPlayTracks,AVG(ca.PlayLengthTicks) AS AvgPlayLen,
+																MAX(ca.PlayLengthTicks) AS MaxPlayLen,MAX(ca.BidValue) AS MaxBid
+																FROM CampaignAudit ca
+																WHERE ca.Proceed = 1
+																GROUP BY ca.CampaignProfileId
+															) AS p ON p.CampaignProfileId = cp.CampaignProfileId
 														LEFT JOIN 
 															( SELECT DISTINCT AdvertId,CampaignProfileId FROM CampaignAdverts
 															) AS cad ON cad.CampaignProfileId=cp.CampaignProfileId
@@ -203,10 +226,34 @@ namespace AdtonesAdminWebApi.DAL.Queries
 																	CAST(ISNULL(p.MaxBid, 0) AS numeric(16,2)) AS MaxBid,
 																	cp.CurrencyCode AS CurrencyCode,ctu.TotalReach
 																	FROM 
-																		(SELECT SUM(ISNULL(TotalBudget,0)) AS TotalBudget,CountryId,CurrencyCode,CampaignProfileId FROM CampaignProfile
-																		GROUP BY CampaignProfileId,CountryId,CurrencyCode) AS cp
+																		(SELECT SUM(ISNULL(TotalBudget,0)) AS TotalBudget,CountryId,CurrencyCode FROM CampaignProfile
+																		GROUP BY CountryId,CurrencyCode) AS cp
 																	INNER JOIN
-																		" + GetCampaignDashboardSummariesFROMCampaignAudit + @"
+																		( SELECT cpi.CountryId,CONVERT(numeric(16,0), SUM(ca.TotalCost)) AS TotalPlayedCost,
+																			CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgBid,
+																			SUM(CASE WHEN ca.SMS IS NOT NULL THEN 1 ELSE 0 END) AS TotalSMS,
+																			CONVERT(numeric(16,0), SUM(ISNULL(ca.SMSCost,0))) AS TotalSMSCost,
+																			SUM(CASE WHEN ca.Email IS NOT NULL THEN 1 ELSE 0 END) AS TotalEmail,
+																			CONVERT(NUMERIC(16,0), SUM(ISNULL(ca.EmailCost,0))) AS TotalEmailCost,
+																			count(*) AS TotalPlayTracks 
+																			FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+																			WHERE ca.PlayLengthTicks >= 6000 AND ca.Proceed = 1
+																			GROUP BY cpi.CountryId
+																		) AS g ON g.CountryId = cp.CountryId
+																	LEFT JOIN 
+																		( SELECT cpi.CountryId, COUNT(DISTINCT ca.UserProfileId) AS UniqueListenrs
+																			FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+																			WHERE ca.PlayLengthTicks >= 6000 AND ca.Proceed = 1
+																			GROUP BY cpi.CountryId
+																		) AS r ON r.CountryId = cp.CountryId
+																	LEFT JOIN 
+																		(  SELECT cpi.CountryId, COUNT(*) AS TotalPlayTracks,AVG(ca.PlayLengthTicks) AS AvgPlayLen,
+																			MAX(ca.PlayLengthTicks) AS MaxPlayLen,MAX(ca.BidValue) AS MaxBid
+																			FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+																			WHERE ca.Proceed = 1
+																			GROUP BY cpi.CountryId
+																		) AS p ON p.CountryId = cp.CountryId
+
 																	LEFT JOIN
 																		(SELECT COUNT(UserId) AS TotalReach,op.CountryId FROM Users AS u 
 																			INNER JOIN Operators AS op ON u.OperatorId=op.OperatorId 
@@ -233,7 +280,31 @@ namespace AdtonesAdminWebApi.DAL.Queries
 																		(SELECT SUM(ISNULL(TotalBudget,0)) AS TotalBudget,CountryId,CurrencyCode FROM CampaignProfile
 																		GROUP BY CountryId,CurrencyCode) AS cp
 																	INNER JOIN
-																		" + GetCampaignDashboardSummariesFROMCampaignAudit + @"
+																		( SELECT cpi.CountryId,CONVERT(numeric(16,0), SUM(ca.TotalCost)) AS TotalPlayedCost,
+																			CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgCost,
+																			SUM(CASE WHEN ca.SMS IS NOT NULL THEN 1 ELSE 0 END) AS TotalSMS,
+																			CONVERT(numeric(16,0), SUM(ISNULL(ca.SMSCost,0))) AS TotalSMSCost,
+																			SUM(CASE WHEN ca.Email IS NOT NULL THEN 1 ELSE 0 END) AS TotalEmail,
+																			CONVERT(NUMERIC(16,0), SUM(ISNULL(ca.EmailCost,0))) AS TotalEmailCost,
+																			count(*) AS TotalPlayTracks 
+																			FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+																			WHERE ca.PlayLengthTicks >= 6000 AND ca.Proceed = 1
+																			GROUP BY cpi.CountryId
+																		) AS g ON g.CountryId = cp.CountryId
+																	LEFT JOIN 
+																		( SELECT cpi.CountryId, COUNT(DISTINCT ca.UserProfileId) AS UniqueListenrs
+																			FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+																			WHERE ca.PlayLengthTicks >= 6000 AND ca.Proceed = 1
+																			GROUP BY cpi.CountryId
+																		) AS r ON r.CountryId = cp.CountryId
+																	LEFT JOIN 
+																		(  SELECT cpi.CountryId, COUNT(*) AS TotalPlayTracks,AVG(ca.PlayLengthTicks) AS AvgPlayLen,
+																			MAX(ca.PlayLengthTicks) AS MaxPlayLen,MAX(ca.BidValue) AS MaxBid
+																			FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+																			WHERE ca.Proceed = 1
+																			GROUP BY cpi.CountryId
+																		) AS p ON p.CountryId = cp.CountryId
+
 																	LEFT JOIN
 																		(SELECT COUNT(UserId) AS TotalReach,op.CountryId FROM Users AS u 
 																			INNER JOIN Operators AS op ON u.OperatorId=op.OperatorId 
@@ -260,7 +331,34 @@ namespace AdtonesAdminWebApi.DAL.Queries
 WHERE UserId IN (Select AdvertiserId FROM Advertisers_SalesTeam WHERE IsActive=1 AND SalesExecId=@Sid)
 																		GROUP BY CountryId,CurrencyCode) AS cp
 																	INNER JOIN
-																		" + GetCampaignDashboardSummariesFROMCampaignAudit + @"
+																		( SELECT cpi.CountryId,CONVERT(numeric(16,0), SUM(ca.TotalCost)) AS TotalPlayedCost,
+																			CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgCost,
+																			SUM(CASE WHEN ca.SMS IS NOT NULL THEN 1 ELSE 0 END) AS TotalSMS,
+																			CONVERT(numeric(16,0), SUM(ISNULL(ca.SMSCost,0))) AS TotalSMSCost,
+																			SUM(CASE WHEN ca.Email IS NOT NULL THEN 1 ELSE 0 END) AS TotalEmail,
+																			CONVERT(NUMERIC(16,0), SUM(ISNULL(ca.EmailCost,0))) AS TotalEmailCost,
+																			count(*) AS TotalPlayTracks 
+																			FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+WHERE cpi.UserId IN (Select AdvertiserId FROM Advertisers_SalesTeam WHERE IsActive=1 AND SalesExecId=@Sid)
+																			AND ca.PlayLengthTicks >= 6000 AND ca.Proceed = 1
+																			GROUP BY cpi.CountryId
+																		) AS g ON g.CountryId = cp.CountryId
+																	LEFT JOIN 
+																		( SELECT cpi.CountryId, COUNT(DISTINCT ca.UserProfileId) AS UniqueListenrs
+																			FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+WHERE cpi.UserId IN (Select AdvertiserId FROM Advertisers_SalesTeam WHERE IsActive=1 AND SalesExecId=@Sid)
+																			AND ca.PlayLengthTicks >= 6000 AND ca.Proceed = 1
+																			GROUP BY cpi.CountryId
+																		) AS r ON r.CountryId = cp.CountryId
+																	LEFT JOIN 
+																		(  SELECT cpi.CountryId, COUNT(*) AS TotalPlayTracks,AVG(ca.PlayLengthTicks) AS AvgPlayLen,
+																			MAX(ca.PlayLengthTicks) AS MaxPlayLen,MAX(ca.BidValue) AS MaxBid
+																			FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+WHERE cpi.UserId IN (Select AdvertiserId FROM Advertisers_SalesTeam WHERE IsActive=1 AND SalesExecId=@Sid)
+																			AND ca.Proceed = 1
+																			GROUP BY cpi.CountryId
+																		) AS p ON p.CountryId = cp.CountryId
+
 																	LEFT JOIN
 																		(SELECT COUNT(UserId) AS TotalReach,op.CountryId FROM Users AS u 
 																			INNER JOIN Operators AS op ON u.OperatorId=op.OperatorId 
