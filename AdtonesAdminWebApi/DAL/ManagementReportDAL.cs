@@ -219,16 +219,14 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<SpendCredit>> GetTotalCreditCost(ManagementReportsSearch search, string query, int ops, string conn, bool exp)
+        public async Task<IEnumerable<SpendCredit>> GetTotalCreditCost(ManagementReportsSearch search, string query, int op, string conn, int exp)
         {
-            var op = await _connService.GetOperatorIdFromAdtoneId(ops);
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(query);
             builder.AddParameters(new { searchOperators = op });
             //builder.AddParameters(new { searchOperators = search.operators.ToArray() });
-            builder.AddParameters(new { start = search.FromDate });
-            builder.AddParameters(new { end = search.ToDate });
+            
 
             if (search.country != null && search.country > 0)
             {
@@ -239,8 +237,25 @@ namespace AdtonesAdminWebApi.DAL
             sb = values.Item1;
             builder = values.Item2;
 
-            if(!exp)
-                sb.Append("GROUP BY cp.CampaignProfileId,CurrencyCode,TotalCredit");
+            if (exp == 1)
+            {
+                sb.Append("GROUP BY cur.CurrencyCode");
+                builder.AddParameters(new { start = search.FromDate });
+                builder.AddParameters(new { end = search.ToDate });
+
+            }
+            else if (exp == 2)
+            {
+                sb.Append("GROUP BY CurrencyCode");
+                
+            }
+            else if (exp == 3)
+            {
+                sb.Append("GROUP BY cur.CurrencyCode");
+                builder.AddParameters(new { start = "2010-01-01" });
+                builder.AddParameters(new { end = "2030-01-01" });
+            }
+            // sb.Append("GROUP BY cp.CampaignProfileId,CurrencyCode,TotalCredit");
             var select = builder.AddTemplate(sb.ToString());
 
             try
@@ -249,8 +264,79 @@ namespace AdtonesAdminWebApi.DAL
                 return await _executers.ExecuteCommand(conn,
                                 conn => conn.Query<SpendCredit>(select.RawSql, select.Parameters));
             }
-            catch
+            catch (Exception ex)
             {
+                var _logging = new ErrorLogging()
+                {
+                    LogLevel = select.RawSql,
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "ManagementReportDAL",
+                    ProcedureName = "GetTotalCreditCost"
+                };
+                _logging.LogError();
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<SpendCredit>> GetTotalCreditCostProv(ManagementReportsSearch search, string query, int ops, string conn, int exp)
+        {
+            var op = await _connService.GetOperatorIdFromAdtoneId(ops);
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(query);
+            builder.AddParameters(new { searchOperators = op });
+            //builder.AddParameters(new { searchOperators = search.operators.ToArray() });
+
+
+            if (search.country != null && search.country > 0)
+            {
+                sb.Append(" AND op.CountryId = @country ");
+                builder.AddParameters(new { country = search.country });
+            }
+            var values = CheckGeneralFile(sb, builder, pais: "op");
+            sb = values.Item1;
+            builder = values.Item2;
+
+            if (exp == 1)
+            {
+                sb.Append("GROUP BY cur.CurrencyCode");
+                builder.AddParameters(new { start = search.FromDate });
+                builder.AddParameters(new { end = search.ToDate });
+
+            }
+            else if (exp == 2)
+            {
+                sb.Append("GROUP BY CurrencyCode");
+
+            }
+            else if (exp == 3)
+            {
+                sb.Append("GROUP BY cur.CurrencyCode");
+                builder.AddParameters(new { start = "2010-01-01" });
+                builder.AddParameters(new { end = "2030-01-01" });
+            }
+            // sb.Append("GROUP BY cp.CampaignProfileId,CurrencyCode,TotalCredit");
+            var select = builder.AddTemplate(sb.ToString());
+
+            try
+            {
+
+                return await _executers.ExecuteCommand(conn,
+                                conn => conn.Query<SpendCredit>(select.RawSql, select.Parameters));
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    LogLevel = select.RawSql,
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "ManagementReportDAL",
+                    ProcedureName = "GetTotalCreditCost"
+                };
+                _logging.LogError();
                 throw;
             }
         }

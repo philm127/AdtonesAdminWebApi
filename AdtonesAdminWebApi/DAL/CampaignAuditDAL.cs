@@ -48,6 +48,7 @@ namespace AdtonesAdminWebApi.DAL
 
 
         /// <summary>
+        /// Called by operator individual campaign
         /// called by GetCampaignDashboardSummariesForOperator if it doesn't have the result set in cache
         /// </summary>
         /// <param name="id">camapign Id</param>
@@ -57,7 +58,12 @@ namespace AdtonesAdminWebApi.DAL
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(CampaignAuditQuery.GetCampaignDashboardSummaries);
-            sb.Append(" cp.CampaignProfileId=@campId;");
+            sb.Append(" cp.CampaignProfileId=@campId ");
+            sb.Append(" GROUP BY u.UserId,cp.CampaignProfileId,a.AdvertId,cp.CampaignName,a.AdvertName,u.FirstName,u.LastName, u.Email, ");
+            // Group By continued
+            sb.Append(" cp.TotalBudget,g.TotalPlayedCost,g.TotalAvgBid,g.TotalSMS,g.TotalSMSCost,g.TotalEmail,g.TotalEmailCost,p.TotalPlayTracks, ");
+            // Group By continued
+            sb.Append(" p.AvgPlayLen,p.MaxPlayLen,r.UniqueListenrs,p.MaxBid,cp.CurrencyCode,ctu.TotalReach ");
             var select = builder.AddTemplate(sb.ToString());
             builder.AddParameters(new { campId = campaignId });
             try
@@ -67,8 +73,17 @@ namespace AdtonesAdminWebApi.DAL
                                  conn => conn.QueryFirstOrDefault<CampaignDashboardChartPREResult>(select.RawSql, select.Parameters));
 
             }
-            catch
+            catch (Exception ex)
             {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CampaignAuditDAL",
+                    ProcedureName = "CampaignDashboardSummariesOperators",
+                    LogLevel = select.RawSql
+                };
+                _logging.LogError();
                 throw;
             }
         }
@@ -96,6 +111,7 @@ namespace AdtonesAdminWebApi.DAL
 
 
         /// <summary>
+        /// Actually called by the operator
         /// called by GetDashboardSummariesForOperator if it doesn't have the result set in cache
         /// </summary>
         /// <param name="id">operatorId</param>
@@ -112,8 +128,17 @@ namespace AdtonesAdminWebApi.DAL
                                  conn => conn.QueryFirstOrDefault<CampaignDashboardChartPREResult>(select.RawSql, select.Parameters));
 
             }
-            catch
+            catch (Exception ex)
             {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CampaignAuditDAL",
+                    ProcedureName = "DashboardSummariesOperators",
+                    LogLevel = select.RawSql
+                };
+                _logging.LogError();
                 throw;
             }
         }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System;
 using Microsoft.AspNetCore.Hosting;
 using AdtonesAdminWebApi.Enums;
+using System.Security.Authentication;
 
 namespace AdtonesAdminWebApi.Services.Mailer
 {
@@ -84,8 +85,7 @@ namespace AdtonesAdminWebApi.Services.Mailer
 
                 using SmtpClient client = new SmtpClient();
                 {
-                    client.Connect(creds.srv, creds.port, SecureSocketOptions.StartTls);//, SecureSocketOptions.StartTls);// creds.sslSend);
-                    client.AuthenticationMechanisms.Remove("XOAUTH2");
+                    client.Connect(creds.srv, 587, SecureSocketOptions.None);//, SecureSocketOptions.StartTls);// creds.sslSend);
                     client.Authenticate(creds.usr, creds.pwd);
                     try
                     {
@@ -119,22 +119,22 @@ namespace AdtonesAdminWebApi.Services.Mailer
         private SMTPCredentials GetCredentials(int operatorId, int roleId)
         {
             var creds = new SMTPCredentials();
-            //if (operatorId == (int)Enums.OperatorTableId.Safaricom && roleId == 6)
-            //{
-            //    creds.pwd = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSMTPPassword").Value;
-            //    creds.usr = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSMTPEmail").Value;
-            //    creds.srv = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSmtpServerAddress").Value;
-            //    creds.port = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSmtpServerPort").Value);
-            //    creds.sslSend = bool.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomEnableEmailSending").Value);
-            //}
-            //else
-            //{
+            if (operatorId == (int)Enums.OperatorTableId.Safaricom && roleId == 6)
+            {
+                creds.pwd = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSMTPPassword").Value;
+                creds.usr = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSMTPEmail").Value;
+                creds.srv = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSmtpServerAddress").Value;
+                creds.port = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSmtpServerPort").Value);
+                creds.sslSend = bool.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomEnableEmailSending").Value);
+            }
+            else
+            {
                 creds.pwd = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPPassword").Value;
                 creds.usr = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPEmail").Value;
                 creds.srv = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerAddress").Value;
                 creds.port = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerPort").Value);
                 creds.sslSend = bool.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("EnableEmailSending").Value);
-            //}
+            }
             return creds;
         }
     }

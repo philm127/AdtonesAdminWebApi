@@ -405,10 +405,11 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 string constring = string.Empty;
+                string mainConstring = _config.GetConnectionString("DefaultConnection");
                 //if (op == 2)
                 //    constring = _config.GetConnectionString("DefaultConnection");
                 //else
-                    constring = await _connService.GetConnectionStringByOperator(op);
+                constring = await _connService.GetConnectionStringByOperator(op);
 
                 if (constring != null && constring.Length > 10)
                 {
@@ -435,17 +436,22 @@ namespace AdtonesAdminWebApi.BusinessServices
                         }
                         // Separated this out as conversion likely to take more time than the initial fetch.
                         /// Spend & Credit
-                        IEnumerable<SpendCredit> amtsSpent = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetAmountSpent, op, constring,false);
+                        IEnumerable<SpendCredit> amtsSpent = await _reportDAL.GetTotalCreditCostProv(search, ManagementReportQuery.GetAmountSpent, op, constring,1);
                         var spentAudit = amtsSpent.ToList();
                         Task<TotalCostCredit> amtSpent = CalculateConvertedSpendCredit(spentAudit, search);
 
-                        IEnumerable<SpendCredit> amtsCredit = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetAmountCredit, op, constring,false);
+                        IEnumerable<SpendCredit> amtsCredit = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetAmountCredit, op, mainConstring,2);
                         var creditAudit = amtsCredit.ToList();
                         Task<TotalCostCredit> amtCredit = CalculateConvertedSpendCredit(creditAudit, search);
 
+                        IEnumerable<SpendCredit> amtsPaid = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetAmountPayment, op, mainConstring, 1);
+                        var paidMain = amtsPaid.ToList();
+                        Task<TotalCostCredit> amtPaid = CalculateConvertedSpendCredit(paidMain, search);
+
                         try
                         {
-                            IEnumerable<SpendCredit> totCosts = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetTotalCost, op, constring, true);
+                            // Actually now total spent
+                            IEnumerable<SpendCredit> totCosts = await _reportDAL.GetTotalCreditCostProv(search, ManagementReportQuery.GetAmountSpent, op, constring, 3);
                             var costAudit = totCosts.ToList();
                             Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit, search);
 
@@ -472,6 +478,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                                             await Task.WhenAll(
                                                 amtSpent,
+                                                amtPaid,
                                                 totCost,
                                                 totUser,
                                                 totListen,
@@ -523,10 +530,10 @@ namespace AdtonesAdminWebApi.BusinessServices
                                             model.NumPlays = numPlay.Plays;
 
                                             /// Credit & Spend
-                                            model.TotalCredit = (int)totCost.Result.TotalCredit;
+                                            model.TotalCredit = (int)amtCredit.Result.TotalCredit;
                                             model.TotalSpend = (int)totCost.Result.TotalSpend;
                                             model.AmountSpent = (int)amtSpent.Result.TotalSpend;
-                                            model.AmountCredit = (int)amtCredit.Result.TotalCredit;
+                                            model.AmountCredit = (int)amtPaid.Result.TotalCredit;
                                             model.CurrencyCode = GetCurrencySymbol(currency.CurrencyCode);
 
                                             /// Rewards

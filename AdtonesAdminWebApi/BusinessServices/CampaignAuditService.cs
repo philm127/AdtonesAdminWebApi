@@ -76,6 +76,11 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        /// <summary>
+        /// Called by operator for individual campaign playlist
+        /// </summary>
+        /// <param name="paging"></param>
+        /// <returns></returns>
         public async Task<ReturnResult> GetPlayDetailsForOperatorByCampaign(PagingSearchClass paging)
         {
             try
@@ -101,6 +106,11 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        /// <summary>
+        /// Actually called by the Operator
+        /// </summary>
+        /// <param name="operatorId"></param>
+        /// <returns></returns>
         public async Task<ReturnResult> GetDashboardSummariesByOperator(int operatorId)
         {
             try
