@@ -12,22 +12,27 @@
     <Compile Remove="EmailTemplates\**" />
     <Compile Remove="Invoice\**" />
     <Compile Remove="PromotionalUserCSV\**" />
+    <Compile Remove="ViewModels\AdProfilrModels\**" />
     <Content Remove="DAL\**" />
     <Content Remove="EmailTemplates\**" />
     <Content Remove="Invoice\**" />
     <Content Remove="PromotionalUserCSV\**" />
+    <Content Remove="ViewModels\AdProfilrModels\**" />
     <EmbeddedResource Remove="DAL\**" />
     <EmbeddedResource Remove="EmailTemplates\**" />
     <EmbeddedResource Remove="Invoice\**" />
     <EmbeddedResource Remove="PromotionalUserCSV\**" />
+    <EmbeddedResource Remove="ViewModels\AdProfilrModels\**" />
     <None Remove="DAL\**" />
     <None Remove="EmailTemplates\**" />
     <None Remove="Invoice\**" />
     <None Remove="PromotionalUserCSV\**" />
+    <None Remove="ViewModels\AdProfilrModels\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="BusinessServices\AdvertiserCreditService.cs" />
+    <Compile Remove="BusinessServices\BillingService.cs" />
     <Compile Remove="BusinessServices\CountryTaxService.cs" />
     <Compile Remove="BusinessServices\ExpressoPromotionalUserService.cs" />
     <Compile Remove="BusinessServices\Interfaces\IAdvertiserCreditService.cs" />
@@ -137,6 +142,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="ClosedXML" Version="0.95.0" />
     <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="Dapper.SqlBuilder" Version="2.0.35" />

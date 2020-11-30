@@ -233,7 +233,7 @@ namespace AdtonesAdminWebApi.DAL
                 {
                     model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
-                    var x = await _executers.ExecuteCommand(constr,
+                    x = await _executers.ExecuteCommand(constr,
                                     conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
                 }
             }
