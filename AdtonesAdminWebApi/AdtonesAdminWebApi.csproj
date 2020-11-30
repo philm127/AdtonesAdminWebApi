@@ -78,6 +78,7 @@
     <Compile Include="DAL\ProfileMatchInfoDAL.cs" />
     <Compile Include="DAL\Interfaces\IRewardDAL.cs" />
     <Compile Include="DAL\Queries\BillingQuery.cs" />
+    <Compile Include="DAL\Queries\ClientQuery.cs" />
     <Compile Include="DAL\Queries\OperatorQuery.cs" />
     <Compile Include="DAL\Queries\ProfileMatchInfoQuery.cs" />
     <Compile Include="DAL\Queries\SalesManagementQuery.cs" />
