@@ -210,245 +210,245 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> CreateNewCampaign_Advert(NewAdvertFormModel model)
-        {
+        //public async Task<ReturnResult> CreateNewCampaign_Advert(NewAdvertFormModel model)
+        //{
 
-            var AdvertNameexists = await _advertDAL.CheckAdvertNameExists(model.AdvertName, model.AdvertiserId);
+        //    var AdvertNameexists = await _advertDAL.CheckAdvertNameExists(model.AdvertName, model.AdvertiserId);
 
-                if (AdvertNameexists)
-                {
-                result.result = 0;
-                result.body = "The Advert Name already exists";
-                return result;
-                }
+        //        if (AdvertNameexists)
+        //        {
+        //        result.result = 0;
+        //        result.body = "The Advert Name already exists";
+        //        return result;
+        //        }
 
-                    if(model.file.Count == 0)
-                {
-                    result.result = 0;
-                    result.body = "A media file is required to proceed";
-                    return result;
-                }
+        //            if(model.file.Count == 0)
+        //        {
+        //            result.result = 0;
+        //            result.body = "A media file is required to proceed";
+        //            return result;
+        //        }
 
-            IFormFile mediaFile = null;
-            IFormFile  scriptFile = null;
-                if (model.file.Count == 1)
-                    mediaFile = model.file[0];
-            else
-            {
-                foreach( var file in model.file)
-                {
-                    if (file.ContentType == "audio/wav" || file.ContentType == "audio/wave")
-                        mediaFile = file;
-                    else
-                        scriptFile = file;
-                }
-            }
-                        #region Media
+        //    IFormFile mediaFile = null;
+        //    IFormFile  scriptFile = null;
+        //        if (model.file.Count == 1)
+        //            mediaFile = model.file[0];
+        //    else
+        //    {
+        //        foreach( var file in model.file)
+        //        {
+        //            if (file.ContentType == "audio/wav" || file.ContentType == "audio/wave")
+        //                mediaFile = file;
+        //            else
+        //                scriptFile = file;
+        //        }
+        //    }
+        //                #region Media
 
-                                var userData = _userRepository.GetById(efmvcUser.UserId);
+        //                        var userData = _userRepository.GetById(efmvcUser.UserId);
 
-                                var firstAudioName = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Second.ToString();
+        //                        var firstAudioName = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Second.ToString();
 
-                                string fileName = firstAudioName;
+        //                        string fileName = firstAudioName;
 
-                                string fileName2 = null;
-                                if (Convert.ToInt32(model.OperatorId) == (int)Enums.OperatorTableId.Safaricom)
-                                {
-                                    var secondAudioName = Convert.ToInt64(firstAudioName) + 1;
-                                    fileName2 = secondAudioName.ToString();
-                                }
+        //                        string fileName2 = null;
+        //                        if (Convert.ToInt32(model.OperatorId) == (int)Enums.OperatorTableId.Safaricom)
+        //                        {
+        //                            var secondAudioName = Convert.ToInt64(firstAudioName) + 1;
+        //                            fileName2 = secondAudioName.ToString();
+        //                        }
 
-                                string extension = Path.GetExtension(mediaFile.FileName);
-                                var onlyFileName = Path.GetFileNameWithoutExtension(mediaFile.FileName);
-                                string outputFormat = "wav";
+        //                        string extension = Path.GetExtension(mediaFile.FileName);
+        //                        var onlyFileName = Path.GetFileNameWithoutExtension(mediaFile.FileName);
+        //                        string outputFormat = "wav";
 
-                                var audioFormatExtension = "." + outputFormat;
-            string actualDirectoryName = "Media";
-            string directoryName = Path.Combine(actualDirectoryName, model.OperatorId.ToString());
-            string newfile = string.Empty;
+        //                        var audioFormatExtension = "." + outputFormat;
+        //    string actualDirectoryName = "Media";
+        //    string directoryName = Path.Combine(actualDirectoryName, model.OperatorId.ToString());
+        //    string newfile = string.Empty;
 
-            if (extension != audioFormatExtension)
-            {
-                string tempDirectoryName = @"Media\Temp\";
-                string tempFile = await _saveFile.SaveFileToSite(tempDirectoryName, mediaFile);
+        //    if (extension != audioFormatExtension)
+        //    {
+        //        string tempDirectoryName = @"Media\Temp\";
+        //        string tempFile = await _saveFile.SaveFileToSite(tempDirectoryName, mediaFile);
 
-                newfile = _convFile.ConvertAndSaveMediaFile(tempDirectoryName + tempFile, extension, outputFormat, onlyFileName, directoryName);
+        //        newfile = _convFile.ConvertAndSaveMediaFile(tempDirectoryName + tempFile, extension, outputFormat, onlyFileName, directoryName);
 
-                model.MediaFileLocation = string.Format("/Media/{0}/{1}", model.AdvertiserId.ToString(),
-                                                                        fileName + "." + outputFormat);
-            }
-            else
-            {
-                newfile = await _saveFile.SaveFileToSite(directoryName, mediaFile);
+        //        model.MediaFileLocation = string.Format("/Media/{0}/{1}", model.AdvertiserId.ToString(),
+        //                                                                fileName + "." + outputFormat);
+        //    }
+        //    else
+        //    {
+        //        newfile = await _saveFile.SaveFileToSite(directoryName, mediaFile);
 
-                string archiveDirectoryName = "Media//Archive";
+        //        string archiveDirectoryName = "Media//Archive";
 
-                string apath = await _saveFile.SaveOriginalFileToSite(archiveDirectoryName, mediaFile);
+        //        string apath = await _saveFile.SaveOriginalFileToSite(archiveDirectoryName, mediaFile);
 
 
-                model.MediaFileLocation = string.Format("/Media/{0}/{1}", model.AdvertiserId.ToString(),
-                                                                            fileName + extension);
-            }
+        //        model.MediaFileLocation = string.Format("/Media/{0}/{1}", model.AdvertiserId.ToString(),
+        //                                                                    fileName + extension);
+        //    }
 
-                        #endregion
+        //                #endregion
 
-                        #region Script
+        //                #region Script
 
-                        if (scriptFile != null)
-                        {
-                            if (scriptFile.ContentLength != 0)
-                            {
-                                string fileName = Guid.NewGuid().ToString();
-                                string extension = Path.GetExtension(scriptFile.FileName);
+        //                if (scriptFile != null)
+        //                {
+        //                    if (scriptFile.ContentLength != 0)
+        //                    {
+        //                        string fileName = Guid.NewGuid().ToString();
+        //                        string extension = Path.GetExtension(scriptFile.FileName);
 
-                                string directoryName = Server.MapPath("/Script/");
-                                directoryName = Path.Combine(directoryName, efmvcUser.UserId.ToString());
+        //                        string directoryName = Server.MapPath("/Script/");
+        //                        directoryName = Path.Combine(directoryName, efmvcUser.UserId.ToString());
 
-                                if (!Directory.Exists(directoryName))
-                                    Directory.CreateDirectory(directoryName);
+        //                        if (!Directory.Exists(directoryName))
+        //                            Directory.CreateDirectory(directoryName);
 
-                                string path = Path.Combine(directoryName, fileName + extension);
-                                scriptFile.SaveAs(path);
+        //                        string path = Path.Combine(directoryName, fileName + extension);
+        //                        scriptFile.SaveAs(path);
 
-                                string archiveDirectoryName = Server.MapPath("/Script/Archive/");
+        //                        string archiveDirectoryName = Server.MapPath("/Script/Archive/");
 
-                                if (!Directory.Exists(archiveDirectoryName))
-                                    Directory.CreateDirectory(archiveDirectoryName);
+        //                        if (!Directory.Exists(archiveDirectoryName))
+        //                            Directory.CreateDirectory(archiveDirectoryName);
 
-                                string archivePath = Path.Combine(archiveDirectoryName, fileName + extension);
-                                scriptFile.SaveAs(archivePath);
+        //                        string archivePath = Path.Combine(archiveDirectoryName, fileName + extension);
+        //                        scriptFile.SaveAs(archivePath);
 
-                                model.ScriptFileLocation = string.Format("/Script/{0}/{1}", efmvcUser.UserId.ToString(),
-                                                                        fileName + extension);
-                            }
-                            else
-                            {
-                                model.ScriptFileLocation = "";
-                            }
-                        }
-                        else
-                        {
-                            model.ScriptFileLocation = "";
-                        }
-                        #endregion
+        //                        model.ScriptFileLocation = string.Format("/Script/{0}/{1}", efmvcUser.UserId.ToString(),
+        //                                                                fileName + extension);
+        //                    }
+        //                    else
+        //                    {
+        //                        model.ScriptFileLocation = "";
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    model.ScriptFileLocation = "";
+        //                }
+        //                #endregion
 
-                        #region Add Records
+        //                #region Add Records
 
-                        var campaign = db.CampaignProfiles.Where(c => c.CampaignName == campaignName && c.UserId == efmvcUser.UserId).FirstOrDefault();
-                        int campaignId = 0;
+        //                var campaign = db.CampaignProfiles.Where(c => c.CampaignName == campaignName && c.UserId == efmvcUser.UserId).FirstOrDefault();
+        //                int campaignId = 0;
 
-                        if (campaign.CampaignProfileId != 0 && campaign.CampaignProfileId != null)
-                        {
-                            campaignId = Convert.ToInt32(campaign.CampaignProfileId);
-                        }
+        //                if (campaign.CampaignProfileId != 0 && campaign.CampaignProfileId != null)
+        //                {
+        //                    campaignId = Convert.ToInt32(campaign.CampaignProfileId);
+        //                }
 
-                        int? clientId = null;
-                        if (advertClientId == "")
-                        {
-                            clientId = null;
-                        }
-                        else
-                        {
-                            clientId = Convert.ToInt32(advertClientId);
-                        }
+        //                int? clientId = null;
+        //                if (advertClientId == "")
+        //                {
+        //                    clientId = null;
+        //                }
+        //                else
+        //                {
+        //                    clientId = Convert.ToInt32(advertClientId);
+        //                }
 
-                        if (ModelState.IsValid)
-                        {
-                            model.AdvertId = 0;
-                            model.UserId = efmvcUser.UserId;
-                            model.AdvertClientId = clientId;
-                            model.AdvertName = advertName;
-                            model.BrandName = advertBrandName;
-                            model.UploadedToMediaServer = false;
-                            model.CreatedDateTime = DateTime.Now;
-                            model.UpdatedDateTime = DateTime.Now;
-                            model.Status = (int)AdvertStatus.Waitingforapproval;
-                            model.Script = script;
-                            model.IsAdminApproval = false;
-                            model.AdvertCategoryId = int.Parse(advertCategoryId);
-                            model.CountryId = int.Parse(countryId);
-                            model.PhoneticAlphabet = advertPhoneticAlphabet;
-                            model.NextStatus = false;
-                            model.CampProfileId = campaignId;
-                            model.AdtoneServerAdvertId = null;
-                            model.OperatorId = Convert.ToInt32(operatorId);
+        //                if (ModelState.IsValid)
+        //                {
+        //                    model.AdvertId = 0;
+        //                    model.UserId = efmvcUser.UserId;
+        //                    model.AdvertClientId = clientId;
+        //                    model.AdvertName = advertName;
+        //                    model.BrandName = advertBrandName;
+        //                    model.UploadedToMediaServer = false;
+        //                    model.CreatedDateTime = DateTime.Now;
+        //                    model.UpdatedDateTime = DateTime.Now;
+        //                    model.Status = (int)AdvertStatus.Waitingforapproval;
+        //                    model.Script = script;
+        //                    model.IsAdminApproval = false;
+        //                    model.AdvertCategoryId = int.Parse(advertCategoryId);
+        //                    model.CountryId = int.Parse(countryId);
+        //                    model.PhoneticAlphabet = advertPhoneticAlphabet;
+        //                    model.NextStatus = false;
+        //                    model.CampProfileId = campaignId;
+        //                    model.AdtoneServerAdvertId = null;
+        //                    model.OperatorId = Convert.ToInt32(operatorId);
 
-                            CreateOrUpdateCopyAdvertCommand command = Mapper.Map<NewAdvertFormModel, CreateOrUpdateCopyAdvertCommand>(model);
+        //                    CreateOrUpdateCopyAdvertCommand command = Mapper.Map<NewAdvertFormModel, CreateOrUpdateCopyAdvertCommand>(model);
 
-                            ICommandResult result = _commandBus.Submit(command);
+        //                    ICommandResult result = _commandBus.Submit(command);
 
-                            if (result.Success)
-                            {
-                                if (campaignId != 0)
-                                {
-                                    CampaignAdvertFormModel _campaignAdvert = new CampaignAdvertFormModel();
-                                    _campaignAdvert.AdvertId = result.Id;
-                                    _campaignAdvert.CampaignProfileId = campaignId;
-                                    _campaignAdvert.NextStatus = true;
-                                    CreateOrUpdateCampaignAdvertCommand campaignAdvertcommand =
-                                    Mapper.Map<CampaignAdvertFormModel, CreateOrUpdateCampaignAdvertCommand>(_campaignAdvert);
+        //                    if (result.Success)
+        //                    {
+        //                        if (campaignId != 0)
+        //                        {
+        //                            CampaignAdvertFormModel _campaignAdvert = new CampaignAdvertFormModel();
+        //                            _campaignAdvert.AdvertId = result.Id;
+        //                            _campaignAdvert.CampaignProfileId = campaignId;
+        //                            _campaignAdvert.NextStatus = true;
+        //                            CreateOrUpdateCampaignAdvertCommand campaignAdvertcommand =
+        //                            Mapper.Map<CampaignAdvertFormModel, CreateOrUpdateCampaignAdvertCommand>(_campaignAdvert);
 
-                                    ICommandResult campaignAdvertcommandResult = _commandBus.Submit(campaignAdvertcommand);
+        //                            ICommandResult campaignAdvertcommandResult = _commandBus.Submit(campaignAdvertcommand);
 
-                                    if (campaignAdvertcommandResult.Success)
-                                    {
-                                        if (campaign != null)
-                                        {
-                                            campaign.NumberInBatch = int.Parse(numberofadsinabatch);
-                                            campaign.UpdatedDateTime = DateTime.Now;
-                                            db.SaveChanges();
-                                            if (ConnString != null && ConnString.Count() > 0)
-                                            {
-                                                UserMatchTableProcess obj = new UserMatchTableProcess();
+        //                            if (campaignAdvertcommandResult.Success)
+        //                            {
+        //                                if (campaign != null)
+        //                                {
+        //                                    campaign.NumberInBatch = int.Parse(numberofadsinabatch);
+        //                                    campaign.UpdatedDateTime = DateTime.Now;
+        //                                    db.SaveChanges();
+        //                                    if (ConnString != null && ConnString.Count() > 0)
+        //                                    {
+        //                                        UserMatchTableProcess obj = new UserMatchTableProcess();
 
-                                                string adName = "";
-                                                if (command.MediaFileLocation == null || command.MediaFileLocation == "")
-                                                {
-                                                    adName = "";
-                                                }
-                                                else
-                                                {
+        //                                        string adName = "";
+        //                                        if (command.MediaFileLocation == null || command.MediaFileLocation == "")
+        //                                        {
+        //                                            adName = "";
+        //                                        }
+        //                                        else
+        //                                        {
 
-                                                    EFMVCDataContex SQLServerEntities = new EFMVCDataContex();
-                                                    var advertOperatorId = _advertRepository.GetById(result.Id).OperatorId;
-                                                    var operatorFTPDetails = SQLServerEntities.OperatorFTPDetails.Where(top => top.OperatorId == (int)advertOperatorId).FirstOrDefault();
-                                                    adName = operatorFTPDetails.FtpRoot + "/" + command.MediaFileLocation.Split('/')[3];
-                                                }
+        //                                            EFMVCDataContex SQLServerEntities = new EFMVCDataContex();
+        //                                            var advertOperatorId = _advertRepository.GetById(result.Id).OperatorId;
+        //                                            var operatorFTPDetails = SQLServerEntities.OperatorFTPDetails.Where(top => top.OperatorId == (int)advertOperatorId).FirstOrDefault();
+        //                                            adName = operatorFTPDetails.FtpRoot + "/" + command.MediaFileLocation.Split('/')[3];
+        //                                        }
 
-                                                foreach (var item in ConnString)
-                                                {
-                                                    EFMVCDataContex db1 = new EFMVCDataContex(item);
-                                                    var campaignProfileDetails = db1.CampaignProfiles.Where(s => s.AdtoneServerCampaignProfileId == campaign.CampaignProfileId).FirstOrDefault();
-                                                    if (campaignProfileDetails != null)
-                                                    {
-                                                        campaignProfileDetails.NumberInBatch = int.Parse(numberofadsinabatch);
-                                                        campaignProfileDetails.UpdatedDateTime = DateTime.Now;
-                                                        db1.SaveChanges();
+        //                                        foreach (var item in ConnString)
+        //                                        {
+        //                                            EFMVCDataContex db1 = new EFMVCDataContex(item);
+        //                                            var campaignProfileDetails = db1.CampaignProfiles.Where(s => s.AdtoneServerCampaignProfileId == campaign.CampaignProfileId).FirstOrDefault();
+        //                                            if (campaignProfileDetails != null)
+        //                                            {
+        //                                                campaignProfileDetails.NumberInBatch = int.Parse(numberofadsinabatch);
+        //                                                campaignProfileDetails.UpdatedDateTime = DateTime.Now;
+        //                                                db1.SaveChanges();
 
-                                                        obj.UpdateCampaignAd(campaignProfileDetails.CampaignProfileId, adName, db1);
-                                                        PreMatchProcess.PrematchProcessForCampaign(campaignProfileDetails.CampaignProfileId, item);
-                                                    }
-                                                }
-                                            }
-                                            //Email Code
-                                            //advertEmail.SendMail(advertName, model.OperatorId);
-                                            advertEmail.SendMail(advertName, model.OperatorId, efmvcUser.UserId, campaignName, countryName, operatorName, DateTime.Now);
-                                            return Json("success");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        #endregion
-                    }
-                    catch (Exception ex)
-                    {
-                        TempData["Error"] = ex.InnerException.Message;
-                        return Json("fail");
-                    }
-                }
+        //                                                obj.UpdateCampaignAd(campaignProfileDetails.CampaignProfileId, adName, db1);
+        //                                                PreMatchProcess.PrematchProcessForCampaign(campaignProfileDetails.CampaignProfileId, item);
+        //                                            }
+        //                                        }
+        //                                    }
+        //                                    //Email Code
+        //                                    //advertEmail.SendMail(advertName, model.OperatorId);
+        //                                    advertEmail.SendMail(advertName, model.OperatorId, efmvcUser.UserId, campaignName, countryName, operatorName, DateTime.Now);
+        //                                    return Json("success");
+        //                                }
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //                #endregion
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                TempData["Error"] = ex.InnerException.Message;
+        //                return Json("fail");
+        //            }
+        //        }
 
-        }
+        //}
 
 
         private async Task<bool> CampaignProfileTimeSettingMapping(int campaignId, int countryId, int provCampId)
