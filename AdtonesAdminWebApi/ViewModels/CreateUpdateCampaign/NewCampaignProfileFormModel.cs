@@ -31,27 +31,27 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
         public float MaxMonthBudget { get; set; }
         public float MaxWeeklyBudget { get; set; }
         public float MaxHourlyBudget { get; set; }
-        public decimal TotalCredit { get; set; }
-        public float SpendToDate { get; set; }
+        public decimal TotalCredit { get; set; } = 0.00M;
+        public float SpendToDate { get; set; } = 0.00F;
         public decimal AvailableCredit { get; set; }
-        public int PlaysToDate { get; set; }
-        public int PlaysLastMonth { get; set; }
-        public int PlaysCurrentMonth { get; set; }
-        public int CancelledToDate { get; set; }
-        public int CancelledLastMonth { get; set; }
-        public int CancelledCurrentMonth { get; set; }
-        public int SmsToDate { get; set; }
-        public int SmsLastMonth { get; set; }
-        public int SmsCurrentMonth { get; set; }
-        public int EmailToDate { get; set; }
-        public int EmailsLastMonth { get; set; }
-        public int EmailsCurrentMonth { get; set; }
+        public int PlaysToDate { get; set; } = 0;
+        public int PlaysLastMonth { get; set; } = 0;
+        public int PlaysCurrentMonth { get; set; } = 0;
+        public int CancelledToDate { get; set; } = 0;
+        public int CancelledLastMonth { get; set; } = 0;
+        public int CancelledCurrentMonth { get; set; } = 0;
+        public int SmsToDate { get; set; } = 0;
+        public int SmsLastMonth { get; set; } = 0;
+        public int SmsCurrentMonth { get; set; } = 0;
+        public int EmailToDate { get; set; } = 0;
+        public int EmailsLastMonth { get; set; } = 0;
+        public int EmailsCurrentMonth { get; set; } = 0;
         public string EmailFileLocation { get; set; }
         public bool Active { get; set; }
-        public int NumberOfPlays { get; set; }
-        public int AverageDailyPlays { get; set; }
-        public int SmsRequests { get; set; }
-        public int EmailsDelievered { get; set; }
+        public int NumberOfPlays { get; set; } = 0;
+        public int AverageDailyPlays { get; set; } = 0;
+        public int SmsRequests { get; set; } = 0;
+        public int EmailsDelievered { get; set; } = 0;
         public string EmailSubject { get; set; }
         public string EmailBody { get; set; }
         public string EmailSenderAddress { get; set; }
@@ -63,17 +63,18 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
         public int Status { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public int NumberInBatch { get; set; }
+        public int NumberInBatch { get; set; } = 1;
         public bool IsAdminApproval { get; set; }
-        public float RemainingMaxDailyBudget { get; set; }
-        public float RemainingMaxHourlyBudget { get; set; }
-        public float RemainingMaxWeeklyBudget { get; set; }
-        public float RemainingMaxMonthBudget { get; set; }
-        public decimal ProvidendSpendAmount { get; set; }
-        public int BucketCount { get; set; }
+        public float RemainingMaxDailyBudget => MaxDailyBudget;
+        public float RemainingMaxHourlyBudget => MaxHourlyBudget;
+        public float RemainingMaxWeeklyBudget => MaxWeeklyBudget;
+        public float RemainingMaxMonthBudget => MaxMonthBudget;
+        public decimal ProvidendSpendAmount { get; set; } = 0.00M;
+        public int BucketCount { get; set; } = 0;
         public bool NextStatus { get; set; }
 
         public string CurrencyCode { get; set; }
+        public int CurrencyId { get; set; }
 
         public int? AdtoneServerCampaignProfileId { get; set; }
 
@@ -91,5 +92,11 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
             newCampaignDateandInteraction = new NewCampaignDateandInteraction();
             newAdProfileMappingFormModel = new NewAdProfileMappingFormModel();
         }
+    }
+
+
+    public class NewCampaignProfileFormDataModel : NewCampaignProfileFormModel
+    {
+        public int MSCampaignProfileId { get; set; }
     }
 }

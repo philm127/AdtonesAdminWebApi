@@ -17,27 +17,26 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
 
         }
 
-        public CampaignProfileGeographicFormModel(int CountryId)
-        {
-            EFMVCDataContex db = new EFMVCDataContex();
+        //public CampaignProfileGeographicFormModel(int CountryId)
+        //{
+        //    // EFMVCDataContex db = new EFMVCDataContex();
 
-            var locationProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Location".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var locationProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == locationProfileMatchId).ToList();
+        //    var locationProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Location".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var locationProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == locationProfileMatchId).ToList();
 
-            Dictionary<string, bool> location = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> locationlist = new List<Dictionary<string, bool>>();
+        //    Dictionary<string, bool> location = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> locationlist = new List<Dictionary<string, bool>>();
 
-            foreach (var item in locationProfileLabel)
-            {
-                location = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                locationlist.Add(location);
-            }
-            LocationQuestion = CompileQuestionsDynamic(locationlist);
+        //    foreach (var item in locationProfileLabel)
+        //    {
+        //        location = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        locationlist.Add(location);
+        //    }
+        //    LocationQuestion = CompileQuestionsDynamic(locationlist);
 
             
-        }
-        // [Required]
-        // [RegularExpression(@"^[a-zA-Z0-9,]*$", ErrorMessage = "Only comma(,) are allowed.")]
+        //}
+
         public string PostCode { get; set; }
         // [Required]
         public int CountryId { get; set; }

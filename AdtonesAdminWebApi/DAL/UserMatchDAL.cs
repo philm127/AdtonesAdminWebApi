@@ -1,6 +1,7 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -97,12 +98,27 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<int> AddCampaignData(NewCampaignProfileFormModel model, string conn)
+        {
+            try
+            {
+
+                return await _executers.ExecuteCommand(conn,
+                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertNewCampaignData, model));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task PrematchUserProcess(int campaignId, string conn)
         {
             using (var connection = new SqlConnection(conn))
             {
                 await connection.OpenAsync();
-                await connection.ExecuteAsync("NAME OF SP",
+                await connection.ExecuteAsync("CampaignUserMatchSpByCampaignId",
                                                                     new { CampaignProfileId = campaignId },
                                                                     commandType: CommandType.StoredProcedure);
             }

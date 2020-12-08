@@ -65,6 +65,23 @@ namespace AdtonesAdminWebApi.DAL.Shared
         }
 
 
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetClientList(int userId)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connStr))
+                {
+                    connection.Open();
+                    return await connection.QueryAsync<SharedSelectListViewModel>(SharedListQuery.GetClientList, new { Id = userId });
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<IEnumerable<object>> GetUserPermissionsWRoles()
         {
             var sb = new StringBuilder();
@@ -131,6 +148,24 @@ namespace AdtonesAdminWebApi.DAL.Shared
                 {
                     connection.Open();
                     return await connection.QueryAsync<SharedSelectListViewModel>(SharedListQuery.GetOrganisationTypes);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetAdvertCategory()
+        {
+
+            try
+            {
+                using (var connection = new SqlConnection(_connStr))
+                {
+                    connection.Open();
+                    return await connection.QueryAsync<SharedSelectListViewModel>(SharedListQuery.GetAdvertCategory);
                 }
             }
             catch

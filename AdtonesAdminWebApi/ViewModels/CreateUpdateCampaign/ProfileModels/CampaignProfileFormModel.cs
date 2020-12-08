@@ -117,16 +117,16 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         public ICollection<CampaignProfileDateSettingsFormModel> CampaignProfileDateSettings { get; set; }
         public ICollection<CampaignProfileDemographicsFormModel> CampaignProfileDemographicsFormModels { get; set; }
 
-        public ICollection<CampaignAuditFormModel> GetCampaignAudits(ICampaignAuditRepository auditRepo)
-        {
-            return auditRepo.AsQueryable().Where(a => a.CampaignProfileId == CampaignProfileId).Select(a => Mapper.Map<CampaignAudit, CampaignAuditFormModel>(a)).ToList();
-        }
-        public IQueryable<CampaignAudit> GetDomainCampaignAudits(ICampaignAuditRepository auditRepo)
-        {
-            return auditRepo.AsQueryable().Where(a => a.CampaignProfileId == CampaignProfileId);
-        }
+        //public ICollection<CampaignAuditFormModel> GetCampaignAudits(ICampaignAuditRepository auditRepo)
+        //{
+        //    return auditRepo.AsQueryable().Where(a => a.CampaignProfileId == CampaignProfileId).Select(a => Mapper.Map<CampaignAudit, CampaignAuditFormModel>(a)).ToList();
+        //}
+        //public IQueryable<CampaignAudit> GetDomainCampaignAudits(ICampaignAuditRepository auditRepo)
+        //{
+        //    return auditRepo.AsQueryable().Where(a => a.CampaignProfileId == CampaignProfileId);
+        //}
 
-        public ICollection<CampaignProfilePreference> CampaignProfilePreferences { get; set; }
+        //public ICollection<CampaignProfilePreference> CampaignProfilePreferences { get; set; }
 
         //public ICollection<CampaignAuditFormModel> CampaignAudit2 { get; set; }
 

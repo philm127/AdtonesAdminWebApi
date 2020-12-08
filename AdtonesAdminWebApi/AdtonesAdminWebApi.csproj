@@ -70,7 +70,9 @@
 
   <ItemGroup>
     <Compile Include="DAL\BillingDAL.cs" />
+    <Compile Include="DAL\CreateUpdateCampaignDAL.cs" />
     <Compile Include="DAL\Interfaces\IBillingDAL.cs" />
+    <Compile Include="DAL\Interfaces\ICreateUpdateCampaignDAL.cs" />
     <Compile Include="DAL\Interfaces\IOperatorDAL.cs" />
     <Compile Include="DAL\Interfaces\ISalesManagementDAL.cs" />
     <Compile Include="DAL\OperatorDAL.cs" />
@@ -79,6 +81,7 @@
     <Compile Include="DAL\Interfaces\IRewardDAL.cs" />
     <Compile Include="DAL\Queries\BillingQuery.cs" />
     <Compile Include="DAL\Queries\ClientQuery.cs" />
+    <Compile Include="DAL\Queries\CreateUpdateCampaignQuery.cs" />
     <Compile Include="DAL\Queries\OperatorQuery.cs" />
     <Compile Include="DAL\Queries\ProfileMatchInfoQuery.cs" />
     <Compile Include="DAL\Queries\SalesManagementQuery.cs" />

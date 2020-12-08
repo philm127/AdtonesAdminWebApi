@@ -197,977 +197,977 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
                   {{"Young cautious caller", true}, {"Toa Mpango", false},{"Young progressive worker", false}, {"Older Toa Mpango", true}, {"Progressive worker", false}});
         }
 
-        public CampaignProfileAdvertFormModel(int CountryId)//int CountryId
-        {
-            EFMVCDataContex db = new EFMVCDataContex();
-
-            //Food
-            var foodProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Food".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var foodProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == foodProfileMatchId).ToList();
-
-            Dictionary<string, bool> food = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> foodlist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in foodProfileLabel)
-            {
-                food = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                foodlist.Add(food);
-            }
-            FoodQuestion = CompileQuestionsDynamic(foodlist);
-            foreach (var item in FoodQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //SweetSaltySnacks
-            var sweetSaltySnacksProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Sweets/Snacks".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var sweetSaltySnacksProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == sweetSaltySnacksProfileMatchId).ToList();
-
-            Dictionary<string, bool> sweetSaltySnacks = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> sweetSaltySnackslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in sweetSaltySnacksProfileLabel)
-            {
-                sweetSaltySnacks = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                sweetSaltySnackslist.Add(sweetSaltySnacks);
-            }
-            SweetSaltySnacksQuestion = CompileQuestionsDynamic(sweetSaltySnackslist);
-            foreach (var item in SweetSaltySnacksQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //AlcoholicDrinks
-            var alcoholicDrinksProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Alcoholic Drinks".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var alcoholicDrinksProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == alcoholicDrinksProfileMatchId).ToList();
-
-            Dictionary<string, bool> alcoholicDrinks = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> alcoholicDrinkslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in alcoholicDrinksProfileLabel)
-            {
-                alcoholicDrinks = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                alcoholicDrinkslist.Add(alcoholicDrinks);
-            }
-            AlcoholicDrinksQuestion = CompileQuestionsDynamic(alcoholicDrinkslist);
-            foreach (var item in AlcoholicDrinksQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //NonAlcoholicDrinks
-            var nonAlcoholicDrinksProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Non-Alcoholic Drinks".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var nonAlcoholicDrinksProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == nonAlcoholicDrinksProfileMatchId).ToList();
-
-            Dictionary<string, bool> nonAlcoholicDrinks = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> nonAlcoholicDrinkslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in nonAlcoholicDrinksProfileLabel)
-            {
-                nonAlcoholicDrinks = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                nonAlcoholicDrinkslist.Add(nonAlcoholicDrinks);
-            }
-            NonAlcoholicDrinksQuestion = CompileQuestionsDynamic(nonAlcoholicDrinkslist);
-            foreach (var item in NonAlcoholicDrinksQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Householdproducts
-            var householdproductsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Household Appliances/Products".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var householdproductsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == householdproductsProfileMatchId).ToList();
-
-            Dictionary<string, bool> householdproducts = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> householdproductslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in householdproductsProfileLabel)
-            {
-                householdproducts = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                householdproductslist.Add(householdproducts);
-            }
-            HouseholdproductsQuestion = CompileQuestionsDynamic(householdproductslist);
-            foreach (var item in HouseholdproductsQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //ToiletriesCosmetics
-            var toiletriesCosmeticsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Toiletries/Cosmetics".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var toiletriesCosmeticsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == toiletriesCosmeticsProfileMatchId).ToList();
-
-            Dictionary<string, bool> toiletriesCosmetics = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> toiletriesCosmeticslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in toiletriesCosmeticsProfileLabel)
-            {
-                toiletriesCosmetics = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                toiletriesCosmeticslist.Add(toiletriesCosmetics);
-            }
-            ToiletriesCosmeticsQuestion = CompileQuestionsDynamic(toiletriesCosmeticslist);
-            foreach (var item in ToiletriesCosmeticsQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //PharmaceuticalChemistsProducts
-            var pharmaceuticalChemistsProductsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Pharmaceutical/Chemists Products".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var pharmaceuticalChemistsProductsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == pharmaceuticalChemistsProductsProfileMatchId).ToList();
-
-            Dictionary<string, bool> pharmaceuticalChemistsProducts = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> pharmaceuticalChemistsProductslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in pharmaceuticalChemistsProductsProfileLabel)
-            {
-                pharmaceuticalChemistsProducts = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                pharmaceuticalChemistsProductslist.Add(pharmaceuticalChemistsProducts);
-            }
-            PharmaceuticalChemistsProductsQuestion = CompileQuestionsDynamic(pharmaceuticalChemistsProductslist);
-            foreach (var item in PharmaceuticalChemistsProductsQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //TobaccoProducts
-            var tobaccoProductsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Tobacco Products".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var tobaccoProductsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == tobaccoProductsProfileMatchId).ToList();
-
-            Dictionary<string, bool> tobaccoProducts = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> tobaccoProductslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in tobaccoProductsProfileLabel)
-            {
-                tobaccoProducts = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                tobaccoProductslist.Add(tobaccoProducts);
-            }
-            TobaccoProductsQuestion = CompileQuestionsDynamic(tobaccoProductslist);
-            foreach (var item in TobaccoProductsQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //PetsPetFood
-            var petsPetFoodProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Pets".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var petsPetFoodProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == petsPetFoodProfileMatchId).ToList();
-
-            Dictionary<string, bool> petsPetFood = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> petsPetFoodlist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in petsPetFoodProfileLabel)
-            {
-                petsPetFood = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                petsPetFoodlist.Add(petsPetFood);
-            }
-            PetsPetFoodQuestion = CompileQuestionsDynamic(petsPetFoodlist);
-            foreach (var item in PetsPetFoodQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //ShoppingRetailClothing
-            var shoppingRetailClothingProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Clothing/Fashion".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var shoppingRetailClothingProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == shoppingRetailClothingProfileMatchId).ToList();
-
-            Dictionary<string, bool> shoppingRetailClothing = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> shoppingRetailClothinglist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in shoppingRetailClothingProfileLabel)
-            {
-                shoppingRetailClothing = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                shoppingRetailClothinglist.Add(shoppingRetailClothing);
-            }
-            ShoppingRetailClothingQuestion = CompileQuestionsDynamic(shoppingRetailClothinglist);
-            foreach (var item in ShoppingRetailClothingQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //DIYGardening
-            var dIYGardeningProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("DIY/Gardening".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var dIYGardeningProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == dIYGardeningProfileMatchId).ToList();
-
-            Dictionary<string, bool> dIYGardening = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> dIYGardeninglist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in dIYGardeningProfileLabel)
-            {
-                dIYGardening = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                dIYGardeninglist.Add(dIYGardening);
-            }
-            DIYGardeningQuestion = CompileQuestionsDynamic(dIYGardeninglist);
-            foreach (var item in DIYGardeningQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //ElectronicsOtherPersonalItems
-            var electronicsOtherPersonalItemsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Electronics/Other Personal Items".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var electronicsOtherPersonalItemsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == electronicsOtherPersonalItemsProfileMatchId).ToList();
-
-            Dictionary<string, bool> electronicsOtherPersonalItems = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> electronicsOtherPersonalItemslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in electronicsOtherPersonalItemsProfileLabel)
-            {
-                electronicsOtherPersonalItems = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                electronicsOtherPersonalItemslist.Add(electronicsOtherPersonalItems);
-            }
-            ElectronicsOtherPersonalItemsQuestion = CompileQuestionsDynamic(electronicsOtherPersonalItemslist);
-            foreach (var item in ElectronicsOtherPersonalItemsQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //CommunicationsInternet
-            var communicationsInternetProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Communications/Internet Telecom".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var communicationsInternetProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == communicationsInternetProfileMatchId).ToList();
-
-            Dictionary<string, bool> communicationsInternet = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> communicationsInternetlist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in communicationsInternetProfileLabel)
-            {
-                communicationsInternet = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                communicationsInternetlist.Add(communicationsInternet);
-            }
-            CommunicationsInternetQuestion = CompileQuestionsDynamic(communicationsInternetlist);
-            foreach (var item in CommunicationsInternetQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //FinancialServices
-            var financialServicesProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Financial Services".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var financialServicesProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == financialServicesProfileMatchId).ToList();
-
-            Dictionary<string, bool> financialServices = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> financialServiceslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in financialServicesProfileLabel)
-            {
-                financialServices = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                financialServiceslist.Add(financialServices);
-            }
-            FinancialServicesQuestion = CompileQuestionsDynamic(financialServiceslist);
-            foreach (var item in FinancialServicesQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //HolidaysTravel
-            var holidaysTravelProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Holidays/Travel Tourism".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var holidaysTravelProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == holidaysTravelProfileMatchId).ToList();
-
-            Dictionary<string, bool> holidaysTravel = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> holidaysTravellist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in holidaysTravelProfileLabel)
-            {
-                holidaysTravel = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                holidaysTravellist.Add(holidaysTravel);
-            }
-            HolidaysTravelQuestion = CompileQuestionsDynamic(holidaysTravellist);
-            foreach (var item in HolidaysTravelQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //SportsLeisure
-            var sportsLeisureProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Sports/Leisure".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var sportsLeisureProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == sportsLeisureProfileMatchId).ToList();
-
-            Dictionary<string, bool> sportsLeisure = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> sportsLeisurelist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in sportsLeisureProfileLabel)
-            {
-                sportsLeisure = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                sportsLeisurelist.Add(sportsLeisure);
-            }
-            SportsLeisureQuestion = CompileQuestionsDynamic(sportsLeisurelist);
-            foreach (var item in SportsLeisureQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Motoring
-            var motoringProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Motoring/Automotive".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var motoringProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == motoringProfileMatchId).ToList();
-
-            Dictionary<string, bool> motoring = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> motoringlist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in motoringProfileLabel)
-            {
-                motoring = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                motoringlist.Add(motoring);
-            }
-            MotoringQuestion = CompileQuestionsDynamic(motoringlist);
-            foreach (var item in MotoringQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Newspapers
-            var newspapersProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Newspapers/Magazines".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var newspapersProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == newspapersProfileMatchId).ToList();
-
-            Dictionary<string, bool> newspapers = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> newspaperslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in newspapersProfileLabel)
-            {
-                newspapers = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                newspaperslist.Add(newspapers);
-            }
-            NewspapersQuestion = CompileQuestionsDynamic(newspaperslist);
-            foreach (var item in NewspapersQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //TV
-            var tVProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("TV/Video/ Radio".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var tVProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == tVProfileMatchId).ToList();
-
-            Dictionary<string, bool> tV = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> tVlist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in tVProfileLabel)
-            {
-                tV = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                tVlist.Add(tV);
-            }
-            TVQuestion = CompileQuestionsDynamic(tVlist);
-            foreach (var item in TVQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Cinema
-            var cinemaProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Cinema".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var cinemaProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == cinemaProfileMatchId).ToList();
-
-            Dictionary<string, bool> cinema = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> cinemalist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in cinemaProfileLabel)
-            {
-                cinema = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                cinemalist.Add(cinema);
-            }
-            CinemaQuestion = CompileQuestionsDynamic(cinemalist);
-            foreach (var item in CinemaQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //SocialNetworking
-            var socialNetworkingProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Social Networking".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var socialNetworkingProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == socialNetworkingProfileMatchId).ToList();
-
-            Dictionary<string, bool> socialNetworking = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> socialNetworkinglist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in socialNetworkingProfileLabel)
-            {
-                socialNetworking = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                socialNetworkinglist.Add(socialNetworking);
-            }
-            SocialNetworkingQuestion = CompileQuestionsDynamic(socialNetworkinglist);
-            foreach (var item in SocialNetworkingQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Shopping
-            var shoppingProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Shopping(retail gen merc)".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var shoppingProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == shoppingProfileMatchId).ToList();
-
-            Dictionary<string, bool> shopping = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> shoppinglist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in shoppingProfileLabel)
-            {
-                shopping = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                shoppinglist.Add(shopping);
-            }
-            ShoppingQuestion = CompileQuestionsDynamic(shoppinglist);
-            foreach (var item in ShoppingQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Fitness
-            var fitnessProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Fitness".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var fitnessProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == fitnessProfileMatchId).ToList();
-
-            Dictionary<string, bool> fitness = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> fitnesslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in fitnessProfileLabel)
-            {
-                fitness = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                fitnesslist.Add(fitness);
-            }
-            FitnessQuestion = CompileQuestionsDynamic(fitnesslist);
-            foreach (var item in FitnessQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Environment
-            var environmentProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Environment".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var environmentProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == environmentProfileMatchId).ToList();
-
-            Dictionary<string, bool> environment = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> environmentlist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in environmentProfileLabel)
-            {
-                environment = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                environmentlist.Add(environment);
-            }
-            EnvironmentQuestion = CompileQuestionsDynamic(environmentlist);
-            foreach (var item in EnvironmentQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //GoingOut
-            var goingOutProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Going Out/Entertainment".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var goingOutProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == goingOutProfileMatchId).ToList();
-
-            Dictionary<string, bool> goingOut = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> goingOutlist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in goingOutProfileLabel)
-            {
-                goingOut = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                goingOutlist.Add(goingOut);
-            }
-            GoingOutQuestion = CompileQuestionsDynamic(goingOutlist);
-            foreach (var item in GoingOutQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Religion
-            var religionProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Religion".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var religionProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == religionProfileMatchId).ToList();
-
-            Dictionary<string, bool> religion = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> religionlist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in religionProfileLabel)
-            {
-                religion = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                religionlist.Add(religion);
-            }
-            ReligionQuestion = CompileQuestionsDynamic(religionlist);
-            foreach (var item in ReligionQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Music
-            var musicProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Music".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var musicProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == musicProfileMatchId).ToList();
-
-            Dictionary<string, bool> music = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> musiclist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in musicProfileLabel)
-            {
-                music = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                musiclist.Add(music);
-            }
-            MusicQuestion = CompileQuestionsDynamic(musiclist);
-            foreach (var item in MusicQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //BusinessOrOpportunities
-            var businessOrOpportunitiesProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Business/opportunities".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var businessOrOpportunitiesProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == businessOrOpportunitiesProfileMatchId).ToList();
-
-            Dictionary<string, bool> businessOrOpportunities = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> businessOrOpportunitieslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in businessOrOpportunitiesProfileLabel)
-            {
-                businessOrOpportunities = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                businessOrOpportunitieslist.Add(businessOrOpportunities);
-            }
-            BusinessOrOpportunitiesQuestion = CompileQuestionsDynamic(businessOrOpportunitieslist);
-            foreach (var item in BusinessOrOpportunitiesQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Gambling
-            var gamblingProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Over 18/Gambling".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var gamblingProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == gamblingProfileMatchId).ToList();
-
-            Dictionary<string, bool> gambling = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> gamblinglist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in gamblingProfileLabel)
-            {
-                gambling = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                gamblinglist.Add(gambling);
-            }
-            GamblingQuestion = CompileQuestionsDynamic(gamblinglist);
-            foreach (var item in GamblingQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Restaurants
-            var restaurantsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Restaurants".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var restaurantsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == restaurantsProfileMatchId).ToList();
-
-            Dictionary<string, bool> restaurants = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> restaurantslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in restaurantsProfileLabel)
-            {
-                restaurants = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                restaurantslist.Add(restaurants);
-            }
-            RestaurantsQuestion = CompileQuestionsDynamic(restaurantslist);
-            foreach (var item in RestaurantsQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Insurance
-            var insuranceProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Insurance".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var insuranceProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == insuranceProfileMatchId).ToList();
-
-            Dictionary<string, bool> insurance = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> insurancelist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in insuranceProfileLabel)
-            {
-                insurance = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                insurancelist.Add(insurance);
-            }
-            InsuranceQuestion = CompileQuestionsDynamic(insurancelist);
-            foreach (var item in InsuranceQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Furniture
-            var furnitureProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Furniture".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var furnitureProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == furnitureProfileMatchId).ToList();
-
-            Dictionary<string, bool> furniture = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> furniturelist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in furnitureProfileLabel)
-            {
-                furniture = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                furniturelist.Add(furniture);
-            }
-            FurnitureQuestion = CompileQuestionsDynamic(furniturelist);
-            foreach (var item in FurnitureQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //InformationTechnology
-            var informationTechnologyProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Information technology".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var informationTechnologyProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == informationTechnologyProfileMatchId).ToList();
-
-            Dictionary<string, bool> informationTechnology = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> informationTechnologylist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in informationTechnologyProfileLabel)
-            {
-                informationTechnology = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                informationTechnologylist.Add(informationTechnology);
-            }
-            InformationTechnologyQuestion = CompileQuestionsDynamic(informationTechnologylist);
-            foreach (var item in InformationTechnologyQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Energy
-            var energyProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Energy".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var energyProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == energyProfileMatchId).ToList();
-
-            Dictionary<string, bool> energy = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> energylist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in energyProfileLabel)
-            {
-                energy = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                energylist.Add(energy);
-            }
-            EnergyQuestion = CompileQuestionsDynamic(energylist);
-            foreach (var item in EnergyQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Supermarkets
-            var supermarketsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Supermarkets".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var supermarketsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == supermarketsProfileMatchId).ToList();
-
-            Dictionary<string, bool> supermarkets = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> supermarketslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in supermarketsProfileLabel)
-            {
-                supermarkets = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                supermarketslist.Add(supermarkets);
-            }
-            SupermarketsQuestion = CompileQuestionsDynamic(supermarketslist);
-            foreach (var item in SupermarketsQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Healthcare
-            var healthcareProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Healthcare".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var healthcareProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == healthcareProfileMatchId).ToList();
-
-            Dictionary<string, bool> healthcare = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> healthcarelist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in healthcareProfileLabel)
-            {
-                healthcare = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                healthcarelist.Add(healthcare);
-            }
-            HealthcareQuestion = CompileQuestionsDynamic(healthcarelist);
-            foreach (var item in HealthcareQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //JobsAndEducation
-            var jobsAndEducationProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Jobs and Education".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var jobsAndEducationProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == jobsAndEducationProfileMatchId).ToList();
-
-            Dictionary<string, bool> jobsAndEducation = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> jobsAndEducationlist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in jobsAndEducationProfileLabel)
-            {
-                jobsAndEducation = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                jobsAndEducationlist.Add(jobsAndEducation);
-            }
-            JobsAndEducationQuestion = CompileQuestionsDynamic(jobsAndEducationlist);
-            foreach (var item in JobsAndEducationQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Gifts
-            var giftsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Gifts".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var giftsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == giftsProfileMatchId).ToList();
-
-            Dictionary<string, bool> gifts = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> giftslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in giftsProfileLabel)
-            {
-                gifts = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                giftslist.Add(gifts);
-            }
-            GiftsQuestion = CompileQuestionsDynamic(giftslist);
-            foreach (var item in GiftsQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //AdvocacyOrLegal
-            var advocacyOrLegalProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Advocacy/Legal".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var advocacyOrLegalProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == advocacyOrLegalProfileMatchId).ToList();
-
-            Dictionary<string, bool> advocacyOrLegal = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> advocacyOrLegallist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in advocacyOrLegalProfileLabel)
-            {
-                advocacyOrLegal = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                advocacyOrLegallist.Add(advocacyOrLegal);
-            }
-            AdvocacyOrLegalQuestion = CompileQuestionsDynamic(advocacyOrLegallist);
-            foreach (var item in AdvocacyOrLegalQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //DatingAndPersonal
-            var datingAndPersonalProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Dating & Personal".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var datingAndPersonalProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == datingAndPersonalProfileMatchId).ToList();
-
-            Dictionary<string, bool> datingAndPersonal = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> datingAndPersonallist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in datingAndPersonalProfileLabel)
-            {
-                datingAndPersonal = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                datingAndPersonallist.Add(datingAndPersonal);
-            }
-            DatingAndPersonalQuestion = CompileQuestionsDynamic(datingAndPersonallist);
-            foreach (var item in DatingAndPersonalQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //RealEstate
-            var realEstateProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Real Estate/Property".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var realEstateProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == realEstateProfileMatchId).ToList();
-
-            Dictionary<string, bool> realEstate = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> realEstatelist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in realEstateProfileLabel)
-            {
-                realEstate = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                realEstatelist.Add(realEstate);
-            }
-            RealEstateQuestion = CompileQuestionsDynamic(realEstatelist);
-            foreach (var item in RealEstateQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Games
-            var gamesProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Games".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var gamesProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == gamesProfileMatchId).ToList();
-
-            Dictionary<string, bool> games = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> gameslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in gamesProfileLabel)
-            {
-                games = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                gameslist.Add(games);
-            }
-            GamesQuestion = CompileQuestionsDynamic(gameslist);
-            foreach (var item in GamesQuestion)
-            {
-                if (item.QuestionName == "Neutral")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Hustlers
-            var hustlersProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Hustlers".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var hustlersProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == hustlersProfileMatchId).ToList();
-
-            Dictionary<string, bool> hustlers = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> hustlerslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in hustlersProfileLabel)
-            {
-                hustlers = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                hustlerslist.Add(hustlers);
-            }
-            HustlersQuestion = CompileQuestionsDynamic(hustlerslist);
-
-            //Youth
-            var youthProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Youth".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var youthProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == youthProfileMatchId).ToList();
-
-            Dictionary<string, bool> youth = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> youthlist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in youthProfileLabel)
-            {
-                youth = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                youthlist.Add(youth);
-            }
-            YouthQuestion = CompileQuestionsDynamic(youthlist);
-            foreach (var item in YouthQuestion)
-            {
-                if (item.QuestionName == "Hi-Pot students")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //DiscerningProfessionals
-            var discerningProfessionalsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Discerning Professionals".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var discerningProfessionalsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == discerningProfessionalsProfileMatchId).ToList();
-
-            Dictionary<string, bool> discerningProfessionals = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> discerningProfessionalslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in discerningProfessionalsProfileLabel)
-            {
-                discerningProfessionals = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                discerningProfessionalslist.Add(discerningProfessionals);
-            }
-            DiscerningProfessionalsQuestion = CompileQuestionsDynamic(discerningProfessionalslist);
-            foreach (var item in DiscerningProfessionalsQuestion)
-            {
-                if (item.QuestionName == "Mature trendies")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
-
-            //Mass
-            var massProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Mass".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var massProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == massProfileMatchId).ToList();
-
-            Dictionary<string, bool> mass = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> masslist = new List<Dictionary<string, bool>>();
-
-            foreach (var item in massProfileLabel)
-            {
-                mass = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                masslist.Add(mass);
-            }
-            MassQuestion = CompileQuestionsDynamic(masslist);
-            foreach (var item in MassQuestion)
-            {
-                if (item.QuestionName == "Young cautious caller")
-                {
-                    item.DefaultAnswer = true;
-                }
-                if (item.QuestionName == "Older Toa Mpango")
-                {
-                    item.DefaultAnswer = true;
-                }
-            }
+        //public CampaignProfileAdvertFormModel(int CountryId)//int CountryId
+        //{
+        //    // EFMVCDataContex db = new EFMVCDataContex();
+
+        //    //Food
+        //    var foodProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Food".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var foodProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == foodProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> food = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> foodlist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in foodProfileLabel)
+        //    {
+        //        food = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        foodlist.Add(food);
+        //    }
+        //    FoodQuestion = CompileQuestionsDynamic(foodlist);
+        //    foreach (var item in FoodQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //SweetSaltySnacks
+        //    var sweetSaltySnacksProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Sweets/Snacks".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var sweetSaltySnacksProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == sweetSaltySnacksProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> sweetSaltySnacks = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> sweetSaltySnackslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in sweetSaltySnacksProfileLabel)
+        //    {
+        //        sweetSaltySnacks = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        sweetSaltySnackslist.Add(sweetSaltySnacks);
+        //    }
+        //    SweetSaltySnacksQuestion = CompileQuestionsDynamic(sweetSaltySnackslist);
+        //    foreach (var item in SweetSaltySnacksQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //AlcoholicDrinks
+        //    var alcoholicDrinksProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Alcoholic Drinks".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var alcoholicDrinksProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == alcoholicDrinksProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> alcoholicDrinks = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> alcoholicDrinkslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in alcoholicDrinksProfileLabel)
+        //    {
+        //        alcoholicDrinks = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        alcoholicDrinkslist.Add(alcoholicDrinks);
+        //    }
+        //    AlcoholicDrinksQuestion = CompileQuestionsDynamic(alcoholicDrinkslist);
+        //    foreach (var item in AlcoholicDrinksQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //NonAlcoholicDrinks
+        //    var nonAlcoholicDrinksProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Non-Alcoholic Drinks".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var nonAlcoholicDrinksProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == nonAlcoholicDrinksProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> nonAlcoholicDrinks = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> nonAlcoholicDrinkslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in nonAlcoholicDrinksProfileLabel)
+        //    {
+        //        nonAlcoholicDrinks = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        nonAlcoholicDrinkslist.Add(nonAlcoholicDrinks);
+        //    }
+        //    NonAlcoholicDrinksQuestion = CompileQuestionsDynamic(nonAlcoholicDrinkslist);
+        //    foreach (var item in NonAlcoholicDrinksQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Householdproducts
+        //    var householdproductsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Household Appliances/Products".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var householdproductsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == householdproductsProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> householdproducts = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> householdproductslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in householdproductsProfileLabel)
+        //    {
+        //        householdproducts = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        householdproductslist.Add(householdproducts);
+        //    }
+        //    HouseholdproductsQuestion = CompileQuestionsDynamic(householdproductslist);
+        //    foreach (var item in HouseholdproductsQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //ToiletriesCosmetics
+        //    var toiletriesCosmeticsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Toiletries/Cosmetics".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var toiletriesCosmeticsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == toiletriesCosmeticsProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> toiletriesCosmetics = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> toiletriesCosmeticslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in toiletriesCosmeticsProfileLabel)
+        //    {
+        //        toiletriesCosmetics = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        toiletriesCosmeticslist.Add(toiletriesCosmetics);
+        //    }
+        //    ToiletriesCosmeticsQuestion = CompileQuestionsDynamic(toiletriesCosmeticslist);
+        //    foreach (var item in ToiletriesCosmeticsQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //PharmaceuticalChemistsProducts
+        //    var pharmaceuticalChemistsProductsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Pharmaceutical/Chemists Products".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var pharmaceuticalChemistsProductsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == pharmaceuticalChemistsProductsProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> pharmaceuticalChemistsProducts = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> pharmaceuticalChemistsProductslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in pharmaceuticalChemistsProductsProfileLabel)
+        //    {
+        //        pharmaceuticalChemistsProducts = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        pharmaceuticalChemistsProductslist.Add(pharmaceuticalChemistsProducts);
+        //    }
+        //    PharmaceuticalChemistsProductsQuestion = CompileQuestionsDynamic(pharmaceuticalChemistsProductslist);
+        //    foreach (var item in PharmaceuticalChemistsProductsQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //TobaccoProducts
+        //    var tobaccoProductsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Tobacco Products".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var tobaccoProductsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == tobaccoProductsProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> tobaccoProducts = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> tobaccoProductslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in tobaccoProductsProfileLabel)
+        //    {
+        //        tobaccoProducts = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        tobaccoProductslist.Add(tobaccoProducts);
+        //    }
+        //    TobaccoProductsQuestion = CompileQuestionsDynamic(tobaccoProductslist);
+        //    foreach (var item in TobaccoProductsQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //PetsPetFood
+        //    var petsPetFoodProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Pets".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var petsPetFoodProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == petsPetFoodProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> petsPetFood = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> petsPetFoodlist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in petsPetFoodProfileLabel)
+        //    {
+        //        petsPetFood = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        petsPetFoodlist.Add(petsPetFood);
+        //    }
+        //    PetsPetFoodQuestion = CompileQuestionsDynamic(petsPetFoodlist);
+        //    foreach (var item in PetsPetFoodQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //ShoppingRetailClothing
+        //    var shoppingRetailClothingProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Clothing/Fashion".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var shoppingRetailClothingProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == shoppingRetailClothingProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> shoppingRetailClothing = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> shoppingRetailClothinglist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in shoppingRetailClothingProfileLabel)
+        //    {
+        //        shoppingRetailClothing = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        shoppingRetailClothinglist.Add(shoppingRetailClothing);
+        //    }
+        //    ShoppingRetailClothingQuestion = CompileQuestionsDynamic(shoppingRetailClothinglist);
+        //    foreach (var item in ShoppingRetailClothingQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //DIYGardening
+        //    var dIYGardeningProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("DIY/Gardening".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var dIYGardeningProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == dIYGardeningProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> dIYGardening = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> dIYGardeninglist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in dIYGardeningProfileLabel)
+        //    {
+        //        dIYGardening = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        dIYGardeninglist.Add(dIYGardening);
+        //    }
+        //    DIYGardeningQuestion = CompileQuestionsDynamic(dIYGardeninglist);
+        //    foreach (var item in DIYGardeningQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //ElectronicsOtherPersonalItems
+        //    var electronicsOtherPersonalItemsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Electronics/Other Personal Items".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var electronicsOtherPersonalItemsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == electronicsOtherPersonalItemsProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> electronicsOtherPersonalItems = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> electronicsOtherPersonalItemslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in electronicsOtherPersonalItemsProfileLabel)
+        //    {
+        //        electronicsOtherPersonalItems = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        electronicsOtherPersonalItemslist.Add(electronicsOtherPersonalItems);
+        //    }
+        //    ElectronicsOtherPersonalItemsQuestion = CompileQuestionsDynamic(electronicsOtherPersonalItemslist);
+        //    foreach (var item in ElectronicsOtherPersonalItemsQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //CommunicationsInternet
+        //    var communicationsInternetProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Communications/Internet Telecom".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var communicationsInternetProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == communicationsInternetProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> communicationsInternet = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> communicationsInternetlist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in communicationsInternetProfileLabel)
+        //    {
+        //        communicationsInternet = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        communicationsInternetlist.Add(communicationsInternet);
+        //    }
+        //    CommunicationsInternetQuestion = CompileQuestionsDynamic(communicationsInternetlist);
+        //    foreach (var item in CommunicationsInternetQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //FinancialServices
+        //    var financialServicesProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Financial Services".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var financialServicesProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == financialServicesProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> financialServices = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> financialServiceslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in financialServicesProfileLabel)
+        //    {
+        //        financialServices = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        financialServiceslist.Add(financialServices);
+        //    }
+        //    FinancialServicesQuestion = CompileQuestionsDynamic(financialServiceslist);
+        //    foreach (var item in FinancialServicesQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //HolidaysTravel
+        //    var holidaysTravelProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Holidays/Travel Tourism".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var holidaysTravelProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == holidaysTravelProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> holidaysTravel = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> holidaysTravellist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in holidaysTravelProfileLabel)
+        //    {
+        //        holidaysTravel = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        holidaysTravellist.Add(holidaysTravel);
+        //    }
+        //    HolidaysTravelQuestion = CompileQuestionsDynamic(holidaysTravellist);
+        //    foreach (var item in HolidaysTravelQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //SportsLeisure
+        //    var sportsLeisureProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Sports/Leisure".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var sportsLeisureProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == sportsLeisureProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> sportsLeisure = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> sportsLeisurelist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in sportsLeisureProfileLabel)
+        //    {
+        //        sportsLeisure = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        sportsLeisurelist.Add(sportsLeisure);
+        //    }
+        //    SportsLeisureQuestion = CompileQuestionsDynamic(sportsLeisurelist);
+        //    foreach (var item in SportsLeisureQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Motoring
+        //    var motoringProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Motoring/Automotive".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var motoringProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == motoringProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> motoring = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> motoringlist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in motoringProfileLabel)
+        //    {
+        //        motoring = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        motoringlist.Add(motoring);
+        //    }
+        //    MotoringQuestion = CompileQuestionsDynamic(motoringlist);
+        //    foreach (var item in MotoringQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Newspapers
+        //    var newspapersProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Newspapers/Magazines".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var newspapersProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == newspapersProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> newspapers = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> newspaperslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in newspapersProfileLabel)
+        //    {
+        //        newspapers = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        newspaperslist.Add(newspapers);
+        //    }
+        //    NewspapersQuestion = CompileQuestionsDynamic(newspaperslist);
+        //    foreach (var item in NewspapersQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //TV
+        //    var tVProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("TV/Video/ Radio".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var tVProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == tVProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> tV = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> tVlist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in tVProfileLabel)
+        //    {
+        //        tV = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        tVlist.Add(tV);
+        //    }
+        //    TVQuestion = CompileQuestionsDynamic(tVlist);
+        //    foreach (var item in TVQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Cinema
+        //    var cinemaProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Cinema".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var cinemaProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == cinemaProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> cinema = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> cinemalist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in cinemaProfileLabel)
+        //    {
+        //        cinema = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        cinemalist.Add(cinema);
+        //    }
+        //    CinemaQuestion = CompileQuestionsDynamic(cinemalist);
+        //    foreach (var item in CinemaQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //SocialNetworking
+        //    var socialNetworkingProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Social Networking".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var socialNetworkingProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == socialNetworkingProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> socialNetworking = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> socialNetworkinglist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in socialNetworkingProfileLabel)
+        //    {
+        //        socialNetworking = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        socialNetworkinglist.Add(socialNetworking);
+        //    }
+        //    SocialNetworkingQuestion = CompileQuestionsDynamic(socialNetworkinglist);
+        //    foreach (var item in SocialNetworkingQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Shopping
+        //    var shoppingProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Shopping(retail gen merc)".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var shoppingProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == shoppingProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> shopping = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> shoppinglist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in shoppingProfileLabel)
+        //    {
+        //        shopping = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        shoppinglist.Add(shopping);
+        //    }
+        //    ShoppingQuestion = CompileQuestionsDynamic(shoppinglist);
+        //    foreach (var item in ShoppingQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Fitness
+        //    var fitnessProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Fitness".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var fitnessProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == fitnessProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> fitness = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> fitnesslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in fitnessProfileLabel)
+        //    {
+        //        fitness = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        fitnesslist.Add(fitness);
+        //    }
+        //    FitnessQuestion = CompileQuestionsDynamic(fitnesslist);
+        //    foreach (var item in FitnessQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Environment
+        //    var environmentProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Environment".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var environmentProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == environmentProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> environment = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> environmentlist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in environmentProfileLabel)
+        //    {
+        //        environment = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        environmentlist.Add(environment);
+        //    }
+        //    EnvironmentQuestion = CompileQuestionsDynamic(environmentlist);
+        //    foreach (var item in EnvironmentQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //GoingOut
+        //    var goingOutProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Going Out/Entertainment".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var goingOutProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == goingOutProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> goingOut = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> goingOutlist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in goingOutProfileLabel)
+        //    {
+        //        goingOut = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        goingOutlist.Add(goingOut);
+        //    }
+        //    GoingOutQuestion = CompileQuestionsDynamic(goingOutlist);
+        //    foreach (var item in GoingOutQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Religion
+        //    var religionProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Religion".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var religionProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == religionProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> religion = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> religionlist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in religionProfileLabel)
+        //    {
+        //        religion = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        religionlist.Add(religion);
+        //    }
+        //    ReligionQuestion = CompileQuestionsDynamic(religionlist);
+        //    foreach (var item in ReligionQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Music
+        //    var musicProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Music".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var musicProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == musicProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> music = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> musiclist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in musicProfileLabel)
+        //    {
+        //        music = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        musiclist.Add(music);
+        //    }
+        //    MusicQuestion = CompileQuestionsDynamic(musiclist);
+        //    foreach (var item in MusicQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //BusinessOrOpportunities
+        //    var businessOrOpportunitiesProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Business/opportunities".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var businessOrOpportunitiesProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == businessOrOpportunitiesProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> businessOrOpportunities = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> businessOrOpportunitieslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in businessOrOpportunitiesProfileLabel)
+        //    {
+        //        businessOrOpportunities = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        businessOrOpportunitieslist.Add(businessOrOpportunities);
+        //    }
+        //    BusinessOrOpportunitiesQuestion = CompileQuestionsDynamic(businessOrOpportunitieslist);
+        //    foreach (var item in BusinessOrOpportunitiesQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Gambling
+        //    var gamblingProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Over 18/Gambling".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var gamblingProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == gamblingProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> gambling = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> gamblinglist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in gamblingProfileLabel)
+        //    {
+        //        gambling = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        gamblinglist.Add(gambling);
+        //    }
+        //    GamblingQuestion = CompileQuestionsDynamic(gamblinglist);
+        //    foreach (var item in GamblingQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Restaurants
+        //    var restaurantsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Restaurants".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var restaurantsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == restaurantsProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> restaurants = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> restaurantslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in restaurantsProfileLabel)
+        //    {
+        //        restaurants = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        restaurantslist.Add(restaurants);
+        //    }
+        //    RestaurantsQuestion = CompileQuestionsDynamic(restaurantslist);
+        //    foreach (var item in RestaurantsQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Insurance
+        //    var insuranceProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Insurance".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var insuranceProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == insuranceProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> insurance = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> insurancelist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in insuranceProfileLabel)
+        //    {
+        //        insurance = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        insurancelist.Add(insurance);
+        //    }
+        //    InsuranceQuestion = CompileQuestionsDynamic(insurancelist);
+        //    foreach (var item in InsuranceQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Furniture
+        //    var furnitureProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Furniture".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var furnitureProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == furnitureProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> furniture = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> furniturelist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in furnitureProfileLabel)
+        //    {
+        //        furniture = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        furniturelist.Add(furniture);
+        //    }
+        //    FurnitureQuestion = CompileQuestionsDynamic(furniturelist);
+        //    foreach (var item in FurnitureQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //InformationTechnology
+        //    var informationTechnologyProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Information technology".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var informationTechnologyProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == informationTechnologyProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> informationTechnology = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> informationTechnologylist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in informationTechnologyProfileLabel)
+        //    {
+        //        informationTechnology = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        informationTechnologylist.Add(informationTechnology);
+        //    }
+        //    InformationTechnologyQuestion = CompileQuestionsDynamic(informationTechnologylist);
+        //    foreach (var item in InformationTechnologyQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Energy
+        //    var energyProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Energy".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var energyProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == energyProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> energy = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> energylist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in energyProfileLabel)
+        //    {
+        //        energy = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        energylist.Add(energy);
+        //    }
+        //    EnergyQuestion = CompileQuestionsDynamic(energylist);
+        //    foreach (var item in EnergyQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Supermarkets
+        //    var supermarketsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Supermarkets".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var supermarketsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == supermarketsProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> supermarkets = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> supermarketslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in supermarketsProfileLabel)
+        //    {
+        //        supermarkets = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        supermarketslist.Add(supermarkets);
+        //    }
+        //    SupermarketsQuestion = CompileQuestionsDynamic(supermarketslist);
+        //    foreach (var item in SupermarketsQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Healthcare
+        //    var healthcareProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Healthcare".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var healthcareProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == healthcareProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> healthcare = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> healthcarelist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in healthcareProfileLabel)
+        //    {
+        //        healthcare = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        healthcarelist.Add(healthcare);
+        //    }
+        //    HealthcareQuestion = CompileQuestionsDynamic(healthcarelist);
+        //    foreach (var item in HealthcareQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //JobsAndEducation
+        //    var jobsAndEducationProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Jobs and Education".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var jobsAndEducationProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == jobsAndEducationProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> jobsAndEducation = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> jobsAndEducationlist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in jobsAndEducationProfileLabel)
+        //    {
+        //        jobsAndEducation = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        jobsAndEducationlist.Add(jobsAndEducation);
+        //    }
+        //    JobsAndEducationQuestion = CompileQuestionsDynamic(jobsAndEducationlist);
+        //    foreach (var item in JobsAndEducationQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Gifts
+        //    var giftsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Gifts".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var giftsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == giftsProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> gifts = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> giftslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in giftsProfileLabel)
+        //    {
+        //        gifts = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        giftslist.Add(gifts);
+        //    }
+        //    GiftsQuestion = CompileQuestionsDynamic(giftslist);
+        //    foreach (var item in GiftsQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //AdvocacyOrLegal
+        //    var advocacyOrLegalProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Advocacy/Legal".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var advocacyOrLegalProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == advocacyOrLegalProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> advocacyOrLegal = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> advocacyOrLegallist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in advocacyOrLegalProfileLabel)
+        //    {
+        //        advocacyOrLegal = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        advocacyOrLegallist.Add(advocacyOrLegal);
+        //    }
+        //    AdvocacyOrLegalQuestion = CompileQuestionsDynamic(advocacyOrLegallist);
+        //    foreach (var item in AdvocacyOrLegalQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //DatingAndPersonal
+        //    var datingAndPersonalProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Dating & Personal".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var datingAndPersonalProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == datingAndPersonalProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> datingAndPersonal = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> datingAndPersonallist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in datingAndPersonalProfileLabel)
+        //    {
+        //        datingAndPersonal = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        datingAndPersonallist.Add(datingAndPersonal);
+        //    }
+        //    DatingAndPersonalQuestion = CompileQuestionsDynamic(datingAndPersonallist);
+        //    foreach (var item in DatingAndPersonalQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //RealEstate
+        //    var realEstateProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Real Estate/Property".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var realEstateProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == realEstateProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> realEstate = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> realEstatelist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in realEstateProfileLabel)
+        //    {
+        //        realEstate = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        realEstatelist.Add(realEstate);
+        //    }
+        //    RealEstateQuestion = CompileQuestionsDynamic(realEstatelist);
+        //    foreach (var item in RealEstateQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Games
+        //    var gamesProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Games".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var gamesProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == gamesProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> games = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> gameslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in gamesProfileLabel)
+        //    {
+        //        games = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        gameslist.Add(games);
+        //    }
+        //    GamesQuestion = CompileQuestionsDynamic(gameslist);
+        //    foreach (var item in GamesQuestion)
+        //    {
+        //        if (item.QuestionName == "Neutral")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Hustlers
+        //    var hustlersProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Hustlers".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var hustlersProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == hustlersProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> hustlers = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> hustlerslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in hustlersProfileLabel)
+        //    {
+        //        hustlers = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        hustlerslist.Add(hustlers);
+        //    }
+        //    HustlersQuestion = CompileQuestionsDynamic(hustlerslist);
+
+        //    //Youth
+        //    var youthProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Youth".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var youthProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == youthProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> youth = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> youthlist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in youthProfileLabel)
+        //    {
+        //        youth = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        youthlist.Add(youth);
+        //    }
+        //    YouthQuestion = CompileQuestionsDynamic(youthlist);
+        //    foreach (var item in YouthQuestion)
+        //    {
+        //        if (item.QuestionName == "Hi-Pot students")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //DiscerningProfessionals
+        //    var discerningProfessionalsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Discerning Professionals".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var discerningProfessionalsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == discerningProfessionalsProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> discerningProfessionals = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> discerningProfessionalslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in discerningProfessionalsProfileLabel)
+        //    {
+        //        discerningProfessionals = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        discerningProfessionalslist.Add(discerningProfessionals);
+        //    }
+        //    DiscerningProfessionalsQuestion = CompileQuestionsDynamic(discerningProfessionalslist);
+        //    foreach (var item in DiscerningProfessionalsQuestion)
+        //    {
+        //        if (item.QuestionName == "Mature trendies")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
+
+        //    //Mass
+        //    var massProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Mass".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var massProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == massProfileMatchId).ToList();
+
+        //    Dictionary<string, bool> mass = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> masslist = new List<Dictionary<string, bool>>();
+
+        //    foreach (var item in massProfileLabel)
+        //    {
+        //        mass = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        masslist.Add(mass);
+        //    }
+        //    MassQuestion = CompileQuestionsDynamic(masslist);
+        //    foreach (var item in MassQuestion)
+        //    {
+        //        if (item.QuestionName == "Young cautious caller")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //        if (item.QuestionName == "Older Toa Mpango")
+        //        {
+        //            item.DefaultAnswer = true;
+        //        }
+        //    }
 
             
 
             
-        }
+        //}
 
         /// <summary>
         /// Gets or sets the campaign profile adverts identifier.

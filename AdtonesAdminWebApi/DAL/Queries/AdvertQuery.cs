@@ -38,6 +38,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 LEFT JOIN Users AS sexcs ON sexcs.UserId=sales.SalesExecId ";
 
 
+        public static string CheckAdvertNameExists => @"SELECT COUNT(1) FROM Advert WHERE LOWER(AdvertName)=@Id AND UserId=@UserId;";
+
+
 
         public static string GetAdvertCategoryDataTable => @"SELECT AdvertCategoryId,ad.Name AS CategoryName,ad.CountryId, ISNULL(c.Name,'-') AS CountryName, ad.CreatedDate
                                                         FROM AdvertCategories AS ad INNER JOIN Country AS c ON c.Id = ad.CountryId

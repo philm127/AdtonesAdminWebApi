@@ -13,7 +13,7 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
 
         public CampaignProfileSkizaFormModel()
         {
-            EFMVCDataContex db = new EFMVCDataContex();
+            // EFMVCDataContex db = new EFMVCDataContex();
 
             HustlersQuestion =
             CompileQuestions(new Dictionary<string, bool>
@@ -32,67 +32,67 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
                   {{"Young cautious caller", true}, {"Toa Mpango", false},{"Young progressive worker", false}, {"Older Toa Mpango", true}, {"Progressive worker", false}});
         }
 
-        public CampaignProfileSkizaFormModel(int CountryId)
-        {
-            EFMVCDataContex db = new EFMVCDataContex();
+        //public CampaignProfileSkizaFormModel(int CountryId)
+        //{
+        //    // EFMVCDataContex db = new EFMVCDataContex();
 
-            //Hustlers
-            var hustlersProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Hustlers".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var hustlersProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == hustlersProfileMatchId).ToList();
+        //    //Hustlers
+        //    var hustlersProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Hustlers".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var hustlersProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == hustlersProfileMatchId).ToList();
 
-            Dictionary<string, bool> hustlers = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> hustlerslist = new List<Dictionary<string, bool>>();
+        //    Dictionary<string, bool> hustlers = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> hustlerslist = new List<Dictionary<string, bool>>();
 
-            foreach (var item in hustlersProfileLabel)
-            {
-                hustlers = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                hustlerslist.Add(hustlers);
-            }
-            HustlersQuestion = CompileQuestionsDynamic(hustlerslist);
+        //    foreach (var item in hustlersProfileLabel)
+        //    {
+        //        hustlers = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        hustlerslist.Add(hustlers);
+        //    }
+        //    HustlersQuestion = CompileQuestionsDynamic(hustlerslist);
 
-            //Youth
-            var youthProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Youth".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var youthProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == youthProfileMatchId).ToList();
+        //    //Youth
+        //    var youthProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Youth".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var youthProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == youthProfileMatchId).ToList();
 
-            Dictionary<string, bool> youth = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> youthlist = new List<Dictionary<string, bool>>();
+        //    Dictionary<string, bool> youth = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> youthlist = new List<Dictionary<string, bool>>();
 
-            foreach (var item in youthProfileLabel)
-            {
-                youth = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                youthlist.Add(youth);
-            }
-            YouthQuestion = CompileQuestionsDynamic(youthlist);
+        //    foreach (var item in youthProfileLabel)
+        //    {
+        //        youth = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        youthlist.Add(youth);
+        //    }
+        //    YouthQuestion = CompileQuestionsDynamic(youthlist);
 
-            //DiscerningProfessionals
-            var discerningProfessionalsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Discerning Professionals".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var discerningProfessionalsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == discerningProfessionalsProfileMatchId).ToList();
+        //    //DiscerningProfessionals
+        //    var discerningProfessionalsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Discerning Professionals".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var discerningProfessionalsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == discerningProfessionalsProfileMatchId).ToList();
 
-            Dictionary<string, bool> discerningProfessionals = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> discerningProfessionalslist = new List<Dictionary<string, bool>>();
+        //    Dictionary<string, bool> discerningProfessionals = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> discerningProfessionalslist = new List<Dictionary<string, bool>>();
 
-            foreach (var item in discerningProfessionalsProfileLabel)
-            {
-                discerningProfessionals = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                discerningProfessionalslist.Add(discerningProfessionals);
-            }
-            DiscerningProfessionalsQuestion = CompileQuestionsDynamic(discerningProfessionalslist);
+        //    foreach (var item in discerningProfessionalsProfileLabel)
+        //    {
+        //        discerningProfessionals = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        discerningProfessionalslist.Add(discerningProfessionals);
+        //    }
+        //    DiscerningProfessionalsQuestion = CompileQuestionsDynamic(discerningProfessionalslist);
 
 
-            //Mass
-            var massProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Mass".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            var massProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == massProfileMatchId).ToList();
+        //    //Mass
+        //    var massProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Mass".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
+        //    var massProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == massProfileMatchId).ToList();
 
-            Dictionary<string, bool> mass = new Dictionary<string, bool>();
-            List<Dictionary<string, bool>> masslist = new List<Dictionary<string, bool>>();
+        //    Dictionary<string, bool> mass = new Dictionary<string, bool>();
+        //    List<Dictionary<string, bool>> masslist = new List<Dictionary<string, bool>>();
 
-            foreach (var item in massProfileLabel)
-            {
-                mass = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-                masslist.Add(mass);
-            }
-            MassQuestion = CompileQuestionsDynamic(masslist);
-        }
+        //    foreach (var item in massProfileLabel)
+        //    {
+        //        mass = new Dictionary<string, bool> { { item.ProfileLabel, false } };
+        //        masslist.Add(mass);
+        //    }
+        //    MassQuestion = CompileQuestionsDynamic(masslist);
+        //}
 
         /// <summary>
         /// Gets or sets the campaign profile adverts identifier.

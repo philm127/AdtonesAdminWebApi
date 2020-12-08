@@ -355,6 +355,26 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<bool> CheckCampaignNameExists(string campaignName,int userId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(CampaignQuery.CheckCampaignNameExists);
+            builder.AddParameters(new { Id = campaignName.ToLower() });
+            builder.AddParameters(new { UserId = userId });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<bool>(select.RawSql, select.Parameters));
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<int> GetAdvertIdFromCampaignAdvert(int campaignId)
         {
             var builder = new SqlBuilder();

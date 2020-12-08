@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,21 +10,16 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
     {
         public int AdvertId { get; set; }
 
-        public int UserId { get; set; }
+        public int AdvertiserId { get; set; }
 
-        public int? AdvertClientId { get; set; }
-
-        public string BrandName { get; set; }
+        public string Brand { get; set; }
 
         public string AdvertName { get; set; }
 
         public int AdvertCategoryId { get; set; }
 
-        public string UploadMediaFile { get; set; }
 
-        public string UploadScriptFile { get; set; }
-
-        public string Script { get; set; }
+        public string SmsScript { get; set; }
 
         public string Numberofadsinabatch { get; set; }
 
@@ -52,10 +48,14 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
 
         public bool NextStatus { get; set; }
 
-        public int? CampProfileId { get; set; }
+        public int? CampaignProfileId { get; set; }
 
         public int? AdtoneServerAdvertId { get; set; }
 
         public int OperatorId { get; set; }
+
+        public List<IFormFile> file { get; set; }
     }
-}
+
+
+ }

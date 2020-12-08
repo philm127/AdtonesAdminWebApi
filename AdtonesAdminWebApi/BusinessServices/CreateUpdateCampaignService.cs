@@ -1,22 +1,43 @@
-﻿using AdtonesAdminWebApi.Services;
+﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
+using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign;
+using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
-    public class CreateUpdateCampaignService
+    public class CreateUpdateCampaignService : ICreateUpdateCampaignService
     {
         private readonly IHttpContextAccessor _httpAccessor;
+        private readonly ICurrencyDAL _currencyRepository;
+        private readonly ICampaignDAL _campaignDAL;
+        private readonly ICreateUpdateCampaignDAL _createDAL;
+        private readonly IConnectionStringService _connService;
+        private readonly IPrematchProcess _matchProcess;
+        private readonly IUserMatchDAL _matchDAL;
+        private readonly IAdvertDAL _advertDAL;
         ReturnResult result = new ReturnResult();
 
 
-        public CreateUpdateCampaignService(IHttpContextAccessor httpAccessor)
+        public CreateUpdateCampaignService(IHttpContextAccessor httpAccessor, ICurrencyDAL currencyRepository, ICampaignDAL campaignDAL,
+                                            ICreateUpdateCampaignDAL createDAL, IConnectionStringService connService, IPrematchProcess matchProcess,
+                                            IUserMatchDAL matchDAL, IAdvertDAL advertDAL)
         {
             _httpAccessor = httpAccessor;
+            _currencyRepository = currencyRepository;
+            _campaignDAL = campaignDAL;
+            _createDAL = createDAL;
+            _connService = connService;
+            _matchProcess = matchProcess;
+            _matchDAL = matchDAL;
+            _advertDAL = advertDAL;
         }
 
 
@@ -24,11 +45,153 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// Gets initial data to populate the create campaign stepper.
         /// </summary>
         /// <returns></returns>
-        public async Task<ReturnResult> GetInitialData(int advertiserId = 0)
+        //public async Task<ReturnResult> GetInitialData(int advertiserId = 0)
+        //{
+        //    try
+        //    {
+        //        result.body = await _advertDAL.GetAdvertResultSet(advertiserId);
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var _logging = new ErrorLogging()
+        //        {
+        //            ErrorMessage = ex.Message.ToString(),
+        //            StackTrace = ex.StackTrace.ToString(),
+        //            PageName = "CreateUpdateCampaignService",
+        //            ProcedureName = "GetInitialData"
+        //        };
+        //        _logging.LogError();
+        //        result.result = 0;
+        //    }
+        //    return result;
+        //}
+
+
+        public async Task<ReturnResult> CreateNewCampaign(NewCampaignProfileFormModel model)
         {
+            var CampaignNameexists = await _campaignDAL.CheckCampaignNameExists(model.CampaignName, model.UserId);
+            if (CampaignNameexists)
+            {
+                result.result = 0;
+                result.body = "The Campaign name already exists";
+                return result;
+            }
+
             try
             {
-                result.body = await _advertDAL.GetAdvertResultSet(id);
+
+                var currencyData = await _currencyRepository.GetCurrencyUsingCurrencyIdAsync(model.CurrencyId);
+                var currencyCountryData = await _currencyRepository.GetCurrencyUsingCountryIdAsync(model.CountryId);
+                decimal currencyRate = 1.00M;
+                var fromCurrencyCode = currencyData.CurrencyCode;
+                var toCurrencyCode = currencyCountryData.CurrencyCode;
+                if (fromCurrencyCode != toCurrencyCode)
+                {
+                    currencyRate = 2;
+                }
+
+                model.CreatedDateTime = DateTime.Now;
+                model.UpdatedDateTime = DateTime.Now;
+
+                if (model.CountryId == 12 || model.CountryId == 13 || model.CountryId == 14)
+                    model.CountryId = 12;
+                else if (model.CountryId == 11)
+                    model.CountryId = 8;
+
+                
+
+                model.MaxDailyBudget = float.Parse((Convert.ToDecimal(model.MaxDailyBudget) * currencyRate).ToString());
+                model.MaxBid = float.Parse((Convert.ToDecimal(model.MaxBid) * currencyRate).ToString());
+                model.MaxHourlyBudget = float.Parse((Convert.ToDecimal(model.MaxHourlyBudget) * currencyRate).ToString());
+                model.MaxMonthBudget = float.Parse((Convert.ToDecimal(model.MaxMonthBudget) * currencyRate).ToString());
+                model.MaxWeeklyBudget = float.Parse((Convert.ToDecimal(model.MaxWeeklyBudget) * currencyRate).ToString());
+
+                model.EmailFileLocation = null;
+                model.Active = true;
+                model.Status = (int)Enums.CampaignStatus.InProgress;
+                model.IsAdminApproval = false;
+                model.PhoneticAlphabet = PhoneticString();
+                model.NextStatus = true;
+                model.CurrencyCode = currencyCountryData.CurrencyCode;
+
+                var newModel = new NewCampaignProfileFormModel();
+                try
+                {
+                    newModel = await _createDAL.CreateNewCampaign(model);
+
+                    // Is actually the CampaignProfileId from 168 Main Server
+                    result.body = newModel.AdtoneServerCampaignProfileId;
+                }
+                catch (Exception ex)
+                {
+                    var _logging = new ErrorLogging()
+                    {
+                        ErrorMessage = ex.Message.ToString(),
+                        StackTrace = ex.StackTrace.ToString(),
+                        PageName = "CreateUpdateCampaignService",
+                        ProcedureName = "CreateNewCampaign - AddDataToMain"
+                    };
+                    _logging.LogError();
+                    result.result = 0;
+                    return result;
+                }
+                try
+                {
+                    var timesettings = await CampaignProfileTimeSettingMapping(newModel.AdtoneServerCampaignProfileId.Value, model.CountryId, newModel.CampaignProfileId);
+                }
+                catch (Exception ex)
+                {
+                    var _logging = new ErrorLogging()
+                    {
+                        ErrorMessage = ex.Message.ToString(),
+                        StackTrace = ex.StackTrace.ToString(),
+                        PageName = "CreateUpdateCampaignService",
+                        ProcedureName = "CreateNewCampaign - Update Time Settings"
+                    };
+                    _logging.LogError();
+                    result.result = 0;
+                    return result;
+                }
+                var operatorString = await _connService.GetConnectionStringsByCountryId(model.CountryId);
+
+                try
+                {
+                    var z = await _matchDAL.AddCampaignData(newModel, operatorString);
+                }
+                catch (Exception ex)
+                {
+                    var _logging = new ErrorLogging()
+                    {
+                        ErrorMessage = ex.Message.ToString(),
+                        StackTrace = ex.StackTrace.ToString(),
+                        PageName = "CreateUpdateCampaignService",
+                        ProcedureName = "CreateNewCampaign - AddUserMatch Data"
+                    };
+                    _logging.LogError();
+                    result.result = 0;
+                    return result;
+                }
+                try
+                {
+                    await _matchProcess.PrematchProcessForCampaign(newModel.CampaignProfileId, operatorString);
+                }
+                catch (Exception ex)
+                {
+                    var _logging = new ErrorLogging()
+                    {
+                        ErrorMessage = ex.Message.ToString(),
+                        StackTrace = ex.StackTrace.ToString(),
+                        PageName = "CreateUpdateCampaignService",
+                        ProcedureName = "CreateNewCampaign - PrematchProcessForCampaign"
+                    };
+                    _logging.LogError();
+                    result.result = 0;
+                    return result;
+                }
+
+                // Supposed to send confirmation Email to Admin user but admin has no email address
+
 
             }
             catch (Exception ex)
@@ -38,12 +201,385 @@ namespace AdtonesAdminWebApi.BusinessServices
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "CreateUpdateCampaignService",
-                    ProcedureName = "GetInitialData"
+                    ProcedureName = "CreateNewCampaign"
                 };
                 _logging.LogError();
                 result.result = 0;
             }
             return result;
         }
+
+
+        public async Task<ReturnResult> CreateNewCampaign_Advert(NewAdvertFormModel model)
+        {
+
+            var AdvertNameexists = await _advertDAL.CheckAdvertNameExists(model.AdvertName, model.AdvertiserId);
+
+                if (AdvertNameexists)
+                {
+                result.result = 0;
+                result.body = "The Advert Name already exists";
+                return result;
+                }
+
+                    if(model.file.Count == 0)
+                {
+                    result.result = 0;
+                    result.body = "A media file is required to proceed";
+                    return result;
+                }
+
+            IFormFile mediaFile = null;
+            IFormFile  scriptFile = null;
+                if (model.file.Count == 1)
+                    mediaFile = model.file[0];
+            else
+            {
+                foreach( var file in model.file)
+                {
+                    if (file.ContentType == "audio/wav" || file.ContentType == "audio/wave")
+                        mediaFile = file;
+                    else
+                        scriptFile = file;
+                }
+            }
+                        #region Media
+
+                                var userData = _userRepository.GetById(efmvcUser.UserId);
+
+                                var firstAudioName = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Second.ToString();
+
+                                string fileName = firstAudioName;
+
+                                string fileName2 = null;
+                                if (Convert.ToInt32(model.OperatorId) == (int)Enums.OperatorTableId.Safaricom)
+                                {
+                                    var secondAudioName = Convert.ToInt64(firstAudioName) + 1;
+                                    fileName2 = secondAudioName.ToString();
+                                }
+
+                                string extension = Path.GetExtension(mediaFile.FileName);
+                                var onlyFileName = Path.GetFileNameWithoutExtension(mediaFile.FileName);
+                                string outputFormat = "wav";
+
+                                var audioFormatExtension = "." + outputFormat;
+            string actualDirectoryName = "Media";
+            string directoryName = Path.Combine(actualDirectoryName, model.OperatorId.ToString());
+            string newfile = string.Empty;
+
+            if (extension != audioFormatExtension)
+            {
+                string tempDirectoryName = @"Media\Temp\";
+                string tempFile = await _saveFile.SaveFileToSite(tempDirectoryName, mediaFile);
+
+                newfile = _convFile.ConvertAndSaveMediaFile(tempDirectoryName + tempFile, extension, outputFormat, onlyFileName, directoryName);
+
+                model.MediaFileLocation = string.Format("/Media/{0}/{1}", model.AdvertiserId.ToString(),
+                                                                        fileName + "." + outputFormat);
+            }
+            else
+            {
+                newfile = await _saveFile.SaveFileToSite(directoryName, mediaFile);
+
+                string archiveDirectoryName = "Media//Archive";
+
+                string apath = await _saveFile.SaveOriginalFileToSite(archiveDirectoryName, mediaFile);
+
+
+                model.MediaFileLocation = string.Format("/Media/{0}/{1}", model.AdvertiserId.ToString(),
+                                                                            fileName + extension);
+            }
+
+                        #endregion
+
+                        #region Script
+
+                        if (scriptFile != null)
+                        {
+                            if (scriptFile.ContentLength != 0)
+                            {
+                                string fileName = Guid.NewGuid().ToString();
+                                string extension = Path.GetExtension(scriptFile.FileName);
+
+                                string directoryName = Server.MapPath("/Script/");
+                                directoryName = Path.Combine(directoryName, efmvcUser.UserId.ToString());
+
+                                if (!Directory.Exists(directoryName))
+                                    Directory.CreateDirectory(directoryName);
+
+                                string path = Path.Combine(directoryName, fileName + extension);
+                                scriptFile.SaveAs(path);
+
+                                string archiveDirectoryName = Server.MapPath("/Script/Archive/");
+
+                                if (!Directory.Exists(archiveDirectoryName))
+                                    Directory.CreateDirectory(archiveDirectoryName);
+
+                                string archivePath = Path.Combine(archiveDirectoryName, fileName + extension);
+                                scriptFile.SaveAs(archivePath);
+
+                                model.ScriptFileLocation = string.Format("/Script/{0}/{1}", efmvcUser.UserId.ToString(),
+                                                                        fileName + extension);
+                            }
+                            else
+                            {
+                                model.ScriptFileLocation = "";
+                            }
+                        }
+                        else
+                        {
+                            model.ScriptFileLocation = "";
+                        }
+                        #endregion
+
+                        #region Add Records
+
+                        var campaign = db.CampaignProfiles.Where(c => c.CampaignName == campaignName && c.UserId == efmvcUser.UserId).FirstOrDefault();
+                        int campaignId = 0;
+
+                        if (campaign.CampaignProfileId != 0 && campaign.CampaignProfileId != null)
+                        {
+                            campaignId = Convert.ToInt32(campaign.CampaignProfileId);
+                        }
+
+                        int? clientId = null;
+                        if (advertClientId == "")
+                        {
+                            clientId = null;
+                        }
+                        else
+                        {
+                            clientId = Convert.ToInt32(advertClientId);
+                        }
+
+                        if (ModelState.IsValid)
+                        {
+                            model.AdvertId = 0;
+                            model.UserId = efmvcUser.UserId;
+                            model.AdvertClientId = clientId;
+                            model.AdvertName = advertName;
+                            model.BrandName = advertBrandName;
+                            model.UploadedToMediaServer = false;
+                            model.CreatedDateTime = DateTime.Now;
+                            model.UpdatedDateTime = DateTime.Now;
+                            model.Status = (int)AdvertStatus.Waitingforapproval;
+                            model.Script = script;
+                            model.IsAdminApproval = false;
+                            model.AdvertCategoryId = int.Parse(advertCategoryId);
+                            model.CountryId = int.Parse(countryId);
+                            model.PhoneticAlphabet = advertPhoneticAlphabet;
+                            model.NextStatus = false;
+                            model.CampProfileId = campaignId;
+                            model.AdtoneServerAdvertId = null;
+                            model.OperatorId = Convert.ToInt32(operatorId);
+
+                            CreateOrUpdateCopyAdvertCommand command = Mapper.Map<NewAdvertFormModel, CreateOrUpdateCopyAdvertCommand>(model);
+
+                            ICommandResult result = _commandBus.Submit(command);
+
+                            if (result.Success)
+                            {
+                                if (campaignId != 0)
+                                {
+                                    CampaignAdvertFormModel _campaignAdvert = new CampaignAdvertFormModel();
+                                    _campaignAdvert.AdvertId = result.Id;
+                                    _campaignAdvert.CampaignProfileId = campaignId;
+                                    _campaignAdvert.NextStatus = true;
+                                    CreateOrUpdateCampaignAdvertCommand campaignAdvertcommand =
+                                    Mapper.Map<CampaignAdvertFormModel, CreateOrUpdateCampaignAdvertCommand>(_campaignAdvert);
+
+                                    ICommandResult campaignAdvertcommandResult = _commandBus.Submit(campaignAdvertcommand);
+
+                                    if (campaignAdvertcommandResult.Success)
+                                    {
+                                        if (campaign != null)
+                                        {
+                                            campaign.NumberInBatch = int.Parse(numberofadsinabatch);
+                                            campaign.UpdatedDateTime = DateTime.Now;
+                                            db.SaveChanges();
+                                            if (ConnString != null && ConnString.Count() > 0)
+                                            {
+                                                UserMatchTableProcess obj = new UserMatchTableProcess();
+
+                                                string adName = "";
+                                                if (command.MediaFileLocation == null || command.MediaFileLocation == "")
+                                                {
+                                                    adName = "";
+                                                }
+                                                else
+                                                {
+
+                                                    EFMVCDataContex SQLServerEntities = new EFMVCDataContex();
+                                                    var advertOperatorId = _advertRepository.GetById(result.Id).OperatorId;
+                                                    var operatorFTPDetails = SQLServerEntities.OperatorFTPDetails.Where(top => top.OperatorId == (int)advertOperatorId).FirstOrDefault();
+                                                    adName = operatorFTPDetails.FtpRoot + "/" + command.MediaFileLocation.Split('/')[3];
+                                                }
+
+                                                foreach (var item in ConnString)
+                                                {
+                                                    EFMVCDataContex db1 = new EFMVCDataContex(item);
+                                                    var campaignProfileDetails = db1.CampaignProfiles.Where(s => s.AdtoneServerCampaignProfileId == campaign.CampaignProfileId).FirstOrDefault();
+                                                    if (campaignProfileDetails != null)
+                                                    {
+                                                        campaignProfileDetails.NumberInBatch = int.Parse(numberofadsinabatch);
+                                                        campaignProfileDetails.UpdatedDateTime = DateTime.Now;
+                                                        db1.SaveChanges();
+
+                                                        obj.UpdateCampaignAd(campaignProfileDetails.CampaignProfileId, adName, db1);
+                                                        PreMatchProcess.PrematchProcessForCampaign(campaignProfileDetails.CampaignProfileId, item);
+                                                    }
+                                                }
+                                            }
+                                            //Email Code
+                                            //advertEmail.SendMail(advertName, model.OperatorId);
+                                            advertEmail.SendMail(advertName, model.OperatorId, efmvcUser.UserId, campaignName, countryName, operatorName, DateTime.Now);
+                                            return Json("success");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        #endregion
+                    }
+                    catch (Exception ex)
+                    {
+                        TempData["Error"] = ex.InnerException.Message;
+                        return Json("fail");
+                    }
+                }
+
+        }
+
+
+        private async Task<bool> CampaignProfileTimeSettingMapping(int campaignId, int countryId, int provCampId)
+        {
+            PostedTimesModel postedTimesModel = new PostedTimesModel();
+            postedTimesModel.DayIds = new string[] { "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "24:00" };
+
+            CampaignProfileTimeSetting timeSettings = new CampaignProfileTimeSetting();
+            var model = new CampaignProfileTimeSettingFormModel{ CampaignProfileId = campaignId, AvailableTimes = WizardGetTimes() };
+
+            //Update Campaign Profile Time Setting
+
+            model.MondayPostedTimes = postedTimesModel;
+            model.TuesdayPostedTimes = postedTimesModel;
+            model.WednesdayPostedTimes = postedTimesModel;
+            model.ThursdayPostedTimes = postedTimesModel;
+            model.FridayPostedTimes = postedTimesModel;
+            model.SaturdayPostedTimes = postedTimesModel;
+            model.SundayPostedTimes = postedTimesModel;
+            
+
+                timeSettings = new CampaignProfileTimeSetting();
+                timeSettings.Monday = string.Empty;
+                foreach (string s in model.MondayPostedTimes.DayIds)
+                    timeSettings.Monday += s + ",";
+
+                if (!string.IsNullOrEmpty(timeSettings.Monday))
+                    timeSettings.Monday = timeSettings.Monday.Substring(0, timeSettings.Monday.Length - 1);
+
+                timeSettings.Tuesday = string.Empty;
+                foreach (string s in model.TuesdayPostedTimes.DayIds)
+                    timeSettings.Tuesday += s + ",";
+
+                if (!string.IsNullOrEmpty(timeSettings.Tuesday))
+                    timeSettings.Tuesday = timeSettings.Tuesday.Substring(0, timeSettings.Tuesday.Length - 1);
+
+                timeSettings.Wednesday = string.Empty;
+                foreach (string s in model.WednesdayPostedTimes.DayIds)
+                    timeSettings.Wednesday += s + ",";
+
+                if (!string.IsNullOrEmpty(timeSettings.Wednesday))
+                    timeSettings.Wednesday = timeSettings.Wednesday.Substring(0, timeSettings.Wednesday.Length - 1);
+
+                timeSettings.Thursday = string.Empty;
+                foreach (string s in model.ThursdayPostedTimes.DayIds)
+                    timeSettings.Thursday += s + ",";
+
+                if (!string.IsNullOrEmpty(timeSettings.Thursday))
+                    timeSettings.Thursday = timeSettings.Thursday.Substring(0, timeSettings.Thursday.Length - 1);
+
+                timeSettings.Friday = string.Empty;
+                foreach (string s in model.FridayPostedTimes.DayIds)
+                    timeSettings.Friday += s + ",";
+
+                if (!string.IsNullOrEmpty(timeSettings.Friday))
+                    timeSettings.Friday = timeSettings.Friday.Substring(0, timeSettings.Friday.Length - 1);
+
+                timeSettings.Saturday = string.Empty;
+                foreach (string s in model.SaturdayPostedTimes.DayIds)
+                    timeSettings.Saturday += s + ",";
+
+                if (!string.IsNullOrEmpty(timeSettings.Saturday))
+                    timeSettings.Saturday = timeSettings.Saturday.Substring(0, timeSettings.Saturday.Length - 1);
+
+                timeSettings.Sunday = string.Empty;
+                foreach (string s in model.SundayPostedTimes.DayIds)
+                    timeSettings.Sunday += s + ",";
+
+                if (!string.IsNullOrEmpty(timeSettings.Sunday))
+                    timeSettings.Sunday = timeSettings.Sunday.Substring(0, timeSettings.Sunday.Length - 1);
+
+                timeSettings.CampaignProfileId = model.CampaignProfileId;
+                timeSettings.CampaignProfileTimeSettingsId = model.CampaignProfileTimeSettingsId;
+
+            var x = await _createDAL.AddProfileTimeSettings(timeSettings, countryId, provCampId);
+
+            return true;
+
+            }
+
+        public IList<TimeOfDay> WizardGetTimes()
+        {
+            IList<TimeOfDay> times = new List<TimeOfDay>();
+            times.Add(new TimeOfDay { Id = "01:00", Name = "01:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "02:00", Name = "02:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "03:00", Name = "03:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "04:00", Name = "04:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "05:00", Name = "05:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "06:00", Name = "06:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "07:00", Name = "07:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "08:00", Name = "08:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "09:00", Name = "09:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "10:00", Name = "10:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "11:00", Name = "11:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "12:00", Name = "12:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "13:00", Name = "13:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "14:00", Name = "14:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "15:00", Name = "15:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "16:00", Name = "16:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "17:00", Name = "17:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "18:00", Name = "18:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "19:00", Name = "19:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "20:00", Name = "20:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "21:00", Name = "21:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "22:00", Name = "22:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "23:00", Name = "23:00", IsSelected = true });
+            times.Add(new TimeOfDay { Id = "24:00", Name = "24:00", IsSelected = true });
+
+            return times;
+        }
+
+
+        private static string PhoneticString()
+        {
+            var str1 = RandomString(3);
+            var str2 = RandomString(3);
+            var str3 = RandomString(3);
+
+            string phonetic = phonetic = str1.ToLower() + "-" + str2.ToLower() + "-" + str3.ToLower();
+
+            return phonetic;
+        }
+
+
+        private static Random random = new Random();
+        private static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
     }
 }

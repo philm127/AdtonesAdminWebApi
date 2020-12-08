@@ -86,6 +86,25 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<bool> CheckAdvertNameExists(string advertName, int userId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(AdvertQuery.CheckAdvertNameExists);
+            builder.AddParameters(new { Id = advertName.ToLower() });
+            builder.AddParameters(new { UserId = userId });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<bool>(select.RawSql, select.Parameters));
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
 
         /// <summary>
         /// Gets a single Advert as Result list when clicked through from Campaign Page.

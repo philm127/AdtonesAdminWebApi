@@ -150,7 +150,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string CheckCampaignBillingExists => @"SELECT COUNT(1) FROM Billing WHERE CampaignProfileId=@Id;";
 
 
-        public static string UpdateCampaignMatchStatus => @"UPDATE CampaignMatches SET Status=@Status WHERE MSCampaignProfileId=@Id";
+		public static string CheckCampaignNameExists => @"SELECT COUNT(1) FROM CampaignProfile WHERE LOWER(CampaignName)=@Id AND UserId=@UserId;";
+
+
+		public static string UpdateCampaignMatchStatus => @"UPDATE CampaignMatches SET Status=@Status WHERE MSCampaignProfileId=@Id";
 
 
         public static string GetAdvertIdFromCampaignAd => @"SELECT AdvertId FROM CampaignAdvert WHERE CampaignProfileId=@Id";

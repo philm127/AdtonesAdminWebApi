@@ -76,6 +76,17 @@ namespace AdtonesAdminWebApi.Controllers
         /// <summary>
         /// 
         /// </summary>
+        /// <returns>body contains List SharedSelectListViewModel</returns>
+        [HttpGet("v1/GetClientList/{id}")]
+        public async Task<ReturnResult> GetClientList(int userId)
+        {
+            return await _sharedList.GetClientList(userId);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="id">CountryId</param>
         /// <returns>body contains List SharedSelectListViewModel</returns>
         [HttpGet("v1/GetOperatorList/{id}")]
@@ -104,6 +115,13 @@ namespace AdtonesAdminWebApi.Controllers
         public async Task<ReturnResult> FillOrganisationTypeDropDown()
         {
             return await _sharedList.GetOrganisationTypeDropDown();
+        }
+
+
+        [HttpGet("v1/FillAdvertCategoryDropDown")]
+        public async Task<ReturnResult> FillAdvertCategoryDropDown()
+        {
+            return await _sharedList.GetAdvertCategoryDropDown();
         }
 
 

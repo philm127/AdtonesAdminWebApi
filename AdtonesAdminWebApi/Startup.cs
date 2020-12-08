@@ -71,7 +71,8 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ICampaignAuditService, CampaignAuditService>();
             services.AddScoped<IPermissionManagementService, PermisionManagementService>();
             services.AddScoped<IManagementReportService, ManagementReportService>();
-            services.AddScoped<IBillingService, BillingService>();
+            services.AddScoped<ICreateUpdateCampaignService, CreateUpdateCampaignService>();
+            // services.AddScoped<IBillingService, BillingService>();
 
             #endregion
 
@@ -103,6 +104,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IOperatorDAL, OperatorDAL>();
             services.AddScoped<ISalesManagementDAL, SalesManagementDAL>();
             services.AddScoped<IBillingDAL, BillingDAL>();
+            services.AddScoped<ICreateUpdateCampaignDAL, CreateUpdateCampaignDAL>();
 
             #endregion
 

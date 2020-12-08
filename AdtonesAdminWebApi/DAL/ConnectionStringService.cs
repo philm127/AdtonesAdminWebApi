@@ -74,6 +74,20 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<string> GetConnectionStringsByCountryId(int Id)
+        {
+
+            StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings WHERE CountryId=@Id");
+
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                return await connection.QueryFirstOrDefaultAsync<string>(sb.ToString(), new { Id = Id });
+            }
+        }
+
+
         public async Task<string> GetOperatorConnectionByUserId(int id)
         {
 

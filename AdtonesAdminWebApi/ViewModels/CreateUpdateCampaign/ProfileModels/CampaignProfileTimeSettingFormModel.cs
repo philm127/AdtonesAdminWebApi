@@ -134,6 +134,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The sunday posted times.</value>
         public PostedTimesModel SundayPostedTimes { get; set; }
+
+        public int? AdtoneServerCampaignProfileTimeId { get; set; }
     }
 
     public class PostedTimesModel

@@ -33,7 +33,7 @@
 //                try
 //                {
 //                    NewCampaignProfileFormModel model = new NewCampaignProfileFormModel();
-//                    EFMVCDataContex db = new EFMVCDataContex();
+//                    // EFMVCDataContex db = new EFMVCDataContex();
 //                    PostedTimesModel postedTimesModel = new PostedTimesModel();
 //                    postedTimesModel.DayIds = new string[] { "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "24:00" };
 //                    int CountryId = 0;
@@ -381,7 +381,7 @@
 //                try
 //                {
 //                    NewCampaignProfileFormModel model = new NewCampaignProfileFormModel();
-//                    EFMVCDataContex db = new EFMVCDataContex();
+//                    // EFMVCDataContex db = new EFMVCDataContex();
 //                    PostedTimesModel postedTimesModel = new PostedTimesModel();
 //                    postedTimesModel.DayIds = new string[] { "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "24:00" };
 //                    int CountryId = 0;
@@ -926,7 +926,7 @@
 //            if (efmvcUser != null)
 //            {
 //                NewClientFormModel model = new NewClientFormModel();
-//                EFMVCDataContex db = new EFMVCDataContex();
+//                // EFMVCDataContex db = new EFMVCDataContex();
 
 //                int ClientId = Convert.ToInt32(clientId);
 //                NewAdvertFormModel model1 = new NewAdvertFormModel();
@@ -1010,7 +1010,7 @@
 //            EFMVCUser efmvcUser = HttpContext.User.GetEFMVCUser();
 //            if (efmvcUser != null)
 //            {
-//                EFMVCDataContex db = new EFMVCDataContex();
+//                // EFMVCDataContex db = new EFMVCDataContex();
 //                NewClientFormModel model = new NewClientFormModel();
 //                int ClientId = Convert.ToInt32(clientId);
 //                NewAdvertFormModel model1 = new NewAdvertFormModel();
@@ -1118,7 +1118,7 @@
 //                        if (countryId != "") CountryId = Convert.ToInt32(countryId);
 //                        var ConnString = ConnectionString.GetConnectionStringByCountryId(CountryId);
 //                        NewCampaignProfileFormModel model = new NewCampaignProfileFormModel();
-//                        EFMVCDataContex db = new EFMVCDataContex();
+//                        // EFMVCDataContex db = new EFMVCDataContex();
 //                        CurrencyModel currencyModel = new CurrencyModel();
 //                        var client = _clientRepository.Get(c => c.Name == clientName);
 //                        var campaign = db.CampaignProfiles.Where(c => c.CampaignName == campaignName && c.UserId == efmvcUser.UserId).FirstOrDefault();
@@ -1259,7 +1259,7 @@
 //                    int? CountryId = null;
 //                    if (countryId != "") CountryId = Convert.ToInt32(countryId);
 //                    var ConnString = ConnectionString.GetConnectionStringByCountryId(CountryId);
-//                    EFMVCDataContex db = new EFMVCDataContex();
+//                    // EFMVCDataContex db = new EFMVCDataContex();
 //                    CurrencyModel currencyModel = new CurrencyModel();
 //                    var client = _clientRepository.Get(c => c.Name == clientName && c.UserId == efmvcUser.UserId);
 //                    var campaign = db.CampaignProfiles.Where(c => c.CampaignName == campaignName && c.UserId == efmvcUser.UserId).FirstOrDefault();
@@ -1416,7 +1416,7 @@
 //                string operatorName = _operatorRepository.GetById(Convert.ToInt32(operatorId)).OperatorName;
 
 //                NewAdvertFormModel model = new NewAdvertFormModel();
-//                EFMVCDataContex db = new EFMVCDataContex();
+//                // EFMVCDataContex db = new EFMVCDataContex();
 //                AdvertEmail advertEmail = new AdvertEmail(_commandBus, _userRepository);
 
 //                int? CountryId = null;
