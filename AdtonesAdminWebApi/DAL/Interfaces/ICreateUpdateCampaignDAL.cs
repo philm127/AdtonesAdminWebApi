@@ -13,5 +13,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> AddProfileTimeSettings(CampaignProfileTimeSetting model, int countryId, int provCampaignId);
 
         Task<NewCampaignProfileFormModel> CreateNewCampaign(NewCampaignProfileFormModel model);
+        Task<NewAdvertFormModel> CreateNewCampaignAdvert(NewAdvertFormModel model);
+        Task<CampaignAdvertFormModel> CreateNewIntoCampaignAdverts(CampaignAdvertFormModel model, int operatorId, int provAdId);
     }
 }

@@ -19,5 +19,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<string> GetConnectionStringsByCountryId(int Id);
         Task<int> GetOperatorIdFromAdtoneId(int operatorId);
         Task<int> GetCountryIdFromAdtoneId(int Id, string conn);
+        Task<int> GetClientIdFromAdtoneIdByConnString(int Id, string conn);
     }
 }

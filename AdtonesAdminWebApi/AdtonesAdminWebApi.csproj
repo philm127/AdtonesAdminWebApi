@@ -31,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="BusinessServices\AddNewCampaign.cs" />
     <Compile Remove="BusinessServices\AdvertiserCreditService.cs" />
     <Compile Remove="BusinessServices\BillingService.cs" />
     <Compile Remove="BusinessServices\CountryTaxService.cs" />

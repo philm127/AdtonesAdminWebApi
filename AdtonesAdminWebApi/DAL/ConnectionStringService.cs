@@ -127,6 +127,18 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<int> GetClientIdFromAdtoneIdByConnString(int Id, string conn)
+        {
+            var select_string = "SELECT Id FROM Client WHERE AdtoneServerClientId=@Id";
+
+            using (var connection = new SqlConnection(conn))
+            {
+                await connection.OpenAsync();
+                return await connection.QueryFirstOrDefaultAsync<int>(select_string, new { Id = Id });
+            }
+        }
+
+
         public async Task<int> GetCampaignProfileIdFromAdtoneId(int Id, int operatorId)
         {
             

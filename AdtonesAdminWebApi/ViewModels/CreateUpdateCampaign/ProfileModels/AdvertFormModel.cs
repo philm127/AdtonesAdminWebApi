@@ -131,6 +131,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         public int AdvertId { get; set; }
         public bool NextStatus { get; set; }
 
+        public int? AdtoneServerCampaignAdvertId { get; set; }
+
         /// <summary>
         /// Gets or sets the advert.
         /// </summary>

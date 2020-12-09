@@ -124,6 +124,7 @@ namespace AdtonesAdminWebApi
             services.AddTransient<IPrematchProcess, PrematchProcess>();
             services.AddTransient<IConvertSaveMediaFile, ConvertSaveMediaFile>();
             services.AddTransient<ICurrencyConversion, CurrencyConversion> ();
+            services.AddTransient<IAdvertEmail, AdvertEmail>();
 
             #endregion
 

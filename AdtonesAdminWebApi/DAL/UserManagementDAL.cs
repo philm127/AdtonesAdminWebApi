@@ -39,11 +39,11 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<bool> CheckIfUserExists(UserAddFormModel model)
         {
             bool exists = false;
-            
+
             using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
                 exists = await _executers.ExecuteCommand(_connStr,
-                         conn => conn.ExecuteScalar<bool>(UserManagementQuery.CheckUserExists, new { email = model.Email.ToLower() })); 
+                         conn => conn.ExecuteScalar<bool>(UserManagementQuery.CheckUserExists, new { email = model.Email.ToLower() }));
             }
             return exists;
         }
@@ -205,7 +205,7 @@ namespace AdtonesAdminWebApi.DAL
                                     conn => conn.ExecuteScalar<int>(sel.RawSql, sel.Parameters));
                     }
                 }
-                
+
             }
             catch
             {
@@ -236,7 +236,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             var build = new SqlBuilder();
             var sel = build.AddTemplate(UserManagementQuery.UpdateUserPermissions);
-            build.AddParameters(new { userId = model.userId});
+            build.AddParameters(new { userId = model.userId });
             build.AddParameters(new { perm = model.permData.ToString() });
 
             try
@@ -275,7 +275,7 @@ namespace AdtonesAdminWebApi.DAL
 
         }
 
-        
+
 
         // Comes from SoapApiService
         public async Task<int> UpdateCorpUser(string command, int userId)
@@ -296,7 +296,7 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
 
-            
+
             return x;
 
         }
@@ -315,7 +315,7 @@ namespace AdtonesAdminWebApi.DAL
 
                 return await _executers.ExecuteCommand(_connStr,
                     conn => conn.QueryFirstOrDefault<User>(select.RawSql, select.Parameters));
-                
+
             }
             catch
             {
@@ -432,8 +432,8 @@ namespace AdtonesAdminWebApi.DAL
         {
             try
             {
-                    return await _executers.ExecuteCommand(_connStr,
-                         conn => conn.ExecuteScalar<int>(UserManagementQuery.InsertManagerToSalesExec, new { manId = manId, execId = execId }));
+                return await _executers.ExecuteCommand(_connStr,
+                     conn => conn.ExecuteScalar<int>(UserManagementQuery.InsertManagerToSalesExec, new { manId = manId, execId = execId }));
             }
             catch
             {
@@ -441,5 +441,31 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
+
+        public async Task<IEnumerable<string>> GetAdvertOperatorAdmins(int roleId, int operatorId = 0)
+        {
+
+            var sb1 = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb1.Append(UserManagementQuery.GetAdvertAdminOperator);
+
+            builder.AddParameters(new { RoleId = roleId });
+            if (operatorId > 0)
+            {
+                sb1.Append(" AND OperatorId=@Id");
+                builder.AddParameters(new { Id = operatorId });
+            }
+
+            var select = builder.AddTemplate(sb1.ToString());
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                         conn => conn.Query<string>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }

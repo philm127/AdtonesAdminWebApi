@@ -54,7 +54,12 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
 
         public int OperatorId { get; set; }
 
+        public int? ClientId { get; set; }
+
         public List<IFormFile> file { get; set; }
+
+        public IFormFile MediaFile { get; set; }
+        public IFormFile ScriptFile { get; set; }
     }
 
 

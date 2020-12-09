@@ -77,8 +77,70 @@ namespace AdtonesAdminWebApi.DAL
                 {
                     var conn = await _connService.GetConnectionStringsByCountryId(model.CountryId);
                     if (conn != null && conn != "")
+
+                        model.UserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.UserId, conn);
+                    if (model.ClientId != null)
+                        model.ClientId = await _connService.GetClientIdFromAdtoneIdByConnString(model.ClientId.Value, conn);
                         model.CampaignProfileId = await _executers.ExecuteCommand(conn,
                                 conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewCampaign, model));
+                }
+            }
+            catch
+            {
+                throw;
+            }
+
+            return model;
+        }
+
+
+        public async Task<NewAdvertFormModel> CreateNewCampaignAdvert(NewAdvertFormModel model)
+        {
+            try
+            {
+
+                model.AdtoneServerAdvertId = await _executers.ExecuteCommand(_connStr,
+                                conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewCampaignAdvert, model));
+
+                if (model.AdtoneServerAdvertId != null && model.AdtoneServerAdvertId > 0)
+                {
+                    var conn = await _connService.GetConnectionStringByOperator(model.OperatorId);
+                    if (conn != null && conn != "")
+
+                        model.AdvertiserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.AdvertiserId, conn);
+                    if (model.ClientId != null)
+                        model.ClientId = await _connService.GetClientIdFromAdtoneIdByConnString(model.ClientId.Value, conn);
+                    model.AdvertId = await _executers.ExecuteCommand(conn,
+                            conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewCampaignAdvert, model));
+                }
+            }
+            catch
+            {
+                throw;
+            }
+
+            return model;
+        }
+
+
+        public async Task<CampaignAdvertFormModel> CreateNewIntoCampaignAdverts(CampaignAdvertFormModel model, int operatorId, int provAdId)
+        {
+            try
+            {
+
+                model.AdtoneServerCampaignAdvertId = await _executers.ExecuteCommand(_connStr,
+                                conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewIntoCampaignAdverts, model));
+
+                if (model.AdtoneServerCampaignAdvertId != null && model.AdtoneServerCampaignAdvertId > 0)
+                {
+                    var conn = await _connService.GetConnectionStringByOperator(operatorId);
+                    if (conn != null && conn != "")
+                    {
+                        model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneId(model.CampaignProfileId, operatorId);
+                        model.AdvertId = provAdId;
+                        model.CampaignAdvertId = await _executers.ExecuteCommand(conn,
+                                conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewCampaignAdvert, model));
+                    }
                 }
             }
             catch
