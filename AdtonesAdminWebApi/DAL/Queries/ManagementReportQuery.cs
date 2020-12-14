@@ -331,8 +331,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
        
-        public static string TotalExpRewards => @"SELECT SUM(x.TotalItem) AS IsRewardReceivedTot,COUNT(DISTINCT x.UserId) as UserProfileIdTot,
-                                                   SUM(y.TotalItem) AS IsRewardReceivedNum,COUNT(DISTINCT y.UserId) as UserProfileIdNum
+        public static string TotalExpRewards => @"SELECT ISNULL(SUM(x.TotalItem),0) AS IsRewardReceivedTot,COUNT(DISTINCT x.UserId) as UserProfileIdTot,
+                                                   ISNULL(SUM(y.TotalItem),0) AS IsRewardReceivedNum,COUNT(DISTINCT y.UserId) as UserProfileIdNum
                                                     FROM Users As u
                                                     LEFT JOIN 
                                                         ( SELECT COUNT(ClaimRewardAuditId) AS TotalItem,UserId

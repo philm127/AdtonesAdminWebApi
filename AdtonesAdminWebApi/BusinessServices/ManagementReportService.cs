@@ -360,10 +360,10 @@ namespace AdtonesAdminWebApi.BusinessServices
                     model.CurrencyCode = tempResult.CurrencyCode;
 
                     /// Rewards 
-                    model.TotRewardUsers = tempResult.TotRewardUsers;
-                    model.NumRewardUsers = tempResult.NumRewardUsers;
-                    model.TotalRewards = tempResult.TotalRewards;
-                    model.NumRewards = tempResult.NumRewards;
+                    model.TotRewardUsers += tempResult.TotRewardUsers;
+                    model.NumRewardUsers += tempResult.NumRewardUsers;
+                    model.TotalRewards += tempResult.TotalRewards;
+                    model.NumRewards += tempResult.NumRewards;
                     // }
                     // });
                 }

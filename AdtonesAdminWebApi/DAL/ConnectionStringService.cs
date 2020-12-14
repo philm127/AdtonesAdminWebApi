@@ -157,12 +157,12 @@ namespace AdtonesAdminWebApi.DAL
         {
 
             var conn = await GetConnectionStringByOperator(operatorId);
-            StringBuilder sb = new StringBuilder("SELECT OperatorId FROM Operators WHERE AdtoneServerOperatorId=@Id");
+            var query_string = "SELECT OperatorId FROM Operators WHERE AdtoneServerOperatorId=@Id";
 
             using (var connection = new SqlConnection(conn))
             {
                 await connection.OpenAsync();
-                return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = operatorId });
+                return await connection.QueryFirstOrDefaultAsync<int>(query_string, new { Id = operatorId });
             }
         }
 
