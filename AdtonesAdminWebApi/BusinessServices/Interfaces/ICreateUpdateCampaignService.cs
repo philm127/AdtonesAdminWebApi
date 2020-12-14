@@ -11,5 +11,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     {
         Task<ReturnResult> CreateNewCampaign(NewCampaignProfileFormModel model);
         Task<ReturnResult> CreateNewCampaign_Advert(NewAdvertFormModel model);
+        Task<ReturnResult> CheckIfAdvertNameExists(NewAdvertFormModel model);
+        Task<ReturnResult> CheckIfCampaignNameExists(NewCampaignProfileFormModel model);
     }
 }

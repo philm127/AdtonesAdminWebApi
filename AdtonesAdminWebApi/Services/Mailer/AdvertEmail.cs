@@ -1,5 +1,8 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -11,7 +14,7 @@ namespace AdtonesAdminWebApi.Services.Mailer
 {
     public interface IAdvertEmail
     {
-        void SendMail(string AdvertName, int? OperatorAdmin, int UserId, string CampaignName, string CountryName, string OperatorName, DateTime AdvertDateTime);
+        void SendMail(NewAdvertFormModel model);
     }
 
 
@@ -21,16 +24,26 @@ namespace AdtonesAdminWebApi.Services.Mailer
         private readonly IConfiguration _configuration;
         private readonly IUserManagementDAL _userDAL;
         private readonly ISendEmailMailer _mailer;
+        private readonly ICampaignDAL _campDAL;
+        private readonly ICountryAreaDAL _countryDAL;
+        private readonly IOperatorDAL _operatorDAL;
+        private readonly IHttpContextAccessor _httpAccessor;
 
-        public AdvertEmail(IConfiguration configuration, IWebHostEnvironment _env, IUserManagementDAL userDAL, ISendEmailMailer mailer)
+        public AdvertEmail(IHttpContextAccessor httpAccessor, IConfiguration configuration, IWebHostEnvironment _env, IUserManagementDAL userDAL, ISendEmailMailer mailer,
+                            ICampaignDAL campDAL, ICountryAreaDAL countryDAL, IOperatorDAL operatorDAL)
         {
             _configuration = configuration;
             env = _env;
             _userDAL = userDAL;
             _mailer = mailer;
+            _campDAL = campDAL;
+            _countryDAL = countryDAL;
+            _operatorDAL = operatorDAL;
+            _httpAccessor = httpAccessor;
         }
 
-        public void SendMail(string AdvertName, int? OperatorAdmin, int UserId, string CampaignName, string CountryName, string OperatorName, DateTime AdvertDateTime)
+        public void SendMail(NewAdvertFormModel model)
+            //string AdvertName, int? OperatorAdmin, int UserId, string CampaignName, string CountryName, string OperatorName, DateTime AdvertDateTime)
         {
             try
             {
@@ -38,49 +51,66 @@ namespace AdtonesAdminWebApi.Services.Mailer
                 string advertURL = "";
                 string siteAddress = _configuration.GetValue<string>("AppSettings:siteAddress");
 
+                CampaignProfile campaignDetails = _campDAL.GetCampaignProfileDetail(model.CampaignProfileId).Result;
+                var countryDetails = _countryDAL.GetCountryById(campaignDetails.CountryId.Value).Result;
+                var operatorDetails = _operatorDAL.GetOperatorById(model.OperatorId).Result;
+
+                // Need this until Advert Admin users use admin.adtones.com
+                string adtonesSiteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress");
+
                 var advertAdminDetails = _userDAL.GetAdvertOperatorAdmins((int)Enums.UserRole.AdvertAdmin).Result.ToList();
-                var operatorAdminDetails = _userDAL.GetAdvertOperatorAdmins((int)Enums.UserRole.OperatorAdmin, OperatorAdmin.Value).Result.ToList();
-                var advertiserDetails = _userDAL.GetUserById(UserId).Result;
+                var operatorAdminDetails = _userDAL.GetAdvertOperatorAdmins((int)Enums.UserRole.OperatorAdmin, model.OperatorId).Result.ToList();
+                var advertiserDetails = _userDAL.GetUserById(model.AdvertiserId).Result;
 
                 TimeZone curTimeZone = TimeZone.CurrentTimeZone;
-                DateTime advertUTC = curTimeZone.ToUniversalTime(AdvertDateTime);
+                DateTime advertUTC = curTimeZone.ToUniversalTime(DateTime.Now);
 
-                string subject = "New Advert: " + AdvertName + " - Campaign: " + CampaignName + " - Advertiser: " + advertiserDetails.FirstName + " " + advertiserDetails.LastName;
+                string subject = "New Advert: " + model.AdvertName + " - Campaign: " + campaignDetails.CampaignName + " - Advertiser: " + advertiserDetails.FirstName + " " + advertiserDetails.LastName;
 
-                var mail = new SendEmailModel();
+
                 if (advertAdminDetails != null)
                 {
+                    var mail = new SendEmailModel();
                     var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
                     var template = _configuration.GetSection("AppSettings").GetSection("AdvertEmailTemplateForAdvertAdmin").Value;
                     var path = Path.Combine(otherpath, template);
                     string emailContent = string.Empty;
+                    if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
+                    {
+                        emailContent = "<b>This is a courtesy message as Advert HAS BEEN Pre-APPROVED at Advert Admin Level</b>\n";
+                    }
                     using (var reader = new StreamReader(path))
                     {
-                        emailContent = reader.ReadToEnd();
+                        emailContent += reader.ReadToEnd();
                     }
 
-                    advertURL = "<a href='" + siteAddress + "AdvertAdmin/UserAdvert/Index'>" + AdvertName + "</a>";
-                    url = siteAddress + "AdvertAdmin/UserAdvert/Index";
+                    advertURL = "<a href='" + adtonesSiteAddress + "/AdvertAdmin/UserAdvert/Index'>" + model.AdvertName + "</a>";
+                    url = adtonesSiteAddress + "/AdvertAdmin/UserAdvert/Index";
                     url = "<a href='" + url + "'>" + url + " </a>";
 
-                    emailContent = string.Format(emailContent, advertURL, CampaignName, CountryName, OperatorName, advertUTC, url);
+                    emailContent = string.Format(emailContent, advertURL, campaignDetails.CampaignName, countryDetails.Name, operatorDetails.OperatorName, advertUTC, url);
 
                     mail.SingleTo = advertAdminDetails[0];
                     mail.From = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SiteEmailAddress").Value;
                     mail.Subject = subject;
 
+                    if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
+                    {
+                        emailContent += "\n\n <b>This is a courtesy message as Advert HAS BEEN Pre-APPROVED at Advert Admin Level</b>";
+                    }
+
                     mail.Body = emailContent.Replace("\n", "<br/>");
 
                     mail.isBodyHTML = true;
 
-                    _mailer.SendBasicEmail(mail, OperatorAdmin.Value, (int)Enums.UserRole.AdvertAdmin);
-
+                    _mailer.SendBasicEmail(mail, model.OperatorId, (int)Enums.UserRole.AdvertAdmin);
                 }
 
                 if (operatorAdminDetails.Count() > 0)
                 {
                     foreach (var operatorAdminData in operatorAdminDetails)
                     {
+                        var mail = new SendEmailModel();
                         mail = new SendEmailModel();
                         var safaricomOperatorAdminSiteAddress = "";
                         string campaignURL = "";
@@ -94,12 +124,12 @@ namespace AdtonesAdminWebApi.Services.Mailer
                             emailContent = reader.ReadToEnd();
                         }
 
-                        if (OperatorAdmin == (int)Enums.OperatorTableId.Safaricom)
+                        if (model.OperatorId == (int)Enums.OperatorTableId.Safaricom)
                         {
                             safaricomOperatorAdminSiteAddress = _configuration.GetValue<string>("AppSettings:SafaricomOperatorAdminSiteAddress");
-                            advertURL = "<a href='" + safaricomOperatorAdminSiteAddress + "Advert/Index'>" + AdvertName + "</a>";
-                            campaignURL = "<a href='" + safaricomOperatorAdminSiteAddress + "OperatorAdmin/UserCampaign/Index'>" + CampaignName + "</a>";
-                            url = safaricomOperatorAdminSiteAddress + "OperatorAdmin/UserAdvert/Index";
+                            advertURL = "<a href='" + safaricomOperatorAdminSiteAddress + "'>" + model.AdvertName + "</a>";
+                            campaignURL = "<a href='" + safaricomOperatorAdminSiteAddress + "'>" + campaignDetails.CampaignName + "</a>";
+                            url = safaricomOperatorAdminSiteAddress;
                             url = "<a href='" + url + "'>" + url + " </a>";
 
                             mail.SingleTo = operatorAdminData;
@@ -113,9 +143,9 @@ namespace AdtonesAdminWebApi.Services.Mailer
                         }
                         else
                         {
-                            advertURL = "<a href='" + siteAddress + "OperatorAdmin/UserAdvert/Index'>" + AdvertName + "</a>";
-                            campaignURL = "<a href='" + siteAddress + "OperatorAdmin/UserCampaign/Index'>" + CampaignName + "</a>";
-                            url = siteAddress + "OperatorAdmin/UserAdvert/Index";
+                            advertURL = "<a href='" + siteAddress + "'>" + model.AdvertName + "</a>";
+                            campaignURL = "<a href='" + siteAddress + "'>" + campaignDetails.CampaignName + "</a>";
+                            url = siteAddress;
                             url = "<a href='" + url + "'>" + url + " </a>";
 
                             mail.SingleTo = operatorAdminData;
@@ -129,7 +159,7 @@ namespace AdtonesAdminWebApi.Services.Mailer
 
                         }
 
-                       _mailer.SendBasicEmail(mail, OperatorAdmin.Value, (int)Enums.UserRole.OperatorAdmin);
+                       _mailer.SendBasicEmail(mail, model.OperatorId, (int)Enums.UserRole.OperatorAdmin);
                     }
                 }
             }

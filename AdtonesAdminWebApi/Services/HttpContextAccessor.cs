@@ -23,6 +23,7 @@ namespace AdtonesAdminWebApi.Services
         {
             try
             {
+                var tst = accessor.HttpContext.User;
                 return int.Parse(accessor.HttpContext.User.FindFirst("roleId")?.Value);
             }
             catch { }

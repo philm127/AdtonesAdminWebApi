@@ -57,15 +57,17 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                             UploadedToMediaServer,CreatedDateTime,UpdatedDateTime,Status,Script,ScriptFileLocation,
                                                             IsAdminApproval,AdvertCategoryId,CountryId,PhoneticAlphabet,NextStatus,CampProfileId,
                                                             AdtoneServerAdvertId,UpdatedBy,OperatorId)
-                                                          VALUES((@AdvertiserId,@ClientId,@AdvertName,@Brand,@MediaFileLocation,
-                                                            @UploadedToMediaServer,GETDATE(),GETDATE(),@Status,@Script,@ScriptFileLocation,
-                                                            @IsAdminApproval,@AdvertCategoryId,@CountryId,@PhoneticAlphabet,@NextStatus,@CamppaignProfileId,
-                                                            @AdtoneServerAdvertId,@UpdatedBy,@OperatorId)";
+                                                          VALUES(@AdvertiserId,@ClientId,@AdvertName,@Brand,@MediaFileLocation,
+                                                            @UploadedToMediaServer,GETDATE(),GETDATE(),@Status,@SmsScript,@ScriptFileLocation,
+                                                            @IsAdminApproval,@AdvertCategoryId,@CountryId,@PhoneticAlphabet,@NextStatus,@CampaignProfileId,
+                                                            @AdtoneServerAdvertId,@UpdatedBy,@OperatorId);
+                                                            SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
 
         public static string InsertNewIntoCampaignAdverts => @"INSERT INTO CampaignAdverts(CampaignProfileId, AdvertId, NextStatus, 
                                                                         AdtoneServerCampaignAdvertId)
-                                                               VALUES(@CampaignProfileId, @AdvertId, @NextStatus,@AdtoneServerCampaignAdvertId);";
+                                                               VALUES(@CampaignProfileId, @AdvertId, @NextStatus,@AdtoneServerCampaignAdvertId);
+                                                                SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
 
         public static string GetProfileTimeSettingsByCampId => @"SELECT CampaignProfileTimeSettingsId,CampaignProfileId,Monday,Tuesday

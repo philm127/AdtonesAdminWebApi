@@ -15,7 +15,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string UpdateBucketAmount => "Update CampaignProfile SET BucketCount=@BucketCount WHERE CampaignProfileId=@Id";
 
 
-        public static string InsertNewCampaignData => @"INSERT INTO CampaignMatches(CampaignProfileId,UserId,ClientId,CampaignName,CampaignDescription,TotalBudget,
+        public static string InsertNewCampaignData => @"INSERT INTO CampaignMatches(UserId,ClientId,CampaignName,CampaignDescription,TotalBudget,
                                                     MaxDailyBudget,MaxBid,MaxMonthBudget,MaxWeeklyBudget,MaxHourlyBudget,TotalCredit,
                                                     AvailableCredit,PlaysToDate,PlaysLastMonth,PlaysCurrentMonth,CancelledToDate,CancelledLastMonth,CancelledCurrentMonth,
                                                     SmsToDate,SmsLastMonth,SmsCurrentMonth,EmailToDate,EmailsLastMonth,EmailsCurrentMonth,

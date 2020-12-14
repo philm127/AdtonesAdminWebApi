@@ -23,7 +23,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 														LEFT JOIN Client AS c ON c.Id = cp.ClientId
 														LEFT JOIN 
 															(  SELECT ca.CampaignProfileId,CONVERT(numeric(16,2), SUM(ca.TotalCost)) AS TotalPlayedCost,
-																CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgCost,
+																CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgBid,
 																SUM(CASE WHEN ca.SMS IS NOT NULL THEN 1 ELSE 0 END) AS TotalSMS,
 																CONVERT(numeric(16,2), SUM(ISNULL(ca.SMSCost,0.00))) AS TotalSMSCost,
 																SUM(CASE WHEN ca.Email IS NOT NULL THEN 1 ELSE 0 END) AS TotalEmail,
@@ -266,7 +266,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 		public static string GetCampaignDashboardSummariesByCountry => @"SELECT ISNULL(CAST(cp.TotalBudget AS bigint),0) AS Budget, ISNULL(g.TotalPlayedCost,0) AS Spend,
 																	ISNULL(cp.TotalBudget,0) - ISNULL(g.TotalPlayedCost,0) AS FundsAvailable,
-																	ISNULL(g.TotalAvgCost,0) AS AvgBid,CAST(ISNULL(g.TotalSMS,0) AS bigint) AS TotalSMS,
+																	ISNULL(g.TotalAvgBid,0) AS AvgBid,CAST(ISNULL(g.TotalSMS,0) AS bigint) AS TotalSMS,
 																	ISNULL(g.TotalSMSCost,0) AS TotalSMSCost,CAST(ISNULL(g.TotalEmail,0) AS bigint) AS TotalEmail,
 																	ISNULL(g.TotalEmailCost,0) AS TotalEmailCost,Cast(ISNULL(p.TotalPlayTracks,0) AS bigint) AS TotalPlays,
 																	Cast(ISNULL(g.TotalPlayTracks,0) AS bigint) AS MoreSixSecPlays,
@@ -281,7 +281,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 																		GROUP BY CountryId,CurrencyCode) AS cp
 																	INNER JOIN
 																		( SELECT cpi.CountryId,CONVERT(numeric(16,0), SUM(ca.TotalCost)) AS TotalPlayedCost,
-																			CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgCost,
+																			CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgBid,
 																			SUM(CASE WHEN ca.SMS IS NOT NULL THEN 1 ELSE 0 END) AS TotalSMS,
 																			CONVERT(numeric(16,0), SUM(ISNULL(ca.SMSCost,0))) AS TotalSMSCost,
 																			SUM(CASE WHEN ca.Email IS NOT NULL THEN 1 ELSE 0 END) AS TotalEmail,
@@ -316,7 +316,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 		public static string GetCampaignDashboardSummariesByExec => @"SELECT ISNULL(CAST(cp.TotalBudget AS bigint),0) AS Budget, ISNULL(g.TotalPlayedCost,0) AS Spend,
 																	ISNULL(cp.TotalBudget,0) - ISNULL(g.TotalPlayedCost,0) AS FundsAvailable,
-																	ISNULL(g.TotalAvgCost,0) AS AvgBid,CAST(ISNULL(g.TotalSMS,0) AS bigint) AS TotalSMS,
+																	ISNULL(g.TotalAvgBid,0) AS AvgBid,CAST(ISNULL(g.TotalSMS,0) AS bigint) AS TotalSMS,
 																	ISNULL(g.TotalSMSCost,0) AS TotalSMSCost,CAST(ISNULL(g.TotalEmail,0) AS bigint) AS TotalEmail,
 																	ISNULL(g.TotalEmailCost,0) AS TotalEmailCost,Cast(ISNULL(p.TotalPlayTracks,0) AS bigint) AS TotalPlays,
 																	Cast(ISNULL(g.TotalPlayTracks,0) AS bigint) AS MoreSixSecPlays,
@@ -332,7 +332,7 @@ WHERE UserId IN (Select AdvertiserId FROM Advertisers_SalesTeam WHERE IsActive=1
 																		GROUP BY CountryId,CurrencyCode) AS cp
 																	INNER JOIN
 																		( SELECT cpi.CountryId,CONVERT(numeric(16,0), SUM(ca.TotalCost)) AS TotalPlayedCost,
-																			CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgCost,
+																			CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgBid,
 																			SUM(CASE WHEN ca.SMS IS NOT NULL THEN 1 ELSE 0 END) AS TotalSMS,
 																			CONVERT(numeric(16,0), SUM(ISNULL(ca.SMSCost,0))) AS TotalSMSCost,
 																			SUM(CASE WHEN ca.Email IS NOT NULL THEN 1 ELSE 0 END) AS TotalEmail,

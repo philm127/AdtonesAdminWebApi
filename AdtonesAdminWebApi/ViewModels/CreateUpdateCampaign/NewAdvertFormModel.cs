@@ -38,6 +38,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
 
         public DateTime UpdatedDateTime { get; set; }
 
+        public int UpdatedBy { get; set; }
+
         public int Status { get; set; }
 
         public bool IsAdminApproval { get; set; }
@@ -48,7 +50,7 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
 
         public bool NextStatus { get; set; }
 
-        public int? CampaignProfileId { get; set; }
+        public int CampaignProfileId { get; set; }
 
         public int? AdtoneServerAdvertId { get; set; }
 

@@ -139,7 +139,7 @@ namespace AdtonesAdminWebApi.DAL
                         model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneId(model.CampaignProfileId, operatorId);
                         model.AdvertId = provAdId;
                         model.CampaignAdvertId = await _executers.ExecuteCommand(conn,
-                                conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewCampaignAdvert, model));
+                                conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewIntoCampaignAdverts, model));
                     }
                 }
             }

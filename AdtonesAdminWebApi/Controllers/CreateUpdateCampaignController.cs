@@ -24,18 +24,18 @@ namespace AdtonesAdminWebApi.Controllers
         #region Create
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>body contains List CountryResult</returns>
-        //[HttpGet("v1/GetInitialData/{id}")]
-        //public async Task<ReturnResult> GetInitialData(int id)
-        //{
-        //    return await _countryService.GetInitialData(id);
-        //}
+        [HttpPost("v1/CheckIfCampaignNameExists")]
+        public async Task<ReturnResult> CheckIfCampaignNameExists(NewCampaignProfileFormModel campaignName)
+        {
+            return await _campService.CheckIfCampaignNameExists(campaignName);
+        }
 
 
-
+        [HttpPost("v1/CheckIfAdvertNameExists")]
+        public async Task<ReturnResult> CheckIfAdvertNameExists(NewAdvertFormModel advertName)
+        {
+            return await _campService.CheckIfAdvertNameExists(advertName);
+        }
 
 
         /// <summary>

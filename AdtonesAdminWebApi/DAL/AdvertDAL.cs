@@ -1,5 +1,6 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
+using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +28,12 @@ namespace AdtonesAdminWebApi.DAL
             var builder = new SqlBuilder();
             sb.Append(AdvertQuery.GetAdvertResultSet);
 
-            if (id > 0)
+            if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
+            {
+                sb.Append(" WHERE ad.UserId=@UserId ");
+                builder.AddParameters(new { UserId = _httpAccessor.GetUserIdFromJWT() });
+            }
+            else if (id > 0)
             {
                 sb.Append(" WHERE ad.UserId=@UserId AND ad.Status=4 ");
                 builder.AddParameters(new { UserId = id });

@@ -29,8 +29,14 @@ namespace AdtonesAdminWebApi.DAL
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(CampaignQuery.GetCampaignResultSet);
-
-            if (id > 0)
+            if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
+            {
+                sb.Clear();
+                sb.Append(CampaignQuery.GetCampaignResultSetForProfile);
+                sb.Append(" WHERE camp.UserId=@UserId ");
+                builder.AddParameters(new { UserId = _httpAccessor.GetUserIdFromJWT() });
+            }
+            else if (id > 0)
             {
                 sb.Append(" WHERE camp.UserId=@Id ");
                 sb.Append(" AND camp.Status IN(1,2,3,4) ");
