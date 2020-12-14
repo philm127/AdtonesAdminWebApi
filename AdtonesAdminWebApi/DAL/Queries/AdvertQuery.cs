@@ -38,6 +38,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 LEFT JOIN Users AS sexcs ON sexcs.UserId=sales.SalesExecId ";
 
 
+        public static string CheckAdvertNameExists => @"SELECT COUNT(1) FROM Advert WHERE LOWER(AdvertName)=@Id AND UserId=@UserId;";
+
+
 
         public static string GetAdvertCategoryDataTable => @"SELECT AdvertCategoryId,ad.Name AS CategoryName,ad.CountryId, ISNULL(c.Name,'-') AS CountryName, ad.CreatedDate
                                                         FROM AdvertCategories AS ad INNER JOIN Country AS c ON c.Id = ad.CountryId
@@ -73,5 +76,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string AddAdvertCategory => @"INSERT INTO AdvertCategories (CountryId,Name,CreatedDate,UpdatedDate,AdtoneServerAdvertCategoryId)
                                                         VALUES(@countryId,@name,GETDATE(),GETDATE(),@Id);
                                                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+
+        public static string UpdateAdvertFromBilling => @"UPDATE Advert SET UpdatedDateTime=GETDATE(), IsAdminApproval=1, NextStatus=0 WHERE AdvertId=@Id";
     }
 }

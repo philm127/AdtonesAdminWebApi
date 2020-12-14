@@ -11,8 +11,8 @@ namespace AdtonesAdminWebApi.Services
 {
     public interface ISaveGetFiles
     {
-        Task<string> SaveFileToSite(string dir, IFormFile data);
-        Task<string> SaveOriginalFileToSite(string dir, IFormFile data);
+        Task<string> SaveFileToSite(string dir, IFormFile data, string originalFileName = null);
+        Task<string> SaveOriginalFileToSite(string dir, IFormFile data, string originalFileName = null);
         bool DeleteFileByName(string dir, string filename);
     }
 
@@ -29,12 +29,16 @@ namespace AdtonesAdminWebApi.Services
         }
 
 
-        public async Task<string> SaveFileToSite(string dir, IFormFile data)
+        public async Task<string> SaveFileToSite(string dir, IFormFile data, string originalFileName = null)
         {
             try
             {
+                string fileName = string.Empty;
                 var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
-                var fileName = DateTime.Now.Ticks + System.IO.Path.GetFileName(data.FileName);
+                if (originalFileName != null)
+                    fileName = originalFileName;
+                else
+                    fileName = DateTime.Now.Ticks + System.IO.Path.GetFileName(data.FileName);
                 var directoryName = Path.Combine(otherpath, dir);
 
                 if (!Directory.Exists(directoryName))
@@ -64,7 +68,7 @@ namespace AdtonesAdminWebApi.Services
 
         
 
-        public async Task<string> SaveOriginalFileToSite(string dir, IFormFile data)
+        public async Task<string> SaveOriginalFileToSite(string dir, IFormFile data, string originalFileName = null)
         {
             try
             {

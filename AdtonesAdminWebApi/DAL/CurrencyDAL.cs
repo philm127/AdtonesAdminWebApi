@@ -73,7 +73,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(CurrencyQuery.GetCurrencyByCurrencyId);
-            builder.AddParameters(new { currencyId = currencyId });
+            builder.AddParameters(new { currencyId = currencyId.Value });
 
             try
             {

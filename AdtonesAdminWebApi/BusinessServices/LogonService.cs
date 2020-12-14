@@ -165,10 +165,11 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
                 var template = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("ResetPasswordEmailTemplate").Value;
                 var path = Path.Combine(otherpath,template);
-                var reader = new StreamReader(path);
-
-
-                string emailContent = reader.ReadToEnd();
+                string emailContent = string.Empty;
+                using (var reader = new StreamReader(path))
+                {
+                    emailContent = reader.ReadToEnd();
+                }
                 emailContent = string.Format(emailContent, url);
 
                 SendEmailModel emailModel = new SendEmailModel();

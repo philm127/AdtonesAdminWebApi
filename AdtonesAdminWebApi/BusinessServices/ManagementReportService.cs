@@ -534,7 +534,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                                             model.TotalSpend = (int)totCost.Result.TotalSpend;
                                             model.AmountSpent = (int)amtSpent.Result.TotalSpend;
                                             model.AmountCredit = (int)amtPaid.Result.TotalCredit;
-                                            model.CurrencyCode = GetCurrencySymbol(currency.CurrencyCode);
+                                            model.CurrencyCode = _curConv.GetCurrencySymbol(currency.CurrencyCode);
 
                                             /// Rewards
                                             model.TotalRewards = rewardsTot.IsRewardReceivedTot;
@@ -831,19 +831,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         //}
 
 
-        public class CurrencyListing
-        {
-            public string CurrencyCode { get; set; }
-            public decimal CurrencyRate { get; set; }
-        }
-
-
-        private decimal GetCurrencyRateModel(string from, string to)
-        {
-            return _curConv.Convert(1, from, to);
-        }
-
-
         private async Task<List<CurrencyListing>> GetConvertedCurrency(List<SpendCredit> creditList,ManagementReportsSearch search)
         {
             string toCurrencyCode = "GBP";
@@ -868,7 +855,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     {
                         cl.CurrencyCode = cur;
 
-                        cl.CurrencyRate = GetCurrencyRateModel(cur, toCurrencyCode);
+                        cl.CurrencyRate = _curConv.GetCurrencyRateModel(cur, toCurrencyCode);
                         clList.Add(cl);
                     }
                 }
@@ -889,18 +876,18 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        private string GetCurrencySymbol(string currencyCode)
-        {
-            switch (currencyCode)
-            {
-                case "GBP": return "£";
-                case "USD": return "$";
-                case "XOF": return "CFA";
-                case "EUR": return "€";
-                case "KES": return "Ksh";
-                default: return "£";
-            }
-        }
+        //private string GetCurrencySymbol(string currencyCode)
+        //{
+        //    switch (currencyCode)
+        //    {
+        //        case "GBP": return "£";
+        //        case "USD": return "$";
+        //        case "XOF": return "CFA";
+        //        case "EUR": return "€";
+        //        case "KES": return "Ksh";
+        //        default: return "£";
+        //    }
+        //}
 
         
         private async Task<TotalCostCredit> CalculateConvertedSpendCredit(List<SpendCredit> creditList, ManagementReportsSearch search)

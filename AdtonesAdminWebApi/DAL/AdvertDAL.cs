@@ -1,5 +1,6 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
+using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +28,12 @@ namespace AdtonesAdminWebApi.DAL
             var builder = new SqlBuilder();
             sb.Append(AdvertQuery.GetAdvertResultSet);
 
-            if (id > 0)
+            if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
+            {
+                sb.Append(" WHERE ad.UserId=@UserId ");
+                builder.AddParameters(new { UserId = _httpAccessor.GetUserIdFromJWT() });
+            }
+            else if (id > 0)
             {
                 sb.Append(" WHERE ad.UserId=@UserId AND ad.Status=4 ");
                 builder.AddParameters(new { UserId = id });
@@ -85,6 +91,25 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
+
+        public async Task<bool> CheckAdvertNameExists(string advertName, int userId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(AdvertQuery.CheckAdvertNameExists);
+            builder.AddParameters(new { Id = advertName.ToLower() });
+            builder.AddParameters(new { UserId = userId });
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<bool>(select.RawSql, select.Parameters));
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
 
 
         /// <summary>
@@ -469,7 +494,29 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        
+        public async Task<int> UpdateAdvertForBilling(int advertId, int operatorId)
+        {
+            int adId = 0;
+            try
+            {
+                var x = await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(AdvertQuery.UpdateAdvertFromBilling, new { Id = advertId }));
+
+                var constr = await _connService.GetConnectionStringByOperator(operatorId);
+
+                adId = await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>("SELECT AdvertId FROM Advert WHERE AdtoneServerAdvertId=@Id", new { Id = advertId }));
+
+                return await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>(AdvertQuery.UpdateAdvertFromBilling, new { Id = adId }));
+            }
+            catch
+            {
+                throw;
+            }
+
+            return adId;
+        }
 
     }
 }

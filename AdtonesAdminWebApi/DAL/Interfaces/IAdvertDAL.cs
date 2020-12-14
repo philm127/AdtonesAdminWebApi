@@ -25,5 +25,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 
         Task<int> DeleteAdvertRejection(UserAdvertResult model);
         Task<int> DeleteRejectAdvertReasonOperator(string connString, int adId);
+        Task<int> UpdateAdvertForBilling(int advertId, int countryId);
+        Task<bool> CheckAdvertNameExists(string advertName, int userId);
     }
 }

@@ -74,6 +74,20 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<string> GetConnectionStringsByCountryId(int Id)
+        {
+
+            StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings WHERE CountryId=@Id");
+
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+
+                return await connection.QueryFirstOrDefaultAsync<string>(sb.ToString(), new { Id = Id });
+            }
+        }
+
+
         public async Task<string> GetOperatorConnectionByUserId(int id)
         {
 
@@ -104,6 +118,18 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> GetUserIdFromAdtoneIdByConnString(int Id, string conn)
         {
             var select_string = "SELECT UserId FROM Users WHERE AdtoneServerUserId=@Id";
+
+            using (var connection = new SqlConnection(conn))
+            {
+                await connection.OpenAsync();
+                return await connection.QueryFirstOrDefaultAsync<int>(select_string, new { Id = Id });
+            }
+        }
+
+
+        public async Task<int> GetClientIdFromAdtoneIdByConnString(int Id, string conn)
+        {
+            var select_string = "SELECT Id FROM Client WHERE AdtoneServerClientId=@Id";
 
             using (var connection = new SqlConnection(conn))
             {

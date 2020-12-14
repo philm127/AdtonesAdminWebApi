@@ -173,8 +173,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                     bool exists = false;
 
                     exists = await _campDAL.CheckCampaignBillingExists(campaignId);
-
-                    if (exists)
+                    var roleId = _httpAccessor.GetRoleIdFromJWT();
+                    if (exists || roleId == (int)Enums.UserRole.ProfileAdmin)
                     {
 
                         if (_campProfile.StartDate == null && _campProfile.EndDate == null)

@@ -27,5 +27,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> UpdateUserPermission(IdCollectionViewModel model);
         Task<int> DeleteNewUser(int userId);
         Task<int> InsertManagerToSalesExec(int manId, int execId);
+        Task<int> GetOperatorIdByUserId(int userId);
+        Task<IEnumerable<string>> GetAdvertOperatorAdmins(int roleId, int operatorId = 0);
     }
 }

@@ -80,5 +80,11 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string InsertManagerToSalesExec => @"INSERT INTO SalesManager_SalesExec(ManId,ExecId,Active,CreatedDate,UpdatedDate)
                                                             VALUES(@manId,@execId,1,GETDATE(),GETDATE());";
+
+
+        public static string GetOperatorIdFromUserId => @"SELECT OperatorId FROM Users WHERE UserId=@Id";
+
+
+        public static string GetAdvertAdminOperator => @"SELECT Email FROM Users WHERE Activated=1 AND RoleId=@RoleId ";
     }
 }

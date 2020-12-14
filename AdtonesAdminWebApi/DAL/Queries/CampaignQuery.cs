@@ -31,6 +31,26 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId ";
 
 
+		public static string GetCampaignResultSetForProfile => @"SELECT camp.CampaignProfileId,op.OperatorName
+                                                ,CampaignName,camp.CreatedDateTime AS CreatedDate
+                                                ,camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,
+                                                camp.Status AS Status,
+                                                play.ct AS finaltotalplays
+                                                FROM CampaignProfile AS camp
+                                                LEFT JOIN CampaignAdverts AS campAd ON campAd.CampaignProfileId=camp.CampaignProfileId
+												LEFT JOIN Advert AS ad ON ad.AdvertId=campAd.AdvertId
+                                                LEFT JOIN 
+		                                                (SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct 
+			                                                FROM CampaignAudit
+			                                                WHERE LOWER(Status)='played' AND PlayLengthTicks>6000
+			                                                GROUP BY CampaignProfileId
+		                                                ) AS play
+                                                ON camp.CampaignProfileId=play.CampaignProfileId
+                                                LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
+                                                LEFT JOIN Contacts AS con ON con.UserId=camp.UserId
+                                                LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId ";
+
+
 		public static string GetCampaignResultSetFromProv => @"SELECT camp.CampaignProfileId,ct,AvgBidValue,TotalSpend
 										FROM CampaignProfile AS camp
 										INNER JOIN (
@@ -146,10 +166,21 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         NextStatus,AdtoneServerCampaignAdvertId
                                                         FROM CampaignAdverts WHERE ";
 
-
+		
         public static string CheckCampaignBillingExists => @"SELECT COUNT(1) FROM Billing WHERE CampaignProfileId=@Id;";
 
 
-        public static string UpdateCampaignMatchStatus => @"UPDATE CampaignMatches SET Status=@Status WHERE MSCampaignProfileId=@Id";
+		public static string CheckCampaignNameExists => @"SELECT COUNT(1) FROM CampaignProfile WHERE LOWER(CampaignName)=@Id AND UserId=@UserId;";
+
+
+		public static string UpdateCampaignMatchStatus => @"UPDATE CampaignMatches SET Status=@Status WHERE MSCampaignProfileId=@Id";
+
+
+        public static string GetAdvertIdFromCampaignAd => @"SELECT AdvertId FROM CampaignAdvert WHERE CampaignProfileId=@Id";
+
+        public static string UpdateCampaignMatchFromBilling => @"UPDATE CampaignMatches SET UpdatedDateTime=GETDATE(), Status=@Status, NextStatus=0 WHERE MSCampaignProfileId=@Id";
+
+
+        public static string UpdateCampaignBilling => @"UPDATE CampaignProfile SET UpdatedDateTime=GETDATE(), Status=@Status, TotalCredit=TotalCredit + @TotalCredit,TotalBudget = TotalBudget + @TotalBudget WHERE CampaignProfileId=@Id";
     }
 }

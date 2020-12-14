@@ -24,9 +24,18 @@ namespace AdtonesAdminWebApi.Services
         }
     }
 
+    public class CurrencyListing
+    {
+        public string CurrencyCode { get; set; }
+        public decimal CurrencyRate { get; set; }
+    }
+
+
     public interface ICurrencyConversion
     {
         decimal Convert(decimal value, string currencyFrom, string currencyTo);
+        decimal GetCurrencyRateModel(string from, string to);
+        string GetCurrencySymbol(string currencyCode);
     }
 
     public class CurrencyConversion : ICurrencyConversion
@@ -55,6 +64,25 @@ namespace AdtonesAdminWebApi.Services
 
 
         public Model.Currency DisplayCurrency { get; private set; }
+
+
+        public decimal GetCurrencyRateModel(string from, string to)
+        {
+            return Convert(1, from, to);
+        }
+
+        public string GetCurrencySymbol(string currencyCode)
+        {
+            switch (currencyCode)
+            {
+                case "GBP": return "£";
+                case "USD": return "$";
+                case "XOF": return "CFA";
+                case "EUR": return "€";
+                case "KES": return "Ksh";
+                default: return "£";
+            }
+        }
 
 
         //public async Task InitializeAsync(int userId)

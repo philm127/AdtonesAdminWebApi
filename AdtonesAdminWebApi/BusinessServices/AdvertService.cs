@@ -346,7 +346,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
                 int adId = await _connService.GetAdvertIdFromAdtoneId(adModel.AdvertId, adModel.OperatorId);
-                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(adModel.AdvertId);
+                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsById(adModel.AdvertId,0);
                 var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
 
                 var updstatus = UpdateStatus(adModel,uid,adId);
@@ -640,7 +640,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         private async Task<bool> UpdateMediaFileLocation(UserAdvertResult adModel, string ConnString)
         {
             //ApproveRejectRejected
-            var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsByAdvertId(adModel.AdvertId);
+            var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsById(adModel.AdvertId,0);
             var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
 
             if (ConnString != null)
@@ -817,7 +817,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         //        command.AdvertId = id;
         //        command.Status = status;
         //        ICommandResult result = _commandBus.Submit(command);
-        //        EFMVCDataContex db = new EFMVCDataContex();
+        //        // EFMVCDataContex db = new EFMVCDataContex();
         //        var toneId = db.Adverts.Where(s => s.AdvertId == id).FirstOrDefault().SoapToneId;
 
         //        //271191

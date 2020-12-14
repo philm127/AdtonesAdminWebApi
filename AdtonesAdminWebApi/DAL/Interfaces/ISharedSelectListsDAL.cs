@@ -19,7 +19,8 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<IEnumerable<SharedSelectListViewModel>> GetInvoiceList(int id = 0);
         Task<IEnumerable<SharedSelectListViewModel>> GetOrganisationTypes();
         Task<IEnumerable<object>> GetUserPermissionsWRoles();
-
         Task<IEnumerable<object>> GetUsersnRoles();
+        Task<IEnumerable<SharedSelectListViewModel>> GetAdvertCategory();
+        Task<IEnumerable<SharedSelectListViewModel>> GetClientList(int userId);
     }
 }

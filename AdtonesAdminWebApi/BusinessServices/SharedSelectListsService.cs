@@ -90,7 +90,29 @@ namespace AdtonesAdminWebApi.BusinessServices
                     ErrorMessage = ex.Message.ToString(),
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "SharedSelectListsService",
-                    ProcedureName = "GetOperatorList"
+                    ProcedureName = "GetOrganisationTypeDropDown"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> GetAdvertCategoryDropDown()
+        {
+            try
+            {
+                result.body = await _sharedDal.GetAdvertCategory();
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "SharedSelectListsService",
+                    ProcedureName = "GetAdvertCategoryDropDown"
                 };
                 _logging.LogError();
                 result.result = 0;
@@ -118,6 +140,29 @@ namespace AdtonesAdminWebApi.BusinessServices
                     StackTrace = ex.StackTrace.ToString(),
                     PageName = "SharedSelectListsService",
                     ProcedureName = "GetCurrencyList"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> GetClientList(int userId = 0)
+        {
+
+            try
+            {
+                result.body = await _sharedDal.GetClientList(userId);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "SharedSelectListsService",
+                    ProcedureName = "GetClientList"
                 };
                 _logging.LogError();
                 result.result = 0;
