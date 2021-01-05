@@ -274,7 +274,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 {
                     adModel.Status = (int)Enums.AdvertStatus.Pending;
                     bool update = false;
-                    update = await ApproveRejectApproveAd(adModel, ConnString);
+                    update = await ApproveAd(adModel, ConnString);
 
                     if (update)
                         result.body = "Advert " + adModel.AdvertName + " is approved successfully.";
@@ -284,7 +284,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 else if (adModel.Status == (int)Enums.AdvertStatus.Live && adModel.PrevStatus == (int)Enums.AdvertStatus.Pending) // Live
                 {
                     bool update = false;
-                    update = await ApproveRejectLiveFromPending(adModel, ConnString);
+                    update = await LiveFromPending(adModel, ConnString);
 
                     if (update)
                         result.body = "Advert " + adModel.AdvertName + " is approved successfully.";
@@ -296,7 +296,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 else if (adModel.Status == (int)Enums.AdvertStatus.Suspended) // suspended
                 {
                     bool update = false;
-                    update = await ApproveRejectSuspended(adModel, ConnString);
+                    update = await Suspended(adModel, ConnString);
 
                     if (update)
                         result.body = "Advert " + adModel.AdvertName + " is suspended successfully.";
@@ -306,7 +306,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 else if (adModel.Status == (int)Enums.AdvertStatus.Archived) // Archived(Deleted)
                 {
                     bool update = false;
-                    update = await ApproveRejectArchived(adModel, ConnString);
+                    update = await Archived(adModel, ConnString);
 
                     if (update)
                         result.body = "Advert " + adModel.AdvertName + " is archived successfully.";
@@ -316,7 +316,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 else if (adModel.Status == (int)Enums.AdvertStatus.Rejected)
                 {
                     bool update = false;
-                    update = await ApproveRejectRejected(adModel, ConnString);
+                    update = await Rejected(adModel, ConnString);
 
                     if (update)
                         result.body = "Advert " + adModel.AdvertName + " was rejected successfully.";
@@ -340,7 +340,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        private async Task<bool> ApproveRejectApproveAd(UserAdvertResult adModel, string ConnString)
+        private async Task<bool> ApproveAd(UserAdvertResult adModel, string ConnString)
         {
             try
             {
@@ -410,7 +410,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        private async Task<bool> ApproveRejectLiveFromPending(UserAdvertResult adModel, string ConnString)
+        private async Task<bool> LiveFromPending(UserAdvertResult adModel, string ConnString)
         {
             try
             {
@@ -441,7 +441,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                             //var responseCode = "000000";
                             if (responseCode == "000000")
                             {
-                                var boolRet = await ApproveRejectApproveAd(adModel, ConnString);
+                                var boolRet = await ApproveAd(adModel, ConnString);
                             }
                             else
                             {
@@ -480,7 +480,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         await _ticketService.CreateAdTicket(_httpAccessor.GetUserIdFromJWT(), "Advert Error", message, subjectId, 0);
                     }
 
-                    var boolRet = await ApproveRejectApproveAd(adModel, ConnString);
+                    var boolRet = await ApproveAd(adModel, ConnString);
                 }
 
                 int adId = await _connService.GetAdvertIdFromAdtoneId(adModel.AdvertId, adModel.OperatorId);
@@ -504,7 +504,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        private async Task<bool> ApproveRejectSuspended(UserAdvertResult adModel, string ConnString)
+        private async Task<bool> Suspended(UserAdvertResult adModel, string ConnString)
         {
             try
             {
@@ -531,7 +531,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        private async Task<bool> ApproveRejectArchived(UserAdvertResult adModel, string ConnString)
+        private async Task<bool> Archived(UserAdvertResult adModel, string ConnString)
         {
             try
             {
@@ -589,7 +589,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        private async Task<bool> ApproveRejectRejected(UserAdvertResult adModel, string ConnString)
+        private async Task<bool> Rejected(UserAdvertResult adModel, string ConnString)
         {
             try
             {

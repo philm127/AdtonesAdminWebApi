@@ -101,13 +101,20 @@ namespace AdtonesAdminWebApi.DAL
             int x = 0;
             try
             {
-                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId);
-                List<string> conns = lst.ToList();
+                var conns = new List<string>();
+                if (model.RoleId == (int)Enums.UserRole.Admin || model.RoleId == (int)Enums.UserRole.AdvertAdmin ||
+                    model.RoleId == (int)Enums.UserRole.ProfileAdmin || model.RoleId == (int)Enums.UserRole.UserAdmin ||
+                    model.CountryId == 0)
+                    conns = await _connService.GetConnectionStrings();
+                else
+                    conns = await _connService.GetConnectionStringsByCountry(model.CountryId);
+
 
                 foreach (string constr in conns)
                 {
-                    x = await _executers.ExecuteCommand(constr,
-                         conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewUserToOperator, model));
+                    if (constr != null && constr.Length > 10)
+                        x = await _executers.ExecuteCommand(constr,
+                             conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewUserToOperator, model));
                 }
             }
             catch
@@ -141,11 +148,18 @@ namespace AdtonesAdminWebApi.DAL
             int x = 0;
             try
             {
-                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.Value);
-                List<string> conns = lst.ToList();
+                var conns = new List<string>();
+                if (model.RoleId == (int)Enums.UserRole.Admin || model.RoleId == (int)Enums.UserRole.AdvertAdmin ||
+                    model.RoleId == (int)Enums.UserRole.ProfileAdmin || model.RoleId == (int)Enums.UserRole.UserAdmin ||
+                    model.CountryId == null || model.CountryId.Value == 0)
+                    conns = await _connService.GetConnectionStrings();
+                else
+                    conns = await _connService.GetConnectionStringsByCountry(model.CountryId.Value);
+
 
                 foreach (string constr in conns)
                 {
+                    if (constr != null && constr.Length > 10)
                     x = await _executers.ExecuteCommand(constr,
                          conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewContact, model));
                 }

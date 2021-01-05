@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AdtonesAdminWebApi.Services.Mailer;
+using AdtonesAdminWebApi.DAL;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -28,13 +29,14 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConvertSaveMediaFile _convFile;
         private readonly IAdvertEmail _adEmail;
         private readonly IAdvertService _advertService;
+        private readonly ICreateCheckSaveProfileModels _profileService;
         ReturnResult result = new ReturnResult();
 
 
         public CreateUpdateCampaignService(IHttpContextAccessor httpAccessor, ICurrencyDAL currencyRepository, ICampaignDAL campaignDAL,
                                             ICreateUpdateCampaignDAL createDAL, IConnectionStringService connService, IPrematchProcess matchProcess,
                                             IUserMatchDAL matchDAL, IAdvertDAL advertDAL, ISaveGetFiles saveFile, IConvertSaveMediaFile convFile,
-                                            IAdvertEmail adEmail, IAdvertService advertService)
+                                            IAdvertEmail adEmail, IAdvertService advertService, ICreateCheckSaveProfileModels profileService)
         {
             _httpAccessor = httpAccessor;
             _currencyRepository = currencyRepository;
@@ -48,34 +50,88 @@ namespace AdtonesAdminWebApi.BusinessServices
             _convFile = convFile;
             _adEmail = adEmail;
             _advertService = advertService;
+            _profileService = profileService;
         }
 
 
         /// <summary>
-        /// Gets initial data to populate the create campaign stepper.
+        /// Gets initial profile models to populate the create campaign stepper.
         /// </summary>
+        /// <param name="countryId">countryid</param>
         /// <returns></returns>
-        //public async Task<ReturnResult> GetInitialData(int advertiserId = 0)
-        //{
-        //    try
-        //    {
-        //        result.body = await _advertDAL.GetAdvertResultSet(advertiserId);
+        public async Task<ReturnResult> GetInitialData(int countryId,int advertiserId = 0)
+        {
+            try
+            {
+                var model = new NewAdProfileMappingFormModel();
+                model.CampaignProfileGeographicModel = _profileService.GetGeographicModel(countryId);
+                //model.CampaignProfileDemographicsmodel = _profileService.GetDemographicModel(countryId);
+                // model.CampaignProfileTimeSettingModel = _profileService.GetTimeSettingModel(0);
+                // model.CampaignProfileMobileFormModel = await _profileService.GetMobileModel(countryId);
+                // model.CampaignProfileSkizaFormModel = await _profileService.GetQuestionnaireModel(countryId);
+                //model.CampaignProfileAd = await _profileService.GetAdvertProfileModel(countryId);
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var _logging = new ErrorLogging()
-        //        {
-        //            ErrorMessage = ex.Message.ToString(),
-        //            StackTrace = ex.StackTrace.ToString(),
-        //            PageName = "CreateUpdateCampaignService",
-        //            ProcedureName = "GetInitialData"
-        //        };
-        //        _logging.LogError();
-        //        result.result = 0;
-        //    }
-        //    return result;
-        //}
+                result.body = model;
+
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CreateUpdateCampaignService",
+                    ProcedureName = "GetInitialData"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> GetProfileData(int campaignId, int advertiserId = 0)
+        {
+            try
+            {
+                CampaignProfilePreference CampaignProfilePreferences = await _matchDAL.GetCampaignProfilePreferenceDetailsByCampaignId(campaignId);
+                var model = new NewAdProfileMappingFormModel();
+                if (CampaignProfilePreferences != null)
+                {
+                    model.CampaignProfileGeographicModel = await _profileService.GetGeographicData(campaignId, CampaignProfilePreferences);
+                    //model.CampaignProfileDemographicsmodel = await _profileService.GetDemographicData(campaignId, CampaignProfilePreferences);
+                    // model.CampaignProfileMobileFormModel = await _profileService.GetMobileData(campaignId, CampaignProfilePreferences);
+                    //model.CampaignProfileSkizaFormModel = await _profileService.GetQuestionnaireData(campaignId, CampaignProfilePreferences);
+                    //model.CampaignProfileAd = await _profileService.GetAdvertProfileData(campaignId, CampaignProfilePreferences);
+                }
+
+                // model.CampaignProfileTimeSettingModel = await _profileService.GetTimeSettingData(campaignId);
+
+                result.body = model;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CreateUpdateCampaignService",
+                    ProcedureName = "GetProfileData"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> InsertProfileInformation(NewAdProfileMappingFormModel model)
+        {
+            var x = await _profileService.SaveGeographicWizard(model.CampaignProfileGeographicModel);
+            x = await _profileService.SaveDemographicsWizard(model.CampaignProfileDemographicsmodel);
+            result.body = x;
+            return result;
+        }
 
 
         public async Task<ReturnResult> CreateNewCampaign(NewCampaignProfileFormModel model)
@@ -125,10 +181,28 @@ namespace AdtonesAdminWebApi.BusinessServices
                 model.NextStatus = true;
                 model.CurrencyCode = currencyCountryData.CurrencyCode;
 
+                //var _infoLogging = new ErrorLogging()
+                //{
+                //    ErrorMessage = model.CampaignName.ToString(),
+                //    LogLevel = model.PhoneticAlphabet.ToString(),
+                //    PageName = "CreateUpdateCampaignService",
+                //    ProcedureName = "CreateNewCampaign - Pre Insert"
+                //};
+                //_infoLogging.LogInfo();
+
                 var newModel = new NewCampaignProfileFormModel();
                 try
                 {
                     newModel = await _createDAL.CreateNewCampaign(model);
+
+                    //_infoLogging = new ErrorLogging()
+                    //{
+                    //    ErrorMessage = newModel.CampaignProfileId.ToString(),
+                    //    LogLevel = newModel.AdtoneServerCampaignProfileId.ToString(),
+                    //    PageName = "CreateUpdateCampaignService",
+                    //    ProcedureName = "CreateNewCampaign - Post Insert"
+                    //};
+                    //_infoLogging.LogInfo();
 
                     // Is actually the CampaignProfileId from 168 Main Server
                     result.body = newModel.AdtoneServerCampaignProfileId;
@@ -148,7 +222,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 try
                 {
-                    var timesettings = await CampaignProfileTimeSettingMapping(newModel.AdtoneServerCampaignProfileId.Value, model.CountryId, newModel.CampaignProfileId);
+                    // var timesettings = await CampaignProfileTimeSettingMapping(newModel.AdtoneServerCampaignProfileId.Value, model.CountryId, newModel.CampaignProfileId);
                 }
                 catch (Exception ex)
                 {
@@ -254,7 +328,8 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> CreateNewCampaign_Advert(NewAdvertFormModel model)
         {
-
+            // var testgeo = GetGeographicMode();
+            int mainOperatorId = model.OperatorId;
             var AdvertNameexists = await _advertDAL.CheckAdvertNameExists(model.AdvertName, model.AdvertiserId);
 
             if (AdvertNameexists)
@@ -272,6 +347,15 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             IFormFile mediaFile = model.MediaFile;
             IFormFile scriptFile = model.ScriptFile;
+
+            //var _infoLogging = new ErrorLogging()
+            //{
+            //    ErrorMessage = "The submitted operator Id is " + model.OperatorId.ToString(),
+            //    LogLevel = "The submitted campaign Id is " + model.CampaignProfileId.ToString(),
+            //    PageName = "CreateNewCampaignServgice",
+            //    ProcedureName = "CreateNewCampaign_Advert - Check submitted values"
+            //};
+            //_infoLogging.LogInfo();
 
             #region Media
             if (mediaFile.Length > 0)
@@ -291,7 +375,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 //
                 string actualDirectoryName = "Media";
                 string directoryName = Path.Combine(actualDirectoryName, model.AdvertiserId.ToString());
-                string newfile = string.Empty;
+                string newfile;
                 //
                 if (extension != audioFormatExtension)
                 {
@@ -309,7 +393,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                     string archiveDirectoryName = @"Media\Archive";
 
-                    string apath = await _saveFile.SaveFileToSite(archiveDirectoryName, mediaFile, fileName + audioFormatExtension);
+                    await _saveFile.SaveFileToSite(archiveDirectoryName, mediaFile, fileName + audioFormatExtension);
 
 
                     model.MediaFileLocation = string.Format("/Media/{0}/{1}", model.AdvertiserId.ToString(),
@@ -372,7 +456,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                 campaignId = Convert.ToInt32(campaign.CampaignProfileId);
             }
 
-            int? clientId = null;
             if (campaign.ClientId == 0 || campaign.ClientId != null)
             {
                 model.ClientId = null;
@@ -389,6 +472,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 var newModel = await _createDAL.CreateNewCampaignAdvert(model);
+                model.OperatorId = mainOperatorId;
 
                 CampaignAdvertFormModel _campaignAdvert = new CampaignAdvertFormModel();
                 _campaignAdvert.AdvertId = newModel.AdtoneServerAdvertId.Value;
@@ -414,7 +498,15 @@ namespace AdtonesAdminWebApi.BusinessServices
                             adName = operatorFTPDetails.FtpRoot + "/" + model.MediaFileLocation.Split('/')[3];
                         }
                         var ConnString = await _connService.GetConnectionStringByOperator(model.OperatorId);
-
+                        
+                        //_infoLogging = new ErrorLogging()
+                        //{
+                        //    ErrorMessage = "The submitted operator Id is " + model.OperatorId.ToString()  + "  And the newModel Op Id is " + newModel.OperatorId.ToString(),
+                        //    LogLevel = "The submitted campaign Id is " + model.CampaignProfileId.ToString(),
+                        //    PageName = "CreateNewCampaignServgice",
+                        //    ProcedureName = "CreateNewCampaign_Advert - Check before getting adtonecampId"
+                        //};
+                        //_infoLogging.LogInfo();
 
                         var campaignProfileDetails = await _connService.GetCampaignProfileIdFromAdtoneId(model.CampaignProfileId, model.OperatorId);
                         if (campaignProfileDetails != 0)
@@ -463,117 +555,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             return result;
         }
 
-        
 
-
-        private async Task<bool> CampaignProfileTimeSettingMapping(int campaignId, int countryId, int provCampId)
-        {
-            PostedTimesModel postedTimesModel = new PostedTimesModel();
-            postedTimesModel.DayIds = new string[] { "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "24:00" };
-
-            CampaignProfileTimeSetting timeSettings = new CampaignProfileTimeSetting();
-            var model = new CampaignProfileTimeSettingFormModel{ CampaignProfileId = campaignId, AvailableTimes = WizardGetTimes() };
-
-            //Update Campaign Profile Time Setting
-
-            model.MondayPostedTimes = postedTimesModel;
-            model.TuesdayPostedTimes = postedTimesModel;
-            model.WednesdayPostedTimes = postedTimesModel;
-            model.ThursdayPostedTimes = postedTimesModel;
-            model.FridayPostedTimes = postedTimesModel;
-            model.SaturdayPostedTimes = postedTimesModel;
-            model.SundayPostedTimes = postedTimesModel;
-            
-
-                timeSettings = new CampaignProfileTimeSetting();
-                timeSettings.Monday = string.Empty;
-                foreach (string s in model.MondayPostedTimes.DayIds)
-                    timeSettings.Monday += s + ",";
-
-                if (!string.IsNullOrEmpty(timeSettings.Monday))
-                    timeSettings.Monday = timeSettings.Monday.Substring(0, timeSettings.Monday.Length - 1);
-
-                timeSettings.Tuesday = string.Empty;
-                foreach (string s in model.TuesdayPostedTimes.DayIds)
-                    timeSettings.Tuesday += s + ",";
-
-                if (!string.IsNullOrEmpty(timeSettings.Tuesday))
-                    timeSettings.Tuesday = timeSettings.Tuesday.Substring(0, timeSettings.Tuesday.Length - 1);
-
-                timeSettings.Wednesday = string.Empty;
-                foreach (string s in model.WednesdayPostedTimes.DayIds)
-                    timeSettings.Wednesday += s + ",";
-
-                if (!string.IsNullOrEmpty(timeSettings.Wednesday))
-                    timeSettings.Wednesday = timeSettings.Wednesday.Substring(0, timeSettings.Wednesday.Length - 1);
-
-                timeSettings.Thursday = string.Empty;
-                foreach (string s in model.ThursdayPostedTimes.DayIds)
-                    timeSettings.Thursday += s + ",";
-
-                if (!string.IsNullOrEmpty(timeSettings.Thursday))
-                    timeSettings.Thursday = timeSettings.Thursday.Substring(0, timeSettings.Thursday.Length - 1);
-
-                timeSettings.Friday = string.Empty;
-                foreach (string s in model.FridayPostedTimes.DayIds)
-                    timeSettings.Friday += s + ",";
-
-                if (!string.IsNullOrEmpty(timeSettings.Friday))
-                    timeSettings.Friday = timeSettings.Friday.Substring(0, timeSettings.Friday.Length - 1);
-
-                timeSettings.Saturday = string.Empty;
-                foreach (string s in model.SaturdayPostedTimes.DayIds)
-                    timeSettings.Saturday += s + ",";
-
-                if (!string.IsNullOrEmpty(timeSettings.Saturday))
-                    timeSettings.Saturday = timeSettings.Saturday.Substring(0, timeSettings.Saturday.Length - 1);
-
-                timeSettings.Sunday = string.Empty;
-                foreach (string s in model.SundayPostedTimes.DayIds)
-                    timeSettings.Sunday += s + ",";
-
-                if (!string.IsNullOrEmpty(timeSettings.Sunday))
-                    timeSettings.Sunday = timeSettings.Sunday.Substring(0, timeSettings.Sunday.Length - 1);
-
-                timeSettings.CampaignProfileId = model.CampaignProfileId;
-                timeSettings.CampaignProfileTimeSettingsId = model.CampaignProfileTimeSettingsId;
-
-            var x = await _createDAL.AddProfileTimeSettings(timeSettings, countryId, provCampId);
-
-            return true;
-
-            }
-
-        public IList<TimeOfDay> WizardGetTimes()
-        {
-            IList<TimeOfDay> times = new List<TimeOfDay>();
-            times.Add(new TimeOfDay { Id = "01:00", Name = "01:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "02:00", Name = "02:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "03:00", Name = "03:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "04:00", Name = "04:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "05:00", Name = "05:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "06:00", Name = "06:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "07:00", Name = "07:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "08:00", Name = "08:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "09:00", Name = "09:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "10:00", Name = "10:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "11:00", Name = "11:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "12:00", Name = "12:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "13:00", Name = "13:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "14:00", Name = "14:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "15:00", Name = "15:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "16:00", Name = "16:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "17:00", Name = "17:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "18:00", Name = "18:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "19:00", Name = "19:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "20:00", Name = "20:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "21:00", Name = "21:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "22:00", Name = "22:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "23:00", Name = "23:00", IsSelected = true });
-            times.Add(new TimeOfDay { Id = "24:00", Name = "24:00", IsSelected = true });
-
-            return times;
-        }
 
 
         private static string PhoneticString()

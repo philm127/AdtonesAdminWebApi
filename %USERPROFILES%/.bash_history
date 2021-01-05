@@ -28,3 +28,6 @@ git add .
 git merge operatorDashboardFromProv
 git add -A && git commit -m "resolved merge conflict"
 exit
+git checkout master
+git merge advertiserManagement
+exit

@@ -189,6 +189,53 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<int> InsertCampaignCategory(CampaignCategoryResult model)
+        {
+            int x = 0;
+            int y = 0;
+            
+            try
+            {
+                model.AdtoneServerCampaignCategoryId = await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(CampaignQuery.AddCampaignCategory, new
+                                    {
+                                        description = model.Description,
+                                        name = model.CategoryName,
+                                        Id = model.AdtoneServerCampaignCategoryId,
+                                        active = 1,
+                                        CountryId = model.CountryId
+                                    }));
+
+                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.GetValueOrDefault());
+                List<string> conns = lst.ToList();
+
+                foreach (string constr in conns)
+                {
+                    if (constr != null && constr.Length > 10)
+                    {
+
+                        y += await _executers.ExecuteCommand(constr,
+                                        conn => conn.ExecuteScalar<int>(CampaignQuery.AddCampaignCategory, new
+                                        {
+                                            description = model.Description,
+                                            name = model.CategoryName,
+                                            Id = model.AdtoneServerCampaignCategoryId,
+                                            active = 1,
+                                            CountryId = model.CountryId
+                                        }));
+                    }
+                }
+
+            }
+            catch
+            {
+                throw;
+            }
+            return x;
+        }
+
+
+
         public async Task<int> ChangeCampaignProfileStatus(CampaignProfile model)
         {
 

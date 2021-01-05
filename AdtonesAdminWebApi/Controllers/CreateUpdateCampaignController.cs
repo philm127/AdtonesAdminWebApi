@@ -78,6 +78,37 @@ namespace AdtonesAdminWebApi.Controllers
             return await _campService.CreateNewCampaign(model);
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">countryid</param>
+        /// <returns>Empty profile models</returns>
+        [HttpGet("v1/GetInitialData/{id}")]
+        public async Task<ReturnResult> GetInitialData(int id)
+        {
+            return await _campService.GetInitialData(id);
+        }
+
+
+        /// <summary>
+        /// Gets populated profile models
+        /// </summary>
+        /// <param name="id">id is CampaignProfileId</param>
+        /// <returns>Populated profile models</returns>
+        [HttpGet("v1/GetProfileData/{id}")]
+        public async Task<ReturnResult> GetProfileData(int id)
+        {
+            return await _campService.GetProfileData(id);
+        }
+
+
+        [HttpPost("v1/InsertProfileInformation")]
+        public async Task<ReturnResult> InsertProfileInformation(NewAdProfileMappingFormModel model)
+        {
+            return await _campService.InsertProfileInformation(model);
+        }
+
         #endregion
 
     }

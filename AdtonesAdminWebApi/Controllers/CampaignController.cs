@@ -186,6 +186,17 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains empty result</returns>
+        [HttpPost("v1/AddCampaignCategory")]
+        public async Task<ReturnResult> AddCampaignCategory(CampaignCategoryResult model)
+        {
+            return await _campService.AddCampaignCategory(model);
+        }
+
+
         #endregion
 
 

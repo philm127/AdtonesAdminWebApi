@@ -14,5 +14,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> UpdateCampaignStatus(IdCollectionViewModel model);
         Task<bool> ChangeCampaignStatus(int campaignId);
         Task<ReturnResult> LoadCampaignDataTableSalesExec(int id = 0);
+        Task<ReturnResult> AddCampaignCategory(CampaignCategoryResult model);
     }
 }

@@ -514,8 +514,6 @@ namespace AdtonesAdminWebApi.DAL
             {
                 throw;
             }
-
-            return adId;
         }
 
     }

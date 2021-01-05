@@ -46,7 +46,7 @@ namespace AdtonesAdminWebApi.Services
         private readonly IConfiguration _configuration;
        public static int Userjwt { get; private set; }
 
-        private readonly ICurrencyDAL _repository;
+        // private readonly ICurrencyDAL _repository;
 
         public CurrencyConversion(IConfiguration configuration, IHttpContextAccessor httpAccessor)
         {

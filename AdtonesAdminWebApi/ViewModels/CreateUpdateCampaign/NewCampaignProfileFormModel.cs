@@ -75,6 +75,7 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
 
         public string CurrencyCode { get; set; }
         public int CurrencyId { get; set; }
+        public int? CampaignCategoryId { get; set; }
 
         public int? AdtoneServerCampaignProfileId { get; set; }
 

@@ -95,6 +95,12 @@ namespace AdtonesAdminWebApi.Services
         //}
 
 
+        /// <summary>
+        /// Takes in original CampaignProfileId from MAIN updates both DB's
+        /// </summary>
+        /// <param name="campaignId">original CampaignProfileId from MAIN</param>
+        /// <param name="conn"></param>
+        /// <returns></returns>
         public async Task PrematchProcessForCampaign(int campaignId, string conn)
         {
             await _matchDAL.PrematchProcessForCampaign(campaignId, conn);
@@ -104,8 +110,8 @@ namespace AdtonesAdminWebApi.Services
 
         private async Task UpdateCampaignBudget(int campaignId, string conn)
         {
-            // var campaignData = new CampaignBudgetModel();
-            var campaignData = await _matchDAL.GetBudgetAmounts(campaignId, conn);
+            var camId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(campaignId, conn);
+            var campaignData = await _matchDAL.GetBudgetAmounts(camId, conn);
 
             if (campaignData != null)
             {
@@ -115,7 +121,7 @@ namespace AdtonesAdminWebApi.Services
                 {
                     bucketCount = (int)bucketCountFloat;
                 }
-                await _matchDAL.UpdateBucketCount(campaignId, conn, bucketCount);
+                await _matchDAL.UpdateBucketCount(camId, conn, bucketCount);
             }
             // }
 

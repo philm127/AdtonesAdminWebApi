@@ -18,7 +18,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string AdvertName { get; set; }
         public int CampaignProfileId { get; set; }
         public string CampaignName { get; set; }
-
+        public string categoryName { get; set; }
         public decimal TotalBudget { get; set; }
         public int finaltotalplays { get; set; }
         public decimal FundsAvailable { get; set; }

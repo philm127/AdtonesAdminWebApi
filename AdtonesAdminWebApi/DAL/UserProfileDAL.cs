@@ -22,20 +22,46 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<string> GetUserProfileMsisdn(int id)
+        public async Task PrematchProcessForCampaign(int campaignId, string conn)
         {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(command);
-            builder.AddParameters(new { Id = id });
-            try
+            string _connStr = _configuration.GetConnectionString("DefaultConnection");
+            using (var connection = new SqlConnection(conn))
+            {
+                await connection.OpenAsync();
+                await connection.ExecuteAsync("CampaignUserMatchSpByCampaignId",
+                                                                    new { CampaignProfileId = campaignId },
+                                                                    commandType: CommandType.StoredProcedure);
+            }
+
+        }
+
+
+        public async Task<int> GetProfileMatchInformationId(int countryId)
+        {
+            using (var connection = new SqlConnection(conn))
+            {
+                await connection.OpenAsync();
+                await connection.ExecuteAsync(UserMatchQuery.GetProfileMatchLabels, new { Id = infoId }));
+            }
+
+            using (var connection = new SqlConnection(_connStr))
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.QueryFirstOrDefault<string>(select.RawSql, select.Parameters));
+                                    conn => conn.QueryFirstOrDefault<int>(UserMatchQuery.GetProfileMatchInformationId,
+                                                                                                                        new { Id = countryId }));
             }
-            catch
+
+        }
+
+
+        public async Task<IEnumerable<string>> GetProfileMatchLabels(int infoId)
+        {
+            using (var connection = new SqlConnection(_connStr))
             {
-                throw;
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.Query<string>(UserMatchQuery.GetProfileMatchLabels, new { Id = infoId }));
             }
+
         }
     }
 }

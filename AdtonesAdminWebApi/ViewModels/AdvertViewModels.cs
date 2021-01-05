@@ -18,6 +18,21 @@ namespace AdtonesAdminWebApi.ViewModels
         public int? AdtoneServerAdvertCategoryId { get; set; }
     }
 
+
+    public class CampaignCategoryResult
+    {
+        public int CampaignCategoryId { get; set; }
+        public string CategoryName { get; set; }
+        public string Description { get; set; }
+
+        public bool Active { get; set; }
+
+        public int? CountryId { get; set; }
+
+        public int? AdtoneServerCampaignCategoryId { get; set; }
+    }
+
+
     public class UserAdvertResult
     {
         public int AdvertId { get; set; }

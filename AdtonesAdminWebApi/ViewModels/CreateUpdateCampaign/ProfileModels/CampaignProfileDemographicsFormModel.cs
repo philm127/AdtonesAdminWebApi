@@ -83,159 +83,146 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
                                      });
         }
 
-        //public CampaignProfileDemographicsFormModel(int CountryId)
-        //{
-        //    // EFMVCDataContex db = new EFMVCDataContex();
+        public CampaignProfileDemographicsFormModel(int CountryId, List<string> ageProfileLabel, List<string>  genderProfileLabel,
+                                                    List<string>  incomeProfileLabel, List<string> workingStatusProfileLabel, List<string> relationshipStatusProfileLabel,
+                                                    List<string> educationProfileLabel, List<string> householdStatusProfileLabel)
+        {
+            // EFMVCDataContex db = new EFMVCDataContex();
 
-        //    //Age
-        //    var ageProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Age".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-        //    var ageProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == ageProfileMatchId).ToList();
+            //Age
 
-        //    Dictionary<string, bool> age = new Dictionary<string, bool>();
-        //    List<Dictionary<string, bool>> agelist = new List<Dictionary<string, bool>>();
+            Dictionary<string, bool> age = new Dictionary<string, bool>();
+            List<Dictionary<string, bool>> agelist = new List<Dictionary<string, bool>>();
 
-        //    foreach (var item in ageProfileLabel)
-        //    {
-        //        age = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-        //        agelist.Add(age);
-        //    }
-        //    AgeQuestion = CompileQuestionsDynamic(agelist);
-        //    foreach (var item in AgeQuestion)
-        //    {
-        //        if (item.QuestionName == "Prefer not to answer")
-        //        {
-        //            item.DefaultAnswer = true;
-        //        }
-        //    }
+            foreach (var item in ageProfileLabel)
+            {
+                age = new Dictionary<string, bool> { { item, false } };
+                agelist.Add(age);
+            }
+            AgeQuestion = CompileQuestionsDynamic(agelist);
+            foreach (var item in AgeQuestion)
+            {
+                if (item.QuestionName == "Prefer not to answer")
+                {
+                    item.DefaultAnswer = true;
+                }
+            }
 
-        //    //Gender
-        //    var genderProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Gender".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-        //    var genderProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == genderProfileMatchId).ToList();
+            //Gender
+            Dictionary<string, bool> gender = new Dictionary<string, bool>();
+            List<Dictionary<string, bool>> genderlist = new List<Dictionary<string, bool>>();
 
-        //    Dictionary<string, bool> gender = new Dictionary<string, bool>();
-        //    List<Dictionary<string, bool>> genderlist = new List<Dictionary<string, bool>>();
+            foreach (var item in genderProfileLabel)
+            {
+                gender = new Dictionary<string, bool> { { item, false } };
+                genderlist.Add(gender);
+            }
+            GenderQuestion = CompileQuestionsDynamic(genderlist);
+            foreach (var item in GenderQuestion)
+            {
+                if (item.QuestionName == "Prefer not to answer")
+                {
+                    item.DefaultAnswer = true;
+                }
+            }
 
-        //    foreach (var item in genderProfileLabel)
-        //    {
-        //        gender = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-        //        genderlist.Add(gender);
-        //    }
-        //    GenderQuestion = CompileQuestionsDynamic(genderlist);
-        //    foreach (var item in GenderQuestion)
-        //    {
-        //        if (item.QuestionName == "Prefer not to answer")
-        //        {
-        //            item.DefaultAnswer = true;
-        //        }
-        //    }
+            //Income
 
-        //    //Income
-        //    var incomeProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("IncomeBracket".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-        //    var incomeProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == incomeProfileMatchId).ToList();
+            Dictionary<string, bool> income = new Dictionary<string, bool>();
+            List<Dictionary<string, bool>> incomelist = new List<Dictionary<string, bool>>();
 
-        //    Dictionary<string, bool> income = new Dictionary<string, bool>();
-        //    List<Dictionary<string, bool>> incomelist = new List<Dictionary<string, bool>>();
+            foreach (var item in incomeProfileLabel)
+            {
+                income = new Dictionary<string, bool> { { item, false } };
+                incomelist.Add(income);
+            }
+            IncomeBracketQuestion = CompileQuestionsDynamic(incomelist);
+            foreach (var item in IncomeBracketQuestion)
+            {
+                if (item.QuestionName == "Prefer not to answer")
+                {
+                    item.DefaultAnswer = true;
+                }
+            }
 
-        //    foreach (var item in incomeProfileLabel)
-        //    {
-        //        income = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-        //        incomelist.Add(income);
-        //    }
-        //    IncomeBracketQuestion = CompileQuestionsDynamic(incomelist);
-        //    foreach (var item in IncomeBracketQuestion)
-        //    {
-        //        if (item.QuestionName == "Prefer not to answer")
-        //        {
-        //            item.DefaultAnswer = true;
-        //        }
-        //    }
+            //WorkingStatus
+            
+            Dictionary<string, bool> workingStatus = new Dictionary<string, bool>();
+            List<Dictionary<string, bool>> workingStatuslist = new List<Dictionary<string, bool>>();
 
-        //    //WorkingStatus
-        //    var workingStatusProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Working Status".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-        //    var workingStatusProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == workingStatusProfileMatchId).ToList();
+            foreach (var item in workingStatusProfileLabel)
+            {
+                workingStatus = new Dictionary<string, bool> { { item, false } };
+                workingStatuslist.Add(workingStatus);
+            }
+            WorkingStatusQuestion = CompileQuestionsDynamic(workingStatuslist);
+            foreach (var item in WorkingStatusQuestion)
+            {
+                if (item.QuestionName == "Prefer not to answer")
+                {
+                    item.DefaultAnswer = true;
+                }
+            }
 
-        //    Dictionary<string, bool> workingStatus = new Dictionary<string, bool>();
-        //    List<Dictionary<string, bool>> workingStatuslist = new List<Dictionary<string, bool>>();
+            //RelationshipStatus
+            
+            Dictionary<string, bool> relationshipStatus = new Dictionary<string, bool>();
+            List<Dictionary<string, bool>> relationshipStatuslist = new List<Dictionary<string, bool>>();
 
-        //    foreach (var item in workingStatusProfileLabel)
-        //    {
-        //        workingStatus = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-        //        workingStatuslist.Add(workingStatus);
-        //    }
-        //    WorkingStatusQuestion = CompileQuestionsDynamic(workingStatuslist);
-        //    foreach (var item in WorkingStatusQuestion)
-        //    {
-        //        if (item.QuestionName == "Prefer not to answer")
-        //        {
-        //            item.DefaultAnswer = true;
-        //        }
-        //    }
+            foreach (var item in relationshipStatusProfileLabel)
+            {
+                relationshipStatus = new Dictionary<string, bool> { { item, false } };
+                relationshipStatuslist.Add(relationshipStatus);
+            }
+            RelationshipStatusQuestion = CompileQuestionsDynamic(relationshipStatuslist);
+            foreach (var item in RelationshipStatusQuestion)
+            {
+                if (item.QuestionName == "Prefer not to answer")
+                {
+                    item.DefaultAnswer = true;
+                }
+            }
 
-        //    //RelationshipStatus
-        //    var relationshipStatusProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Relationship Status".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-        //    var relationshipStatusProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == relationshipStatusProfileMatchId).ToList();
+            //Education
+            
+            Dictionary<string, bool> education = new Dictionary<string, bool>();
+            List<Dictionary<string, bool>> educationlist = new List<Dictionary<string, bool>>();
 
-        //    Dictionary<string, bool> relationshipStatus = new Dictionary<string, bool>();
-        //    List<Dictionary<string, bool>> relationshipStatuslist = new List<Dictionary<string, bool>>();
+            foreach (var item in educationProfileLabel)
+            {
+                education = new Dictionary<string, bool> { { item, false } };
+                educationlist.Add(education);
+            }
+            EducationQuestion = CompileQuestionsDynamic(educationlist);
+            foreach (var item in EducationQuestion)
+            {
+                if (item.QuestionName == "Prefer not to answer")
+                {
+                    item.DefaultAnswer = true;
+                }
+            }
 
-        //    foreach (var item in relationshipStatusProfileLabel)
-        //    {
-        //        relationshipStatus = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-        //        relationshipStatuslist.Add(relationshipStatus);
-        //    }
-        //    RelationshipStatusQuestion = CompileQuestionsDynamic(relationshipStatuslist);
-        //    foreach (var item in RelationshipStatusQuestion)
-        //    {
-        //        if (item.QuestionName == "Prefer not to answer")
-        //        {
-        //            item.DefaultAnswer = true;
-        //        }
-        //    }
+            //HouseholdStatus
+            
+            Dictionary<string, bool> householdStatus = new Dictionary<string, bool>();
+            List<Dictionary<string, bool>> householdStatuslist = new List<Dictionary<string, bool>>();
 
-        //    //Education
-        //    var educationProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Education".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-        //    var educationProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == educationProfileMatchId).ToList();
-
-        //    Dictionary<string, bool> education = new Dictionary<string, bool>();
-        //    List<Dictionary<string, bool>> educationlist = new List<Dictionary<string, bool>>();
-
-        //    foreach (var item in educationProfileLabel)
-        //    {
-        //        education = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-        //        educationlist.Add(education);
-        //    }
-        //    EducationQuestion = CompileQuestionsDynamic(educationlist);
-        //    foreach (var item in EducationQuestion)
-        //    {
-        //        if (item.QuestionName == "Prefer not to answer")
-        //        {
-        //            item.DefaultAnswer = true;
-        //        }
-        //    }
-
-        //    //HouseholdStatus
-        //    var householdStatusProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Household Status".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-        //    var householdStatusProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == householdStatusProfileMatchId).ToList();
-
-        //    Dictionary<string, bool> householdStatus = new Dictionary<string, bool>();
-        //    List<Dictionary<string, bool>> householdStatuslist = new List<Dictionary<string, bool>>();
-
-        //    foreach (var item in householdStatusProfileLabel)
-        //    {
-        //        householdStatus = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-        //        householdStatuslist.Add(householdStatus);
-        //    }
-        //    HouseholdStatusQuestion = CompileQuestionsDynamic(householdStatuslist);
-        //    foreach (var item in HouseholdStatusQuestion)
-        //    {
-        //        if (item.QuestionName == "Prefer not to answer")
-        //        {
-        //            item.DefaultAnswer = true;
-        //        }
-        //    }
+            foreach (var item in householdStatusProfileLabel)
+            {
+                householdStatus = new Dictionary<string, bool> { { item, false } };
+                householdStatuslist.Add(householdStatus);
+            }
+            HouseholdStatusQuestion = CompileQuestionsDynamic(householdStatuslist);
+            foreach (var item in HouseholdStatusQuestion)
+            {
+                if (item.QuestionName == "Prefer not to answer")
+                {
+                    item.DefaultAnswer = true;
+                }
+            }
 
             
-        //}
+        }
 
         /// <summary>
         /// Gets or sets the campaign profile demographics identifier.

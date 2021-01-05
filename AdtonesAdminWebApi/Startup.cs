@@ -16,6 +16,7 @@ using AdtonesAdminWebApi.DAL;
 using AdtonesAdminWebApi.UserMatchServices;
 using AdtonesAdminWebApi.Services.Mailer;
 using System.Collections.Generic;
+using AutoMapper;
 
 namespace AdtonesAdminWebApi
 {
@@ -43,9 +44,10 @@ namespace AdtonesAdminWebApi
 
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddMemoryCache();
-
+            
             services.AddControllers().AddNewtonsoftJson();
             services.AddHttpContextAccessor();
+            services.AddAutoMapper(typeof(Startup));
 
             #region Business Services
 
@@ -72,6 +74,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IPermissionManagementService, PermisionManagementService>();
             services.AddScoped<IManagementReportService, ManagementReportService>();
             services.AddScoped<ICreateUpdateCampaignService, CreateUpdateCampaignService>();
+            services.AddScoped<ICreateCheckSaveProfileModels, CreateCheckSaveProfileModels>();
             // services.AddScoped<IBillingService, BillingService>();
 
             #endregion

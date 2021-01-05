@@ -10,7 +10,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public DateTime? DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
 
-        public int[]? operators { get; set; }
+        public int[] operators { get; set; }
         public int? country { get; set; }
         public int? currency { get; set; }
 

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.Services;
 
 namespace AdtonesAdminWebApi.DAL
 {
@@ -49,18 +50,19 @@ namespace AdtonesAdminWebApi.DAL
         /// </summary>
         /// <param name="Id">uses OperatorId</param>
         /// <returns>IEnumerable List of strings</returns>
-        public async Task<IEnumerable<string>> GetConnectionStrings()
+        public async Task<List<string>> GetConnectionStrings()
         {
 
             StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings");
 
             using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
-                    return await connection.QueryAsync<string>(sb.ToString());
+                var lst = await connection.QueryAsync<string>(sb.ToString());
+                return lst.ToList();
             }
         }
 
-        public async Task<IEnumerable<string>> GetConnectionStringsByCountry(int Id)
+        public async Task<List<string>> GetConnectionStringsByCountry(int Id)
         {
 
             StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings WHERE CountryId=@Id");
@@ -69,7 +71,8 @@ namespace AdtonesAdminWebApi.DAL
             {
                 await connection.OpenAsync();
 
-                return await connection.QueryAsync<string>(sb.ToString(), new { Id = Id });
+                var lst = await connection.QueryAsync<string>(sb.ToString(), new { Id = Id });
+                return lst.ToList();
             }
         }
 
@@ -141,8 +144,7 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> GetCampaignProfileIdFromAdtoneId(int Id, int operatorId)
         {
-            
-                var conn = await GetConnectionStringByOperator(operatorId);
+            var conn = await GetConnectionStringByOperator(operatorId);
                 StringBuilder sb = new StringBuilder("SELECT CampaignProfileId FROM CampaignProfile WHERE AdtoneServerCampaignProfileId=@Id");
 
                 using (var connection = new SqlConnection(conn))
@@ -150,6 +152,18 @@ namespace AdtonesAdminWebApi.DAL
                     await connection.OpenAsync();
                     return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = Id });
                 }
+        }
+
+
+        public async Task<int> GetCampaignProfileIdFromAdtoneIdByConn(int Id, string conn)
+        {
+            StringBuilder sb = new StringBuilder("SELECT CampaignProfileId FROM CampaignProfile WHERE AdtoneServerCampaignProfileId=@Id");
+
+            using (var connection = new SqlConnection(conn))
+            {
+                await connection.OpenAsync();
+                return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = Id });
+            }
         }
 
 
@@ -196,6 +210,19 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> GetCountryIdFromAdtoneId(int Id, string conn)
         {
             StringBuilder sb = new StringBuilder("SELECT Id FROM Country WHERE AdtoneServeCountryId=@Id");
+
+            using (var connection = new SqlConnection(conn))
+            {
+                await connection.OpenAsync();
+                return await connection.QueryFirstOrDefaultAsync<int>(sb.ToString(), new { Id = Id });
+            }
+        }
+
+
+        
+        public async Task<int> GetCampaignProfilePreferenceIdFromAdtoneId(int Id, string conn)
+        {
+            StringBuilder sb = new StringBuilder("SELECT Id FROM CampaignProfilePreference WHERE AdtoneServerCampaignProfilePrefId=@Id");
 
             using (var connection = new SqlConnection(conn))
             {

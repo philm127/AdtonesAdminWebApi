@@ -60,7 +60,6 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/AddNewElement")]
         public async Task<ReturnResult> AddNewElement(AddNewPermissionPart model)
         {
-            var tst = "Arrived";
             return await _permService.AddNewElement(model);
         }
 

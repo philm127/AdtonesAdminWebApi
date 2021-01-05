@@ -227,5 +227,28 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> AddCampaignCategory(CampaignCategoryResult model)
+        {
+            try
+            {
+                result.body = await _campDAL.InsertCampaignCategory(model);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertService",
+                    ProcedureName = "AddAdvertCategory"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+
     }
 }

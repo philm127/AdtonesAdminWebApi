@@ -121,6 +121,28 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> GetCampaignCategoryDropDown(int countryId = 0)
+        {
+            try
+            {
+                result.body = await _sharedDal.GetCampaignCategory(countryId);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "SharedSelectListsService",
+                    ProcedureName = "GetCampaignCategoryDropDown"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
         public async Task<ReturnResult> GetCurrencyList(int currencyId=0)
         {
             var tst = _httpAccessor.GetUserIdFromJWT();

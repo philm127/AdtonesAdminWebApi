@@ -139,11 +139,17 @@ namespace AdtonesAdminWebApi.Services
 
         public string UploadSoapTone(int advertId)
         {
-            var url = safricomUrl + "UploadTone?advertId=" + advertId;
-            var client = new RestClient(url);
-            var request = new RestRequest(Method.GET);
-            IRestResponse response = client.Execute(request);
-            return response.Content.Replace("\"", "");
+            var test = _configuration.GetValue<bool>("Environment:TestOperatorServer");
+            if (!test)
+            {
+                var url = safricomUrl + "UploadTone?advertId=" + advertId;
+                var client = new RestClient(url);
+                var request = new RestRequest(Method.GET);
+                IRestResponse response = client.Execute(request);
+                return response.Content.Replace("\"", "");
+            }
+            else
+                return "000000";
         }
 
         public string DeleteSoapTone(int advertId)
@@ -176,7 +182,7 @@ namespace AdtonesAdminWebApi.Services
                 return response.Content.Replace("\"", "");
             }
             else
-                return "000000";
+                return "Success";
         }
         #endregion
 

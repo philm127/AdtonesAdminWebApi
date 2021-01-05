@@ -205,10 +205,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         public async Task<ReturnResult> ReceivePayment(AdvertiserCreditFormModel model)
         {
             model.Status = 1;
-
-            var credModel = new AdvertiserCreditFormModel();
-            credModel.UserId = model.UserId;
-            credModel.AssignCredit = model.Amount;
             
             try
             {
@@ -228,12 +224,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                 result.result = 0;
             }
 
-            var updated = await AddCredit(credModel);
+            var updated = await AddCredit(model);
 
-            if (model.Amount >= model.OutstandingAmount)
-            {
-                int x = await _invDAL.UpdateInvoiceSettledDate(model.BillingId);
-            }
+            //if (model.Amount >= model.OutstandingAmount)
+            //{
+            //    int x = await _invDAL.UpdateInvoiceSettledDate(model.BillingId);
+            //}
 
             return result;
         }
@@ -250,6 +246,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// <returns></returns>
         public async Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _usercredit)
         {
+            var newModel = new AdvertiserCreditFormModel();
             try
             {
                 int x = 0;
@@ -257,10 +254,13 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 if (creditDetails != null)
                 {
-                    decimal newCredCalc = await CalculateNewCredit(_usercredit.UserId);
+                    var available = creditDetails.AvailableCredit + _usercredit.Amount;
+                    
                     _usercredit.Id = creditDetails.Id;
-                    _usercredit.AssignCredit = _usercredit.AssignCredit;
-                    _usercredit.AvailableCredit = _usercredit.AssignCredit + newCredCalc;
+                    if (available > creditDetails.AssignCredit)
+                        _usercredit.AvailableCredit = creditDetails.AssignCredit;
+                    else
+                        _usercredit.AvailableCredit = creditDetails.AvailableCredit + _usercredit.Amount;
                     x = await _invDAL.UpdateUserCredit(_usercredit);
                 }
                 else
@@ -295,7 +295,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         public async Task<ReturnResult> GetCreditDetails(int id)
         {
             string select_query = string.Empty;
-            int Id = 0;
 
             try
             {
@@ -374,29 +373,29 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// </summary>
         /// <param name="id">Passed the UserId</param>
         /// <returns>The available credit</returns>
-        private async Task<decimal> CalculateNewCredit(int userId)
-        {
-            decimal available = 0.0000M;
+        //private async Task<decimal> CalculateNewCredit(int userId)
+        //{
+        //    decimal available = 0.0000M;
 
-            try
-            {
-                available = await _invDAL.GetCreditBalance(userId);
-            }
-            catch (Exception ex)
-            {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertisersCreditService",
-                    ProcedureName = "CalculateNewCredit"
-                };
-                _logging.LogError();
-                throw;
-            }
+        //    try
+        //    {
+        //        available = await _invDAL.GetCreditBalance(userId);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var _logging = new ErrorLogging()
+        //        {
+        //            ErrorMessage = ex.Message.ToString(),
+        //            StackTrace = ex.StackTrace.ToString(),
+        //            PageName = "AdvertisersCreditService",
+        //            ProcedureName = "CalculateNewCredit"
+        //        };
+        //        _logging.LogError();
+        //        throw;
+        //    }
 
-            return available;
-        }
+        //    return available;
+        //}
 
 
 

@@ -67,8 +67,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string CheckIfUserExists => @"SELECT COUNT(1) FROM UsersCredit WHERE UserId=@userId";
 
-        public static string UpdateUserCredit => @"UPDATE UsersCredit SET AssignCredit=@AssignCredit,AvailableCredit=@AvailableCredit,
-                                                UpdatedDate=GETDATE()
+        public static string UpdateUserCredit => @"UPDATE UsersCredit SET AvailableCredit=@AvailableCredit, UpdatedDate=GETDATE()
                                                 WHERE Id = @Id";
 
 

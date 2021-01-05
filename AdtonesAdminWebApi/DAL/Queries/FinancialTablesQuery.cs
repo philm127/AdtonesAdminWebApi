@@ -15,8 +15,18 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         bil.Status AS Status,ucp.UserId,
                                                         CONCAT(usr.FirstName,' ',usr.LastName) AS FullName,
                                                         CONCAT(@siteAddress,'/Invoice/Adtones_invoice_',bil.InvoiceNumber,'.pdf') AS InvoicePath,
-                                                        usr.Email,ucp.Id AS UsersCreditPaymentId, ISNULL(usr.Organisation, '-') AS Organisation
-                                                        FROM UsersCreditPayment AS ucp 
+                                                        usr.Email,ISNULL(usr.Organisation, '-') AS Organisation
+                                                        FROM ( SELECT ucpO.UserId,ucpO.BillingId,SUM(ISNULL(ucpO.Amount,0)) AS Amount,ucpO.CampaignProfileId,
+                                                                ucpD.Description 
+                                                                FROM UsersCreditPayment AS ucpO
+                                                                INNER JOIN
+                                                                    ( SELECT BillingId,ISNULL(Description, '-') AS Description FROM UsersCreditPayment 
+                                                                        WHERE Id IN
+                                                                            (SELECT MAX(Id) FROM UsersCreditPayment GROUP BY BillingId )
+                                                                        ) AS ucpD
+                                                                ON ucpD.BillingId=ucpO.BillingId
+                                                                GROUP BY ucpO.UserId,ucpO.BillingId,ucpO.CampaignProfileId,ucpD.Description
+                                                            ) AS ucp 
                                                         LEFT JOIN Billing AS bil ON ucp.BillingId=bil.Id 
                                                         LEFT JOIN Client AS cl ON bil.ClientId=cl.Id
                                                         LEFT JOIN CampaignProfile camp ON camp.CampaignProfileId=ucp.CampaignProfileId
@@ -35,9 +45,20 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         bil.Status AS Status,ucp.UserId,sexcs.UserId AS SUserId,
                                                         CONCAT(usr.FirstName,' ',usr.LastName) AS FullName,
                                                         CONCAT(@siteAddress,'/Invoice/Adtones_invoice_',bil.InvoiceNumber,'.pdf') AS InvoicePath,
-                                                        usr.Email,ucp.Id AS UsersCreditPaymentId, ISNULL(usr.Organisation, '-') AS Organisation
+                                                        usr.Email,ISNULL(usr.Organisation, '-') AS Organisation
                                                         FROM Billing AS bil
-                                                        LEFT JOIN UsersCreditPayment AS ucp ON ucp.BillingId=bil.Id
+                                                        LEFT JOIN ( SELECT ucpO.UserId,ucpO.BillingId,SUM(ISNULL(ucpO.Amount,0)) AS Amount,ucpO.CampaignProfileId,
+                                                                    ucpD.Description 
+                                                                    FROM UsersCreditPayment AS ucpO
+                                                                    INNER JOIN
+                                                                        ( SELECT BillingId,ISNULL(Description, '-') AS Description FROM UsersCreditPayment 
+                                                                            WHERE Id IN
+                                                                                (SELECT MAX(Id) FROM UsersCreditPayment GROUP BY BillingId )
+                                                                            ) AS ucpD
+                                                                    ON ucpD.BillingId=ucpO.BillingId
+                                                                    GROUP BY ucpO.UserId,ucpO.BillingId,ucpO.CampaignProfileId,ucpD.Description
+                                                                ) AS ucp 
+                                                        ON ucp.BillingId=bil.Id
                                                         LEFT JOIN Users AS usr ON ucp.UserId=usr.UserId
                                                         LEFT JOIN Contacts AS con ON usr.UserId=con.UserId
                                                         LEFT JOIN Client AS cl ON bil.ClientId=cl.Id

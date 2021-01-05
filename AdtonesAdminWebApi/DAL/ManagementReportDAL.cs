@@ -116,6 +116,7 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<ManRepUsers> GetManReportsForUsers(ManagementReportsSearch search, string query, int ops, string conn)
         {
+            
             var op = await _connService.GetOperatorIdFromAdtoneId(ops);
             var sb = new StringBuilder();
             var builder = new SqlBuilder();

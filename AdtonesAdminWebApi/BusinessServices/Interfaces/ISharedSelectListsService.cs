@@ -24,5 +24,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> GetUsersWPermissions();
         Task<ReturnResult> GetAdvertCategoryDropDown();
         Task<ReturnResult> GetClientList(int userId = 0);
+        Task<ReturnResult> GetCampaignCategoryDropDown(int countryId = 0);
     }
 }

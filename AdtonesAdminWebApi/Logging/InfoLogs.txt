@@ -22,3 +22,80 @@ Level: INFO: , Page: UserManagementService, Procedure: AddUser,TnfoMsg: Pre inse
 -------------------START-------------11/3/2020 9:56:36 PM
 Level: INFO: , Page: UserManagementService, Procedure: AddUser - AddToSalesTable,TnfoMsg: Entered update advertiser_sales table
 -------------------END-------------11/3/2020 9:56:36 PM
+-------------------START-------------12/15/2020 6:33:25 PM
+Level: , Page: CreateUpdateCampaignService, Procedure: CreateNewCampaign - Pre Insert,TnfoMsg: test108
+-------------------END-------------12/15/2020 6:33:25 PM
+-------------------START-------------12/15/2020 6:33:25 PM
+Level: , Page: CreateUpdateCampaignService, Procedure: CreateNewCampaign - Post Insert,TnfoMsg: 1172
+-------------------END-------------12/15/2020 6:33:25 PM
+-------------------START-------------12/15/2020 6:33:38 PM
+Level: , Page: CreateUpdateCampaignService, Procedure: CreateNewCampaign_Advert - UpdateCampaignAdvert,TnfoMsg: 1413
+-------------------END-------------12/15/2020 6:33:38 PM
+-------------------START-------------12/16/2020 2:10:18 PM
+Level: The query is SELECT u.UserId AS Value, CONCAT(FirstName,' ',LastName,'(',u.Email,')') AS Text FROM Users AS u
+                                                INNER JOIN UsersCredit AS uc ON uc.UserId=u.UserId INNER JOIN Contacts as c ON c.UserId=u.UserId, Page: SharedSelectListsDAL, Procedure: GetSelectList,TnfoMsg: The submitted Id is 0
+-------------------END-------------12/16/2020 2:10:18 PM
+-------------------START-------------12/16/2020 2:10:18 PM
+Level: The query is SELECT c.CurrencyId AS Value,c.CurrencyCode AS Text FROM Currencies AS c, Page: SharedSelectListsDAL, Procedure: GetSelectList,TnfoMsg: The submitted Id is 0
+-------------------END-------------12/16/2020 2:10:18 PM
+-------------------START-------------12/16/2020 2:10:18 PM
+Level: The query is SELECT u.UserId AS Value, CONCAT(FirstName,' ',LastName,'(',u.Email,')') AS Text 
+                                                FROM Users AS u LEFT JOIN Contacts AS c ON c.UserId=u.UserId
+                                                WHERE VerificationStatus=1
+                                                AND u.Activated=1 AND u.RoleId=3 
+                                                AND u.UserId NOT IN(SELECT UserId FROM UsersCredit), Page: SharedSelectListsDAL, Procedure: GetSelectList,TnfoMsg: The submitted Id is 0
+-------------------END-------------12/16/2020 2:10:18 PM
+-------------------START-------------12/18/2020 3:27:08 PM
+Level: The query is SELECT c.OperatorId AS Value,c.OperatorName AS Text FROM Operators AS c WHERE IsActive=1, Page: SharedSelectListsDAL, Procedure: GetSelectList,TnfoMsg: The submitted Id is 0
+-------------------END-------------12/18/2020 3:27:08 PM
+-------------------START-------------12/20/2020 6:44:26 PM
+Level: The query is SELECT c.OperatorId AS Value,c.OperatorName AS Text FROM Operators AS c WHERE IsActive=1 AND CountryId = @Id, Page: SharedSelectListsDAL, Procedure: GetSelectList,TnfoMsg: The submitted Id is 10
+-------------------END-------------12/20/2020 6:44:26 PM
+-------------------START-------------12/20/2020 6:46:46 PM
+Level: The query is SELECT c.OperatorId AS Value,c.OperatorName AS Text FROM Operators AS c WHERE IsActive=1 AND CountryId = @Id, Page: SharedSelectListsDAL, Procedure: GetSelectList,TnfoMsg: The submitted Id is 10
+-------------------END-------------12/20/2020 6:46:46 PM
+-------------------START-------------12/20/2020 6:58:20 PM
+Level: The query is SELECT c.OperatorId AS Value,c.OperatorName AS Text FROM Operators AS c WHERE IsActive=1 AND CountryId = @Id, Page: SharedSelectListsDAL, Procedure: GetSelectList,TnfoMsg: The submitted Id is 10
+-------------------END-------------12/20/2020 6:58:20 PM
+-------------------START-------------12/20/2020 6:58:43 PM
+Level: The submitted campaign Id is 1362, Page: CreateNewCampaignServgice, Procedure: CreateNewCampaign_Advert - Check submitted values,TnfoMsg: The submitted operator Id is 1
+-------------------END-------------12/20/2020 6:58:43 PM
+-------------------START-------------12/20/2020 6:58:46 PM
+Level: The submitted operator Id is 1, Page: ConnectionStringService, Procedure: GetCampaignProfileIdFromAdtoneId,TnfoMsg: The submitted operator Id is 1362
+-------------------END-------------12/20/2020 6:58:46 PM
+-------------------START-------------12/20/2020 6:58:46 PM
+Level: The submitted campaign Id is 1362, Page: CreateNewCampaignServgice, Procedure: CreateNewCampaign_Advert - Check before getting adtonecampId,TnfoMsg: The submitted operator Id is 1  And the newModel Op Id is 1
+-------------------END-------------12/20/2020 6:58:46 PM
+-------------------START-------------12/20/2020 6:58:46 PM
+Level: The submitted operator Id is 1, Page: ConnectionStringService, Procedure: GetCampaignProfileIdFromAdtoneId,TnfoMsg: The submitted operator Id is 1362
+-------------------END-------------12/20/2020 6:58:46 PM
+-------------------START-------------12/20/2020 6:59:08 PM
+Level: The submitted operator Id is 1, Page: ConnectionStringService, Procedure: GetCampaignProfileIdFromAdtoneId,TnfoMsg: The submitted operator Id is 1362
+-------------------END-------------12/20/2020 6:59:08 PM
+-------------------START-------------21/12/2020 09:52:23
+Level: The query is SELECT c.OperatorId AS Value,c.OperatorName AS Text FROM Operators AS c WHERE IsActive=1, Page: SharedSelectListsDAL, Procedure: GetSelectList,TnfoMsg: The submitted Id is 0
+-------------------END-------------21/12/2020 09:52:23
+-------------------START-------------21/12/2020 09:52:38
+Level: 14/04/2007 00:00:00, Page: ManagementReportService, Procedure: GetManReportAsync,TnfoMsg: 23/12/2020 00:00:00
+-------------------END-------------21/12/2020 09:52:38
+-------------------START-------------21/12/2020 09:53:25
+Level: 14/04/2007 00:00:00, Page: ManagementReportService, Procedure: GetManReportAsync,TnfoMsg: 23/12/2020 00:00:00
+-------------------END-------------21/12/2020 09:53:25
+-------------------START-------------21/12/2020 10:01:43
+Level: The query is SELECT c.OperatorId AS Value,c.OperatorName AS Text FROM Operators AS c WHERE IsActive=1, Page: SharedSelectListsDAL, Procedure: GetSelectList,TnfoMsg: The submitted Id is 0
+-------------------END-------------21/12/2020 10:01:43
+-------------------START-------------21/12/2020 10:01:46
+Level: 14/04/2007 00:00:00, Page: ManagementReportService, Procedure: GetManReportAsync,TnfoMsg: 23/12/2020 00:00:00
+-------------------END-------------21/12/2020 10:01:46
+-------------------START-------------21/12/2020 10:02:42
+Level: The query is SELECT c.CurrencyId AS Value,c.CurrencyCode AS Text FROM Currencies AS c, Page: SharedSelectListsDAL, Procedure: GetSelectList,TnfoMsg: The submitted Id is 0
+-------------------END-------------21/12/2020 10:02:42
+-------------------START-------------21/12/2020 10:04:50
+Level: The query is SELECT c.CurrencyId AS Value,c.CurrencyCode AS Text FROM Currencies AS c, Page: SharedSelectListsDAL, Procedure: GetSelectList,TnfoMsg: The submitted Id is 0
+-------------------END-------------21/12/2020 10:04:50
+-------------------START-------------21/12/2020 18:30:52
+Level: 2020-10-28 00:00:00, Page: ManagementReportService, Procedure: GetManReportAsync,TnfoMsg: 2020-11-14 00:00:00
+-------------------END-------------21/12/2020 18:30:52
+-------------------START-------------21/12/2020 18:31:59
+Level: 2020-10-28 00:00:00, Page: ManagementReportService, Procedure: GetManReportAsync,TnfoMsg: 2020-11-14 00:00:00
+-------------------END-------------21/12/2020 18:31:59

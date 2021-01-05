@@ -15,6 +15,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Configuration;
+using System.Globalization;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -46,25 +47,32 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         private ManagementReportsSearch SetDefaults(ManagementReportsSearch search)
         {
+            System.Globalization.CultureInfo enGB = new System.Globalization.CultureInfo("en-GB");
             var today = DateTime.Today;
             var tomorrow = today.AddDays(2);
             var old = today.AddDays(-5000);
             TimeSpan ts = new TimeSpan(0, 0, 0);
 
+            
+            
+
             if (search.DateTo == null || search.DateTo < old || search.DateTo < search.DateFrom)
-                search.ToDate = tomorrow.Date.ToString();
+                
+                search.ToDate = tomorrow.Date.ToString("yyyy-MM-dd HH:mm:ss");
+
             else
             {
-                search.ToDate = search.DateTo.Value.AddDays(1).Date.ToString();// + ts; //;//.AddHours(-3);
-                // search.DateTo = search.DateTo.Value.Date + ts;
+                DateTime iniDate = search.DateTo.Value;// DateTime.ParseExact(search.DateTo, format, CultureInfo.InvariantCulture);
+                var toDate = iniDate.AddDays(1);
+                search.ToDate = toDate.ToString("yyyy-MM-dd 00:00:00");
             }
 
             if (search.DateFrom == null || search.DateFrom < old || search.DateFrom > search.DateTo)
-                search.FromDate = old.Date.ToString();
+                search.FromDate = old.Date.ToString("yyyy-MM-dd HH:mm:ss");
+
             else
-            {
-                search.FromDate = search.DateFrom.Value.Date.ToString();// + ts;
-            }
+                search.FromDate = search.DateFrom.Value.ToString("yyyy-MM-dd 00:00:00");
+
 
             if (search.operators == null || search.operators.Length == 0)
             {
@@ -122,148 +130,19 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        //private async Task<ManagementReportModel> GetManReport(ManagementReportsSearch search)
-        //{
-        //    search = SetDefaults(search);
-
-        //    ManagementReportModel model = new ManagementReportModel();
-        //    //List<ManagementReportModel> models = new List<ManagementReportModel>();
-
-        //    try
-        //    {
-        //        //foreach (var op in search.operators)
-        //        //{
-        //        //    var constring = await _connService.GetConnectionStringByOperator(op);
-        //        //    if (constring != null && constring.Length > 10)
-        //        //    {
-
-        //        /// Temp holding
-        //        var op = 1;
-        //        var constring = "fconn";
-        //        // sets the times correct for the server
-        //        //if (op == (int)Enums.OperatorTableId.Safaricom)
-        //        //{
-        //        //search.DateFrom = search.DateFrom.Value.AddHours(-2);
-        //        // search.DateTo = search.DateTo.Value.AddHours(22);
-        //        // }
-
-        //        // Separated this out as conversion likely to take more time than the initial fetch.
-        //        /// Spend & Credit
-        //        IEnumerable<SpendCredit> totCosts = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetTotalCost, op, constring);
-        //        var costAudit = totCosts.ToList();
-        //        Task<TotalCostCredit> totCost = CalculateConvertedSpendCredit(costAudit, search);
-
-        //        IEnumerable<SpendCredit> amtsSpent = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetAmountSpent, op, constring);
-        //        var spentAudit = amtsSpent.ToList();
-        //        Task<TotalCostCredit> amtSpent = CalculateConvertedSpendCredit(spentAudit, search);
-
-        //        IEnumerable<SpendCredit> amtsCredit = await _reportDAL.GetTotalCreditCost(search, ManagementReportQuery.GetAmountCredit, op, constring);
-        //        var creditAudit = amtsCredit.ToList();
-        //        Task<TotalCostCredit> amtCredit = CalculateConvertedSpendCredit(creditAudit, search);
-
-        //        /// Subscribers
-        //        Task<ManRepUsers> totUser = _reportDAL.GetManReportsForUsers(search, ManagementReportQuery.TotalUsers, op, constring);
-        //        Task<int> totListen = _reportDAL.GetreportInts(search, ManagementReportQuery.TotalListened, op, constring);
-        //        Task<int> numListen = _reportDAL.GetreportInts(search, ManagementReportQuery.NumListened, op, constring);
-
-        //        /// Campaigns & Adverts
-        //        Task<int> numads = _reportDAL.GetreportInts(search, ManagementReportQuery.NumberOfAdsProvisioned, op, constring);
-        //        Task<int> totads = _reportDAL.GetreportInts(search, ManagementReportQuery.TotalAdsProvisioned, op, constring);
-        //        Task<int> totCam = _reportDAL.GetreportInts(search, ManagementReportQuery.TotalLiveCampaign, op, constring);
-        //        Task<int> numCam = _reportDAL.GetreportInts(search, ManagementReportQuery.NumLiveCampaign, op, constring);
-
-        //        /// Plays
-        //        Task<CampaignTableManReport> totPlays = _reportDAL.GetReportPlayLengths(search, ManagementReportQuery.TotalPlayStuff, op, constring);
-        //        Task<CampaignTableManReport> numPlays = _reportDAL.GetReportPlayLengths(search, ManagementReportQuery.NumOfPlayStuff, op, constring);
-
-
-        //        await Task.WhenAll(
-        //                            totUser,
-        //                            totListen,
-        //                            numListen,
-        //                            totads,
-        //                            numads,
-        //                            totCam,
-        //                            numCam,
-        //                            totPlays,
-        //                            numPlays,
-        //                            totCost,
-        //                            amtCredit,
-        //                            amtSpent
-        //                            );
-        //        var currency = await _curDAL.GetCurrencyUsingCurrencyIdAsync(search.currency);
-
-        //        var eqOver6 = totPlays.Result;
-        //        var numPlay = numPlays.Result;
-        //        var usrs = totUser.Result;
-        //        /// Users
-        //        model.TotalUsers += usrs.TotalUsers;
-        //        model.TotalListened += totListen.Result;
-        //        model.TotalRemovedUser += usrs.TotalRemovedUser;
-        //        model.AddedUsers += usrs.AddedUsers;
-        //        model.NumListened += numListen.Result;
-
-        //        /// Campaigns & Adverts
-        //        model.TotalAdverts += totads.Result;
-        //        model.AdvertsProvisioned += numads.Result;
-        //        model.TotalCampaigns += totCam.Result;
-        //        model.CampaignsAdded += numCam.Result;
-        //        model.TotalCancelled += eqOver6.NumCancelled;
-        //        /// Plays
-        //        model.TotalEmail += eqOver6.NumOfEmail;
-        //        model.TotalSMS += eqOver6.NumOfSMS;
-        //        //model.TotalPlays += eqOver6.TotalPlays;
-        //        model.TotalPlayLength += eqOver6.Playlength;
-        //        model.Total6Over += eqOver6.NumOfPlaySixOver;
-        //        model.TotalUnder6 += eqOver6.NumOfPlayUnderSix;
-
-        //        model.NumEmail += numPlay.NumOfEmail;
-        //        model.NumSMS += numPlay.NumOfSMS;
-        //        //model.TotalPlays += eqOver6.TotalPlays;
-        //        model.PeriodPlayLength += numPlay.Playlength;
-        //        model.Num6Over += numPlay.NumOfPlaySixOver;
-        //        model.NumUnder6 += numPlay.NumOfPlayUnderSix;
-
-        //        /// Credit & Spend
-        //        model.TotalCredit += (int)totCost.Result.TotalCredit;
-        //        model.TotalSpend += (int)totCost.Result.TotalSpend;
-        //        model.AmountSpent += (int)amtSpent.Result.TotalSpend;
-        //        model.AmountCredit += (int)amtCredit.Result.TotalCredit;
-        //        model.CurrencyCode = GetCurrencySymbol(currency.CurrencyCode);
-        //        //    }
-        //        //}
-
-        //        model.TotalAvgPlayLength = (double)((model.TotalPlayLength) / 1000) / (model.Total6Over + model.TotalUnder6);
-        //        model.NumAvgPlayLength = (double)((model.PeriodPlayLength) / 1000) / (model.Num6Over + model.NumUnder6);
-
-        //        model.TotalAvgPlays = model.TotalUsers == 0 ? 0 : (double)(model.Total6Over + model.TotalUnder6) / (double)model.TotalUsers;
-        //        model.TotalAvgPlaysListened = model.TotalListened == 0 ? 0 : (double)(model.Total6Over + model.TotalUnder6) / (double)model.TotalListened;
-
-        //        model.NumAvgPlays = model.TotalUsers == 0 ? 0 : (double)(model.Num6Over + model.NumUnder6) / (double)model.TotalUsers;
-        //        model.NumAvgPlaysListened = model.NumListened == 0 ? 0 : (double)(model.Num6Over + model.NumUnder6) / (double)model.NumListened;
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var _logging = new ErrorLogging()
-        //        {
-        //            ErrorMessage = ex.Message.ToString(),
-        //            StackTrace = ex.StackTrace.ToString(),
-        //            PageName = "ManagementReportService",
-        //            ProcedureName = "GetQueries"
-        //        };
-        //        _logging.LogError();
-
-        //    }
-        //    return model;
-        //}
-
-
         private async Task<ManagementReportModel> GetManReportTestAsync(ManagementReportsSearch search)
         {
             var model = new ManagementReportModel();
             var models = new List<ManagementReportModel>();
             search = SetDefaults(search);
+            //var _logging2 = new ErrorLogging()
+            //{
+            //    ErrorMessage = search.ToDate.ToString(),
+            //    LogLevel = search.FromDate.ToString(),
+            //    PageName = "ManagementReportService",
+            //    ProcedureName = "GetManReportAsync"
+            //};
+            //_logging2.LogInfo();
             try
             {
 
@@ -300,24 +179,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                     models.Add(await GetManReportAsync(search, 2));
                 }
 
-                //CancellationTokenSource cts = new CancellationTokenSource();
-                //ParallelOptions options = new ParallelOptions
-                //{ CancellationToken = cts.Token };
-
-                //Parallel.ForEach(search.operators,
-                //options,
-                //() => model,
-                //(item, loopState, localCount) =>
-                //{
-                //    cts.Token.ThrowIfCancellationRequested();
-                //    ManagementReportModel distance = GetManReportAsync(search, item).Result;
-                //    return distance;
-                //},
-                //(tempResult) =>
-                //{
-                //    if (tempResult != null)
-                //    {
-                // models.Add(tempResult);
                 foreach (var tempResult in models)
                 {
                     /// Users

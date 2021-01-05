@@ -4,34 +4,35 @@ namespace AdtonesAdminWebApi.DAL.Queries
 {
     public static class CampaignQuery
     {
-        public static string GetCampaignResultSet => @"SELECT camp.CampaignProfileId,camp.UserId,u.Email,CONCAT(u.FirstName,' ',u.LastName) AS UserName,op.OperatorName
-                                                ,camp.ClientId, ISNULL(cl.Name,'-') AS ClientName,CampaignName,camp.CreatedDateTime AS CreatedDate
-                                                ,camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,camp.TotalBudget,u.Organisation,ctry.Name AS CountryName,
-                                                CASE WHEN bill.Id>0 THEN camp.Status ELSE 8 END AS Status,play.AvgBidValue,play.TotalSpend,bill.CurrencyCode,
-                                                (camp.TotalBudget - play.TotalSpend) AS FundsAvailable,play.ct AS finaltotalplays,con.MobileNumber
-                                                FROM CampaignProfile AS camp LEFT JOIN Users As u ON u.UserId=camp.UserId
-                                                LEFT JOIN Client AS cl ON camp.ClientId=cl.Id
-                                                LEFT JOIN CampaignAdverts AS campAd ON campAd.CampaignProfileId=camp.CampaignProfileId
-												LEFT JOIN Advert AS ad ON ad.AdvertId=campAd.AdvertId
-                                                LEFT JOIN 
-		                                                (SELECT Id,CampaignProfileId,CurrencyCode FROM Billing WHERE Id in
-			                                                (SELECT MAX(Id) FROM Billing GROUP BY CampaignProfileId,CurrencyCode)
-		                                                ) AS bill 
-                                                ON bill.CampaignProfileId=camp.CampaignProfileId
-                                                LEFT JOIN 
-		                                                (SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-                                                            CAST(ISNULL((ISNULL(SUM(BidValue),0))+(ISNULL(SUM(SMSCost),0))+(ISNULL(SUM(EmailCost),0)),0) AS NUMERIC(36,2)) AS TotalSpend 
-			                                                FROM CampaignAudit
-			                                                WHERE LOWER(Status)='played' AND PlayLengthTicks>6000
-			                                                GROUP BY CampaignProfileId
-		                                                ) AS play
-                                                ON camp.CampaignProfileId=play.CampaignProfileId
-                                                LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
-                                                LEFT JOIN Contacts AS con ON con.UserId=camp.UserId
-                                                LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId ";
+        public static string GetCampaignResultSet => @"SELECT camp.CampaignProfileId,camp.UserId,u.Email,CONCAT(u.FirstName,' ',u.LastName) AS UserName,
+														op.OperatorName,ctry.Name AS CountryName,
+														camp.ClientId, ISNULL(cl.Name,'-') AS ClientName,CampaignName,camp.CreatedDateTime AS CreatedDate,
+														camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,camp.TotalBudget,u.Organisation,
+														CASE WHEN bill.Id>0 THEN camp.Status ELSE 8 END AS Status,play.AvgBidValue,play.TotalSpend,bill.CurrencyCode,
+														(camp.TotalBudget - play.TotalSpend) AS FundsAvailable,play.ct AS finaltotalplays,con.MobileNumber
+														FROM CampaignProfile AS camp LEFT JOIN Users As u ON u.UserId=camp.UserId
+														LEFT JOIN Client AS cl ON camp.ClientId=cl.Id
+														LEFT JOIN CampaignAdverts AS campAd ON campAd.CampaignProfileId=camp.CampaignProfileId
+														LEFT JOIN Advert AS ad ON ad.AdvertId=campAd.AdvertId
+														LEFT JOIN 
+																(SELECT Id,CampaignProfileId,CurrencyCode FROM Billing WHERE Id in
+																	(SELECT MAX(Id) FROM Billing GROUP BY CampaignProfileId,CurrencyCode)
+																) AS bill 
+														ON bill.CampaignProfileId=camp.CampaignProfileId
+														LEFT JOIN 
+																(SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+																	CAST(ISNULL((ISNULL(SUM(BidValue),0))+(ISNULL(SUM(SMSCost),0))+(ISNULL(SUM(EmailCost),0)),0) AS NUMERIC(36,2)) AS TotalSpend 
+																	FROM CampaignAudit
+																	WHERE LOWER(Status)='played' AND PlayLengthTicks>6000
+																	GROUP BY CampaignProfileId
+																) AS play
+														ON camp.CampaignProfileId=play.CampaignProfileId
+														LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
+														LEFT JOIN Contacts AS con ON con.UserId=camp.UserId
+														LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId ";
 
 
-		public static string GetCampaignResultSetForProfile => @"SELECT camp.CampaignProfileId,op.OperatorName
+		public static string GetCampaignResultSetForProfile => @"SELECT camp.CampaignProfileId,op.OperatorName,cat.CategoryName
                                                 ,CampaignName,camp.CreatedDateTime AS CreatedDate
                                                 ,camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,
                                                 camp.Status AS Status,
@@ -46,6 +47,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
 			                                                GROUP BY CampaignProfileId
 		                                                ) AS play
                                                 ON camp.CampaignProfileId=play.CampaignProfileId
+												LEFT JOIN CampaignProfileExt AS ext ON ext.CampaignProfileId=camp.CampaignProfileId
+												LEFT JOIN CampaignCategory AS cat ON cat.CampaignCategoryId=ext.CampaignCategoryId
                                                 LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
                                                 LEFT JOIN Contacts AS con ON con.UserId=camp.UserId
                                                 LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId ";
@@ -182,5 +185,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         public static string UpdateCampaignBilling => @"UPDATE CampaignProfile SET UpdatedDateTime=GETDATE(), Status=@Status, TotalCredit=TotalCredit + @TotalCredit,TotalBudget = TotalBudget + @TotalBudget WHERE CampaignProfileId=@Id";
-    }
+
+		public static string AddCampaignCategory => @"INSERT INTO CampaignCategory(CategoryName,Description,Active,CountryId,AdtoneServerCampaignCategoryId)
+                                                        VALUES(@name,@description,@active,@CountryId,@Id);
+                                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
+	}
 }

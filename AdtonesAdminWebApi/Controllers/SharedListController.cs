@@ -125,6 +125,12 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        [HttpGet("v1/FillCampaignCategoryDropDown/{id}")]
+        public async Task<ReturnResult> FillCampaignCategoryDropDown(int countryId)
+        {
+            return await _sharedList.GetCampaignCategoryDropDown(countryId);
+        }
+
         /// <summary>
         /// Gets all the selcted lists required Country, Currency and Users
         /// </summary>

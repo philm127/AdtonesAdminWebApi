@@ -83,5 +83,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
 
+        public static string AddCampaignProfileEx => @"INSERT INTO CampaignProfileExt (CampaignProfileId,NonBillable,IsProfileCampaign,CampaignCategoryId)
+                                                                VALUES(@CampaignProfileId,@NonBillable,@IsProfileCampaign,@CampaignCategoryId)";
+
+
+
     }
 }

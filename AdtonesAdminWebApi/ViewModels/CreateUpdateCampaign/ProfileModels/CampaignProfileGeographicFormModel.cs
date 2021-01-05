@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AdtonesAdminWebApi.DAL;
+using AdtonesAdminWebApi.DAL.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,8 +9,10 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
 {
     public class CampaignProfileGeographicFormModel : QuestionOptionsModel
     {
-        public CampaignProfileGeographicFormModel()
+        // private readonly IUserMatchDAL _matchDAL;
+        public CampaignProfileGeographicFormModel()//IUserMatchDAL matchDAL)
         {
+            //_matchDAL = matchDAL;
 
             LocationQuestion =
                 CompileQuestions(new Dictionary<string, bool>
@@ -17,25 +21,23 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
 
         }
 
-        //public CampaignProfileGeographicFormModel(int CountryId)
-        //{
-        //    // EFMVCDataContex db = new EFMVCDataContex();
+        //public CampaignProfileGeographicFormModel() { }
 
-        //    var locationProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Location".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-        //    var locationProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == locationProfileMatchId).ToList();
+        public CampaignProfileGeographicFormModel(int CountryId, List<string> locationProfileLabel)
+        {
 
-        //    Dictionary<string, bool> location = new Dictionary<string, bool>();
-        //    List<Dictionary<string, bool>> locationlist = new List<Dictionary<string, bool>>();
+            Dictionary<string, bool> location = new Dictionary<string, bool>();
+            List<Dictionary<string, bool>> locationlist = new List<Dictionary<string, bool>>();
 
-        //    foreach (var item in locationProfileLabel)
-        //    {
-        //        location = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-        //        locationlist.Add(location);
-        //    }
-        //    LocationQuestion = CompileQuestionsDynamic(locationlist);
+            foreach (var item in locationProfileLabel)
+            {
+                location = new Dictionary<string, bool> { { item, false } };
+                locationlist.Add(location);
+            }
+            LocationQuestion = CompileQuestionsDynamic(locationlist);
 
-            
-        //}
+
+        }
 
         public string PostCode { get; set; }
         // [Required]
@@ -43,6 +45,7 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         // public string CountryName { get; set; }
         public int CampaignProfileId { get; set; }
         public int CampaignProfileGeographicId { get; set; }
+
 
         // [Display(Name = "Location")]
         public List<QuestionOptionModel> LocationQuestion { get; set; }

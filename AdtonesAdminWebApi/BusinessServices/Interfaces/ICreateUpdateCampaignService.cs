@@ -13,5 +13,8 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> CreateNewCampaign_Advert(NewAdvertFormModel model);
         Task<ReturnResult> CheckIfAdvertNameExists(NewAdvertFormModel model);
         Task<ReturnResult> CheckIfCampaignNameExists(NewCampaignProfileFormModel model);
+        Task<ReturnResult> GetInitialData(int countryId,int advertiserId = 0);
+        Task<ReturnResult> InsertProfileInformation(NewAdProfileMappingFormModel model);
+        Task<ReturnResult> GetProfileData(int campaignId, int advertiserId = 0);
     }
 }

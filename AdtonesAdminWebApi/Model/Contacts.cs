@@ -27,5 +27,7 @@ namespace AdtonesAdminWebApi.Model
         public int? CurrencyId { get; set; }
 
         public int? AdtoneServerContactId { get; set; }
+
+        public int? RoleId { get; set; }
     }
 }

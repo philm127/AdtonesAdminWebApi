@@ -371,6 +371,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     command1.PhoneNumber = model.PhoneNumber;
                     command1.Address = model.Address;
                     command1.CountryId = model.CountryId;
+                    command1.RoleId = model.RoleId;
 
                     var contId = await AddContactInformation(command1);
                     if (contId == 0)

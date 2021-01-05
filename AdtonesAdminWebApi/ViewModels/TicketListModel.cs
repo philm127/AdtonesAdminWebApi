@@ -64,7 +64,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public DateTime CommentDate { get; set; }
         public string TicketCode { get; set; }
         public string UserName { get; set; }
-        public string? ImageFile { get; set; }
+        public string ImageFile { get; set; }
         public IFormFile CommentImage { get; set; }
     }
 }

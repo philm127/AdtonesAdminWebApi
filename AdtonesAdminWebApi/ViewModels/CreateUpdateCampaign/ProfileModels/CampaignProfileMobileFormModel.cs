@@ -28,57 +28,51 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
                                      });
         }
 
-        //public CampaignProfileMobileFormModel(int CountryId)//int CountryId
-        //{
-        //    // EFMVCDataContex db = new EFMVCDataContex();
+        public CampaignProfileMobileFormModel(int CountryId, List<string> contractTypeProfileLabel, List<string> spendProfileLabel)
+        {
 
-        //    //ContractType
-        //    var contractTypeProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Mobile plan".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-        //    var contractTypeProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == contractTypeProfileMatchId).ToList();
+            //ContractType
+            
+            Dictionary<string, bool> contractType = new Dictionary<string, bool>();
+            List<Dictionary<string, bool>> contractTypelist = new List<Dictionary<string, bool>>();
 
-        //    Dictionary<string, bool> contractType = new Dictionary<string, bool>();
-        //    List<Dictionary<string, bool>> contractTypelist = new List<Dictionary<string, bool>>();
+            foreach (var item in contractTypeProfileLabel)
+            {
+                contractType = new Dictionary<string, bool> { { item, false } };
+                contractTypelist.Add(contractType);
+            }
+            ContractTypeQuestion = CompileQuestionsDynamic(contractTypelist);
+            foreach (var item in ContractTypeQuestion)
+            {
+                if (item.QuestionName == "Don't Know")
+                {
+                    item.DefaultAnswer = true;
+                }
+            }
 
-        //    foreach (var item in contractTypeProfileLabel)
-        //    {
-        //        contractType = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-        //        contractTypelist.Add(contractType);
-        //    }
-        //    ContractTypeQuestion = CompileQuestionsDynamic(contractTypelist);
-        //    foreach (var item in ContractTypeQuestion)
-        //    {
-        //        if (item.QuestionName == "Don't Know")
-        //        {
-        //            item.DefaultAnswer = true;
-        //        }
-        //    }
+            //Spend
+            Dictionary<string, bool> spend = new Dictionary<string, bool>();
+            List<Dictionary<string, bool>> spendlist = new List<Dictionary<string, bool>>();
 
-        //    //Spend
-        //    var spendProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Average Monthly Spend".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-        //    var spendProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == spendProfileMatchId).ToList();
+            foreach (var item in spendProfileLabel)
+            {
+                spend = new Dictionary<string, bool> { { item, false } };
+                spendlist.Add(spend);
+            }
+            SpendQuestion = CompileQuestionsDynamic(spendlist);
+            foreach (var item in SpendQuestion)
+            {
+                if (item.QuestionName == "Don't Know")
+                {
+                    item.DefaultAnswer = true;
+                }
+                if (item.QuestionName == "0-9")
+                {
+                    item.DefaultAnswer = true;
+                }
+            }
 
-        //    Dictionary<string, bool> spend = new Dictionary<string, bool>();
-        //    List<Dictionary<string, bool>> spendlist = new List<Dictionary<string, bool>>();
-
-        //    foreach (var item in spendProfileLabel)
-        //    {
-        //        spend = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-        //        spendlist.Add(spend);
-        //    }
-        //    SpendQuestion = CompileQuestionsDynamic(spendlist);
-        //    foreach (var item in SpendQuestion)
-        //    {
-        //        if (item.QuestionName == "Don't Know")
-        //        {
-        //            item.DefaultAnswer = true;
-        //        }
-        //        if (item.QuestionName == "0-9")
-        //        {
-        //            item.DefaultAnswer = true;
-        //        }
-        //    }
-
-        //}
+        }
 
         /// <summary>
         /// Gets or sets the campaign profile mobile identifier.

@@ -175,6 +175,27 @@ namespace AdtonesAdminWebApi.DAL.Shared
         }
 
 
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetCampaignCategory(int countryId = 0)
+        {
+            var sb = new StringBuilder();
+            sb.Append(SharedListQuery.GetCampaignCategory);
+            if (countryId > 0)
+                sb.Append(" AND CountryId=@Id");
+            try
+            {
+                using (var connection = new SqlConnection(_connStr))
+                {
+                    connection.Open();
+                    return await connection.QueryAsync<SharedSelectListViewModel>(sb.ToString(), new { Id = countryId });
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<IEnumerable<SharedSelectListViewModel>> GetCountry(int id = 0)
         {
 
@@ -306,6 +327,14 @@ namespace AdtonesAdminWebApi.DAL.Shared
             sb = values.Item1;
             builder = values.Item2;
             var select = builder.AddTemplate(sb.ToString());
+            //var _infoLogging = new ErrorLogging()
+            //{
+            //    LogLevel = "The query is " + sb.ToString(),
+            //    ErrorMessage = "The submitted Id is " + id.ToString(),
+            //    PageName = "SharedSelectListsDAL",
+            //    ProcedureName = "GetSelectList"
+            //};
+            //_infoLogging.LogInfo();
             try
             {
                 using (var connection = new SqlConnection(_connStr))

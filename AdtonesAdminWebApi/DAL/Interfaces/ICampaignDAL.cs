@@ -25,6 +25,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetBySalesExec(int id = 0);
         Task<int> UpdateCampaignMatchesforBilling(int id = 0, int operatorId = 0);
         Task<int> UpdateCampaignCredit(BillingPaymentModel model, int operatorId);
-
+        Task<int> InsertCampaignCategory(CampaignCategoryResult model);
     }
 }

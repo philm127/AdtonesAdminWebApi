@@ -22,5 +22,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<IEnumerable<object>> GetUsersnRoles();
         Task<IEnumerable<SharedSelectListViewModel>> GetAdvertCategory();
         Task<IEnumerable<SharedSelectListViewModel>> GetClientList(int userId);
+        Task<IEnumerable<SharedSelectListViewModel>> GetCampaignCategory(int countryId = 0);
     }
 }
