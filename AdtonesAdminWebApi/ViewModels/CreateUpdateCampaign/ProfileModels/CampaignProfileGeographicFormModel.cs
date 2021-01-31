@@ -10,18 +10,18 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
     public class CampaignProfileGeographicFormModel : QuestionOptionsModel
     {
         // private readonly IUserMatchDAL _matchDAL;
-        public CampaignProfileGeographicFormModel()//IUserMatchDAL matchDAL)
-        {
-            //_matchDAL = matchDAL;
+        //public CampaignProfileGeographicFormModel(IUserMatchDAL matchDAL)
+        //{
+        //    //_matchDAL = matchDAL;
 
-            LocationQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Nairobi East", false}, {"Nairobi West", false}, {"Mt.Kenya", false}, {"Rift", false}, {"Western Nyanza", false}, {"Coast", false}});
+        //    LocationQuestion =
+        //        CompileQuestions(new Dictionary<string, bool>
+        //                             {{"Nairobi East", false}, {"Nairobi West", false}, {"Mt.Kenya", false}, {"Rift", false}, {"Western Nyanza", false}, {"Coast", false}});
 
 
-        }
+        //}
 
-        //public CampaignProfileGeographicFormModel() { }
+        public CampaignProfileGeographicFormModel() { }
 
         public CampaignProfileGeographicFormModel(int CountryId, List<string> locationProfileLabel)
         {
@@ -51,30 +51,30 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         public List<QuestionOptionModel> LocationQuestion { get; set; }
 
         // [Display(Name = "Location")]
-        public string Location_Demographics
-        {
-            get
-            {
-                if (LocationQuestion == null)
-                    LocationQuestion = new List<QuestionOptionModel>();
+        public string Location_Demographics { get; set; }
+        //{
+        //    get
+        //    {
+        //        if (LocationQuestion == null)
+        //            LocationQuestion = new List<QuestionOptionModel>();
 
-                return CompileAnswers(SortList(LocationQuestion));
-            }
-            set
-            {
-                if (LocationQuestion != null && LocationQuestion.Count() > 0)
-                {
-                    if (value == null) return;
+        //        return CompileAnswers(SortList(LocationQuestion));
+        //    }
+        //    set
+        //    {
+        //        if (LocationQuestion != null && LocationQuestion.Count() > 0)
+        //        {
+        //            if (value == null) return;
 
-                    for (int i = 0; i < value.Length; i++)
-                        LocationQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        //            for (int i = 0; i < value.Length; i++)
+        //                LocationQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
+        //        }
+        //        else
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
 
         public bool Location { get; set; }
 

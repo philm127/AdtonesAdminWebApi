@@ -22,14 +22,17 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IBillingDAL _billDAL;
         private readonly IAdvertDAL _advertDAL;
         private readonly IAdvertiserFinancialDAL _userCredit;
+        private readonly IAdvertiserFinancialService _userFin;
         private readonly IConfiguration _configuration;
         private readonly ICurrencyConversion _curConv;
+        private readonly IConnectionStringService _conService;
         private static Random random = new Random();
         ReturnResult result = new ReturnResult();
 
         public BillingService(IHttpContextAccessor httpAccessor, IUserManagementDAL userDAL, ICurrencyDAL currencyDAL, ICampaignDAL campDAL,
-                                IBillingDAL billDAL, IAdvertDAL advertDAL, IAdvertiserFinancialDAL userCredit, IConfiguration configuration,
-                                ICurrencyConversion curConv)
+                                IBillingDAL billDAL, IAdvertDAL advertDAL, IAdvertiserFinancialDAL userCredit, 
+                                IAdvertiserFinancialService userFin, IConfiguration configuration,
+                                ICurrencyConversion curConv, IConnectionStringService conService)
         {
             _httpAccessor = httpAccessor;
             _userDAL = userDAL;
@@ -38,19 +41,46 @@ namespace AdtonesAdminWebApi.BusinessServices
             _billDAL = billDAL;
             _advertDAL = advertDAL;
             _userCredit = userCredit;
+            _userFin = userFin;
             _configuration = configuration;
             _curConv = curConv;
+            _conService = conService;
         }
 
 
-        /// <summary>
-        /// This is adapted rfrom the original purely for use with User Credit funding campaigns
-        /// so limits the currenecies available purely for either campaign currency or usercredit currency
-        /// if they are the same then only that currency can be used.
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        public async Task<ReturnResult> PaywithUserCredit(BillingPaymentModel model)
+
+        public async Task<ReturnResult> GetPaymentData(int campaignId)
+        {
+            try
+            {
+                result.body = await _billDAL.GetCampaignBillingData(campaignId);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "BillingService",
+                    ProcedureName = "GetPaymentData"
+                };
+                _logging.LogError();
+                result.result = 0;
+                result.body = ex.Message.ToString();
+                return result;
+            }
+            return result;
+        }
+
+
+            /// <summary>
+            /// This is adapted rfrom the original purely for use with User Credit funding campaigns
+            /// so limits the currenecies available purely for either campaign currency or usercredit currency
+            /// if they are the same then only that currency can be used.
+            /// </summary>
+            /// <param name="model"></param>
+            /// <returns></returns>
+            public async Task<ReturnResult> PaywithUserCredit(BillingPaymentModel model)
         {
             /// Ensure all this handled by front end
             /*
@@ -134,13 +164,19 @@ namespace AdtonesAdminWebApi.BusinessServices
                         return RedirectToAction("buy_credit");
                     }
             */
-            int billingId = 0;
+            
             try
             {
-                CurrencyModel currencyModel = new CurrencyModel();
+                model.SettledDate = DateTime.Now;
+                var creditPeriod = await _billDAL.GetCreditPeriod(model.CampaignProfileId);
+                        if (creditPeriod == 0)
+                            model.SettledDate = model.SettledDate.Value.AddDays(7);
+                        else
+                            model.SettledDate = model.SettledDate.Value.AddDays(creditPeriod);
+                    CurrencyModel currencyModel = new CurrencyModel();
                 model.UserId = _httpAccessor.GetUserIdFromJWT();
-                var operatorId = await _userDAL.GetOperatorIdByUserId(model.AdvertiserId);
                 var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
+                var connString = await _conService.GetConnectionStringsByCountryId(campaignDetails.CountryId.Value);
                 var userCredDetails = await _userCredit.GetUserCreditDetail(model.AdvertiserId);
 
                 // Id from the form selection
@@ -160,6 +196,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 string fromCurrencyCode = selectedCurrencyCode;
                 string toCurrencyCode = campaignCurrencyCode;
 
+                model.CurrencyCode = selectedCurrencyCode;
+
                 //var companydetails = await _userDAL.getCompanyDetails(model.AdvertiserId);
 
                 int CountryId = 0;
@@ -175,7 +213,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     currencyRate = _curConv.GetCurrencyRateModel(fromCurrencyCode, toCurrencyCode);
                     
                         double TotalAmount = Convert.ToDouble(model.TotalAmount * currencyRate);
-                double CreditAvailable = Convert.ToDouble(model.CreditAvailable.ToString());
+                double CreditAvailable = Convert.ToDouble(model.AvailableCredit.ToString());
 
                         if (TotalAmount > CreditAvailable)
                         {
@@ -187,31 +225,37 @@ namespace AdtonesAdminWebApi.BusinessServices
                     model.InvoiceNumber = "A" + RandomString(6) + DateTime.Now.ToString("yy");
                 model.PaymentMethodId = 1;
                 model.Status = 2;
-                model.SettledDate = null;
                 model.AdtoneServerBillingId = null;
-                if (model.ClientId == 0)
-                    model.ClientId = null;
-                billingId = await _billDAL.AddBillingRecord(model);
-                if (billingId > 0)
+                model.BillingId = await _billDAL.AddBillingRecord(model);
+                if (model.BillingId > 0)
                 {
                     //Update Advert And CampaignAdvert
-                    var advertDetails = await _campDAL.GetCampaignAdvertDetailsById(0, model.CampaignProfileId);
+                    int x = 0;
+                    var campadvertDetails = await _campDAL.GetCampaignAdvertDetailsById(0, model.CampaignProfileId);
+                    if(campadvertDetails == null)
+                    {
+                        var advertDetails = await _advertDAL.GetAdvertIdByCampid(model.CampaignProfileId);
+                        x = await _advertDAL.UpdateAdvertForBilling(advertDetails, connString);
+                    }
+                    else
+                        x = await _advertDAL.UpdateAdvertForBilling(campadvertDetails.AdvertId, connString);
 
-                    var x = await _advertDAL.UpdateAdvertForBilling(advertDetails.AdvertId, operatorId);
-                    var y = await _campDAL.UpdateCampaignMatchesforBilling(model.CampaignProfileId, operatorId);
+                    var y = await _campDAL.UpdateCampaignMatchesforBilling(model.CampaignProfileId, connString);
 
                     var creditForm = new AdvertiserCreditFormModel();
+                    creditForm.UserId = userCredDetails.UserId;
                     creditForm.AssignCredit = userCredDetails.AssignCredit;
                     creditForm.Id = userCredDetails.Id;
                     creditForm.AvailableCredit = userCredDetails.AvailableCredit - Convert.ToDecimal(TotalAmount.ToString());
-
-                    var campaigncreditstatus = _campDAL.UpdateCampaignCredit(model, operatorId);
+                    creditForm.CurrencyId = userCredDetails.CurrencyId;
 
                     //update credit available of user
-                    var creditStatus = await _userCredit.UpdateUserCredit(creditForm);
-                    
+                    var creditStatus = await _userFin.AddUserCredit(creditForm);
 
-                    if (creditStatus >= 0)
+                    var campaigncreditstatus = _campDAL.UpdateCampaignCredit(model, connString);
+
+
+                    if (creditStatus.result == 1)
                     {
                         result.body = "Payment received successfully for " + model.InvoiceNumber;
 
@@ -223,6 +267,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     else result.body = "Internal Server error. Please try again.";
                     result.result = 0;
                 }
+                result.body = "Paid with invoice number " + model.InvoiceNumber;
                 return result;
             }
             catch (Exception ex)
@@ -247,109 +292,105 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 CurrencySymbol currencySymbol = new CurrencySymbol();
-                string invoiceno = string.Empty;
-                string customername = string.Empty;
-                string companyname = string.Empty;
-                string address = string.Empty;
-                string addaddress = string.Empty;
-                string town = string.Empty;
-                string postcode = string.Empty;
-                string country = string.Empty;
-                string finaladdress = string.Empty;
-                string itemdetails = string.Empty;
-                string methodofPayment = string.Empty;
-                int? typeofPayment;
-                string country_Tax = string.Empty;
+                //string invoiceno = string.Empty;
+                //string customername = string.Empty;
+                //string companyname = string.Empty;
+                //string address = string.Empty;
+                //string addaddress = string.Empty;
+                //string town = string.Empty;
+                //string postcode = string.Empty;
+                //string country = string.Empty;
+                //string finaladdress = string.Empty;
+                //string itemdetails = string.Empty;
+                //string methodofPayment = string.Empty;
+                //int? typeofPayment;
+                //string country_Tax = string.Empty;
 
-                // var billingdetails = _billingRepository.Get(top => top.Id == billingId);
-                invoiceno = model.InvoiceNumber;
-                itemdetails = billingdetails.CampaignProfile.CampaignName;
-                methodofPayment = _paymentMethodRepository.Get(top => top.Id == billingdetails.PaymentMethodId).Description;
-                typeofPayment = model.PaymentMethodId;
-                var userdetails = _userDAL.GetUserById(model.AdvertiserId).Result;
-                customername = userdetails.FirstName + " " + userdetails.LastName;
-                var clientcompany = _userDAL.getCompanyDetails(model.AdvertiserId).Result;
-                companyname = clientcompany.CompanyName;
-                address = clientcompany.Address;
-                addaddress = clientcompany.AdditionalAddress;
-                town = clientcompany.Town;
-                postcode = clientcompany.PostCode;
-                country = clientcompany.Country.Name;
-                var campaignCreditDetails = _campaignCreditPeriodRepository.Get(top => top.UserId == userId && top.CampaignProfileId == billingdetails.CampaignProfile.CampaignProfileId);
+                //var billingdetails = _billingRepository.Get(top => top.Id == billingId);
+                //invoiceno = model.InvoiceNumber;
+                //itemdetails = billingdetails.CampaignProfile.CampaignName;
+                //methodofPayment = _paymentMethodRepository.Get(top => top.Id == billingdetails.PaymentMethodId).Description;
+                //typeofPayment = model.PaymentMethodId;
+                //var userdetails = _userDAL.GetUserById(model.AdvertiserId).Result;
+                //customername = userdetails.FirstName + " " + userdetails.LastName;
+                //var clientcompany = _userDAL.getCompanyDetails(model.AdvertiserId).Result;
+                //companyname = clientcompany.CompanyName;
+                //address = clientcompany.Address;
+                //addaddress = clientcompany.AdditionalAddress;
+                //town = clientcompany.Town;
+                //postcode = clientcompany.PostCode;
+                //country = clientcompany.Country.Name;
+                //var campaignCreditDetails = _campaignCreditPeriodRepository.Get(top => top.UserId == userId && top.CampaignProfileId == billingdetails.CampaignProfile.CampaignProfileId);
                 // int campaignId = billingdetails.CampaignProfileId.Value;
 
                 
 
-                var customercontactinfo = _contactRepository.Get(top => top.UserId == userId);
+                // var customercontactinfo = _contactRepository.Get(top => top.UserId == userId);
                 var currencyCode = "";
                 currencyCode = currencySymbol1;
+
+                var billingDetails = _billDAL.GetInvoiceDetailsForPDF(model.BillingId.Value).Result;
                 AdtonesAdminWebApi.ViewModels.Item item1 = new AdtonesAdminWebApi.ViewModels.Item();
-                item1.Description = itemdetails;
-                item1.Price = model.Fundamount;
+                item1.Description = billingDetails.CampaignName;
+                item1.Price = billingDetails.FundAmount;
                 item1.Quantity = 1;
-                item1.Organisation = clientcompany.CompanyName;
+                item1.Organisation = billingDetails.CompanyName;
                 Customer customer = new Customer();
-                customer.FullName = customername;
-                customer.AddressLine1 = address;
-                customer.AddressLine2 = addaddress;
-                customer.City = town;
-                customer.Country = country;
-                customer.Postcode = postcode;
-                customer.PhoneNumber = customercontactinfo.PhoneNumber;
-                customer.Email = customercontactinfo.Email;
+                customer.FullName = billingDetails.FullName;
+                customer.AddressLine1 = billingDetails.AddressLine1;
+                customer.AddressLine2 = billingDetails.AddressLine2;
+                customer.City = billingDetails.City;
+                customer.Country = billingDetails.InvoiceCountry;
+                customer.Postcode = billingDetails.PostCode;
+                customer.PhoneNumber = billingDetails.PhoneNumber;
+                customer.Email = billingDetails.Email;
                 Invoice invoice = new Invoice();
                 invoice = new Invoice(item1);
-                invoice.InvoiceNumber = model.InvoiceNumber;
-                invoice.vat = model.TaxPercantage / 100;
-                invoice.InvoiceTax = model.TaxPercantage.ToString();
-                invoice.InvoiceCountry = _countryRepository.Get(top => top.Id == CountryId).ShortName;
-                invoice.MethodOfPayment = methodofPayment;
-                invoice.typeOfPayment = typeofPayment;
-                invoice.PONumber = model.PONumber;
-                if (paymentMethod == "Instantpayment") invoice.SettledDate = null;
+                invoice.InvoiceNumber = billingDetails.InvoiceNumber;
+                invoice.vat = billingDetails.InvoiceTax / 100;
+                invoice.InvoiceTax = billingDetails.InvoiceTax.ToString();
+                invoice.InvoiceCountry = billingDetails.ShortName;
+                invoice.MethodOfPayment = billingDetails.MethodOfPayment;
+                invoice.typeOfPayment = billingDetails.PaymentMethodId;
+                invoice.PONumber = billingDetails.PONumber;
+                if (billingDetails.SettledDate == null)
+                    billingDetails.SettledDate = DateTime.Now;
+                if (billingDetails.MethodOfPayment == "Instantpayment") 
+                    invoice.SettledDate = null;             
                 else
                 {
-                    if (paymentMethod == "CreditPayment")
+                    if (billingDetails.MethodOfPayment == "CreditPayment")
                     {
-                        if (campaignCreditDetails == null) invoice.SettledDate = billingdetails.SettledDate.AddDays(7);
-                        else invoice.SettledDate = billingdetails.SettledDate.AddDays(campaignCreditDetails.CreditPeriod);
+                        if (billingDetails.CreditPeriod == null)
+                            invoice.SettledDate = billingDetails.SettledDate.Value.AddDays(7);
+                        else
+                            invoice.SettledDate = billingDetails.SettledDate.Value.AddDays(billingDetails.CreditPeriod.Value);
                     }
-                    else invoice.SettledDate = billingdetails.SettledDate.AddDays(45);
+                    else invoice.SettledDate = billingDetails.SettledDate.Value.AddDays(45);
                 }
                 var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
                 invoice.Imagepath = otherpath + "\\Images\\5acf06fc.png";
                 invoice.Customer = customer;
                 invoice.Items = 1;
-                invoice.CountryId = countryId;
+                invoice.CountryId = CountryId;
                 invoice.CurrencySymbol = currencyCode;
 
-                GeneratePDF pdf = new GeneratePDF(_currencyConversion);
+                GenerateInvoicePDF pdf = new GenerateInvoicePDF(_curConv);
                 pdf.Invoice = invoice;
-                string path = pdf.CreatePDF(Server.MapPath("~/Invoice"), fromCurrencyCode, toCurrencyCode);
+                string path = pdf.CreatePDF(otherpath + "/Invoice", fromCurrencyCode, toCurrencyCode);
 
                 string[] mailto = new string[1];
-                mailto[0] = userdetails.Email;
+                mailto[0] = billingDetails.Email;
                 string[] attachment = new string[1];
                 attachment[0] = path;
-                sendemailtoclient(userdetails.Email, userdetails.FirstName, userdetails.LastName, 
-                    "Adtones Invoice (" + invoice.InvoiceNumber + ") (" + DateTime.Parse(billingdetails.SettledDate.ToString(), new CultureInfo("en-US")).Day + ") (" + DateTime.Parse(billingdetails.SettledDate.ToString(), new CultureInfo("en-US")).Month + ") (" + DateTime.Parse(billingdetails.SettledDate.ToString(), new CultureInfo("en-US")).Year + ")", 
-                    2, mailto, null, null, attachment, true, DateTime.Now.ToString(), paymentMethod, invoice.SettledDate, invoice.InvoiceNumber);
+                //sendemailtoclient(userdetails.Email, userdetails.FirstName, userdetails.LastName, 
+                //    "Adtones Invoice (" + invoice.InvoiceNumber + ") (" + DateTime.Parse(billingdetails.SettledDate.ToString(), new CultureInfo("en-US")).Day + ") (" + DateTime.Parse(billingdetails.SettledDate.ToString(), new CultureInfo("en-US")).Month + ") (" + DateTime.Parse(billingdetails.SettledDate.ToString(), new CultureInfo("en-US")).Year + ")", 
+                //    2, mailto, null, null, attachment, true, DateTime.Now.ToString(), paymentMethod, invoice.SettledDate, invoice.InvoiceNumber);
                 return true;
             }
             catch (Exception ex)
             {
                 return false;
-            }
-        }
-
-
-
-        private async Task UpdateUserCredit(BillingPaymentModel model, AdvertiserCreditDetailModel usercreditDetails)
-        {
-            if (usercreditDetails != null)
-            {
-                usercreditDetails.AvailableCredit = usercreditDetails.AvailableCredit - model.TotalAmount;
-
             }
         }
 

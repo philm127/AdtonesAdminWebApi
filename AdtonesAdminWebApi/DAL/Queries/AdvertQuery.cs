@@ -79,5 +79,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         public static string UpdateAdvertFromBilling => @"UPDATE Advert SET UpdatedDateTime=GETDATE(), IsAdminApproval=1, NextStatus=0 WHERE AdvertId=@Id";
+
+
+        public static string GetAdvertIdByCampid => @"SELECT AdvertId from Advert WHERE CampProfileId=@Id";
     }
 }

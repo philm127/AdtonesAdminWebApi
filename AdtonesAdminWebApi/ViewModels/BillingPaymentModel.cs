@@ -14,9 +14,9 @@ namespace AdtonesAdminWebApi.ViewModels
         public int? ClientId { get; set; }
         public string InvoiceNumber { get; set; }
         public string PONumber { get; set; }
-        public decimal CreditAvailable { get; set; }
+        public decimal AvailableCredit { get; set; }
         public decimal TotalFundAmount { get; set; }
-
+        public decimal AssignedCredit { get; set; }
         public decimal Fundamount { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal TaxPercantage { get; set; }

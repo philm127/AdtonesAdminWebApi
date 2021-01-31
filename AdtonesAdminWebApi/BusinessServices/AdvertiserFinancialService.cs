@@ -224,13 +224,59 @@ namespace AdtonesAdminWebApi.BusinessServices
                 result.result = 0;
             }
 
-            var updated = await AddCredit(model);
+            var updated = await AddPaymentToUserCredit(model);
 
             //if (model.Amount >= model.OutstandingAmount)
             //{
             //    int x = await _invDAL.UpdateInvoiceSettledDate(model.BillingId);
             //}
 
+            return result;
+        }
+
+
+        /// <summary>
+        /// Used for both Adding New Credit and Updating Existing Credit
+        /// </summary>
+        /// <param name="_usercredit"></param>
+        /// <returns></returns>
+        private async Task<ReturnResult> AddPaymentToUserCredit(AdvertiserCreditFormModel _usercredit)
+        {
+            var newModel = new AdvertiserCreditFormModel();
+            try
+            {
+                int x = 0;
+                var creditDetails = await _invDAL.GetUserCreditDetail(_usercredit.UserId);
+                var balance = await _invDAL.GetCreditBalance(_usercredit.UserId);
+                if (creditDetails != null)
+                {
+                    _usercredit.Id = creditDetails.Id;
+                    _usercredit.AssignCredit = creditDetails.AssignCredit;                   
+                    _usercredit.AvailableCredit = _usercredit.AssignCredit + (balance);
+                    x = await _invDAL.UpdateUserCredit(_usercredit);
+                }
+                else
+                { 
+                    _usercredit.AvailableCredit = (balance);
+                    _usercredit.AssignCredit = _usercredit.Amount;
+                    x = await _invDAL.AddUserCredit(_usercredit);
+                }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "AdvertisersCreditService",
+                    ProcedureName = "AddCredit"
+                };
+                _logging.LogError();
+                result.result = 0;
+                result.error = "Credit was not added successfully";
+                return result;
+            }
+            result.body = "Assigned credit successfully";
             return result;
         }
 
@@ -244,23 +290,20 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// </summary>
         /// <param name="_usercredit"></param>
         /// <returns></returns>
-        public async Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _usercredit)
+        public async Task<ReturnResult> AddUserCredit(AdvertiserCreditFormModel _usercredit)
         {
             var newModel = new AdvertiserCreditFormModel();
             try
             {
                 int x = 0;
-                var creditDetails = await _invDAL.GetUserCreditDetail(_usercredit.UserId);
+                var balance = await _invDAL.GetCreditBalance(_usercredit.UserId);
+                _usercredit.AvailableCredit = _usercredit.AssignCredit + (balance);
 
+                var creditDetails = await _invDAL.GetUserCreditDetail(_usercredit.UserId);
+                
                 if (creditDetails != null)
                 {
-                    var available = creditDetails.AvailableCredit + _usercredit.Amount;
-                    
                     _usercredit.Id = creditDetails.Id;
-                    if (available > creditDetails.AssignCredit)
-                        _usercredit.AvailableCredit = creditDetails.AssignCredit;
-                    else
-                        _usercredit.AvailableCredit = creditDetails.AvailableCredit + _usercredit.Amount;
                     x = await _invDAL.UpdateUserCredit(_usercredit);
                 }
                 else

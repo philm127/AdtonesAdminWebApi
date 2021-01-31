@@ -93,79 +93,20 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        //private CampaignProfileGeographicFormModel CampaignProfileGeographicMapping(int Id, CampaignProfileGeographicFormModel CampaignProfileGeographicmodel)
-        //{
-        //    int countryId = 0;
-        //    if (Id == 0)
-        //    {
-        //        countryId = _profileRepository.GetById(Id).CountryId.Value;
-        //    }
-        //    else
-        //    {
-        //        countryId = _countryRepository.Get(top => top.Name.ToLower().Equals("kenya".ToLower())).Id;
-        //    }
-        //    CampaignProfilePreference campaignProfileGeographics = _campaignProfilePreferenceRepository.GetAll().FirstOrDefault();
-        //    if (campaignProfileGeographics == null)
-        //    {
-        //        CampaignProfileGeographicmodel = new CampaignProfileGeographicFormModel(Id);
-        //    }
-        //    else
-        //    {
-        //        bool status = checkcampaignProfileDemographics(campaignProfileGeographics);
-        //        if (status == false)
-        //        {
-        //            CampaignProfileGeographicmodel = new CampaignProfileGeographicFormModel(Id) { CampaignProfileGeographicId = campaignProfileGeographics.Id };
-        //        }
-        //        else
-        //        {
-        //            if (campaignProfileGeographics.CountryId == 0)
-        //            {
-        //                campaignProfileGeographics.CountryId = countryId;
-        //            }
-        //            CampaignProfileGeographicmodel =
-        //                Mapper.Map<CampaignProfilePreference, CampaignProfileGeographicFormModel>(
-        //                    campaignProfileGeographics);
-        //        }
-        //    }
-
-        //    return CampaignProfileGeographicmodel;
-        //}
-
-
-        public async Task<bool> SaveGeographicWizard(CampaignProfileGeographicFormModel model)
+        public async Task<bool> SaveGeographicWizard(CampaignProfileGeographicFormModel model, List<string> connString)
         {
             try
             {
-                CreateOrUpdateCampaignProfileGeographicCommand command =
-                    _mapper.Map<CampaignProfileGeographicFormModel, CreateOrUpdateCampaignProfileGeographicCommand>(model);
+                var command = new CreateOrUpdateCampaignProfileGeographicCommand();
 
-                if (model.CampaignProfileGeographicId == 0)
-                {
-                    var _campaignProfileId = await _matchDAL.GetCampaignProfilePreferenceId(model.CampaignProfileId);
-                    if (_campaignProfileId != 0)
-                    {
-                        command.CampaignProfileGeographicId = _campaignProfileId;
-                    }
-                }
-                var campaignProfile = await _campaignDAL.GetCampaignProfileDetail(model.CampaignProfileId);
-                if (campaignProfile != null)
-                {
-                    command.CountryId = (int)campaignProfile.CountryId;
-                }
+                command.CampaignProfileId = model.CampaignProfileId;
+                command.CountryId = model.CountryId;
+                command.PostCode = model.PostCode;
+                command.Location_Demographics = CompileAnswers(SortList(model.LocationQuestion));
 
-                var result = await _matchDAL.InsertGeographicProfile(command);
+                var result = await _matchDAL.UpdateGeographicProfile(command, connString);
 
-                var result2 = await _matchDAL.InsertMatchCampaignGeographic(model);
-
-
-
-                if (campaignProfile.Status == (int)Enums.CampaignStatus.Play && campaignProfile.IsAdminApproval == true)
-                {
-                    var conn = await _connService.GetConnectionStringsByCountryId(model.CountryId);
-
-                    await _matchProcess.PrematchProcessForCampaign(model.CampaignProfileId, conn);
-
-                }
+                var result2 = await _matchDAL.UpdateMatchCampaignGeographic(command, connString);
             }
             catch
             {
@@ -184,198 +125,19 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public CampaignProfileTimeSettingFormModel GetTimeSettingModel(int Id = 0)
         {
-            return new CampaignProfileTimeSettingFormModel
-            { CampaignProfileId = Id, AvailableTimes = GetTimes() };
+            var timeSettings = new CampaignProfileTimeSettingFormModel
+            { CampaignProfileId = Id, 
+                MondaySelectedTimes = GetTimes(),
+                TuesdaySelectedTimes = GetTimes(),
+                WednesdaySelectedTimes = GetTimes(),
+                ThursdaySelectedTimes = GetTimes(),
+                FridaySelectedTimes = GetTimes(),
+                SaturdaySelectedTimes = GetTimes(),
+                SundaySelectedTimes = GetTimes(),
+            };
+            
+            return timeSettings;
         }
-
-
-        public async Task<bool> SaveTimeSettingsWizard(CampaignProfileTimeSettingFormModel model)
-        {
-            CreateOrUpdateCampaignProfileTimeSettingCommand command =
-                    _mapper.Map<CampaignProfileTimeSettingFormModel, CreateOrUpdateCampaignProfileTimeSettingCommand>(
-                        model);
-
-            var timeSettings = new CampaignProfileTimeSetting();
-            timeSettings = new CampaignProfileTimeSetting();
-            timeSettings.Monday = string.Empty;
-            foreach (string s in command.MondayPostedTimes.DayIds)
-                timeSettings.Monday += s + ",";
-
-            if (!string.IsNullOrEmpty(timeSettings.Monday))
-                timeSettings.Monday = timeSettings.Monday.Substring(0, timeSettings.Monday.Length - 1);
-
-            timeSettings.Tuesday = string.Empty;
-            foreach (string s in command.TuesdayPostedTimes.DayIds)
-                timeSettings.Tuesday += s + ",";
-
-            if (!string.IsNullOrEmpty(timeSettings.Tuesday))
-                timeSettings.Tuesday = timeSettings.Tuesday.Substring(0, timeSettings.Tuesday.Length - 1);
-
-            timeSettings.Wednesday = string.Empty;
-            foreach (string s in command.WednesdayPostedTimes.DayIds)
-                timeSettings.Wednesday += s + ",";
-
-            if (!string.IsNullOrEmpty(timeSettings.Wednesday))
-                timeSettings.Wednesday = timeSettings.Wednesday.Substring(0, timeSettings.Wednesday.Length - 1);
-
-            timeSettings.Thursday = string.Empty;
-            foreach (string s in command.ThursdayPostedTimes.DayIds)
-                timeSettings.Thursday += s + ",";
-
-            if (!string.IsNullOrEmpty(timeSettings.Thursday))
-                timeSettings.Thursday = timeSettings.Thursday.Substring(0, timeSettings.Thursday.Length - 1);
-
-            timeSettings.Friday = string.Empty;
-            foreach (string s in command.FridayPostedTimes.DayIds)
-                timeSettings.Friday += s + ",";
-
-            if (!string.IsNullOrEmpty(timeSettings.Friday))
-                timeSettings.Friday = timeSettings.Friday.Substring(0, timeSettings.Friday.Length - 1);
-
-            timeSettings.Saturday = string.Empty;
-            foreach (string s in command.SaturdayPostedTimes.DayIds)
-                timeSettings.Saturday += s + ",";
-
-            if (!string.IsNullOrEmpty(timeSettings.Saturday))
-                timeSettings.Saturday = timeSettings.Saturday.Substring(0, timeSettings.Saturday.Length - 1);
-
-            timeSettings.Sunday = string.Empty;
-            foreach (string s in command.SundayPostedTimes.DayIds)
-                timeSettings.Sunday += s + ",";
-
-            if (!string.IsNullOrEmpty(timeSettings.Sunday))
-                timeSettings.Sunday = timeSettings.Sunday.Substring(0, timeSettings.Sunday.Length - 1);
-
-            timeSettings.CampaignProfileId = command.CampaignProfileId;
-            timeSettings.CampaignProfileTimeSettingsId = command.CampaignProfileTimeSettingsId;
-
-            var x = await _matchDAL.InsertTimeSettingsProfile(timeSettings);
-            return true;
-        }
-
-
-        //private async Task<CampaignProfileTimeSettingFormModel> CampaignProfileTimeSettingMapping(int campaignId)
-        //{
-        //    if (campaignId != 0)
-        //    {
-        //        CampaignProfileTimeSetting campaignProfileTimeSettings = await _matchDAL.GetCampaignTimeSettings(campaignId);
-
-        //        if (campaignProfileTimeSettings != null)
-        //        {
-
-        //            var model = new CampaignProfileTimeSettingFormModel
-        //            {
-        //                CampaignProfileId = campaignId,
-        //                CampaignProfileTimeSettingsId = campaignProfileTimeSettings.CampaignProfileTimeSettingsId
-        //            };
-
-        //            if (campaignProfileTimeSettings.Monday == null)
-        //                model.MondaySelectedTimes = WizardGetTimes();
-
-        //            if (campaignProfileTimeSettings.Tuesday == null)
-        //                model.TuesdaySelectedTimes = WizardGetTimes();
-
-        //            if (campaignProfileTimeSettings.Wednesday == null)
-        //                model.WednesdaySelectedTimes = WizardGetTimes();
-
-        //            if (campaignProfileTimeSettings.Thursday == null)
-        //                model.ThursdaySelectedTimes = WizardGetTimes();
-
-        //            if (campaignProfileTimeSettings.Friday == null)
-        //                model.FridaySelectedTimes = WizardGetTimes();
-
-        //            if (campaignProfileTimeSettings.Saturday == null)
-        //                model.SaturdaySelectedTimes = WizardGetTimes();
-
-        //            if (campaignProfileTimeSettings.Sunday == null)
-        //                model.SundaySelectedTimes = WizardGetTimes();
-
-        //            model.AvailableTimes = WizardGetTimes();
-
-        //            return model;
-        //        }
-        //    }
-        //    return new CampaignProfileTimeSettingFormModel
-        //    { CampaignProfileId = campaignId, AvailableTimes = WizardGetTimes() };
-        //}
-
-        //private async Task<bool> CampaignProfileTimeSettingMapping(int campaignId, int countryId, int provCampId)
-        //{
-        //    PostedTimesModel postedTimesModel = new PostedTimesModel();
-        //    postedTimesModel.DayIds = new string[] { "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "24:00" };
-
-        //    CampaignProfileTimeSetting timeSettings = new CampaignProfileTimeSetting();
-        //    var model = new CampaignProfileTimeSettingFormModel { CampaignProfileId = campaignId, AvailableTimes = _profileService.WizardGetTimes() };
-
-        //    //Update Campaign Profile Time Setting
-
-        //    model.MondayPostedTimes = postedTimesModel;
-        //    model.TuesdayPostedTimes = postedTimesModel;
-        //    model.WednesdayPostedTimes = postedTimesModel;
-        //    model.ThursdayPostedTimes = postedTimesModel;
-        //    model.FridayPostedTimes = postedTimesModel;
-        //    model.SaturdayPostedTimes = postedTimesModel;
-        //    model.SundayPostedTimes = postedTimesModel;
-
-
-        //    timeSettings = new CampaignProfileTimeSetting();
-        //    timeSettings.Monday = string.Empty;
-        //    foreach (string s in model.MondayPostedTimes.DayIds)
-        //        timeSettings.Monday += s + ",";
-
-        //    if (!string.IsNullOrEmpty(timeSettings.Monday))
-        //        timeSettings.Monday = timeSettings.Monday.Substring(0, timeSettings.Monday.Length - 1);
-
-        //    timeSettings.Tuesday = string.Empty;
-        //    foreach (string s in model.TuesdayPostedTimes.DayIds)
-        //        timeSettings.Tuesday += s + ",";
-
-        //    if (!string.IsNullOrEmpty(timeSettings.Tuesday))
-        //        timeSettings.Tuesday = timeSettings.Tuesday.Substring(0, timeSettings.Tuesday.Length - 1);
-
-        //    timeSettings.Wednesday = string.Empty;
-        //    foreach (string s in model.WednesdayPostedTimes.DayIds)
-        //        timeSettings.Wednesday += s + ",";
-
-        //    if (!string.IsNullOrEmpty(timeSettings.Wednesday))
-        //        timeSettings.Wednesday = timeSettings.Wednesday.Substring(0, timeSettings.Wednesday.Length - 1);
-
-        //    timeSettings.Thursday = string.Empty;
-        //    foreach (string s in model.ThursdayPostedTimes.DayIds)
-        //        timeSettings.Thursday += s + ",";
-
-        //    if (!string.IsNullOrEmpty(timeSettings.Thursday))
-        //        timeSettings.Thursday = timeSettings.Thursday.Substring(0, timeSettings.Thursday.Length - 1);
-
-        //    timeSettings.Friday = string.Empty;
-        //    foreach (string s in model.FridayPostedTimes.DayIds)
-        //        timeSettings.Friday += s + ",";
-
-        //    if (!string.IsNullOrEmpty(timeSettings.Friday))
-        //        timeSettings.Friday = timeSettings.Friday.Substring(0, timeSettings.Friday.Length - 1);
-
-        //    timeSettings.Saturday = string.Empty;
-        //    foreach (string s in model.SaturdayPostedTimes.DayIds)
-        //        timeSettings.Saturday += s + ",";
-
-        //    if (!string.IsNullOrEmpty(timeSettings.Saturday))
-        //        timeSettings.Saturday = timeSettings.Saturday.Substring(0, timeSettings.Saturday.Length - 1);
-
-        //    timeSettings.Sunday = string.Empty;
-        //    foreach (string s in model.SundayPostedTimes.DayIds)
-        //        timeSettings.Sunday += s + ",";
-
-        //    if (!string.IsNullOrEmpty(timeSettings.Sunday))
-        //        timeSettings.Sunday = timeSettings.Sunday.Substring(0, timeSettings.Sunday.Length - 1);
-
-        //    timeSettings.CampaignProfileId = model.CampaignProfileId;
-        //    timeSettings.CampaignProfileTimeSettingsId = model.CampaignProfileTimeSettingsId;
-
-        //    var x = await _createDAL.AddProfileTimeSettings(timeSettings, countryId, provCampId);
-
-        //    return true;
-
-        //}
 
 
         public async Task<CampaignProfileTimeSettingFormModel> GetTimeSettingData(int campaignId)
@@ -386,8 +148,6 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             if (CampaignProfileTimeSettings != null)
             {
-
-
                 Timing = new CampaignProfileTimeSettingFormModel
                 {
                     CampaignProfileId = campaignId,
@@ -398,43 +158,146 @@ namespace AdtonesAdminWebApi.BusinessServices
                 if (CampaignProfileTimeSettings.Monday != null)
                     Timing.MondaySelectedTimes =
                         ConvertTimesArrayToList(CampaignProfileTimeSettings.Monday.Split(",".ToCharArray()));
+                else
+                    Timing.MondaySelectedTimes = GetTimes();
                 if (CampaignProfileTimeSettings.Tuesday != null)
                     Timing.TuesdaySelectedTimes =
                         ConvertTimesArrayToList(CampaignProfileTimeSettings.Tuesday.Split(",".ToCharArray()));
+                else
+                    Timing.TuesdaySelectedTimes = GetTimes();
                 if (CampaignProfileTimeSettings.Wednesday != null)
                     Timing.WednesdaySelectedTimes =
                         ConvertTimesArrayToList(CampaignProfileTimeSettings.Wednesday.Split(",".ToCharArray()));
+                else
+                    Timing.WednesdaySelectedTimes = GetTimes();
                 if (CampaignProfileTimeSettings.Thursday != null)
                     Timing.ThursdaySelectedTimes =
                         ConvertTimesArrayToList(CampaignProfileTimeSettings.Thursday.Split(",".ToCharArray()));
+                else
+                    Timing.ThursdaySelectedTimes = GetTimes();
                 if (CampaignProfileTimeSettings.Friday != null)
                     Timing.FridaySelectedTimes =
                         ConvertTimesArrayToList(CampaignProfileTimeSettings.Friday.Split(",".ToCharArray()));
+                else
+                    Timing.FridaySelectedTimes = GetTimes();
                 if (CampaignProfileTimeSettings.Saturday != null)
                     Timing.SaturdaySelectedTimes =
                         ConvertTimesArrayToList(CampaignProfileTimeSettings.Saturday.Split(",".ToCharArray()));
+                else
+                    Timing.SaturdaySelectedTimes = GetTimes();
                 if (CampaignProfileTimeSettings.Sunday != null)
                     Timing.SundaySelectedTimes =
                         ConvertTimesArrayToList(CampaignProfileTimeSettings.Sunday.Split(",".ToCharArray()));
-
-                Timing.AvailableTimes = GetTimes();
+                else
+                    Timing.SundaySelectedTimes = GetTimes();
 
 
             }
             else
             {
-                Timing = new CampaignProfileTimeSettingFormModel { CampaignProfileId = campaignId };
+                Timing = GetTimeSettingModel();
             }
 
             return Timing;
         }
 
 
+        public async Task<bool> SaveTimeSettingsWizard(CampaignProfileTimeSettingFormModel model, List<string> connString)
+        {
+
+            var timeSettings = new CampaignProfileTimeSetting();
+            timeSettings = new CampaignProfileTimeSetting();
+            timeSettings.Monday = null;
+            foreach (var item in model.MondaySelectedTimes)
+            {
+                if (item.IsSelected)
+                    timeSettings.Monday += item.Name + ",";
+            }
+
+            if (!string.IsNullOrEmpty(timeSettings.Monday))
+                timeSettings.Monday = timeSettings.Monday.Substring(0, timeSettings.Monday.Length - 1);
+
+            timeSettings.Tuesday = null;
+            foreach (var item in model.TuesdaySelectedTimes)
+            {
+                if (item.IsSelected)
+                    timeSettings.Tuesday += item.Name + ",";
+            }
+
+            if (!string.IsNullOrEmpty(timeSettings.Tuesday))
+                timeSettings.Tuesday = timeSettings.Tuesday.Substring(0, timeSettings.Tuesday.Length - 1);
+
+            timeSettings.Wednesday = null;
+            foreach (var item in model.WednesdaySelectedTimes)
+            {
+                if (item.IsSelected)
+                    timeSettings.Wednesday += item.Name + ",";
+            }
+
+            if (!string.IsNullOrEmpty(timeSettings.Wednesday))
+                timeSettings.Wednesday = timeSettings.Wednesday.Substring(0, timeSettings.Wednesday.Length - 1);
+
+            timeSettings.Thursday = null;
+            foreach (var item in model.ThursdaySelectedTimes)
+            {
+                if (item.IsSelected)
+                    timeSettings.Thursday += item.Name + ",";
+            }
+
+            if (!string.IsNullOrEmpty(timeSettings.Thursday))
+                timeSettings.Thursday = timeSettings.Thursday.Substring(0, timeSettings.Thursday.Length - 1);
+
+            timeSettings.Friday = null;
+            foreach (var item in model.FridaySelectedTimes)
+            {
+                if (item.IsSelected)
+                    timeSettings.Friday += item.Name + ",";
+            }
+
+            if (!string.IsNullOrEmpty(timeSettings.Friday))
+                timeSettings.Friday = timeSettings.Friday.Substring(0, timeSettings.Friday.Length - 1);
+
+            timeSettings.Saturday = null;
+            foreach (var item in model.SaturdaySelectedTimes)
+            {
+                if (item.IsSelected)
+                    timeSettings.Saturday += item.Name + ",";
+            }
+
+            if (!string.IsNullOrEmpty(timeSettings.Saturday))
+                timeSettings.Saturday = timeSettings.Saturday.Substring(0, timeSettings.Saturday.Length - 1);
+
+            timeSettings.Sunday = null;
+            foreach (var item in model.SundaySelectedTimes)
+            {
+                if (item.IsSelected)
+                    timeSettings.Sunday += item.Name + ",";
+            }
+
+            if (!string.IsNullOrEmpty(timeSettings.Sunday))
+                timeSettings.Sunday = timeSettings.Sunday.Substring(0, timeSettings.Sunday.Length - 1);
+
+            timeSettings.CampaignProfileId = model.CampaignProfileId;
+            timeSettings.CampaignProfileTimeSettingsId = model.CampaignProfileTimeSettingsId;
+
+            var x = await _matchDAL.InsertTimeSettingsProfile(timeSettings, connString);
+            return true;
+        }
 
 
         private IList<TimeOfDay> ConvertTimesArrayToList(string[] selectedTimes)
         {
-            return selectedTimes.Select(time => new TimeOfDay { Id = time, Name = time, IsSelected = true }).ToList();
+            var timings = GetTimes();
+            for(int i = 0; i < timings.Count; i++)
+            {
+                var sub = timings[i].Id;
+                if (selectedTimes.Contains(sub))
+                {
+                    timings[i].IsSelected = true;
+                }
+            }
+
+            return timings;
         }
 
 
@@ -611,49 +474,25 @@ namespace AdtonesAdminWebApi.BusinessServices
 
 
         // Update Demographics from Ads Profile Mapping
-        public async Task<bool> SaveDemographicsWizard(CampaignProfileDemographicsFormModel model)
+        public async Task<bool> SaveDemographicsWizard(CampaignProfileDemographicsFormModel model, List<string> connString)
         {
             try
             {
                 int? id = model.CampaignProfileId;
-                CreateOrUpdateCampaignProfileDemographicsCommand command =
+                var command = new CreateOrUpdateCampaignProfileDemographicsCommand();
 
-                   _mapper.Map<CampaignProfileDemographicsFormModel, CreateOrUpdateCampaignProfileDemographicsCommand>(
-                       model);
+                command.CampaignProfileId = model.CampaignProfileId;
 
-                if (model.CampaignProfileDemographicsId == 0)
-                {
-                    var _campaignPrefId = await _matchDAL.GetCampaignProfilePreferenceId(model.CampaignProfileId);
-                    if (_campaignPrefId != 0)
-                    {
-                        model.CampaignProfileDemographicsId = _campaignPrefId;
-                        command.Id = _campaignPrefId;
-                        command.NextStatus = true;
-                    }
-                    else
-                    {
-                        command.Id = model.CampaignProfileDemographicsId;
-                        command.NextStatus = true;
-                    }
-                }
-                else
-                {
-                    command.Id = model.CampaignProfileDemographicsId;
-                    command.NextStatus = true;
-                }
-                var prefId = await _matchDAL.InsertDemographicProfile(command);
+                command.Age_Demographics = CompileAnswers(SortList(model.AgeQuestion));
+                command.Education_Demographics = CompileAnswers(SortList(model.EducationQuestion));
+                command.Gender_Demographics = CompileAnswers(SortList(model.GenderQuestion));
+                command.HouseholdStatus_Demographics = CompileAnswers(SortList(model.HouseholdStatusQuestion));
+                // command.IncomeBracket_Demographics = CompileAnswers(SortList(model.IncomeBracketQuestion));
+                command.RelationshipStatus_Demographics = CompileAnswers(SortList(model.RelationshipStatusQuestion));
+                command.WorkingStatus_Demographics = CompileAnswers(SortList(model.WorkingStatusQuestion));
 
-                var campaignProfile = await _campaignDAL.GetCampaignProfileDetail(model.CampaignProfileId);
-                var result2 = await _matchDAL.InsertMatchCampaignDemographic(model);
-
-                var ConnString = await _connService.GetConnectionStringsByCountryId(campaignProfile.CountryId.Value);
-                if (ConnString != null)
-                {
-                    if (campaignProfile.Status == (int)Enums.CampaignStatus.Play && campaignProfile.IsAdminApproval == true)
-                    {
-                        await _matchProcess.PrematchProcessForCampaign(model.CampaignProfileId, ConnString);
-                    }
-                }
+                var prefId = await _matchDAL.UpdateDemographicProfile(command, connString);
+                var result2 = await _matchDAL.UpdateMatchCampaignDemographic(command, connString);
             }
             catch
             {
@@ -729,44 +568,20 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<bool> SaveMobileWizard(CampaignProfileMobileFormModel model)
+        public async Task<bool> SaveMobileWizard(CampaignProfileMobileFormModel model, List<string> connString)
         {
 
 
-                    CreateOrUpdateCampaignProfileMobileCommand command =
-                        _mapper.Map<CampaignProfileMobileFormModel, CreateOrUpdateCampaignProfileMobileCommand>(model);
-                    //check campaignprofile exists.
+            var command = new CreateOrUpdateCampaignProfileMobileCommand();
 
-                    if (model.CampaignProfileMobileId == 0)
-                    {
-                var _campaignPrefId = await _matchDAL.GetCampaignProfilePreferenceId(model.CampaignProfileId);
-                if (_campaignPrefId != 0)
-                {
-                    model.CampaignProfileMobileId = _campaignPrefId;
-                            command.CampaignProfileMobileId = _campaignPrefId;
-                            command.NextStatus = true;
-                        }
-                        else
-                        {
-                            command.CampaignProfileMobileId = model.CampaignProfileMobileId;
-                            command.NextStatus = true;
-                        }
-                    }
+            command.CampaignProfileId = model.CampaignProfileId;
 
-            var prefId = await _matchDAL.InsertMobileProfile(command);
+            command.ContractType_Mobile = CompileAnswers(SortList(model.ContractTypeQuestion));
+            command.Spend_Mobile = CompileAnswers(SortList(model.SpendQuestion));
 
-            var campaignProfile = await _campaignDAL.GetCampaignProfileDetail(model.CampaignProfileId);
+            var prefId = await _matchDAL.UpdateMobileProfile(command, connString);
 
-            var ConnString = await _connService.GetConnectionStringsByCountryId(campaignProfile.CountryId.Value);
-            if (ConnString != null)
-            {
-                if (campaignProfile.Status == (int)Enums.CampaignStatus.Play && campaignProfile.IsAdminApproval == true)
-                {
-                    await _matchProcess.PrematchProcessForCampaign(model.CampaignProfileId, ConnString);
-                }
-            }
-
-            var result2 = await _matchDAL.UpdateMatchCampaignMobile(model);
+            var result2 = await _matchDAL.UpdateMatchCampaignMobile(command, connString);
 
             return true;   
         }
@@ -860,22 +675,20 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<bool> SaveQuestionnaireWizard(CampaignProfileSkizaFormModel model)
+        public async Task<bool> SaveQuestionnaireWizard(CampaignProfileSkizaFormModel model, List<string> connString)
         {
-            var prefId = await _matchDAL.InsertQuestionnaireProfile(model);
+            var command = new CreateOrUpdateCampaignProfileSkizaCommand();
 
-            var campaignProfile = await _campaignDAL.GetCampaignProfileDetail(model.CampaignProfileId);
+            command.CampaignProfileId = model.CampaignProfileId;
 
-            var ConnString = await _connService.GetConnectionStringsByCountryId(campaignProfile.CountryId.Value);
-            if (ConnString != null)
-            {
-                if (campaignProfile.Status == (int)Enums.CampaignStatus.Play && campaignProfile.IsAdminApproval == true)
-                {
-                    await _matchProcess.PrematchProcessForCampaign(model.CampaignProfileId, ConnString);
-                }
-            }
+            command.DiscerningProfessionals_AdType = CompileAnswers(SortList(model.DiscerningProfessionalsQuestion));
+            command.Hustlers_AdType = CompileAnswers(SortList(model.HustlersQuestion));
+            command.Mass_AdType = CompileAnswers(SortList(model.MassQuestion));
+            command.Youth_AdType = CompileAnswers(SortList(model.YouthQuestion));
 
-            var result2 = await _matchDAL.UpdateMatchCampaignQuestionnaire(model);
+            var prefId = await _matchDAL.UpdateQuestionnaireProfile(command, connString);
+
+            var result2 = await _matchDAL.UpdateMatchCampaignQuestionnaire(command, connString);
 
             return true;
         }
@@ -1405,6 +1218,103 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<bool> SaveAdvertsWizard(CampaignProfileAdvertFormModel model, List<string> connString)
+        {
+            var command = new CreateOrUpdateCampaignProfileAdvertCommand();
+            command.CampaignProfileId = model.CampaignProfileId;
+            command.AdvocacyOrLegal_AdType = CompileAnswers(SortList(model.AdvocacyOrLegalQuestion));
+            command.AlcoholicDrinks_Advert = CompileAnswers(SortList(model.AlcoholicDrinksQuestion));
+            command.BusinessOrOpportunities_AdType = CompileAnswers(SortList(model.BusinessOrOpportunitiesQuestion));
+            command.Cinema_Advert = CompileAnswers(SortList(model.CinemaQuestion));
+            command.CommunicationsInternet_Advert = CompileAnswers(SortList(model.CommunicationsInternetQuestion));
+            command.DatingAndPersonal_AdType = CompileAnswers(SortList(model.DatingAndPersonalQuestion));
+            // command.DiscerningProfessionals_AdType = CompileAnswers(SortList(model.DiscerningProfessionalsQuestion));
+            command.DIYGardening_Advert = CompileAnswers(SortList(model.DIYGardeningQuestion));
+            command.ElectronicsOtherPersonalItems_Advert = CompileAnswers(SortList(model.ElectronicsOtherPersonalItemsQuestion));
+            command.Energy_AdType = CompileAnswers(SortList(model.EnergyQuestion));
+            command.Environment_Advert = CompileAnswers(SortList(model.EnvironmentQuestion));
+            command.FinancialServices_Advert = CompileAnswers(SortList(model.FinancialServicesQuestion));
+            command.Fitness_Advert = CompileAnswers(SortList(model.FitnessQuestion));
+            command.Food_Advert = CompileAnswers(SortList(model.FoodQuestion));
+            command.Furniture_AdType = CompileAnswers(SortList(model.FurnitureQuestion));
+            command.Gambling_AdType = CompileAnswers(SortList(model.GamblingQuestion));
+            command.Games_AdType = CompileAnswers(SortList(model.GamesQuestion));
+            command.Gifts_AdType = CompileAnswers(SortList(model.GiftsQuestion));
+            command.GoingOut_Advert = CompileAnswers(SortList(model.GoingOutQuestion));
+            command.Healthcare_AdType = CompileAnswers(SortList(model.HealthcareQuestion));
+            command.HolidaysTravel_Advert = CompileAnswers(SortList(model.HolidaysTravelQuestion));
+            command.Householdproducts_Advert = CompileAnswers(SortList(model.HouseholdproductsQuestion));
+            command.InformationTechnology_AdType = CompileAnswers(SortList(model.InformationTechnologyQuestion));
+            command.Insurance_AdType = CompileAnswers(SortList(model.InsuranceQuestion));
+            command.JobsAndEducation_AdType = CompileAnswers(SortList(model.JobsAndEducationQuestion));
+            command.Motoring_Advert = CompileAnswers(SortList(model.MotoringQuestion));
+            command.Music_Advert = CompileAnswers(SortList(model.MusicQuestion));
+            command.Newspapers_Advert = CompileAnswers(SortList(model.NewspapersQuestion));
+            command.NonAlcoholicDrinks_Advert = CompileAnswers(SortList(model.NonAlcoholicDrinksQuestion));
+            command.PetsPetFood_Advert = CompileAnswers(SortList(model.PetsPetFoodQuestion));
+            command.PharmaceuticalChemistsProducts_Advert = CompileAnswers(SortList(model.PharmaceuticalChemistsProductsQuestion));
+            command.RealEstate_AdType = CompileAnswers(SortList(model.RealEstateQuestion));
+            command.Religion_Advert = CompileAnswers(SortList(model.ReligionQuestion));
+            command.Restaurants_AdType = CompileAnswers(SortList(model.RestaurantsQuestion));
+            command.ShoppingRetailClothing_Advert = CompileAnswers(SortList(model.ShoppingRetailClothingQuestion));
+            command.Shopping_Advert = CompileAnswers(SortList(model.ShoppingQuestion));
+            command.SocialNetworking_Advert = CompileAnswers(SortList(model.SocialNetworkingQuestion));
+            command.SportsLeisure_Advert = CompileAnswers(SortList(model.SportsLeisureQuestion));
+            command.Supermarkets_AdType = CompileAnswers(SortList(model.SupermarketsQuestion));
+            command.SweetSaltySnacks_Advert = CompileAnswers(SortList(model.SweetSaltySnacksQuestion));
+            command.TobaccoProducts_Advert = CompileAnswers(SortList(model.TobaccoProductsQuestion));
+            command.ToiletriesCosmetics_Advert = CompileAnswers(SortList(model.ToiletriesCosmeticsQuestion));
+            command.TV_Advert = CompileAnswers(SortList(model.TVQuestion));
+            // command.Youth_AdType = CompileAnswers(SortList(model.YouthQuestion));
+
+            var prefId = await _matchDAL.UpdateAdvertProfile(command, connString);
+
+            var result2 = await _matchDAL.UpdateMatchCampaignAdvert(command, connString);
+
+            return true;
+        }
+
+
+
         #endregion
+
+
+        /// <summary>
+        /// Sorts the list.
+        /// </summary>
+        /// <param name="questionOptions">The question options.</param>
+        /// <returns>IEnumerable&lt;QuestionOptionModel&gt;.</returns>
+        internal IEnumerable<QuestionOptionModel> SortList(List<QuestionOptionModel> questionOptions)
+        {
+            questionOptions.Sort((x, y) => String.Compare(x.QuestionValue, y.QuestionValue, StringComparison.Ordinal));
+            return questionOptions;
+        }
+
+        /// <summary>
+        /// Compiles the answers.
+        /// </summary>
+        /// <param name="questionOptions">The question options.</param>
+        /// <returns>System.String.</returns>
+        internal string CompileAnswers(IEnumerable<QuestionOptionModel> questionOptions)
+        {
+            IEnumerable<QuestionOptionModel> questionOptionModels = questionOptions as QuestionOptionModel[] ??
+                                                                    questionOptions.ToArray();
+
+            string answers = questionOptionModels.Where(q => q.Selected).Aggregate(
+                string.Empty,
+                (current, q) => current + q.QuestionValue
+                );
+
+            if (string.IsNullOrEmpty(answers))
+            {
+                foreach (
+                    QuestionOptionModel questionOptionModel in
+                        questionOptionModels.Where(questionOptionModel => questionOptionModel.DefaultAnswer))
+                    answers = questionOptionModel.QuestionValue;
+            }
+
+            return answers;
+        }
+
     }
 }

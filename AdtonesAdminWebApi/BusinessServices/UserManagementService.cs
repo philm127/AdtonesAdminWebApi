@@ -706,6 +706,29 @@ namespace AdtonesAdminWebApi.BusinessServices
             return true;
         }
 
-        
+
+        public async Task<ReturnResult> GetClientProfile(int clientId)
+        {
+
+            try
+            {
+                result.body = await _userDAL.GetClientDetails(clientId);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "UserManagementService",
+                    ProcedureName = "GetClientProfile"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
     }
 }

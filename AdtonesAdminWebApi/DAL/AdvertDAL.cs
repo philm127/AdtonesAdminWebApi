@@ -17,7 +17,7 @@ namespace AdtonesAdminWebApi.DAL
     public class AdvertDAL : BaseDAL, IAdvertDAL
     {
 
-        public AdvertDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor) 
+        public AdvertDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor)
             : base(configuration, executers, connService, httpAccessor)
         { }
 
@@ -38,10 +38,10 @@ namespace AdtonesAdminWebApi.DAL
                 sb.Append(" WHERE ad.UserId=@UserId AND ad.Status=4 ");
                 builder.AddParameters(new { UserId = id });
             }
-                var values = CheckGeneralFile(sb, builder, pais:"ad",ops:"ad",advs:"ad");
-                sb = values.Item1;
-                builder = values.Item2;
-            
+            var values = CheckGeneralFile(sb, builder, pais: "ad", ops: "ad", advs: "ad");
+            sb = values.Item1;
+            builder = values.Item2;
+
             sb.Append(" ORDER BY ad.CreatedDateTime DESC, ad.Status DESC;");
 
             var select = builder.AddTemplate(sb.ToString());
@@ -173,7 +173,7 @@ namespace AdtonesAdminWebApi.DAL
             var builder = new SqlBuilder();
             sb.Append(AdvertQuery.GetAdvertCategoryDataTable);
 
-            var values = CheckGeneralFile(sb, builder, pais:"ad", ops:"op");
+            var values = CheckGeneralFile(sb, builder, pais: "ad", ops: "op");
             sb = values.Item1;
             builder = values.Item2;
             var select = builder.AddTemplate(sb.ToString());
@@ -196,16 +196,16 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 x = await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(AdvertQuery.DeleteAdvertCategory + " AdvertCategoryId=@Id;", 
-                                                                                                                    new { Id = model.id}));
+                                    conn => conn.ExecuteScalar<int>(AdvertQuery.DeleteAdvertCategory + " AdvertCategoryId=@Id;",
+                                                                                                                    new { Id = model.id }));
 
                 var lst = await _connService.GetConnectionStringsByCountry(model.countryId);
                 List<string> conns = lst.ToList();
 
-                foreach(string constr in conns)
+                foreach (string constr in conns)
                 {
                     x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(AdvertQuery.DeleteAdvertCategory + " AdtoneServerAdvertCategoryId=@Id;", 
+                                    conn => conn.ExecuteScalar<int>(AdvertQuery.DeleteAdvertCategory + " AdtoneServerAdvertCategoryId=@Id;",
                                                                                                                      new { Id = model.id }));
                 }
             }
@@ -227,9 +227,12 @@ namespace AdtonesAdminWebApi.DAL
                 sb.Append(AdvertQuery.UpdateAdvertCategory);
                 sb.Append(" AdvertCategoryId=@Id;");
                 x = await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(sb.ToString(),new { Id = model.AdvertCategoryId,
-                                                                                    countryId = model.CountryId,
-                                                                                    name = model.CategoryName}));
+                                    conn => conn.ExecuteScalar<int>(sb.ToString(), new
+                                    {
+                                        Id = model.AdvertCategoryId,
+                                        countryId = model.CountryId,
+                                        name = model.CategoryName
+                                    }));
 
                 var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.GetValueOrDefault());
                 List<string> conns = lst.ToList();
@@ -241,10 +244,12 @@ namespace AdtonesAdminWebApi.DAL
                     var countryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId.GetValueOrDefault(), constr);
 
                     x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(sb1.ToString(), new { Id = model.AdvertCategoryId,
-                                                                                            countryId = countryId,
-                                                                                            name = model.CategoryName
-                                                                                        }));
+                                    conn => conn.ExecuteScalar<int>(sb1.ToString(), new
+                                    {
+                                        Id = model.AdvertCategoryId,
+                                        countryId = countryId,
+                                        name = model.CategoryName
+                                    }));
                 }
             }
             catch
@@ -295,22 +300,22 @@ namespace AdtonesAdminWebApi.DAL
                 var builder2 = new SqlBuilder();
                 var select2 = builder2.AddTemplate(AdvertQuery.AddAdvertCategory);
 
-                    builder2.AddParameters(new { name = model.CategoryName });
-                    builder2.AddParameters(new { Id = model.AdtoneServerAdvertCategoryId });
+                builder2.AddParameters(new { name = model.CategoryName });
+                builder2.AddParameters(new { Id = model.AdtoneServerAdvertCategoryId });
 
 
-                    var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.GetValueOrDefault());
-                    List<string> conns = lst.ToList();
+                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.GetValueOrDefault());
+                List<string> conns = lst.ToList();
 
-                    foreach (string constr in conns)
-                    {
-                        var countryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId.GetValueOrDefault(), constr);
+                foreach (string constr in conns)
+                {
+                    var countryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId.GetValueOrDefault(), constr);
 
-                        builder2.AddParameters(new { countryId = countryId });
+                    builder2.AddParameters(new { countryId = countryId });
 
-                        y += await _executers.ExecuteCommand(constr,
-                                        conn => conn.ExecuteScalar<int>(select2.RawSql, select2.Parameters));
-                    }
+                    y += await _executers.ExecuteCommand(constr,
+                                    conn => conn.ExecuteScalar<int>(select2.RawSql, select2.Parameters));
+                }
 
             }
             catch
@@ -353,7 +358,7 @@ namespace AdtonesAdminWebApi.DAL
         /// <param name="model"></param>
         /// <param name="userId">UserId obtained from operator provisioning server using AdtonesDServerUserId</param>
         /// <returns></returns>
-        public async Task<int> ChangeAdvertStatusOperator(UserAdvertResult model,int userId, int adId)
+        public async Task<int> ChangeAdvertStatusOperator(UserAdvertResult model, int userId, int adId)
         {
             var operatorConnectionString = await _connService.GetConnectionStringByOperator(model.OperatorId);
             var sb = new StringBuilder();
@@ -425,7 +430,7 @@ namespace AdtonesAdminWebApi.DAL
                 builder.AddParameters(new { AdvertId = model.AdvertId });
                 builder.AddParameters(new { UserId = model.UpdatedBy });
                 builder.AddParameters(new { RejectionReason = model.RejectionReason });
-                builder.AddParameters(new { AdtoneServerAdvertRejectionId = 0});
+                builder.AddParameters(new { AdtoneServerAdvertRejectionId = 0 });
 
                 return await _executers.ExecuteCommand(_connStr,
                                     conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
@@ -494,7 +499,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateAdvertForBilling(int advertId, int operatorId)
+        public async Task<int> UpdateAdvertForBilling(int advertId, string constr)
         {
             int adId = 0;
             try
@@ -502,7 +507,6 @@ namespace AdtonesAdminWebApi.DAL
                 var x = await _executers.ExecuteCommand(_connStr,
                                     conn => conn.ExecuteScalar<int>(AdvertQuery.UpdateAdvertFromBilling, new { Id = advertId }));
 
-                var constr = await _connService.GetConnectionStringByOperator(operatorId);
 
                 adId = await _executers.ExecuteCommand(constr,
                                 conn => conn.ExecuteScalar<int>("SELECT AdvertId FROM Advert WHERE AdtoneServerAdvertId=@Id", new { Id = advertId }));
@@ -516,5 +520,18 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
+        public async Task<int> GetAdvertIdByCampid(int campaignId)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.ExecuteScalar<int>(AdvertQuery.GetAdvertIdByCampid, new { Id = campaignId }));
+            }
+            catch
+            {
+                throw;
+            }
+
+        }
     }
 }

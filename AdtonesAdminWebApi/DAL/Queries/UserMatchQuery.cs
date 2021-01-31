@@ -15,30 +15,30 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string UpdateBucketAmount => "Update CampaignProfile SET BucketCount=@BucketCount WHERE CampaignProfileId=@Id";
 
 
-        public static string InsertNewCampaignData => @"INSERT INTO CampaignMatches(UserId,ClientId,CampaignName,CampaignDescription,TotalBudget,
-                                                    MaxDailyBudget,MaxBid,MaxMonthBudget,MaxWeeklyBudget,MaxHourlyBudget,TotalCredit,
-                                                    AvailableCredit,PlaysToDate,PlaysLastMonth,PlaysCurrentMonth,CancelledToDate,CancelledLastMonth,CancelledCurrentMonth,
-                                                    SmsToDate,SmsLastMonth,SmsCurrentMonth,EmailToDate,EmailsLastMonth,EmailsCurrentMonth,
-                                                    EmailFileLocation,Active,NumberOfPlays,AverageDailyPlays,SmsRequests,EmailsDelievered,
-                                                    EmailSubject,EmailBody,EmailSenderAddress,SmsOriginator,SmsBody,SMSFileLocation,CreatedDateTime,
-                                                    UpdatedDateTime,Status,StartDate,EndDate,NumberInBatch,CountryId,RemainingMaxMonthBudget,
-                                                    RemainingMaxDailyBudget,RemainingMaxWeeklyBudget,RemainingMaxHourlyBudget,
-                                                    NextStatus,MSCampaignProfileId,EMAIL_MESSAGE,SMS_MESSAGE,ORIGINATOR)
-                                                    
+        public static string InsertNewCampaignMatchData => @"INSERT INTO CampaignMatches(UserId,ClientId,CampaignName,CampaignDescription,TotalBudget,
+                                                        MaxDailyBudget,MaxBid,MaxMonthBudget,MaxWeeklyBudget,MaxHourlyBudget,TotalCredit,
+                                                        EmailFileLocation,Active,
+                                                        EmailSubject,EmailBody,EmailSenderAddress,SmsOriginator,SmsBody,SMSFileLocation,CreatedDateTime,
+                                                        UpdatedDateTime,Status,StartDate,EndDate,NumberInBatch,CountryId,
+                                                        NextStatus,MSCampaignProfileId,EMAIL_MESSAGE,SMS_MESSAGE,ORIGINATOR)
                                                     VALUES(@UserId,@ClientId,@CampaignName,@CampaignDescription,@TotalBudget,@MaxDailyBudget,
-                                                    @MaxBid,@MaxMonthBudget,@MaxWeeklyBudget,@MaxHourlyBudget,@TotalCredit,
-                                                    @AvailableCredit,@PlaysToDate,@PlaysLastMonth,@PlaysCurrentMonth,@CancelledToDate,@CancelledLastMonth,
-                                                    @CancelledCurrentMonth,@SmsToDate,@SmsLastMonth,@SmsCurrentMonth,@EmailToDate,@EmailsLastMonth,
-                                                    @EmailsCurrentMonth,@EmailFileLocation,@Active,@NumberOfPlays,@AverageDailyPlays,@SmsRequests,
-                                                    @EmailsDelievered,@EmailSubject,@EmailBody,@EmailSenderAddress,@SmsOriginator,@SmsBody,
-                                                    @SMSFileLocation,GETDATE(),GETDATE(),@Status,@StartDate,@EndDate,@NumberInBatch,
-                                                    @CountryId,@RemainingMaxMonthBudget,@RemainingMaxDailyBudget,@RemainingMaxWeeklyBudget,
-                                                    @RemainingMaxHourlyBudget,@NextStatus,
-                                                    @CampaignProfileId,@EmailBody,@SmsBody,@SmsOriginator);
+                                                        @MaxBid,@MaxMonthBudget,@MaxWeeklyBudget,@MaxHourlyBudget,@TotalCredit,
+                                                        @EmailFileLocation,@Active,@EmailSubject,@EmailBody,@EmailSenderAddress,@SmsOriginator,@SmsBody,
+                                                        @SMSFileLocation,GETDATE(),GETDATE(),@Status,@StartDate,@EndDate,@NumberInBatch,
+                                                        @CountryId,1,
+                                                        @CampaignProfileId,@EmailBody,@SmsBody,@SmsOriginator);
                                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
 
-        public static string GetCampaignMatchesDetailsById => @"SELECT* FROM CampaignMatches WHERE MSCampaignProfileId=Id;";
+        public static string UpdateCampaignMatchData => @"UPDATE CampaignMatches SET CampaignDescription=@CampaignDescription,
+                                                    MaxDailyBudget=@MaxDailyBudget,MaxBid=@MaxBid,MaxMonthBudget=@MaxMonthBudget,
+                                                    MaxWeeklyBudget=@MaxWeeklyBudget,MaxHourlyBudget=@MaxHourlyBudget,
+                                                    EmailSubject=@EmailSubject,EmailBody=@EmailBody,SmsOriginator=@SmsOriginator,SmsBody=@SmsBody,
+                                                    UpdatedDateTime=GETDATE(),StartDate=@StartDate,EndDate=@EndDate
+                                                    WHERE MSCampaignProfileId=@CampaignProfileId ";
+
+
+        public static string GetCampaignMatchesDetailsById => @"SELECT * FROM CampaignMatches WHERE MSCampaignProfileId=@Id;";
 
 
         //        public static string UpdateNewCampaignData => @"UPDATE CampaignMatches SET UserId=@UserId,ClientId=@ClientId,CampaignName,CampaignDescription,TotalBudget,
@@ -69,24 +69,18 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string GetCampaignProfilePreferenceDetailsByCampaignId = @"SELECT * FROM CampaignProfilePreference WHERE CampaignProfileId=@Id";
 
 
-        public static string InsertGeographicProfile = @"INSERT INTO CampaignProfilePreference(PostCode,CountryId,CampaignProfileId,
-                                                            Location_Demographics,AdtoneServerCampaignProfilePrefId)
-                                                        VALUES(@PostCode,@CountryId,@CampaignProfileId,@Location_Demographics, @AdtoneServerCampaignProfilePrefId);
-                                                        SELECT CAST(SCOPE_IDENTITY() AS INT);";
+        public static string InsertMatchFinancial = @"UPDATE CampaignMatches SET TotalBudget=@TotalBudget,TotalCredit=@TotalCredit,
+                                                        AvailableCredit=@AvailableCredit,Status=@Status WHERE MSCampaignProfileId=@Id";
 
 
-        public static string InsertDemographicProfile => @"INSERT INTO CampaignProfilePreference(CampaignProfileId,DOBEnd_Demographics,
-                                                            DOBStart_Demographics,Age_Demographics,Education_Demographics,Gender_Demographics,
-                                                            HouseholdStatus_Demographics,IncomeBracket_Demographics,RelationshipStatus_Demographics,
-                                                            WorkingStatus_Demographics,AdtoneServerCampaignProfilePrefId)
-                                                           VALUES(@CampaignProfileId,@DOBEnd_Demographics,@DOBStart_Demographics,@Age_Demographics,
-                                                            @Education_Demographics,@Gender_Demographics,@HouseholdStatus_Demographics,@IncomeBracket_Demographics,
-                                                            @RelationshipStatus_Demographics, @WorkingStatus_Demographics,@AdtoneServerCampaignProfilePrefId);
+
+        public static string InsertProfilePreference = @"INSERT INTO CampaignProfilePreference(CountryId,CampaignProfileId,NextStatus,AdtoneServerCampaignProfilePrefId)
+                                                            VALUES(@CountryId,@CampaignProfileId,0, @AdtoneServerCampaignProfilePrefId);
                                                             SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
 
-        public static string UpdateGeographicProfile = @"UPDATE CampaignProfilePreference SET PostCode=@PostCode,Location_Demographics=@Location_Demographics,
-                                                            CountryId=@CountryId WHERE Id=@Id";
+        public static string UpdateGeographicProfile = @"UPDATE CampaignProfilePreference SET PostCode=@PostCode,Location_Demographics=@Location_Demographics
+                                                            WHERE CampaignProfileId=@Id";
 
 
         public static string UpdateDemographicProfile = @"UPDATE CampaignProfilePreference SET DOBEnd_Demographics=@DOBEnd_Demographics,
@@ -94,7 +88,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                             Education_Demographics=@Education_Demographics,Gender_Demographics=@Gender_Demographics,
                                                             HouseholdStatus_Demographics=@HouseholdStatus_Demographics,IncomeBracket_Demographics=@IncomeBracket_Demographics,
                                                             RelationshipStatus_Demographics=@RelationshipStatus_Demographics,
-                                                            WorkingStatus_Demographics=@WorkingStatus_Demographics WHERE Id=@Id";
+                                                            WorkingStatus_Demographics=@WorkingStatus_Demographics WHERE CampaignProfileId=@Id";
 
 
         public static string InsertMatchCampaignGeographic = @"INSERT INTO CampaignMatches(Location_Demographics, MSCampaignProfileId)
@@ -110,7 +104,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         public static string UpdateMatchCampaignGeographic = @"UPDATE CampaignMatches SET Location_Demographics=@Location_Demographics
-                                                                WHERE MSCampaignProfileId-@Id";
+                                                                WHERE MSCampaignProfileId=@Id";
 
 
         public static string UpdateMatchCampaignDemographic = @"UPDATE CampaignMatches SET Age_Demographics=@Age_Demographics,
@@ -118,7 +112,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                             HouseholdStatus_Demographics=@HouseholdStatus_Demographics,IncomeBracket_Demographics=@IncomeBracket_Demographics,
                                                             RelationshipStatus_Demographics=@RelationshipStatus_Demographics,
                                                             WorkingStatus_Demographics=@WorkingStatus_Demographics
-                                                            WHERE MSCampaignProfileId-@Id";
+                                                            WHERE MSCampaignProfileId=@Id";
 
 
         public static string GetCampaignTimeSettings => @"SELECT * FROM CampaignProfileTimeSetting WHERE CampaignProfileId=@Id";
@@ -136,59 +130,22 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                     WHERE CampaignProfileId=@Id";
 
 
-        public static string InsertMobileProfile => @"INSERT INTO CampaignProfilePreference(CampaignProfileId,ContractType_Mobile,Spend_Mobile,AdtoneServerCampaignProfilePrefId)
-                                                        VALUES(@CampaignProfileId,@ContractType_Mobile,@Spend_Mobile,@AdtoneServerCampaignProfilePrefId)";
-
-
         public static string UpdateMobileProfile => @"UPDATE CampaignProfilePreference SET ContractType_Mobile=@ContractType_Mobile,
                                                         Spend_Mobile=@Spend_Mobile WHERE CampaignProfileId=@Id";
 
 
         public static string UpdateMatchCampaignMobile => @"UPDATE CampaignMatches SET ContractType_Mobile=@ContractType_Mobile,
-                                                        Spend_Mobile=@Spend_Mobile WHERE MSCampaignProfileId-@Id";
-
-
-
-        public static string InsertQuestionnaireProfile => @"INSERT INTO CampaignProfilePreference(CampaignProfileId,Hustlers_AdType,Youth_AdType,
-                                                            DiscerningProfessionals_AdType,Mass_AdType,AdtoneServerCampaignProfilePrefId,CountryId)
-                                                        VALUES(@CampaignProfileId,@Hustlers_AdType,@Youth_AdType,@DiscerningProfessionals_AdType,
-                                                            @Mass_AdType,@AdtoneServerCampaignProfilePrefId,@CountryId)";
+                                                        Spend_Mobile=@Spend_Mobile WHERE MSCampaignProfileId=@Id";
 
 
         public static string UpdateQuestionnaireProfile => @"UPDATE CampaignProfilePreference SET Hustlers_AdType=@Hustlers_AdType,Youth_AdType=@Youth_AdType,
-                                                            DiscerningProfessionals_AdType=@DiscerningProfessionals_AdType,Mass_AdType=@Mass_AdType,
-                                                            CountryId=@CountryId WHERE CampaignProfileId=@Id";
+                                                            DiscerningProfessionals_AdType=@DiscerningProfessionals_AdType,Mass_AdType=@Mass_AdType
+                                                            WHERE CampaignProfileId=@Id";
 
 
         public static string UpdateMatchCampaignQuestionnaire => @"UPDATE CampaignMatches SET Hustlers_AdType=@Hustlers_AdType,Youth_AdType=@Youth_AdType,
                                                                     DiscerningProfessionals_AdType=@DiscerningProfessionals_AdType,Mass_AdType=@Mass_AdType 
                                                                     WHERE MSCampaignProfileId-@Id";
-
-
-        public static string InsertAdvertProfile => @"INSERT INTO CampaignProfilePreference(CampaignProfileId,AlcoholicDrinks_Advert,Cinema_Advert,
-                                                        CommunicationsInternet_Advert,DIYGardening_Advert,ElectronicsOtherPersonalItems_Advert,Environment_Advert,
-                                                        FinancialServices_Advert,Fitness_Advert,Food_Advert,GoingOut_Advert,
-                                                        HolidaysTravel_Advert,Householdproducts_Advert,Motoring_Advert,Music_Advert,
-                                                        Newspapers_Advert,NonAlcoholicDrinks_Advert,PetsPetFood_Advert=@PetsPetFood_Advert,
-                                                        PharmaceuticalChemistsProducts_Advert,Religion_Advert,Shopping_Advert,
-                                                        ShoppingRetailClothing_Advert,SocialNetworking_Advert,SportsLeisure_Advert,
-                                                        SweetSaltySnacks_Advert,TV_Advert,TobaccoProducts_Advert,ToiletriesCosmetics_Advert,
-                                                        BusinessOrOpportunities_AdType,Gambling_AdType,Restaurants_AdType,Insurance_AdType,
-                                                        Furniture_AdType,InformationTechnology_AdType,Energy_AdType,Supermarkets_AdType,
-                                                        Healthcare_AdType,JobsAndEducation_AdType,Gifts_AdType,AdvocacyOrLegal_AdType,
-                                                        DatingAndPersonal_AdType,RealEstate_AdType,Games_AdType)
-                                                        VALUES(@CampaignProfileId,@AlcoholicDrinks_Advert,@Cinema_Advert,@CommunicationsInternet_Advert,
-                                                            @DIYGardening_Advert,@ElectronicsOtherPersonalItems_Advert,@Environment_Advert,
-                                                            @FinancialServices_Advert,@Fitness_Advert,@Food_Advert,@GoingOut_Advert,@HolidaysTravel_Advert,
-                                                            @Householdproducts_Advert,@Motoring_Advert,@Music_Advert,@Newspapers_Advert,
-                                                            @NonAlcoholicDrinks_Advert,@PetsPetFood_Advert=@PetsPetFood_Advert,@PharmaceuticalChemistsProducts_Advert,
-                                                            @Religion_Advert,@Shopping_Advert,@ShoppingRetailClothing_Advert,@SocialNetworking_Advert,
-                                                            @SportsLeisure_Advert,@SweetSaltySnacks_Advert,@TV_Advert,@TobaccoProducts_Advert,
-                                                            @ToiletriesCosmetics_Advert,@BusinessOrOpportunities_AdType,@Gambling_AdType,@Restaurants_AdType,
-                                                            @Insurance_AdType,@Furniture_AdType,@InformationTechnology_AdType,@Energy_AdType,
-                                                            @Supermarkets_AdType,@Healthcare_AdType,@JobsAndEducation_AdType,@Gifts_AdType,
-                                                            @AdvocacyOrLegal_AdType,@DatingAndPersonal_AdType,@RealEstate_AdType,@Games_AdType)";
-
 
 
         public static string UpdateAdvertProfile => @"UPDATE CampaignProfilePreference SET AlcoholicDrinks_Advert=@AlcoholicDrinks_Advert,Cinema_Advert=@Cinema_Advert,
@@ -237,6 +194,59 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         AdvocacyOrLegal_AdType=@AdvocacyOrLegal_AdType,DatingAndPersonal_AdType=@DatingAndPersonal_AdType,
                                                         RealEstate_AdType=@RealEstate_AdType,Games_AdType=@Games_AdType 
                                                         WHERE MSCampaignProfileId=@CampaignProfileId";
+
+        
+
+
+
+        public static string InsertGeographicProfile = @"INSERT INTO CampaignProfilePreference(PostCode,CountryId,CampaignProfileId,
+                                                            Location_Demographics,AdtoneServerCampaignProfilePrefId)
+                                                        VALUES(@PostCode,@CountryId,@CampaignProfileId,@Location_Demographics, @AdtoneServerCampaignProfilePrefId);
+                                                        SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+
+        public static string InsertDemographicProfile => @"INSERT INTO CampaignProfilePreference(CampaignProfileId,DOBEnd_Demographics,
+                                                            DOBStart_Demographics,Age_Demographics,Education_Demographics,Gender_Demographics,
+                                                            HouseholdStatus_Demographics,IncomeBracket_Demographics,RelationshipStatus_Demographics,
+                                                            WorkingStatus_Demographics,AdtoneServerCampaignProfilePrefId)
+                                                           VALUES(@CampaignProfileId,@DOBEnd_Demographics,@DOBStart_Demographics,@Age_Demographics,
+                                                            @Education_Demographics,@Gender_Demographics,@HouseholdStatus_Demographics,@IncomeBracket_Demographics,
+                                                            @RelationshipStatus_Demographics, @WorkingStatus_Demographics,@AdtoneServerCampaignProfilePrefId);
+                                                            SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+
+        public static string InsertAdvertProfile => @"INSERT INTO CampaignProfilePreference(CampaignProfileId,AlcoholicDrinks_Advert,Cinema_Advert,
+                                                        CommunicationsInternet_Advert,DIYGardening_Advert,ElectronicsOtherPersonalItems_Advert,Environment_Advert,
+                                                        FinancialServices_Advert,Fitness_Advert,Food_Advert,GoingOut_Advert,
+                                                        HolidaysTravel_Advert,Householdproducts_Advert,Motoring_Advert,Music_Advert,
+                                                        Newspapers_Advert,NonAlcoholicDrinks_Advert,PetsPetFood_Advert=@PetsPetFood_Advert,
+                                                        PharmaceuticalChemistsProducts_Advert,Religion_Advert,Shopping_Advert,
+                                                        ShoppingRetailClothing_Advert,SocialNetworking_Advert,SportsLeisure_Advert,
+                                                        SweetSaltySnacks_Advert,TV_Advert,TobaccoProducts_Advert,ToiletriesCosmetics_Advert,
+                                                        BusinessOrOpportunities_AdType,Gambling_AdType,Restaurants_AdType,Insurance_AdType,
+                                                        Furniture_AdType,InformationTechnology_AdType,Energy_AdType,Supermarkets_AdType,
+                                                        Healthcare_AdType,JobsAndEducation_AdType,Gifts_AdType,AdvocacyOrLegal_AdType,
+                                                        DatingAndPersonal_AdType,RealEstate_AdType,Games_AdType)
+                                                        VALUES(@CampaignProfileId,@AlcoholicDrinks_Advert,@Cinema_Advert,@CommunicationsInternet_Advert,
+                                                            @DIYGardening_Advert,@ElectronicsOtherPersonalItems_Advert,@Environment_Advert,
+                                                            @FinancialServices_Advert,@Fitness_Advert,@Food_Advert,@GoingOut_Advert,@HolidaysTravel_Advert,
+                                                            @Householdproducts_Advert,@Motoring_Advert,@Music_Advert,@Newspapers_Advert,
+                                                            @NonAlcoholicDrinks_Advert,@PetsPetFood_Advert=@PetsPetFood_Advert,@PharmaceuticalChemistsProducts_Advert,
+                                                            @Religion_Advert,@Shopping_Advert,@ShoppingRetailClothing_Advert,@SocialNetworking_Advert,
+                                                            @SportsLeisure_Advert,@SweetSaltySnacks_Advert,@TV_Advert,@TobaccoProducts_Advert,
+                                                            @ToiletriesCosmetics_Advert,@BusinessOrOpportunities_AdType,@Gambling_AdType,@Restaurants_AdType,
+                                                            @Insurance_AdType,@Furniture_AdType,@InformationTechnology_AdType,@Energy_AdType,
+                                                            @Supermarkets_AdType,@Healthcare_AdType,@JobsAndEducation_AdType,@Gifts_AdType,
+                                                            @AdvocacyOrLegal_AdType,@DatingAndPersonal_AdType,@RealEstate_AdType,@Games_AdType)";
+
+        public static string InsertQuestionnaireProfile => @"INSERT INTO CampaignProfilePreference(CampaignProfileId,Hustlers_AdType,Youth_AdType,
+                                                            DiscerningProfessionals_AdType,Mass_AdType,AdtoneServerCampaignProfilePrefId,CountryId)
+                                                        VALUES(@CampaignProfileId,@Hustlers_AdType,@Youth_AdType,@DiscerningProfessionals_AdType,
+                                                            @Mass_AdType,@AdtoneServerCampaignProfilePrefId,@CountryId)";
+
+        public static string InsertMobileProfile => @"INSERT INTO CampaignProfilePreference(CampaignProfileId,ContractType_Mobile,Spend_Mobile,AdtoneServerCampaignProfilePrefId)
+                                                        VALUES(@CampaignProfileId,@ContractType_Mobile,@Spend_Mobile,@AdtoneServerCampaignProfilePrefId)";
+
 
 
     }

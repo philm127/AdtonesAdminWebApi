@@ -9,5 +9,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     public interface IBillingService
     {
         Task<ReturnResult> PaywithUserCredit(BillingPaymentModel model);
+        Task<ReturnResult> GetPaymentData(int campaignId);
     }
 }

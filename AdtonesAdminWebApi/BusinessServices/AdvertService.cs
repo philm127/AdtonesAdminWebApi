@@ -346,8 +346,24 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 int uid = await _connService.GetUserIdFromAdtoneId(adModel.UpdatedBy, adModel.OperatorId);
                 int adId = await _connService.GetAdvertIdFromAdtoneId(adModel.AdvertId, adModel.OperatorId);
-                var campaignAdvert = await _campDAL.GetCampaignAdvertDetailsById(adModel.AdvertId,0);
-                var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
+                var campaignAdvert = new CampaignAdverts();
+                try
+                {
+                    campaignAdvert = await _campDAL.GetCampaignAdvertDetailsById(adModel.AdvertId, 0);
+                    var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
+                }
+                catch (Exception ex)
+                {
+                    var _logging = new ErrorLogging()
+                    {
+                        ErrorMessage = ex.Message.ToString()  + " No Campaign details in CampaignAdverts Table",
+                        StackTrace = ex.StackTrace.ToString(),
+                        PageName = "AdvertService",
+                        ProcedureName = $"ApproveReject - ApproveAd - GetcampaignAdvert AdvertId={adModel.AdvertId}"
+                    };
+                    _logging.LogError();
+                    return false;
+                }
 
                 var updstatus = UpdateStatus(adModel,uid,adId);
 
@@ -386,7 +402,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                             }
 
                             var z = await _matchDAL.UpdateMediaLocation(ConnString, adName, campaigndetailsid);
-                            await _matchDAL.PrematchProcessForCampaign(campaigndetailsid, ConnString);
+                            await _matchDAL.PrematchProcessForCampaign(campaignAdvert.CampaignProfileId, ConnString);
                         }
                     }
                 }
@@ -649,7 +665,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 if (campaigndetailsid != 0)
                 {
                     var f = await _matchDAL.UpdateMediaLocation(ConnString, null, campaigndetailsid);
-                    await _preProcess.PrematchProcessForCampaign(campaigndetailsid, ConnString);
+                    await _preProcess.PrematchProcessForCampaign(campaignAdvert.CampaignProfileId, ConnString);
                 }
             }
             return true;

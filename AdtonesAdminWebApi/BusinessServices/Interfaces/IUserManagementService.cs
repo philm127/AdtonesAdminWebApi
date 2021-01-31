@@ -25,5 +25,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 
         Task<ReturnResult> GetUserById(int userId);
         Task<ReturnResult> UpdateUserPermission(IdCollectionViewModel model);
+        Task<ReturnResult> GetClientProfile(int clientId);
     }
 }

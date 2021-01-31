@@ -18,10 +18,13 @@ namespace AdtonesAdminWebApi.DAL
 
     public class CampaignDAL : BaseDAL, ICampaignDAL
     {
+        private readonly IAdvertiserFinancialDAL _invDAL;
 
-        public CampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, 
+        public CampaignDAL(IAdvertiserFinancialDAL invDAL, IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, 
                             IHttpContextAccessor httpAccessor) : base(configuration, executers, connService, httpAccessor)
-        {}
+        {
+            _invDAL = invDAL;
+        }
 
 
         public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(int id=0)
@@ -177,10 +180,28 @@ namespace AdtonesAdminWebApi.DAL
             var select = builder.AddTemplate(CampaignQuery.GetCampaignProfileById);
             try
             {
-                builder.AddParameters(new { Id = id });
+                builder.AddParameters(new { Id = id, siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
 
                 return await _executers.ExecuteCommand(_connStr,
                                 conn => conn.QueryFirstOrDefault<CampaignProfile>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<CampaignProfileUpdate> GetCampaignProfileDetailUpdate(int campaignId)
+        {
+            var builder = new SqlBuilder();
+            var select = builder.AddTemplate(CampaignQuery.GetCampaignProfileById);
+            try
+            {
+                builder.AddParameters(new { Id = campaignId, siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<CampaignProfileUpdate>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -260,10 +281,12 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateCampaignCredit(BillingPaymentModel model, int operatorId)
+        public async Task<int> UpdateCampaignCredit(BillingPaymentModel model, string constr)
         {
-
+            var campModel = await GetCampaignProfileDetail(model.CampaignProfileId);
+            var available = await _invDAL.GetAvailableCredit(model.AdvertiserId);
             int x = 0;
+
             var sb = new StringBuilder();
             sb.Append(CampaignQuery.UpdateCampaignBilling);
 
@@ -273,21 +296,37 @@ namespace AdtonesAdminWebApi.DAL
             {
                 builder.AddParameters(new { Id = model.CampaignProfileId });
                 builder.AddParameters(new { Status = (int)Enums.CampaignStatus.Play });
-                builder.AddParameters(new { FundAmount = model.Fundamount });
-                builder.AddParameters(new { Status = (int)Enums.CampaignStatus.Play });
+                builder.AddParameters(new { TotalBudget = (campModel.TotalBudget + model.Fundamount) });
+                builder.AddParameters(new { TotalCredit = (campModel.TotalCredit + model.TotalAmount) });
+                builder.AddParameters(new { AvailableCredit = available });
 
                 x = await _executers.ExecuteCommand(_connStr,
                                     conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
 
 
-                var constr = await _connService.GetConnectionStringByOperator(operatorId);
-
-                if(constr != null && constr.Length > 10)
+                if (constr != null && constr.Length > 10)
                 {
-                    model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+                    var campId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
                     x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+                                    conn => conn.ExecuteScalar<int>(sb.ToString(), new
+                                    {
+                                        Id = campId,
+                                        Status = (int)Enums.CampaignStatus.Play,
+                                        TotalBudget = (campModel.TotalBudget + model.Fundamount),
+                                        TotalCredit = (campModel.TotalCredit + model.TotalAmount),
+                                        AvailableCredit = available
+                                    }));
+
+                    x = await _executers.ExecuteCommand(constr,
+                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertMatchFinancial, new
+                                    {
+                                        Id = campId,
+                                        Status = (int)Enums.CampaignStatus.Play,
+                                        TotalBudget = (campModel.TotalBudget + model.Fundamount),
+                                        TotalCredit = (campModel.TotalCredit + model.TotalAmount),
+                                        AvailableCredit = available
+                                    }));
                 }
             }
             catch
@@ -447,14 +486,13 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateCampaignMatchesforBilling(int id = 0, int operatorId = 0)
+        public async Task<int> UpdateCampaignMatchesforBilling(int id = 0, string constr = null)
         {
             int x = 0;
             try
             {
-                var constr = await _connService.GetConnectionStringByOperator(operatorId);
 
-                var campId = _connService.GetCampaignProfileIdFromAdtoneId(id, operatorId);
+                var campId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(id, constr);
                    x =  await _executers.ExecuteCommand(constr,
                                     conn => conn.ExecuteScalar<int>(CampaignQuery.UpdateCampaignMatchFromBilling, new { Id = campId, Status= (int)Enums.CampaignStatus.Play }));
 

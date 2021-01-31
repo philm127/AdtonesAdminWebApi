@@ -75,7 +75,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<IManagementReportService, ManagementReportService>();
             services.AddScoped<ICreateUpdateCampaignService, CreateUpdateCampaignService>();
             services.AddScoped<ICreateCheckSaveProfileModels, CreateCheckSaveProfileModels>();
-            // services.AddScoped<IBillingService, BillingService>();
+            services.AddScoped<IBillingService, BillingService>();
 
             #endregion
 

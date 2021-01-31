@@ -481,5 +481,49 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
         }
+
+
+        public async Task<int> InsertNewClient(ClientViewModel model)
+        {
+            int x = 0;
+            try
+            {
+                x = await _executers.ExecuteCommand(_connStr,
+                     conn => conn.ExecuteScalar<int>(UserManagementQuery.InsertNewClient, model));
+
+                var constr = await _connService.GetConnectionStringsByCountryId(model.CountryId);
+                if (constr != null && constr.Length > 10)
+                {
+                    model.AdtoneServerClientId = x;
+                    model.UserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.UserId, constr);
+                    model.CountryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId, constr);
+
+
+                    var y = await _executers.ExecuteCommand(constr,
+                         conn => conn.ExecuteScalar<int>(UserManagementQuery.InsertNewClient, model));
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            return x;
+        }
+
+
+        public async Task<ClientViewModel> GetClientDetails(int clientId)
+        {
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                    conn => conn.QueryFirstOrDefault<ClientViewModel>(UserManagementQuery.GetClientDetails, new { Id = clientId }));
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }

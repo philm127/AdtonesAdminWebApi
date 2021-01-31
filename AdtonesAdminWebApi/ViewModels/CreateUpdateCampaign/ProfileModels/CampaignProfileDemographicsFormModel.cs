@@ -11,77 +11,7 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// Initializes a new instance of the <see cref="CampaignProfileDemographicsFormModel"/> class.
         /// </summary>
 
-        public CampaignProfileDemographicsFormModel()
-        {
-            AgeQuestion =
-               CompileQuestions(new Dictionary<string, bool>
-                                    {
-                                         {"Under 18", false},
-                                         {"18-24", false},
-                                         {"25-34", false},
-                                         {"35-44", false},
-                                         {"45-54", false},
-                                         {"55-64", false},
-                                         {"65+", false},
-                                         {"Prefer not to answer", true}
-                                    });
-
-            GenderQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Male", false}, {"Female", false}, {"Prefer not to answer", true}});
-            IncomeBracketQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {
-                                         {"£0 to £14,999", false},
-                                         {"£15,000 to £24,999", false},
-                                         {"£25,000 to £39,999", false},
-                                         {"£40,000 to £74,999", false},
-                                         {"£75,000 to £99,999", false},
-                                         {"£100,000+", false},
-                                         {"Prefer not to answer", true}
-                                     });
-            WorkingStatusQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {
-                                         {"Employed", false},
-                                         {"Self-Employed", false},
-                                         {"Housewife/Househusband", false},
-                                         {"Retired", false},
-                                         {"Unpaid Carer", false},
-                                         {"Full or Part-time Education", false},
-                                         {"Not Working", false},
-                                         {"None of these", false},
-                                         {"Prefer not to answer", true}
-                                     });
-            RelationshipStatusQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {
-                                         {"Divorced", false},
-                                         {"Living with another", false},
-                                         {"Married", false},
-                                         {"Separated", false},
-                                         {"Single", false},
-                                         {"Widowed", false},
-                                         {"Prefer not to answer", true}
-                                     });
-            EducationQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {
-                                         {"Secondary", false},
-                                         {"College", false},
-                                         {"University", false},
-                                         {"Post Graduate", false},
-                                         {"Prefer not to answer", true}
-                                     });
-            HouseholdStatusQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {
-                                         {"Rent", false},
-                                         {"Owner", false},
-                                         {"Live with someone", false},
-                                         {"Prefer not to answer", true}
-                                     });
-        }
+        public CampaignProfileDemographicsFormModel(){}
 
         public CampaignProfileDemographicsFormModel(int CountryId, List<string> ageProfileLabel, List<string>  genderProfileLabel,
                                                     List<string>  incomeProfileLabel, List<string> workingStatusProfileLabel, List<string> relationshipStatusProfileLabel,
@@ -262,28 +192,28 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The age.</value>
         // [Display(Name = "Age")]
-        public string Age_Demographics
-        {
-            get
-            {
-                if (AgeQuestion == null)
-                    AgeQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(AgeQuestion));
-            }
-            set
-            {
-                if (AgeQuestion != null && AgeQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        AgeQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Age_Demographics { get; set; }
+        //{
+        //    get
+        //    {
+        //        if (AgeQuestion == null)
+        //            AgeQuestion = new List<QuestionOptionModel>();
+        //        return CompileAnswers(SortList(AgeQuestion));
+        //    }
+        //    set
+        //    {
+        //        if (AgeQuestion != null && AgeQuestion.Count() > 0)
+        //        {
+        //            if (value == null) return;
+        //            for (int i = 0; i < value.Length; i++)
+        //                AgeQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
+        //        }
+        //        else
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Gets or sets the gender question.
@@ -297,28 +227,28 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The gender.</value>
         // [Display(Name = "Gender")]
-        public string Gender_Demographics
-        {
-            get
-            {
-                if (GenderQuestion == null)
-                    GenderQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(GenderQuestion));
-            }
-            set
-            {
-                if (GenderQuestion != null && GenderQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        GenderQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Gender_Demographics { get; set; }
+        //{
+        //    get
+        //    {
+        //        if (GenderQuestion == null)
+        //            GenderQuestion = new List<QuestionOptionModel>();
+        //        return CompileAnswers(SortList(GenderQuestion));
+        //    }
+        //    set
+        //    {
+        //        if (GenderQuestion != null && GenderQuestion.Count() > 0)
+        //        {
+        //            if (value == null) return;
+        //            for (int i = 0; i < value.Length; i++)
+        //                GenderQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
+        //        }
+        //        else
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
 
 
         /// <summary>
@@ -333,28 +263,28 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The income bracket.</value>
         // [Display(Name = "Income Bracket")]
-        public string IncomeBracket_Demographics
-        {
-            get
-            {
-                if (IncomeBracketQuestion == null)
-                    IncomeBracketQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(IncomeBracketQuestion));
-            }
-            set
-            {
-                if (IncomeBracketQuestion != null && IncomeBracketQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        IncomeBracketQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string IncomeBracket_Demographics { get; set; }
+        //{
+        //    get
+        //    {
+        //        if (IncomeBracketQuestion == null)
+        //            IncomeBracketQuestion = new List<QuestionOptionModel>();
+        //        return CompileAnswers(SortList(IncomeBracketQuestion));
+        //    }
+        //    set
+        //    {
+        //        if (IncomeBracketQuestion != null && IncomeBracketQuestion.Count() > 0)
+        //        {
+        //            if (value == null) return;
+        //            for (int i = 0; i < value.Length; i++)
+        //                IncomeBracketQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
+        //        }
+        //        else
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
 
 
         /// <summary>
@@ -369,28 +299,28 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The working status.</value>
         // [Display(Name = "Working Status")]
-        public string WorkingStatus_Demographics
-        {
-            get
-            {
-                if (WorkingStatusQuestion == null)
-                    WorkingStatusQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(WorkingStatusQuestion));
-            }
-            set
-            {
-                if (WorkingStatusQuestion != null && WorkingStatusQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        WorkingStatusQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string WorkingStatus_Demographics { get; set; }
+        //{
+        //    get
+        //    {
+        //        if (WorkingStatusQuestion == null)
+        //            WorkingStatusQuestion = new List<QuestionOptionModel>();
+        //        return CompileAnswers(SortList(WorkingStatusQuestion));
+        //    }
+        //    set
+        //    {
+        //        if (WorkingStatusQuestion != null && WorkingStatusQuestion.Count() > 0)
+        //        {
+        //            if (value == null) return;
+        //            for (int i = 0; i < value.Length; i++)
+        //                WorkingStatusQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
+        //        }
+        //        else
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
 
 
         /// <summary>
@@ -405,28 +335,28 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The relationship status.</value>
         // [Display(Name = "Relationship Status")]
-        public string RelationshipStatus_Demographics
-        {
-            get
-            {
-                if (RelationshipStatusQuestion == null)
-                    RelationshipStatusQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(RelationshipStatusQuestion));
-            }
-            set
-            {
-                if (RelationshipStatusQuestion != null && RelationshipStatusQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        RelationshipStatusQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string RelationshipStatus_Demographics { get; set; }
+        //{
+        //    get
+        //    {
+        //        if (RelationshipStatusQuestion == null)
+        //            RelationshipStatusQuestion = new List<QuestionOptionModel>();
+        //        return CompileAnswers(SortList(RelationshipStatusQuestion));
+        //    }
+        //    set
+        //    {
+        //        if (RelationshipStatusQuestion != null && RelationshipStatusQuestion.Count() > 0)
+        //        {
+        //            if (value == null) return;
+        //            for (int i = 0; i < value.Length; i++)
+        //                RelationshipStatusQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
+        //        }
+        //        else
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
 
 
         /// <summary>
@@ -441,28 +371,28 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The education.</value>
         // [Display(Name = "Education")]
-        public string Education_Demographics
-        {
-            get
-            {
-                if (EducationQuestion == null)
-                    EducationQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(EducationQuestion));
-            }
-            set
-            {
-                if (EducationQuestion != null && EducationQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        EducationQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Education_Demographics { get; set; }
+        //{
+        //    get
+        //    {
+        //        if (EducationQuestion == null)
+        //            EducationQuestion = new List<QuestionOptionModel>();
+        //        return CompileAnswers(SortList(EducationQuestion));
+        //    }
+        //    set
+        //    {
+        //        if (EducationQuestion != null && EducationQuestion.Count() > 0)
+        //        {
+        //            if (value == null) return;
+        //            for (int i = 0; i < value.Length; i++)
+        //                EducationQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
+        //        }
+        //        else
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
 
 
         /// <summary>
@@ -477,28 +407,28 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The household status.</value>
         // [Display(Name = "Household Status")]
-        public string HouseholdStatus_Demographics
-        {
-            get
-            {
-                if (HouseholdStatusQuestion == null)
-                    HouseholdStatusQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(HouseholdStatusQuestion));
-            }
-            set
-            {
-                if (HouseholdStatusQuestion != null && HouseholdStatusQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        HouseholdStatusQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string HouseholdStatus_Demographics { get; set; }
+        //{
+        //    get
+        //    {
+        //        if (HouseholdStatusQuestion == null)
+        //            HouseholdStatusQuestion = new List<QuestionOptionModel>();
+        //        return CompileAnswers(SortList(HouseholdStatusQuestion));
+        //    }
+        //    set
+        //    {
+        //        if (HouseholdStatusQuestion != null && HouseholdStatusQuestion.Count() > 0)
+        //        {
+        //            if (value == null) return;
+        //            for (int i = 0; i < value.Length; i++)
+        //                HouseholdStatusQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
+        //        }
+        //        else
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
 
 
         /// <summary>

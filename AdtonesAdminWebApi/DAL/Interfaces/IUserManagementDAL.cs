@@ -29,5 +29,8 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> InsertManagerToSalesExec(int manId, int execId);
         Task<int> GetOperatorIdByUserId(int userId);
         Task<IEnumerable<string>> GetAdvertOperatorAdmins(int roleId, int operatorId = 0);
+
+        Task<int> InsertNewClient(ClientViewModel model);
+        Task<ClientViewModel> GetClientDetails(int clientId);
     }
 }

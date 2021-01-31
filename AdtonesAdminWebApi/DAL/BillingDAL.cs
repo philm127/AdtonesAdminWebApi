@@ -23,44 +23,52 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> AddBillingRecord(BillingPaymentModel command)
         {
             int billId = 0;
-            //var builder = new SqlBuilder();
-            //var select = builder.AddTemplate(BillingQuery.InsertIntoBilling );
             try
             {
-                //builder.AddParameters(new { UserId = command.AdvertiserId });
-                //builder.AddParameters(new { ClientId = command.ClientId });
-                //builder.AddParameters(new { CampaignProfileId = command.CampaignProfileId });
-                //builder.AddParameters(new { PaymentMethodId = command.PaymentMethodId });
-                //builder.AddParameters(new { Status = command.Status });
-                //builder.AddParameters(new { InvoiceNumber = command.InvoiceNumber });
-
-                //builder.AddParameters(new { PONumber = command.PONumber });
-                //builder.AddParameters(new { Fundamount = command.Fundamount });
-                //builder.AddParameters(new { TotalAmount = command.TotalAmount });
-                //builder.AddParameters(new { SettledDate = command.SettledDate });
-                //builder.AddParameters(new { CurrencyCode = command.CurrencyCode });
-                //builder.AddParameters(new { AdtoneServerBillingId = command.AdtoneServerBillingId });
-
-
                 billId = await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(BillingQuery.InsertIntoBilling, command));
+                                    conn => conn.ExecuteScalar<int>(BillingQuery.InsertIntoBilling, new
+                                    {
+                                        UserId = command.AdvertiserId,
+                                        CampaignProfileId = command.CampaignProfileId,
+                                        PaymentMethodId = command.PaymentMethodId,
+                                        Status = command.Status,
+                                        TaxPercantage = command.TaxPercantage,
+                                        InvoiceNumber = command.InvoiceNumber,
+                                        PONumber = command.PONumber,
+                                        Fundamount = command.Fundamount,
+                                        TotalAmount = command.TotalAmount,
+                                        SettledDate = command.SettledDate,
+                                        CurrencyCode = command.CurrencyCode,
+                                        AdtoneServerBillingId = command.AdtoneServerBillingId
+                                    }));
 
                 var constr = await _connService.GetOperatorConnectionByUserId(command.AdvertiserId);
                 if (constr != null && constr.Length > 10)
                 {
-                    command.AdtoneServerBillingId = billId;
                     try
                     {
-                        if (command.ClientId != null)
-                            command.ClientId = await _executers.ExecuteCommand(constr,
-                                                                        conn => conn.ExecuteScalar<int>("SELECT Id FROM Client WHERE AdtoneServerClientId=@Id",
-                                                                                                            new { Id = command.ClientId }));
-                        command.AdvertiserId = await _executers.ExecuteCommand(constr,
+                        var campId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(command.CampaignProfileId, constr);
+
+                        var userId = await _executers.ExecuteCommand(constr,
                                                                     conn => conn.ExecuteScalar<int>("SELECT UserId FROM Users WHERE AdtoneServerUserId=@Id",
-                                                                                                        new { Id = command.ClientId }));
+                                                                                                        new { Id = command.AdvertiserId }));
 
                         var x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(BillingQuery.InsertIntoBilling, command));
+                                    conn => conn.ExecuteScalar<int>(BillingQuery.InsertIntoBilling, new
+                                    {
+                                        UserId = userId,
+                                        CampaignProfileId = campId,
+                                        PaymentMethodId = command.PaymentMethodId,
+                                        Status = command.Status,
+                                        InvoiceNumber = command.InvoiceNumber,
+                                        PONumber = command.PONumber,
+                                        Fundamount = command.Fundamount,
+                                        TaxPercantage = command.TaxPercantage,
+                                        TotalAmount = command.TotalAmount,
+                                        SettledDate = command.SettledDate,
+                                        CurrencyCode = command.CurrencyCode,
+                                        AdtoneServerBillingId = billId
+                                    }));
                     }
                     catch
                     {
@@ -74,6 +82,51 @@ namespace AdtonesAdminWebApi.DAL
             }
 
             return billId;
+        }
+
+
+        public async Task<InvoiceForPDF> GetInvoiceDetailsForPDF(int billingId)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<InvoiceForPDF>(BillingQuery.GetInvoiceDetailsForPDF,
+                                                                                new { Id = billingId }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> GetCreditPeriod(int campaignId)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<int>(BillingQuery.GetCreditPeriod,
+                                                                                new { Id = campaignId }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<BillingPaymentModel> GetCampaignBillingData(int campaignId)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<BillingPaymentModel>(BillingQuery.GetCampaignBillingData,
+                                                                                new { Id = campaignId }));
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }

@@ -9,13 +9,15 @@ namespace AdtonesAdminWebApi.DAL.Queries
     {
 
         public static string LoadCountryDataTable => @"SELECT c.Id,c.Name,c.ShortName,c.CountryCode,c.CreatedDate,c.Status,
-                                                        ISNULL(t.TaxPercantage,0) AS TaxPercentage 
-                                                        FROM Country AS c INNER JOIN CountryTax AS t ON t.CountryId=c.Id ";
+                                                        ISNULL(t.TaxPercantage,0) AS TaxPercentage, min.MinBid 
+                                                        FROM Country AS c INNER JOIN CountryTax AS t ON t.CountryId=c.Id
+                                                        LEFT JOIN CountryMinBid AS min ON min.CountryId=c.Id ";
 
 
         public static string GetCountry => @"SELECT c.Id,c.Name,ShortName,c.CountryCode,c.CreatedDate,c.Status,
-                                            t.TaxPercantage AS TaxPercentage,TermAndConditionFileName
+                                            t.TaxPercantage AS TaxPercentage,TermAndConditionFileName,min.MinBid
                                             FROM Country AS c INNER JOIN CountryTax AS t ON t.CountryId=c.Id
+                                            LEFT JOIN CountryMinBid AS min ON min.CountryId=c.Id
                                             WHERE c.Id=@id";
 
 
@@ -33,6 +35,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                             VALUES(@UserId,@CountryId,@TaxPercantage, GETDATE(), GETDATE(),1);";
 
 
+        public static string AddMinBid => @"INSERT INTO CountryMinBid(CountryId,MinBid,CreatedDate,UpdatedDate)
+                                                VALUES(@CountryId,@MinBid,GETDATE(),GETDATE())";
+
+
         public static string UpdateCountry => @"UPDATE Country SET UserId = @UserId, Name = @Name, ShortName = @ShortName, 
                                                             UpdatedDate = GETDATE(),CountryCode = @CountryCode,
                                                             TermAndConditionFileName = @TermAndConditionFileName WHERE Id=@Id;";
@@ -40,6 +46,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string UpdateTax => @"Update CountryTax SET UserId=@UserId,TaxPercantage=@TaxPercantage,
                                             UpdatedDate=GETDATE() WHERE CountryId=@CountryId;";
+
+
+        public static string UpdateMinBid => @"UPDATE CountryMinBid SET MinBid=@MinBid, UpdatedDate=GETDATE() WHERE CountryId=@CountryId";
 
 
         public static string LoadAreaDataTable => @"SELECT ad.AreaId, ad.AreaName,ad.CountryId,c.Name as CountryName 

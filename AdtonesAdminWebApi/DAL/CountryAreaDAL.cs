@@ -4,6 +4,7 @@ using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -90,9 +91,10 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> AddCountry(CountryResult model)
         {
             int x = 0;
+            var ctryId = 0;
             var userId = _httpAccessor.GetUserIdFromJWT();
 
-            model.AdtoneServeCountryId = await _executers.ExecuteCommand(_connStr,
+            ctryId = await _executers.ExecuteCommand(_connStr,
                                                 conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddCountry, new
                                                 {
                                                     Name = model.Name.Trim(),
@@ -107,9 +109,10 @@ namespace AdtonesAdminWebApi.DAL
                                                 conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddTax, new
                                                 {
                                                     UserId = userId,
-                                                    CountryId = model.AdtoneServeCountryId,
+                                                    CountryId = ctryId,
                                                     TaxPercantage = model.TaxPercentage
                                                 }));
+
 
             var lst = await _connService.GetConnectionStrings();
             List<string> conns = lst.ToList();
@@ -127,15 +130,121 @@ namespace AdtonesAdminWebApi.DAL
                                         ShortName = model.ShortName.ToUpper().Trim(),
                                         TermAndConditionFileName = model.TermAndConditionFileName,
                                         CountryCode = model.CountryCode.Trim(),
-                                        AdtoneServeCountryId = model.AdtoneServeCountryId,
+                                        AdtoneServeCountryId = ctryId,
                                         UserId = model.UserId
                                     }));
                 }
 
             }
 
+            x = await AddMinBidCountry(ctryId, model.MinBid);
+
             return x;
         }
+
+
+        public async Task<int> AddMinBidCountry(int countryId, decimal minbid)
+        {
+            int x = 0;
+
+            x = await _executers.ExecuteCommand(_connStr,
+                                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddMinBid, new
+                                                {
+                                                    CountryId = countryId,
+                                                    MinBid = minbid
+                                                }));
+
+            var lst = await _connService.GetConnectionStrings();
+            List<string> conns = lst.ToList();
+
+            foreach (string constr in conns)
+            {
+                if (constr != null && constr.Length > 10)
+                {
+                    x = await AddMinBidCountryByProv(countryId, minbid, constr);
+                }
+
+            }
+
+            return x;
+        }
+
+
+        public async Task<int> AddMinBidCountryByProv(int countryId, decimal minbid, string constr)
+        {
+            int x = 0;
+
+            
+                    var ctryId = await _connService.GetCountryIdFromAdtoneId(countryId, constr);
+
+                    x = await _executers.ExecuteCommand(constr,
+                                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddMinBid, new
+                                                {
+                                                    CountryId = ctryId,
+                                                    MinBid = minbid
+                                                }));
+
+            return x;
+        }
+
+
+        public async Task<int> UpdateMinBidCountry(int countryId, decimal minbid)
+        {
+            int x = 0;
+            var ctryId = 0;
+
+            var select_query = @"SELECT CountryId FROM CountryMinBid WHERE CountryId=@Id";
+
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await connection.OpenAsync();
+                    ctryId = await connection.QueryFirstOrDefaultAsync<int>(select_query, new { Id = countryId });
+                }
+
+            if (ctryId == 0)
+                x = await AddMinBidCountry(countryId, minbid);
+            else
+            {
+                x = await _executers.ExecuteCommand(_connStr,
+                                                    conn => conn.ExecuteScalar<int>(CountryAreaQuery.UpdateMinBid, new
+                                                    {
+                                                        CountryId = countryId,
+                                                        MinBid = minbid
+                                                    }));
+            }
+
+            var lst = await _connService.GetConnectionStrings();
+            List<string> conns = lst.ToList();
+
+            foreach (string constr in conns)
+            {
+                if (constr != null && constr.Length > 10)
+                {
+                    var countryId2 = await _connService.GetCountryIdFromAdtoneId(countryId, constr);
+
+                    using (var connection = new SqlConnection(constr))
+                    {
+                        await connection.OpenAsync();
+                        ctryId = await connection.QueryFirstOrDefaultAsync<int>(select_query, new { Id = countryId2 });
+                    }
+                    if (ctryId == 0)
+                        x = await AddMinBidCountryByProv(countryId, minbid,constr);
+                    else
+                    {
+                        x = await _executers.ExecuteCommand(constr,
+                                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.UpdateMinBid, new
+                                                {
+                                                    CountryId = ctryId,
+                                                    MinBid = minbid
+                                                }));
+                    }
+                }
+
+            }
+
+            return x;
+        }
+
 
 
         public async Task<int> UpdateCountry(CountryResult model)
@@ -185,6 +294,7 @@ namespace AdtonesAdminWebApi.DAL
                                     }));
                 }
             }
+            x = await UpdateMinBidCountry(model.Id, model.MinBid);
 
             return x;
         }
@@ -319,6 +429,25 @@ namespace AdtonesAdminWebApi.DAL
                 return await _executers.ExecuteCommand(_connStr,
                              conn => conn.ExecuteScalar<bool>(select.RawSql, select.Parameters));
 
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<decimal> GetMinBidByCountry(int countryId)
+        {
+            var select_query = @"SELECT MinBid FROM CountryMinBid WHERE CountryId=@Id";
+
+            try
+            {
+                using (var connection = new SqlConnection(_connStr))
+                {
+                    await connection.OpenAsync();
+                    return await connection.QueryFirstOrDefaultAsync<decimal>(select_query, new { Id = countryId });
+                }
             }
             catch
             {

@@ -30,6 +30,14 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
 
+        public static string UpdateCampaignDetails => @"UPDATE CampaignProfile SET CampaignDescription=@CampaignDescription,
+                                                    MaxDailyBudget=@MaxDailyBudget,MaxBid=@MaxBid,MaxMonthBudget=@MaxMonthBudget,
+                                                    MaxWeeklyBudget=@MaxWeeklyBudget,MaxHourlyBudget=@MaxHourlyBudget,
+                                                    EmailSubject=@EmailSubject,EmailBody=@EmailBody,SmsOriginator=@SmsOriginator,SmsBody=@SmsBody,
+                                                    UpdatedDateTime=GETDATE(),StartDate=@StartDate,EndDate=@EndDate
+                                                    WHERE CampaignProfileId=@CampaignProfileId ";
+
+
 
         public static string InsertNewCampaignFromExiting => @"INSERT INTO CampaignProfile(UserId,ClientId,CampaignName,CampaignDescription,TotalBudget,
                                                     MaxDailyBudget,MaxBid,MaxMonthBudget,MaxWeeklyBudget,MaxHourlyBudget,TotalCredit,SpendToDate,
@@ -85,6 +93,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string AddCampaignProfileEx => @"INSERT INTO CampaignProfileExt (CampaignProfileId,NonBillable,IsProfileCampaign,CampaignCategoryId)
                                                                 VALUES(@CampaignProfileId,@NonBillable,@IsProfileCampaign,@CampaignCategoryId)";
+
+
+        public static string UpdateCampaignProfileEx => @"UPDATE CampaignProfileExt SET CampaignCategoryId=@CampaignCategoryId
+                                                                WHERE CampaignProfileId=@CampaignProfileId";
 
 
 

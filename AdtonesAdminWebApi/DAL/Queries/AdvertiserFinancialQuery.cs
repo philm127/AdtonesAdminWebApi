@@ -67,7 +67,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string CheckIfUserExists => @"SELECT COUNT(1) FROM UsersCredit WHERE UserId=@userId";
 
-        public static string UpdateUserCredit => @"UPDATE UsersCredit SET AvailableCredit=@AvailableCredit, UpdatedDate=GETDATE()
+        public static string UpdateUserCredit => @"UPDATE UsersCredit SET AssignCredit=@AssignCredit, AvailableCredit=@AvailableCredit, UpdatedDate=GETDATE()
                                                 WHERE Id = @Id";
 
 
@@ -75,9 +75,11 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                             VALUES(@UserId,@AssignCredit,@AssignCredit,GETDATE(),GETDATE(),@CurrencyId)";
 
 
-        public static string UserCreditDetails => @"SELECT uc.Id,uc.UserId,AssignCredit,AvailableCredit,uc.CreatedDate,uc.CurrencyId,c.CountryId 
-                                                FROM  UsersCredit AS uc LEFT JOIN Currencies AS c ON c.CurrencyId=uc.CurrencyId
-                                                WHERE uc.UserId=@Id";
+        public static string UserCreditDetails => @"SELECT uc.Id,uc.UserId,AssignCredit,
+                                                    ISNULL(CAST(AvailableCredit AS decimal(18,2)),0) AS AvailableCredit,
+                                                    CreatedDate,uc.CurrencyId,c.CountryId 
+                                                    FROM  UsersCredit AS uc LEFT JOIN Currencies AS c ON c.CurrencyId=uc.CurrencyId
+                                                    WHERE uc.UserId=@Id";
 
         public static string GetPaymentHistory => @"SELECT ucp.Id, ucp.Amount, ucp.CreatedDate, bil.InvoiceNumber 
                                                     FROM UsersCreditPayment AS ucp  LEFT JOIN Billing AS bil ON bil.Id=ucp.BillingId 
@@ -96,6 +98,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string InsertCampaignCredit => @"INSERT INTO CampaignCreditPeriods(CreditPeriod,UserId,CampaignProfileId,UpdatedDate,CreatedDate,AdtoneServerCampaignCreditPeriodId)
                                                                 VALUES(@CreditPeriod,@UserId,@CampaignProfileId, GETDATE(),GETDATE(),@AdtoneServerCampaignCreditPeriodId);
                                                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+
+        public static string GetAvailableCredit => @"SELECT AvailableCredit FROM UsersCredit WHERE UserId=@Id";
 
 
     }

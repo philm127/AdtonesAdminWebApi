@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,10 +27,12 @@ namespace AdtonesAdminWebApi.Services
 
         public static ConfigHelper GetCurrentSettings(string Key)
         {
+
             // Gets appsettings.json as is does not use environment
             var builder = new ConfigurationBuilder()
                             .SetBasePath(Directory.GetCurrentDirectory())
                             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                            //.AddJsonFile($"appsettings.{_env.EnvironmentName}.json", optional: true, reloadOnChange: true)
                             .AddEnvironmentVariables();
 
             IConfigurationRoot configuration = builder.Build();

@@ -30,13 +30,15 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IAdvertEmail _adEmail;
         private readonly IAdvertService _advertService;
         private readonly ICreateCheckSaveProfileModels _profileService;
+        private readonly IUserManagementDAL _userDAL;
         ReturnResult result = new ReturnResult();
 
 
         public CreateUpdateCampaignService(IHttpContextAccessor httpAccessor, ICurrencyDAL currencyRepository, ICampaignDAL campaignDAL,
                                             ICreateUpdateCampaignDAL createDAL, IConnectionStringService connService, IPrematchProcess matchProcess,
                                             IUserMatchDAL matchDAL, IAdvertDAL advertDAL, ISaveGetFiles saveFile, IConvertSaveMediaFile convFile,
-                                            IAdvertEmail adEmail, IAdvertService advertService, ICreateCheckSaveProfileModels profileService)
+                                            IAdvertEmail adEmail, IAdvertService advertService, ICreateCheckSaveProfileModels profileService,
+                                            IUserManagementDAL userDAL)
         {
             _httpAccessor = httpAccessor;
             _currencyRepository = currencyRepository;
@@ -51,6 +53,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _adEmail = adEmail;
             _advertService = advertService;
             _profileService = profileService;
+            _userDAL = userDAL;
         }
 
 
@@ -65,11 +68,13 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 var model = new NewAdProfileMappingFormModel();
                 model.CampaignProfileGeographicModel = _profileService.GetGeographicModel(countryId);
-                //model.CampaignProfileDemographicsmodel = _profileService.GetDemographicModel(countryId);
-                // model.CampaignProfileTimeSettingModel = _profileService.GetTimeSettingModel(0);
-                // model.CampaignProfileMobileFormModel = await _profileService.GetMobileModel(countryId);
-                // model.CampaignProfileSkizaFormModel = await _profileService.GetQuestionnaireModel(countryId);
-                //model.CampaignProfileAd = await _profileService.GetAdvertProfileModel(countryId);
+                model.CampaignProfileDemographicsmodel = _profileService.GetDemographicModel(countryId);
+                model.CampaignProfileTimeSettingModel = _profileService.GetTimeSettingModel(0);
+                model.CampaignProfileMobileFormModel = await _profileService.GetMobileModel(countryId);
+                if(countryId == 10)
+                    model.CampaignProfileSkizaFormModel = await _profileService.GetQuestionnaireModel(countryId);
+
+                model.CampaignProfileAd = await _profileService.GetAdvertProfileModel(countryId);
 
                 result.body = model;
 
@@ -94,20 +99,33 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                CampaignProfilePreference CampaignProfilePreferences = await _matchDAL.GetCampaignProfilePreferenceDetailsByCampaignId(campaignId);
-                var model = new NewAdProfileMappingFormModel();
-                if (CampaignProfilePreferences != null)
+                var campaignDetails = await _campaignDAL.GetCampaignProfileDetail(campaignId);
+                if (campaignDetails != null)
                 {
-                    model.CampaignProfileGeographicModel = await _profileService.GetGeographicData(campaignId, CampaignProfilePreferences);
-                    //model.CampaignProfileDemographicsmodel = await _profileService.GetDemographicData(campaignId, CampaignProfilePreferences);
-                    // model.CampaignProfileMobileFormModel = await _profileService.GetMobileData(campaignId, CampaignProfilePreferences);
-                    //model.CampaignProfileSkizaFormModel = await _profileService.GetQuestionnaireData(campaignId, CampaignProfilePreferences);
-                    //model.CampaignProfileAd = await _profileService.GetAdvertProfileData(campaignId, CampaignProfilePreferences);
+                    int countryId = campaignDetails.CountryId.Value;
+                    CampaignProfilePreference CampaignProfilePreferences = await _matchDAL.GetCampaignProfilePreferenceDetailsByCampaignId(campaignId);
+                    var model = new NewAdProfileMappingFormModel();
+                    if (CampaignProfilePreferences != null)
+                    {
+                        model.CampaignProfileGeographicModel = await _profileService.GetGeographicData(campaignId, CampaignProfilePreferences);
+                        model.CampaignProfileDemographicsmodel = await _profileService.GetDemographicData(campaignId, CampaignProfilePreferences);
+                        model.CampaignProfileMobileFormModel = await _profileService.GetMobileData(campaignId, CampaignProfilePreferences);
+                        if (countryId == 10)
+                            model.CampaignProfileSkizaFormModel = await _profileService.GetQuestionnaireData(campaignId, CampaignProfilePreferences);
+                        model.CampaignProfileAd = await _profileService.GetAdvertProfileData(campaignId, CampaignProfilePreferences);
+                    }
+
+                    model.CampaignProfileTimeSettingModel = await _profileService.GetTimeSettingData(campaignId);
+                    model.CampaignProfileId = CampaignProfilePreferences.CampaignProfileId;
+                    model.CountryId = CampaignProfilePreferences.CountryId;
+                    model.Id = CampaignProfilePreferences.Id;
+
+                    result.body = model;
                 }
-
-                // model.CampaignProfileTimeSettingModel = await _profileService.GetTimeSettingData(campaignId);
-
-                result.body = model;
+                else
+                {
+                    return await GetInitialData(10);
+                }
             }
             catch (Exception ex)
             {
@@ -125,11 +143,15 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> InsertProfileInformation(NewAdProfileMappingFormModel model)
+        public async Task<ReturnResult> GetCampaignData(int campaignId)
         {
-            var x = await _profileService.SaveGeographicWizard(model.CampaignProfileGeographicModel);
-            x = await _profileService.SaveDemographicsWizard(model.CampaignProfileDemographicsmodel);
-            result.body = x;
+            CampaignProfileUpdate model = await _campaignDAL.GetCampaignProfileDetailUpdate(campaignId);
+            if (model.NumberInBatch == 0) model.NumberInBatch = 1;
+
+            CampaignProfileFormModel map = new CampaignProfileFormModel();
+
+            result.body = model;
+
             return result;
         }
 
@@ -146,26 +168,26 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             try
             {
-
-                var currencyData = await _currencyRepository.GetCurrencyUsingCurrencyIdAsync(model.CurrencyId);
-                var currencyCountryData = await _currencyRepository.GetCurrencyUsingCountryIdAsync(model.CountryId);
-                decimal currencyRate = 1.00M;
-                var fromCurrencyCode = currencyData.CurrencyCode;
-                var toCurrencyCode = currencyCountryData.CurrencyCode;
-                if (fromCurrencyCode != toCurrencyCode)
-                {
-                    currencyRate = 2;
-                }
-
-                model.CreatedDateTime = DateTime.Now;
-                model.UpdatedDateTime = DateTime.Now;
-
                 if (model.CountryId == 12 || model.CountryId == 13 || model.CountryId == 14)
                     model.CountryId = 12;
                 else if (model.CountryId == 11)
                     model.CountryId = 8;
 
-                
+                var currencyCountryData = await _currencyRepository.GetCurrencyUsingCountryIdAsync(model.CountryId);
+                decimal currencyRate = 1.00M;
+                if (model.CurrencyId != 0)
+                {
+                    var currencyData = await _currencyRepository.GetCurrencyUsingCurrencyIdAsync(model.CurrencyId);
+                    var fromCurrencyCode = currencyData.CurrencyCode;
+                    var toCurrencyCode = currencyCountryData.CurrencyCode;
+                    if (fromCurrencyCode != toCurrencyCode)
+                    {
+                        currencyRate = 2;
+                    }
+                }
+
+                model.CreatedDateTime = DateTime.Now;
+                model.UpdatedDateTime = DateTime.Now;
 
                 model.MaxDailyBudget = float.Parse((Convert.ToDecimal(model.MaxDailyBudget) * currencyRate).ToString());
                 model.MaxBid = float.Parse((Convert.ToDecimal(model.MaxBid) * currencyRate).ToString());
@@ -175,34 +197,39 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 model.EmailFileLocation = null;
                 model.Active = true;
-                model.Status = (int)Enums.CampaignStatus.InProgress;
-                model.IsAdminApproval = false;
+                model.IsAdminApproval = true;
                 model.PhoneticAlphabet = PhoneticString();
-                model.NextStatus = true;
+                model.NextStatus = false;
                 model.CurrencyCode = currencyCountryData.CurrencyCode;
 
-                //var _infoLogging = new ErrorLogging()
-                //{
-                //    ErrorMessage = model.CampaignName.ToString(),
-                //    LogLevel = model.PhoneticAlphabet.ToString(),
-                //    PageName = "CreateUpdateCampaignService",
-                //    ProcedureName = "CreateNewCampaign - Pre Insert"
-                //};
-                //_infoLogging.LogInfo();
+                if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
+                    model.Status = (int)Enums.CampaignStatus.InProgress;
+                else
+                    model.Status = (int)Enums.CampaignStatus.InsufficientFunds;
+                
+
+                if (model.ClientId == 0 || model.ClientId == null)
+                {
+                    if (model.newClientFormModel.Name != null && model.newClientFormModel.Name.Length > 0)
+                    {
+                        var clientModel = new ClientViewModel()
+                        {
+                            Name = model.newClientFormModel.Name,
+                            Description = model.newClientFormModel.Description,
+                            Email = model.newClientFormModel.Email,
+                            ContactPhone = model.newClientFormModel.ContactPhone,
+                            CountryId = model.newClientFormModel.CountryId.Value,
+                            UserId = model.newClientFormModel.UserId
+                        };
+                        model.ClientId = await _userDAL.InsertNewClient(clientModel);
+                    }
+                }
+
 
                 var newModel = new NewCampaignProfileFormModel();
                 try
                 {
                     newModel = await _createDAL.CreateNewCampaign(model);
-
-                    //_infoLogging = new ErrorLogging()
-                    //{
-                    //    ErrorMessage = newModel.CampaignProfileId.ToString(),
-                    //    LogLevel = newModel.AdtoneServerCampaignProfileId.ToString(),
-                    //    PageName = "CreateUpdateCampaignService",
-                    //    ProcedureName = "CreateNewCampaign - Post Insert"
-                    //};
-                    //_infoLogging.LogInfo();
 
                     // Is actually the CampaignProfileId from 168 Main Server
                     result.body = newModel.AdtoneServerCampaignProfileId;
@@ -241,7 +268,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 try
                 {
-                    var z = await _matchDAL.AddCampaignData(newModel, operatorString);
+                    var z = await _matchDAL.AddCampaignMatchData(newModel, operatorString);
                 }
                 catch (Exception ex)
                 {
@@ -258,7 +285,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 try
                 {
-                    await _matchProcess.PrematchProcessForCampaign(newModel.CampaignProfileId, operatorString);
+                    await _matchProcess.PrematchProcessForCampaign(newModel.AdtoneServerCampaignProfileId.Value, operatorString);
                 }
                 catch (Exception ex)
                 {
@@ -294,38 +321,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> CheckIfAdvertNameExists(NewAdvertFormModel model)
-        {
-
-            var AdvertNameexists = await _advertDAL.CheckAdvertNameExists(model.AdvertName, model.AdvertiserId);
-
-            if (AdvertNameexists)
-            {
-                result.result = 0;
-                result.error = "The Advert Name already exists";
-                return result;
-            }
-            else
-                return result;
-        }
-
-
-        public async Task<ReturnResult> CheckIfCampaignNameExists(NewCampaignProfileFormModel model)
-        {
-
-            var CampaignNameexists = await _campaignDAL.CheckCampaignNameExists(model.CampaignName, model.UserId);
-
-            if (CampaignNameexists)
-            {
-                result.result = 0;
-                result.error = "The Campaign Name already exists";
-                return result;
-            }
-            else
-                return result;
-        }
-
-
         public async Task<ReturnResult> CreateNewCampaign_Advert(NewAdvertFormModel model)
         {
             // var testgeo = GetGeographicMode();
@@ -347,15 +342,6 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             IFormFile mediaFile = model.MediaFile;
             IFormFile scriptFile = model.ScriptFile;
-
-            //var _infoLogging = new ErrorLogging()
-            //{
-            //    ErrorMessage = "The submitted operator Id is " + model.OperatorId.ToString(),
-            //    LogLevel = "The submitted campaign Id is " + model.CampaignProfileId.ToString(),
-            //    PageName = "CreateNewCampaignServgice",
-            //    ProcedureName = "CreateNewCampaign_Advert - Check submitted values"
-            //};
-            //_infoLogging.LogInfo();
 
             #region Media
             if (mediaFile.Length > 0)
@@ -463,7 +449,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             model.UploadedToMediaServer = false;
             model.Status = (int)Enums.AdvertStatus.Waitingforapproval;
-            model.IsAdminApproval = false;
+            model.IsAdminApproval = true;
             model.CountryId = campaign.CountryId.Value;
             model.PhoneticAlphabet = PhoneticString();
             model.NextStatus = false;
@@ -477,7 +463,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 CampaignAdvertFormModel _campaignAdvert = new CampaignAdvertFormModel();
                 _campaignAdvert.AdvertId = newModel.AdtoneServerAdvertId.Value;
                 _campaignAdvert.CampaignProfileId = model.CampaignProfileId;
-                _campaignAdvert.NextStatus = true;
+                _campaignAdvert.NextStatus = false;
                 _campaignAdvert.AdtoneServerCampaignAdvertId = null;
                 var newAdCamp = await _createDAL.CreateNewIntoCampaignAdverts(_campaignAdvert, model.OperatorId, newModel.AdvertId);
 
@@ -498,23 +484,15 @@ namespace AdtonesAdminWebApi.BusinessServices
                             adName = operatorFTPDetails.FtpRoot + "/" + model.MediaFileLocation.Split('/')[3];
                         }
                         var ConnString = await _connService.GetConnectionStringByOperator(model.OperatorId);
-                        
-                        //_infoLogging = new ErrorLogging()
-                        //{
-                        //    ErrorMessage = "The submitted operator Id is " + model.OperatorId.ToString()  + "  And the newModel Op Id is " + newModel.OperatorId.ToString(),
-                        //    LogLevel = "The submitted campaign Id is " + model.CampaignProfileId.ToString(),
-                        //    PageName = "CreateNewCampaignServgice",
-                        //    ProcedureName = "CreateNewCampaign_Advert - Check before getting adtonecampId"
-                        //};
-                        //_infoLogging.LogInfo();
+
 
                         var campaignProfileDetails = await _connService.GetCampaignProfileIdFromAdtoneId(model.CampaignProfileId, model.OperatorId);
                         if (campaignProfileDetails != 0)
                         {
                             await _matchDAL.UpdateMediaLocation(ConnString, adName, campaignProfileDetails);
-                            await _matchProcess.PrematchProcessForCampaign(campaignProfileDetails, ConnString);
+                            await _matchProcess.PrematchProcessForCampaign(model.CampaignProfileId, ConnString);
                         }
-                        _adEmail.SendMail(model);
+                        // _adEmail.SendMail(model);
 
                         if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
                         {
@@ -550,12 +528,165 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             #endregion
 
-            
+
 
             return result;
         }
 
 
+        public async Task<ReturnResult> InsertProfileInformation(NewAdProfileMappingFormModel model)
+        {
+            int y = 0;
+            try
+            {
+                var connString = await _connService.GetConnectionStringsByCountry(model.CountryId);
+                y = await _matchDAL.InsertProfilePreference(model);
+
+                var x = await _profileService.SaveGeographicWizard(model.CampaignProfileGeographicModel, connString);
+                x = await _profileService.SaveDemographicsWizard(model.CampaignProfileDemographicsmodel, connString);
+                x = await _profileService.SaveAdvertsWizard(model.CampaignProfileAd, connString);
+                x = await _profileService.SaveMobileWizard(model.CampaignProfileMobileFormModel, connString);
+                //if(model.CountryId == 10)
+                // x = await _profileService.SaveQuestionnaireWizard(model.CampaignProfileSkizaFormModel, connString);
+                x = await _profileService.SaveTimeSettingsWizard(model.CampaignProfileTimeSettingModel, connString);
+
+                result.body = x;
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CreateUpdateCampaignService",
+                    ProcedureName = "InsertProfileInformation"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+
+            try
+            {
+                var campaignProfile = await _campaignDAL.GetCampaignProfileDetail(model.CampaignProfileId);
+
+                var ConnString = await _connService.GetConnectionStringsByCountryId(campaignProfile.CountryId.Value);
+                if (ConnString != null)
+                {
+                    if (campaignProfile.Status == (int)Enums.CampaignStatus.Play && campaignProfile.IsAdminApproval == true)
+                    {
+                        await _matchProcess.PrematchProcessForCampaign(model.CampaignProfileId, ConnString);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CreateUpdateCampaignService",
+                    ProcedureName = "InsertProfileInformation - PrematchProcessForCampaign"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+
+            return result;
+        }
+
+
+        public async Task<ReturnResult> UpdateCampaignDetails(NewCampaignProfileFormModel model)
+        {
+            try
+            {
+                int x = await _createDAL.UpdateCampaignDetails(model);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CreateUpdateCampaignService",
+                    ProcedureName = "UpdateCampaign"
+                };
+                _logging.LogError();
+                result.result = 0;
+                return result;
+            }
+
+            var operatorString = await _connService.GetConnectionStringsByCountryId(model.CountryId);
+
+            try
+            {
+                var z = await _matchDAL.UpdateCampaignMatchData(model, operatorString);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CreateUpdateCampaignService",
+                    ProcedureName = "UpdateCampaign - UpdateMatch Data"
+                };
+                _logging.LogError();
+                result.result = 0;
+                return result;
+            }
+            try
+            {
+                await _matchProcess.PrematchProcessForCampaign(model.CampaignProfileId, operatorString);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CreateUpdateCampaignService",
+                    ProcedureName = "UpdateCampaign - PrematchProcessForCampaign"
+                };
+                _logging.LogError();
+                result.result = 0;
+                return result;
+            }
+
+            return result;
+
+        }
+
+
+        public async Task<ReturnResult> CheckIfAdvertNameExists(NewAdvertFormModel model)
+        {
+
+            var AdvertNameexists = await _advertDAL.CheckAdvertNameExists(model.AdvertName, model.AdvertiserId);
+
+            if (AdvertNameexists)
+            {
+                result.result = 0;
+                result.error = "The Advert Name already exists";
+                return result;
+            }
+            else
+                return result;
+        }
+
+
+        public async Task<ReturnResult> CheckIfCampaignNameExists(NewCampaignProfileFormModel model)
+        {
+
+            var CampaignNameexists = await _campaignDAL.CheckCampaignNameExists(model.CampaignName, model.UserId);
+
+            if (CampaignNameexists)
+            {
+                result.result = 0;
+                result.error = "The Campaign Name already exists";
+                return result;
+            }
+            else
+                return result;
+        }
 
 
         private static string PhoneticString()

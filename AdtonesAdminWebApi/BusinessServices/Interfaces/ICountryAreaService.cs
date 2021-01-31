@@ -19,5 +19,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> GetArea(int id);
         Task<ReturnResult> UpdateArea(AreaResult areamodel);
         Task<ReturnResult> DeleteArea(int id);
+
+        Task<ReturnResult> GetMinBid(int countryId);
     }
 }

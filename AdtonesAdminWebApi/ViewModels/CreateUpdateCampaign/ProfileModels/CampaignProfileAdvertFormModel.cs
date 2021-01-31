@@ -10,192 +10,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// <summary>
         /// Initializes a new instance of the <see cref="CampaignProfileAdvertFormModel"/> class.
         /// </summary>
-        public CampaignProfileAdvertFormModel()
-        {
-            FoodQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            SweetSaltySnacksQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            AlcoholicDrinksQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            NonAlcoholicDrinksQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            HouseholdproductsQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            ToiletriesCosmeticsQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            PharmaceuticalChemistsProductsQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            TobaccoProductsQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            PetsPetFoodQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            ShoppingRetailClothingQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            DIYGardeningQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            //AppliancesOtherHouseholdDurablesQuestion =
-            //    CompileQuestions(new Dictionary<string, bool>
-            //                         {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            ElectronicsOtherPersonalItemsQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            CommunicationsInternetQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            FinancialServicesQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            HolidaysTravelQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            SportsLeisureQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            MotoringQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            NewspapersQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            //MagazinesQuestion =
-            //    CompileQuestions(new Dictionary<string, bool>
-            //                         {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            TVQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            //RadioQuestion =
-            //    CompileQuestions(new Dictionary<string, bool>
-            //                         {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            CinemaQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            SocialNetworkingQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            //GeneralUseQuestion =
-            //    CompileQuestions(new Dictionary<string, bool>
-            //                         {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            ShoppingQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            FitnessQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            //HolidaysQuestion =
-            //    CompileQuestions(new Dictionary<string, bool>
-            //                         {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            EnvironmentQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            GoingOutQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            //FinancialProductsQuestion =
-            //    CompileQuestions(new Dictionary<string, bool>
-            //                         {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            ReligionQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            //FashionQuestion =
-            //    CompileQuestions(new Dictionary<string, bool>
-            //                         {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-            MusicQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-
-            // New Added Question
-
-            BusinessOrOpportunitiesQuestion =
-              CompileQuestions(new Dictionary<string, bool>
-                                   {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            GamblingQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                       {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            RestaurantsQuestion =
-              CompileQuestions(new Dictionary<string, bool>
-                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            InsuranceQuestion =
-            CompileQuestions(new Dictionary<string, bool>
-                   {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            FurnitureQuestion =
-               CompileQuestions(new Dictionary<string, bool>
-                      {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            InformationTechnologyQuestion =
-               CompileQuestions(new Dictionary<string, bool>
-                      {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            EnergyQuestion =
-               CompileQuestions(new Dictionary<string, bool>
-                      {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            SupermarketsQuestion =
-              CompileQuestions(new Dictionary<string, bool>
-                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            HealthcareQuestion =
-                  CompileQuestions(new Dictionary<string, bool>
-                         {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            JobsAndEducationQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                       {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            GiftsQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                       {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            AdvocacyOrLegalQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                       {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            DatingAndPersonalQuestion =
-               CompileQuestions(new Dictionary<string, bool>
-                      {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            RealEstateQuestion =
-              CompileQuestions(new Dictionary<string, bool>
-                     {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            GamesQuestion =
-             CompileQuestions(new Dictionary<string, bool>
-                    {{"Not Important", false}, {"Neutral", true}, {"Important", false}});
-
-            
-
-            HustlersQuestion =
-            CompileQuestions(new Dictionary<string, bool>
-                   {{"Networked Youth", false}, {"Stable Hustler", false}, {"Savvy Loyalist", false}});
-
-            YouthQuestion =
-           CompileQuestions(new Dictionary<string, bool>
-                  {{"Tween", false}, {"Hi-Pot students", true}, {"Prudent Young", false}});
-
-            DiscerningProfessionalsQuestion =
-           CompileQuestions(new Dictionary<string, bool>
-                  {{"Young Flashers", false}, {"Mature trendies", true}, {"Settled Middle Mgmt", false},{"Affluent Influencers", false}});
-
-            MassQuestion =
-           CompileQuestions(new Dictionary<string, bool>
-                  {{"Young cautious caller", true}, {"Toa Mpango", false},{"Young progressive worker", false}, {"Older Toa Mpango", true}, {"Progressive worker", false}});
-        }
+        public CampaignProfileAdvertFormModel() { }
+        
 
         public CampaignProfileAdvertFormModel(int CountryId, List<string> foodProfileLabel, List<string> sweetSaltySnacksProfileLabel, List<string> alcoholicDrinksProfileLabel,
                                                 List<string> nonAlcoholicDrinksProfileLabel, List<string> householdproductsProfileLabel, List<string> toiletriesCosmeticsProfileLabel,
@@ -970,86 +786,7 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
                 }
             }
 
-            ////Hustlers
-            //var hustlersProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Hustlers".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            //var hustlersProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == hustlersProfileMatchId).ToList();
-
-            //Dictionary<string, bool> hustlers = new Dictionary<string, bool>();
-            //List<Dictionary<string, bool>> hustlerslist = new List<Dictionary<string, bool>>();
-
-            //foreach (var item in hustlersProfileLabel)
-            //{
-            //    hustlers = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-            //    hustlerslist.Add(hustlers);
-            //}
-            //HustlersQuestion = CompileQuestionsDynamic(hustlerslist);
-
-            ////Youth
-            //var youthProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Youth".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            //var youthProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == youthProfileMatchId).ToList();
-
-            //Dictionary<string, bool> youth = new Dictionary<string, bool>();
-            //List<Dictionary<string, bool>> youthlist = new List<Dictionary<string, bool>>();
-
-            //foreach (var item in youthProfileLabel)
-            //{
-            //    youth = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-            //    youthlist.Add(youth);
-            //}
-            //YouthQuestion = CompileQuestionsDynamic(youthlist);
-            //foreach (var item in YouthQuestion)
-            //{
-            //    if (item.QuestionName == "Hi-Pot students")
-            //    {
-            //        item.DefaultAnswer = true;
-            //    }
-            //}
-
-            ////DiscerningProfessionals
-            //var discerningProfessionalsProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Discerning Professionals".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            //var discerningProfessionalsProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == discerningProfessionalsProfileMatchId).ToList();
-
-            //Dictionary<string, bool> discerningProfessionals = new Dictionary<string, bool>();
-            //List<Dictionary<string, bool>> discerningProfessionalslist = new List<Dictionary<string, bool>>();
-
-            //foreach (var item in discerningProfessionalsProfileLabel)
-            //{
-            //    discerningProfessionals = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-            //    discerningProfessionalslist.Add(discerningProfessionals);
-            //}
-            //DiscerningProfessionalsQuestion = CompileQuestionsDynamic(discerningProfessionalslist);
-            //foreach (var item in DiscerningProfessionalsQuestion)
-            //{
-            //    if (item.QuestionName == "Mature trendies")
-            //    {
-            //        item.DefaultAnswer = true;
-            //    }
-            //}
-
-            ////Mass
-            //var massProfileMatchId = db.ProfileMatchInformation.Where(top => top.CountryId == CountryId && top.ProfileName.ToLower().Equals("Mass".ToLower()) && top.IsActive == true).Select(top => top.Id).FirstOrDefault();
-            //var massProfileLabel = db.ProfileMatchLabel.Where(top => top.ProfileMatchInformationId == massProfileMatchId).ToList();
-
-            //Dictionary<string, bool> mass = new Dictionary<string, bool>();
-            //List<Dictionary<string, bool>> masslist = new List<Dictionary<string, bool>>();
-
-            //foreach (var item in massProfileLabel)
-            //{
-            //    mass = new Dictionary<string, bool> { { item.ProfileLabel, false } };
-            //    masslist.Add(mass);
-            //}
-            //MassQuestion = CompileQuestionsDynamic(masslist);
-            //foreach (var item in MassQuestion)
-            //{
-            //    if (item.QuestionName == "Young cautious caller")
-            //    {
-            //        item.DefaultAnswer = true;
-            //    }
-            //    if (item.QuestionName == "Older Toa Mpango")
-            //    {
-            //        item.DefaultAnswer = true;
-            //    }
-            //}
+            
 
         }
 
@@ -1083,30 +820,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The food.</value>
         //// [Display(Name = "Food")]
-        public string Food_Advert
-        {
-            get
-            {
-                if (FoodQuestion == null)
-                    FoodQuestion = new List<QuestionOptionModel>();
-
-                return CompileAnswers(SortList(FoodQuestion));
-            }
-            set
-            {
-                if (FoodQuestion != null && FoodQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-
-                    for (int i = 0; i < value.Length; i++)
-                        FoodQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Food_Advert { get; set; }
+        
 
         /// <summary>
         /// Gets or sets the sweet salty snacks question.
@@ -1120,30 +835,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The sweet salty snacks.</value>
         //// [Display(Name = "Sweets/Snacks")]
-        public string SweetSaltySnacks_Advert
-        {
-            get
-            {
-                if (SweetSaltySnacksQuestion == null)
-                    SweetSaltySnacksQuestion = new List<QuestionOptionModel>();
-
-                return CompileAnswers(SortList(SweetSaltySnacksQuestion));
-            }
-            set
-            {
-                if (SweetSaltySnacksQuestion != null && SweetSaltySnacksQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-
-                    for (int i = 0; i < value.Length; i++)
-                        SweetSaltySnacksQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string SweetSaltySnacks_Advert { get; set; }
+        
 
         /// <summary>
         /// Gets or sets the alcoholic drinks question.
@@ -1157,28 +850,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The alcoholic drinks.</value>
         // // [Display(Name = "Alcoholic Drinks")]
-        public string AlcoholicDrinks_Advert
-        {
-            get
-            {
-                if (AlcoholicDrinksQuestion == null)
-                    AlcoholicDrinksQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(AlcoholicDrinksQuestion));
-            }
-            set
-            {
-                if (AlcoholicDrinksQuestion != null && AlcoholicDrinksQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        AlcoholicDrinksQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string AlcoholicDrinks_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -1193,28 +866,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The non alcoholic drinks.</value>
         // // [Display(Name = "Non-Alcoholic Drinks")]
-        public string NonAlcoholicDrinks_Advert
-        {
-            get
-            {
-                if (NonAlcoholicDrinksQuestion == null)
-                    NonAlcoholicDrinksQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(NonAlcoholicDrinksQuestion));
-            }
-            set
-            {
-                if (NonAlcoholicDrinksQuestion != null && NonAlcoholicDrinksQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        NonAlcoholicDrinksQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string NonAlcoholicDrinks_Advert { get; set; }
+        
 
         /// <summary>
         /// Gets or sets the householdproducts question.
@@ -1228,28 +881,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The householdproducts.</value>
         // // [Display(Name = "Household Appliances/Products")]
-        public string Householdproducts_Advert
-        {
-            get
-            {
-                if (HouseholdproductsQuestion == null)
-                    HouseholdproductsQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(HouseholdproductsQuestion));
-            }
-            set
-            {
-                if (HouseholdproductsQuestion != null && HouseholdproductsQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        HouseholdproductsQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Householdproducts_Advert { get; set; }
+        
 
         /// <summary>
         /// Gets or sets the toiletries cosmetics question.
@@ -1263,28 +896,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The toiletries cosmetics.</value>
         // // [Display(Name = "Toiletries/Cosmetics")]
-        public string ToiletriesCosmetics_Advert
-        {
-            get
-            {
-                if (ToiletriesCosmeticsQuestion == null)
-                    ToiletriesCosmeticsQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(ToiletriesCosmeticsQuestion));
-            }
-            set
-            {
-                if (ToiletriesCosmeticsQuestion != null && ToiletriesCosmeticsQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        ToiletriesCosmeticsQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string ToiletriesCosmetics_Advert { get; set; }
+        
 
         /// <summary>
         /// Gets or sets the pharmaceutical chemists products question.
@@ -1298,28 +911,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The pharmaceutical chemists products.</value>
         // // [Display(Name = "Pharmaceutical/Chemists Products")]
-        public string PharmaceuticalChemistsProducts_Advert
-        {
-            get
-            {
-                if (PharmaceuticalChemistsProductsQuestion == null)
-                    PharmaceuticalChemistsProductsQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(PharmaceuticalChemistsProductsQuestion));
-            }
-            set
-            {
-                if (PharmaceuticalChemistsProductsQuestion != null && PharmaceuticalChemistsProductsQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        PharmaceuticalChemistsProductsQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string PharmaceuticalChemistsProducts_Advert { get; set; }
+        
 
         /// <summary>
         /// Gets or sets the tobacco products question.
@@ -1333,28 +926,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The tobacco products.</value>
         // // [Display(Name = "Tobacco Products")]
-        public string TobaccoProducts_Advert
-        {
-            get
-            {
-                if (TobaccoProductsQuestion == null)
-                    TobaccoProductsQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(TobaccoProductsQuestion));
-            }
-            set
-            {
-                if (TobaccoProductsQuestion != null && TobaccoProductsQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        TobaccoProductsQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string TobaccoProducts_Advert { get; set; }
+        
 
         /// <summary>
         /// Gets or sets the pets pet food question.
@@ -1368,28 +941,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The pets pet food.</value>
         // // [Display(Name = "Pets")]
-        public string PetsPetFood_Advert
-        {
-            get
-            {
-                if (PetsPetFoodQuestion == null)
-                    PetsPetFoodQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(PetsPetFoodQuestion));
-            }
-            set
-            {
-                if (PetsPetFoodQuestion != null && PetsPetFoodQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        PetsPetFoodQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string PetsPetFood_Advert { get; set; }
+        
 
         /// <summary>
         /// Gets or sets the shopping retail clothing question.
@@ -1403,28 +956,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The shopping retail clothing.</value>
         // // [Display(Name = "Clothing/Fashion")]
-        public string ShoppingRetailClothing_Advert
-        {
-            get
-            {
-                if (ShoppingRetailClothingQuestion == null)
-                    ShoppingRetailClothingQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(ShoppingRetailClothingQuestion));
-            }
-            set
-            {
-                if (ShoppingRetailClothingQuestion != null && ShoppingRetailClothingQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        ShoppingRetailClothingQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string ShoppingRetailClothing_Advert { get; set; }
+        
 
         /// <summary>
         /// Gets or sets the diy gardening question.
@@ -1438,28 +971,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The diy gardening.</value>
         // // [Display(Name = "DIY/Gardening")]
-        public string DIYGardening_Advert
-        {
-            get
-            {
-                if (DIYGardeningQuestion == null)
-                    DIYGardeningQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(DIYGardeningQuestion));
-            }
-            set
-            {
-                if (DIYGardeningQuestion != null && DIYGardeningQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        DIYGardeningQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string DIYGardening_Advert { get; set; }
+        
 
         
         /// <summary>
@@ -1474,28 +987,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The electronics other personal items.</value>
         // // [Display(Name = "Electronics/Other Personal Items")]
-        public string ElectronicsOtherPersonalItems_Advert
-        {
-            get
-            {
-                if (ElectronicsOtherPersonalItemsQuestion == null)
-                    ElectronicsOtherPersonalItemsQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(ElectronicsOtherPersonalItemsQuestion));
-            }
-            set
-            {
-                if (ElectronicsOtherPersonalItemsQuestion != null && ElectronicsOtherPersonalItemsQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        ElectronicsOtherPersonalItemsQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string ElectronicsOtherPersonalItems_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -1510,28 +1003,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The communications internet.</value>
         // // [Display(Name = "Communications/Internet Telecom")]
-        public string CommunicationsInternet_Advert
-        {
-            get
-            {
-                if (CommunicationsInternetQuestion == null)
-                    CommunicationsInternetQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(CommunicationsInternetQuestion));
-            }
-            set
-            {
-                if (CommunicationsInternetQuestion != null && CommunicationsInternetQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        CommunicationsInternetQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string CommunicationsInternet_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -1546,28 +1019,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The financial services.</value>
         // // [Display(Name = "Financial Services")]
-        public string FinancialServices_Advert
-        {
-            get
-            {
-                if (FinancialServicesQuestion == null)
-                    FinancialServicesQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(FinancialServicesQuestion));
-            }
-            set
-            {
-                if (FinancialServicesQuestion != null && FinancialServicesQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        FinancialServicesQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string FinancialServices_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -1582,28 +1035,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The holidays travel.</value>
         // // [Display(Name = "Holidays/Travel Tourism")]
-        public string HolidaysTravel_Advert
-        {
-            get
-            {
-                if (HolidaysTravelQuestion == null)
-                    HolidaysTravelQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(HolidaysTravelQuestion));
-            }
-            set
-            {
-                if (HolidaysTravelQuestion != null && HolidaysTravelQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        HolidaysTravelQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string HolidaysTravel_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -1618,28 +1051,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The sports leisure.</value>
         // // [Display(Name = "Sports/Leisure")]
-        public string SportsLeisure_Advert
-        {
-            get
-            {
-                if (SportsLeisureQuestion == null)
-                    SportsLeisureQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(SportsLeisureQuestion));
-            }
-            set
-            {
-                if (SportsLeisureQuestion != null && SportsLeisureQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        SportsLeisureQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string SportsLeisure_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -1654,28 +1067,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The motoring.</value>
         // // [Display(Name = "Motoring/Automotive")]
-        public string Motoring_Advert
-        {
-            get
-            {
-                if (MotoringQuestion == null)
-                    MotoringQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(MotoringQuestion));
-            }
-            set
-            {
-                if (MotoringQuestion != null && MotoringQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        MotoringQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Motoring_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -1690,28 +1083,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The newspapers.</value>
         // // [Display(Name = "Newspapers/Magazines")]
-        public string Newspapers_Advert
-        {
-            get
-            {
-                if (NewspapersQuestion == null)
-                    NewspapersQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(NewspapersQuestion));
-            }
-            set
-            {
-                if (NewspapersQuestion != null && NewspapersQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        NewspapersQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Newspapers_Advert { get; set; }
+        
 
         /// <summary>
         /// Gets or sets the tv question.
@@ -1725,28 +1098,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The tv.</value>
         // // [Display(Name = "TV/Video/Radio")]
-        public string TV_Advert
-        {
-            get
-            {
-                if (TVQuestion == null)
-                    TVQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(TVQuestion));
-            }
-            set
-            {
-                if (TVQuestion != null && TVQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        TVQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string TV_Advert { get; set; }
+        
 
 
 
@@ -1762,28 +1115,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The cinema.</value>
         // // [Display(Name = "Cinema")]
-        public string Cinema_Advert
-        {
-            get
-            {
-                if (CinemaQuestion == null)
-                    CinemaQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(CinemaQuestion));
-            }
-            set
-            {
-                if (CinemaQuestion != null && CinemaQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        CinemaQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Cinema_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -1798,28 +1131,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The social networking.</value>
         // // [Display(Name = "Social Networking")]
-        public string SocialNetworking_Advert
-        {
-            get
-            {
-                if (SocialNetworkingQuestion == null)
-                    SocialNetworkingQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(SocialNetworkingQuestion));
-            }
-            set
-            {
-                if (SocialNetworkingQuestion != null && SocialNetworkingQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        SocialNetworkingQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string SocialNetworking_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -1834,28 +1147,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The shopping.</value>
         // // [Display(Name = "Shopping(retail gen merc)")]
-        public string Shopping_Advert
-        {
-            get
-            {
-                if (ShoppingQuestion == null)
-                    ShoppingQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(ShoppingQuestion));
-            }
-            set
-            {
-                if (ShoppingQuestion != null && ShoppingQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        ShoppingQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Shopping_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -1870,28 +1163,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The fitness.</value>
         // // [Display(Name = "Fitness")]
-        public string Fitness_Advert
-        {
-            get
-            {
-                if (FitnessQuestion == null)
-                    FitnessQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(FitnessQuestion));
-            }
-            set
-            {
-                if (FitnessQuestion != null && FitnessQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        FitnessQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Fitness_Advert { get; set; }
+        
 
 
 
@@ -1907,28 +1180,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The environment.</value>
         // // [Display(Name = "Environment")]
-        public string Environment_Advert
-        {
-            get
-            {
-                if (EnvironmentQuestion == null)
-                    EnvironmentQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(EnvironmentQuestion));
-            }
-            set
-            {
-                if (EnvironmentQuestion != null && EnvironmentQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        EnvironmentQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Environment_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -1943,28 +1196,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The going out.</value>
         // // [Display(Name = "Going Out/Entertainment")]
-        public string GoingOut_Advert
-        {
-            get
-            {
-                if (GoingOutQuestion == null)
-                    GoingOutQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(GoingOutQuestion));
-            }
-            set
-            {
-                if (GoingOutQuestion != null && GoingOutQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        GoingOutQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string GoingOut_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -1979,28 +1212,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The religion.</value>
         // // [Display(Name = "Religion")]
-        public string Religion_Advert
-        {
-            get
-            {
-                if (ReligionQuestion == null)
-                    ReligionQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(ReligionQuestion));
-            }
-            set
-            {
-                if (ReligionQuestion != null && ReligionQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        ReligionQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Religion_Advert { get; set; }
+        
 
 
         /// <summary>
@@ -2015,28 +1228,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The music.</value>
         // // [Display(Name = "Music")]
-        public string Music_Advert
-        {
-            get
-            {
-                if (MusicQuestion == null)
-                    MusicQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(MusicQuestion));
-            }
-            set
-            {
-                if (MusicQuestion != null && MusicQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        MusicQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Music_Advert { get; set; }
+        
 
         // New Add Type
         // // [Display(Name = "Business/opportunities")]
@@ -2044,527 +1237,144 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
 
 
         // // [Display(Name = "Business/opportunities")]
-        public string BusinessOrOpportunities_AdType
-        {
-            get
-            {
-                if (BusinessOrOpportunitiesQuestion == null)
-                    BusinessOrOpportunitiesQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(BusinessOrOpportunitiesQuestion));
-            }
-            set
-            {
-                if (BusinessOrOpportunitiesQuestion != null && BusinessOrOpportunitiesQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        BusinessOrOpportunitiesQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string BusinessOrOpportunities_AdType { get; set; }
+        
 
         // // [Display(Name = "Over 18/Gambling")]
         public List<QuestionOptionModel> GamblingQuestion { get; set; }
 
         // // [Display(Name = "Over 18/Gambling")]
-        public string Gambling_AdType
-        {
-            get
-            {
-                if (GamblingQuestion == null)
-                    GamblingQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(GamblingQuestion));
-            }
-            set
-            {
-                if (GamblingQuestion != null && GamblingQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        GamblingQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Gambling_AdType { get; set; }
+        
 
 
         // // [Display(Name = "Restaurants")]
         public List<QuestionOptionModel> RestaurantsQuestion { get; set; }
 
         // // [Display(Name = "Restaurants")]
-        public string Restaurants_AdType
-        {
-            get
-            {
-                if (RestaurantsQuestion == null)
-                    RestaurantsQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(RestaurantsQuestion));
-            }
-            set
-            {
-                if (RestaurantsQuestion != null && RestaurantsQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        RestaurantsQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Restaurants_AdType { get; set; }
+        
 
         // // [Display(Name = "Insurance")]
         public List<QuestionOptionModel> InsuranceQuestion { get; set; }
 
         // // [Display(Name = "Insurance")]
-        public string Insurance_AdType
-        {
-            get
-            {
-                if (InsuranceQuestion == null)
-                    InsuranceQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(InsuranceQuestion));
-            }
-            set
-            {
-                if (InsuranceQuestion != null && InsuranceQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        InsuranceQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Insurance_AdType { get; set; }
+        
 
 
         // // [Display(Name = "Furniture")]
         public List<QuestionOptionModel> FurnitureQuestion { get; set; }
 
         // // [Display(Name = "Furniture")]
-        public string Furniture_AdType
-        {
-            get
-            {
-                if (FurnitureQuestion == null)
-                    FurnitureQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(FurnitureQuestion));
-            }
-            set
-            {
-                if (FurnitureQuestion != null && FurnitureQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        FurnitureQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Furniture_AdType { get; set; }
+        
 
         // [Display(Name = "Information technology")]
         public List<QuestionOptionModel> InformationTechnologyQuestion { get; set; }
 
         // [Display(Name = "Information technology")]
-        public string InformationTechnology_AdType
-        {
-            get
-            {
-                if (InformationTechnologyQuestion == null)
-                    InformationTechnologyQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(InformationTechnologyQuestion));
-            }
-            set
-            {
-                if (InformationTechnologyQuestion != null && InformationTechnologyQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        InformationTechnologyQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string InformationTechnology_AdType { get; set; }
+        
 
 
         // [Display(Name = "Energy")]
         public List<QuestionOptionModel> EnergyQuestion { get; set; }
 
         // [Display(Name = "Energy")]
-        public string Energy_AdType
-        {
-            get
-            {
-                if (EnergyQuestion == null)
-                    EnergyQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(EnergyQuestion));
-            }
-            set
-            {
-                if (EnergyQuestion != null && EnergyQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        EnergyQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Energy_AdType { get; set; }
+        
 
 
         // [Display(Name = "Supermarkets")]
         public List<QuestionOptionModel> SupermarketsQuestion { get; set; }
 
         // [Display(Name = "Supermarkets")]
-        public string Supermarkets_AdType
-        {
-            get
-            {
-                if (SupermarketsQuestion == null)
-                    SupermarketsQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(SupermarketsQuestion));
-            }
-            set
-            {
-                if (SupermarketsQuestion != null && SupermarketsQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        SupermarketsQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Supermarkets_AdType { get; set; }
+        
 
         // [Display(Name = "Healthcare")]
         public List<QuestionOptionModel> HealthcareQuestion { get; set; }
 
         // [Display(Name = "Healthcare")]
-        public string Healthcare_AdType
-        {
-            get
-            {
-                if (HealthcareQuestion == null)
-                    HealthcareQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(HealthcareQuestion));
-            }
-            set
-            {
-                if (HealthcareQuestion != null && HealthcareQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        HealthcareQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Healthcare_AdType { get; set; }
+        
 
 
         // [Display(Name = "Jobs and Education")]
         public List<QuestionOptionModel> JobsAndEducationQuestion { get; set; }
 
         // [Display(Name = "Jobs and Education")]
-        public string JobsAndEducation_AdType
-        {
-            get
-            {
-                if (JobsAndEducationQuestion == null)
-                    JobsAndEducationQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(JobsAndEducationQuestion));
-            }
-            set
-            {
-                if (JobsAndEducationQuestion != null && JobsAndEducationQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        JobsAndEducationQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string JobsAndEducation_AdType { get; set; }
+        
 
 
         // [Display(Name = "Gifts")]
         public List<QuestionOptionModel> GiftsQuestion { get; set; }
 
         // [Display(Name = "Gifts")]
-        public string Gifts_AdType
-        {
-            get
-            {
-                if (GiftsQuestion == null)
-                    GiftsQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(GiftsQuestion));
-            }
-            set
-            {
-                if (GiftsQuestion != null && GiftsQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        GiftsQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Gifts_AdType { get; set; }
+        
 
 
         // [Display(Name = "Advocacy/Legal")]
         public List<QuestionOptionModel> AdvocacyOrLegalQuestion { get; set; }
 
         // [Display(Name = "Advocacy/Legal")]
-        public string AdvocacyOrLegal_AdType
-        {
-            get
-            {
-                if (AdvocacyOrLegalQuestion == null)
-                    AdvocacyOrLegalQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(AdvocacyOrLegalQuestion));
-            }
-            set
-            {
-                if (AdvocacyOrLegalQuestion != null && AdvocacyOrLegalQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        AdvocacyOrLegalQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string AdvocacyOrLegal_AdType { get; set; }
+        
 
         // [Display(Name = "Dating & Personal")]
         public List<QuestionOptionModel> DatingAndPersonalQuestion { get; set; }
 
         // [Display(Name = "Dating & Personal")]
-        public string DatingAndPersonal_AdType
-        {
-            get
-            {
-                if (DatingAndPersonalQuestion == null)
-                    DatingAndPersonalQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(DatingAndPersonalQuestion));
-            }
-            set
-            {
-                if (DatingAndPersonalQuestion != null && DatingAndPersonalQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        DatingAndPersonalQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string DatingAndPersonal_AdType { get; set; }
+        
 
 
         // [Display(Name = "Real Estate/Property")]
         public List<QuestionOptionModel> RealEstateQuestion { get; set; }
 
         // [Display(Name = "Real Estate/Property")]
-        public string RealEstate_AdType
-        {
-            get
-            {
-                if (RealEstateQuestion == null)
-                    RealEstateQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(RealEstateQuestion));
-            }
-            set
-            {
-                if (RealEstateQuestion != null && RealEstateQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        RealEstateQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
-
-
-
+        public string RealEstate_AdType { get; set; }
+        
 
         // [Display(Name = "Games")]
         public List<QuestionOptionModel> GamesQuestion { get; set; }
 
         // [Display(Name = "Games")]
-        public string Games_AdType
-        {
-            get
-            {
-                if (GamesQuestion == null)
-                    GamesQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(GamesQuestion));
-            }
-            set
-            {
-                if (GamesQuestion != null && GamesQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        GamesQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Games_AdType { get; set; }
+        
 
 
         // [Display(Name = "Hustlers")]
         public List<QuestionOptionModel> HustlersQuestion { get; set; }
 
         // [Display(Name = "Hustlers")]
-        public string Hustlers_AdType
-        {
-            get
-            {
-                if (HustlersQuestion == null)
-                    HustlersQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(HustlersQuestion));
-            }
-            set
-            {
-                if (HustlersQuestion != null && HustlersQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        HustlersQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Hustlers_AdType { get; set; }
+        
 
 
         // [Display(Name = "Youth")]
         public List<QuestionOptionModel> YouthQuestion { get; set; }
 
         // [Display(Name = "Youth")]
-        public string Youth_AdType
-        {
-            get
-            {
-                if (YouthQuestion == null)
-                    YouthQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(YouthQuestion));
-            }
-            set
-            {
-                if (YouthQuestion != null && YouthQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        YouthQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Youth_AdType { get; set; }
+        
 
         // [Display(Name = "Discerning Professionals")]
         public List<QuestionOptionModel> DiscerningProfessionalsQuestion { get; set; }
 
         // [Display(Name = "Discerning Professionals")]
-        public string DiscerningProfessionals_AdType
-        {
-            get
-            {
-                if (DiscerningProfessionalsQuestion == null)
-                    DiscerningProfessionalsQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(DiscerningProfessionalsQuestion));
-            }
-            set
-            {
-                if (DiscerningProfessionalsQuestion != null && DiscerningProfessionalsQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        DiscerningProfessionalsQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string DiscerningProfessionals_AdType { get; set; }
+        
 
         // [Display(Name = "Mass")]
         public List<QuestionOptionModel> MassQuestion { get; set; }
 
         // [Display(Name = "Mass")]
-        public string Mass_AdType
-        {
-            get
-            {
-                if (MassQuestion == null)
-                    MassQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(MassQuestion));
-            }
-            set
-            {
-                if (MassQuestion != null && MassQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        MassQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Mass_AdType { get; set; }
+        
 
 
         #region Country Wise Hide Show Option

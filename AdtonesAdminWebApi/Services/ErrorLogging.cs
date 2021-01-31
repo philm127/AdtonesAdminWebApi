@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AdtonesAdminWebApi.Services.Mailer;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.AspNetCore.Hosting;
+using MimeKit;
 
 namespace AdtonesAdminWebApi.Services
 {
@@ -54,6 +58,23 @@ namespace AdtonesAdminWebApi.Services
             //        writer.Close();
             //    }
             //}
+
+            var mail = new SendEmailModel();
+            string emailContent = string.Empty;
+
+            emailContent = "<b>-------------------START-------------" + DateTime.Now + "</b><br><br>\n";
+            emailContent += $"<b>Page: </b>  { PageName},    <b>Procedure:  </b>   { ProcedureName}</b><br>\n";
+            emailContent += $"<b>ErrorMsg: </b>  { ErrorMessage}<br><br>\n";
+            emailContent += $"<b>StackTrace</b><br><br>\n";
+            emailContent += $"{StackTrace}<br><br>\n";
+            emailContent += "<b>------------------- END -------------</b>\n";
+
+
+            emailContent = string.Format(emailContent);
+            mail.From = "support@adtones.com";
+            mail.Subject = "Admin Adtone API error log at  " + DateTime.Now;
+            mail.Body = emailContent;
+            SendErrorEmail(mail);
         }
 
         public static void Log(string PageName,string ProcedureName,string ErrorMessage,string LogLevel,string StackTrace, TextWriter w)
@@ -63,6 +84,86 @@ namespace AdtonesAdminWebApi.Services
             w.WriteLine($"LogLevel: {LogLevel}");
             w.WriteLine($" StackTrace  : {StackTrace}");
             w.WriteLine("------------END-------------------");
+        }
+
+
+        public void SendErrorEmail(SendEmailModel mail)
+        {
+            var message = new MimeMessage();
+            //mail.SingleTo = "support@adtones.com";
+            mail.SingleTo = "myinternet21@hotmail.com";
+
+            message.To.Add(MailboxAddress.Parse(mail.SingleTo));
+            message.From.Add(MailboxAddress.Parse(mail.From));
+
+            if (mail.Bcc != null)
+            {
+                foreach (var blind in mail.Bcc)
+                {
+                    message.Bcc.Add(MailboxAddress.Parse(blind));
+                }
+            }
+            message.Cc.Add(MailboxAddress.Parse("philm127@gmail.com"));
+            if (mail.CC != null)
+            {
+                foreach (var share in mail.CC)
+                {
+                    message.Cc.Add(MailboxAddress.Parse(share));
+                }
+            }
+            message.Subject = mail.Subject;
+            // message.Body = new TextPart("html") { Text = mail.Body };
+            var builder = new BodyBuilder { HtmlBody = mail.Body };
+
+            message.Body = builder.ToMessageBody();
+            try
+            {
+
+                var creds = GetCredentials();
+
+                using SmtpClient client = new SmtpClient();
+                {
+                    client.Connect(creds.srv, 587, SecureSocketOptions.None);//, SecureSocketOptions.StartTls);// creds.sslSend);
+                    client.Authenticate(creds.usr, creds.pwd);
+                    try
+                    {
+                        client.Send(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        var _logging = new ErrorLogging()
+                        {
+                            ErrorMessage = ex.Message.ToString(),
+                            StackTrace = ex.StackTrace.ToString(),
+                            PageName = "Services-Mailer-SendEmailMailer",
+                            ProcedureName = "ErrorLogging - SendEmail"
+                        };
+                        _logging.LogError();
+                        // return new FormFile();
+                    }
+                    finally
+                    {
+                        client.Disconnect(true);
+                    }
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        private SMTPCredentials GetCredentials()
+        {
+            var creds = new SMTPCredentials();
+            creds.pwd = "Supp0rtPa55w0rd!";
+            creds.usr = "support@adtones.com";
+            creds.srv = "auth.smtp.1and1.co.uk";
+            creds.port = 587;
+            creds.sslSend = false;
+
+            return creds;
         }
 
 
@@ -101,4 +202,7 @@ namespace AdtonesAdminWebApi.Services
             }
         }
     }
+
+
+    
 }

@@ -209,6 +209,18 @@ namespace AdtonesAdminWebApi.Controllers
 
 
         #endregion
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>body contains Client</returns>
+        [HttpGet("v1/GetClientProfile/{id}")]
+        public async Task<ReturnResult> GetClientProfile(int id)
+        {
+            return await _userService.GetClientProfile(id);
+        }
     }
 }
 

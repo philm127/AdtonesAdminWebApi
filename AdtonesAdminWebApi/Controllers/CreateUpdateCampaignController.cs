@@ -79,6 +79,13 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        [HttpPost("v1/UpdateCampaignDetails")]
+        public async Task<ReturnResult> UpdateCampaignDetails(NewCampaignProfileFormModel model)
+        {
+            return await _campService.UpdateCampaignDetails(model);
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -110,6 +117,13 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
         #endregion
+
+
+        [HttpGet("v1/GetCampaignData/{id}")]
+        public async Task<ReturnResult> GetCampaignData(int id)
+        {
+            return await _campService.GetCampaignData(id);
+        }
 
     }
 }

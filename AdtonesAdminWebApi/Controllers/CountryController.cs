@@ -140,5 +140,17 @@ namespace AdtonesAdminWebApi.Controllers
         #endregion
 
 
+
+        /// <summary>
+        /// Gets Minimum Bid value for a campaign
+        /// </summary>
+        /// <param name="id">countryId</param>
+        /// <returns>body contains decimal value</returns>
+        [HttpGet("v1/GetMinimumBid/{id}")]
+        public async Task<ReturnResult> GetMinimumBid(int id)
+        {
+            return await _countryService.GetMinBid(id);
+        }
+
     }
 }

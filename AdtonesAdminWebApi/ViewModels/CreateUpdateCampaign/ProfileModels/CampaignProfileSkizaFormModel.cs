@@ -15,21 +15,21 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         {
             // EFMVCDataContex db = new EFMVCDataContex();
 
-            HustlersQuestion =
-            CompileQuestions(new Dictionary<string, bool>
-                   {{"Networked Youth", false}, {"Stable Hustler", false}, {"Savvy Loyalist", false}});
+           // HustlersQuestion =
+           // CompileQuestions(new Dictionary<string, bool>
+           //        {{"Networked Youth", false}, {"Stable Hustler", false}, {"Savvy Loyalist", false}});
 
-            YouthQuestion =
-           CompileQuestions(new Dictionary<string, bool>
-                  {{"Tween", false}, {"Hi-Pot students", true}, {"Prudent Young", false}});
+           // YouthQuestion =
+           //CompileQuestions(new Dictionary<string, bool>
+           //       {{"Tween", false}, {"Hi-Pot students", true}, {"Prudent Young", false}});
 
-            DiscerningProfessionalsQuestion =
-           CompileQuestions(new Dictionary<string, bool>
-                  {{"Young Flashers", false}, {"Mature trendies", true}, {"Settled Middle Mgmt", false},{"Affluent Influencers", false}});
+           // DiscerningProfessionalsQuestion =
+           //CompileQuestions(new Dictionary<string, bool>
+           //       {{"Young Flashers", false}, {"Mature trendies", true}, {"Settled Middle Mgmt", false},{"Affluent Influencers", false}});
 
-            MassQuestion =
-           CompileQuestions(new Dictionary<string, bool>
-                  {{"Young cautious caller", true}, {"Toa Mpango", false},{"Young progressive worker", false}, {"Older Toa Mpango", true}, {"Progressive worker", false}});
+           // MassQuestion =
+           //CompileQuestions(new Dictionary<string, bool>
+           //       {{"Young cautious caller", true}, {"Toa Mpango", false},{"Young progressive worker", false}, {"Older Toa Mpango", true}, {"Progressive worker", false}});
         }
 
         public CampaignProfileSkizaFormModel(int CountryId, List<string> hustlersProfileLabel, List<string>  youthProfileLabel, List<string> discerningProfessionalsProfileLabel,
@@ -108,110 +108,30 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         public List<QuestionOptionModel> HustlersQuestion { get; set; }
 
         // [Display(Name = "Hustlers")]
-        public string Hustlers_AdType
-        {
-            get
-            {
-                if (HustlersQuestion == null)
-                    HustlersQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(HustlersQuestion));
-            }
-            set
-            {
-                if (HustlersQuestion != null && HustlersQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        HustlersQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Hustlers_AdType { get; set; }
+        
 
 
         // [Display(Name = "Youth")]
         public List<QuestionOptionModel> YouthQuestion { get; set; }
 
         // [Display(Name = "Youth")]
-        public string Youth_AdType
-        {
-            get
-            {
-                if (YouthQuestion == null)
-                    YouthQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(YouthQuestion));
-            }
-            set
-            {
-                if (YouthQuestion != null && YouthQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        YouthQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Youth_AdType { get; set; }
+        
 
         // [Display(Name = "Discerning Professionals")]
         public List<QuestionOptionModel> DiscerningProfessionalsQuestion { get; set; }
 
         // [Display(Name = "Discerning Professionals")]
-        public string DiscerningProfessionals_AdType
-        {
-            get
-            {
-                if (DiscerningProfessionalsQuestion == null)
-                    DiscerningProfessionalsQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(DiscerningProfessionalsQuestion));
-            }
-            set
-            {
-                if (DiscerningProfessionalsQuestion != null && DiscerningProfessionalsQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        DiscerningProfessionalsQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string DiscerningProfessionals_AdType { get; set; }
+        
 
         // [Display(Name = "Mass")]
         public List<QuestionOptionModel> MassQuestion { get; set; }
 
         // [Display(Name = "Mass")]
-        public string Mass_AdType
-        {
-            get
-            {
-                if (MassQuestion == null)
-                    MassQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(MassQuestion));
-            }
-            set
-            {
-                if (MassQuestion != null && MassQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        MassQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Mass_AdType { get; set; }
+        
 
     }
 }

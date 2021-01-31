@@ -125,27 +125,87 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<NewAdvertFormModel> CreateNewCampaignAdvert(NewAdvertFormModel model)
+        public async Task<int> UpdateCampaignDetails(NewCampaignProfileFormModel model)
         {
+            var x = 0;
+            var y = 0;
+            var cid = model.CampaignProfileId;
+
             try
             {
 
-                model.AdtoneServerAdvertId = await _executers.ExecuteCommand(_connStr,
+                x = await _executers.ExecuteCommand(_connStr,
+                                conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.UpdateCampaignDetails, model));
+
+                // Campaign Profile Collection Project
+                if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
+                    x = await _executers.ExecuteCommand(_connStr,
+                                conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.UpdateCampaignProfileEx, new
+                                {
+                                    CampaignProfileId = model.CampaignProfileId,
+                                    CampaignCategoryId = model.CampaignCategoryId.GetValueOrDefault()
+                                }));
+
+                var conn = await _connService.GetConnectionStringsByCountryId(model.CountryId);
+                if (conn != null && conn.Length > 10)
+                {
+
+                    model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(model.CampaignProfileId, conn);
+
+                    x = await _executers.ExecuteCommand(conn,
+                            conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.UpdateCampaignDetails, model));
+
+
+                    if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
+                    {
+                        string sql = @"SELECT CampaignCategoryId FROM CampaignCategory WHERE AdtoneServerCampaignCategoryId=@Id";
+
+                        y = await _executers.ExecuteCommand(conn,
+                                    conn => conn.ExecuteScalar<int>(sql, new { Id = model.CampaignCategoryId.GetValueOrDefault() }));
+
+                        x = await _executers.ExecuteCommand(conn,
+                                    conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.UpdateCampaignProfileEx, new
+                                    {
+                                        CampaignProfileId = model.CampaignProfileId,
+                                        CampaignCategoryId = y
+                                    }));
+
+                    }
+                }
+                model.CampaignProfileId = cid;
+            }
+            catch
+            {
+                throw;
+            }
+
+            return x;
+        }
+
+
+        public async Task<NewAdvertFormModel> CreateNewCampaignAdvert(NewAdvertFormModel model)
+        {
+            var newModel = new NewAdvertFormModel();
+            newModel = model;
+            try
+            {
+
+                newModel.AdtoneServerAdvertId = await _executers.ExecuteCommand(_connStr,
                                 conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewCampaignAdvert, model));
 
-                if (model.AdtoneServerAdvertId != null && model.AdtoneServerAdvertId > 0)
+                if (newModel.AdtoneServerAdvertId != null && newModel.AdtoneServerAdvertId > 0)
                 {
                     var opId = model.OperatorId;
                     var conn = await _connService.GetConnectionStringByOperator(model.OperatorId);
                     if (conn != null && conn.Length > 10)
                     {
 
-                        model.AdvertiserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.AdvertiserId, conn);
+                        newModel.AdvertiserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.AdvertiserId, conn);
                         if (model.ClientId != null)
-                            model.ClientId = await _connService.GetClientIdFromAdtoneIdByConnString(model.ClientId.Value, conn);
-                        model.OperatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
-                        model.AdvertId = await _executers.ExecuteCommand(conn,
-                                conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewCampaignAdvert, model));
+                            newModel.ClientId = await _connService.GetClientIdFromAdtoneIdByConnString(model.ClientId.Value, conn);
+                        newModel.OperatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
+                        newModel.AdvertId = await _executers.ExecuteCommand(conn,
+                                conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewCampaignAdvert, newModel));
                     }
                 }
             }
@@ -154,12 +214,13 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
 
-            return model;
+            return newModel;
         }
 
 
         public async Task<CampaignAdvertFormModel> CreateNewIntoCampaignAdverts(CampaignAdvertFormModel model, int operatorId, int provAdId)
         {
+            var newModel = new CampaignAdvertFormModel();
             try
             {
 
@@ -171,10 +232,14 @@ namespace AdtonesAdminWebApi.DAL
                     var conn = await _connService.GetConnectionStringByOperator(operatorId);
                     if (conn != null && conn != "")
                     {
-                        model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneId(model.CampaignProfileId, operatorId);
-                        model.AdvertId = provAdId;
-                        model.CampaignAdvertId = await _executers.ExecuteCommand(conn,
-                                conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewIntoCampaignAdverts, model));
+                        newModel.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneId(model.CampaignProfileId, operatorId);
+                        newModel.AdvertId = provAdId;
+                        newModel.AdtoneServerCampaignAdvertId = model.AdtoneServerCampaignAdvertId;
+                        newModel.Advert = model.Advert;
+                        newModel.NextStatus = model.NextStatus;
+
+                        newModel.CampaignAdvertId = await _executers.ExecuteCommand(conn,
+                                conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewIntoCampaignAdverts, newModel));
                     }
                 }
             }
@@ -183,7 +248,7 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
 
-            return model;
+            return newModel;
         }
 
 

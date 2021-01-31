@@ -305,5 +305,29 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         #endregion
 
+
+        public async Task<ReturnResult> GetMinBid(int countryId)
+        {
+            try
+            {
+                result.body = await _caDAL.GetMinBidByCountry(countryId);
+            }
+            catch (Exception ex)
+            {
+                var _logging = new ErrorLogging()
+                {
+                    ErrorMessage = ex.Message.ToString(),
+                    StackTrace = ex.StackTrace.ToString(),
+                    PageName = "CountryService",
+                    ProcedureName = "GetMinBid"
+                };
+                _logging.LogError();
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+
     }
 }

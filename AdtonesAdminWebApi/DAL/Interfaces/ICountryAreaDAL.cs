@@ -18,5 +18,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> DeleteAreaById(int id);
         Task<int> UpdateArea(AreaResult model);
         Task<bool> CheckAreaExists(AreaResult areamodel);
+        Task<decimal> GetMinBidByCountry(int countryId);
     }
 }

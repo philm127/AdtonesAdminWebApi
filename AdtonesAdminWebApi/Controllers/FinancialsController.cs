@@ -18,12 +18,13 @@ namespace AdtonesAdminWebApi.Controllers
 
         private readonly IFinanceTablesService _invoiceService;
         private readonly IAdvertiserFinancialService _paymentService;
+        private readonly IBillingService _billService;
 
-
-        public FinancialsController(IFinanceTablesService invoiceService, IAdvertiserFinancialService paymentService)
+        public FinancialsController(IFinanceTablesService invoiceService, IAdvertiserFinancialService paymentService, IBillingService billService)
         {
             _invoiceService = invoiceService;
             _paymentService = paymentService;
+            _billService = billService;
         }
 
 
@@ -181,7 +182,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/AddCredit")]
         public async Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _creditmodel)
         {
-            var tst = await _paymentService.AddCredit(_creditmodel);
+            var tst = await _paymentService.AddUserCredit(_creditmodel);
             return tst;
         }
 
@@ -213,7 +214,7 @@ namespace AdtonesAdminWebApi.Controllers
 
 
         /// TODO: Await design decisiones
-        
+
         //[Route("v1/GetCreditDetailsUsersList")]
         //public async Task<ReturnResult> GetCreditDetailsUsersList()
         //{
@@ -222,12 +223,24 @@ namespace AdtonesAdminWebApi.Controllers
         //}
 
 
-        //[Route("v1/UserCreditPayment")]
-        //public async Task<ReturnResult> UserCreditPayment(IdCollectionViewModel model)
-        //{
-        //    var tst = await _creditService.UserCreditpayment(model);
-        //    return tst;
-        //}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>body contains BillingPaymentModel</returns>
+        [HttpGet("v1/GetPaymentData/{id}")]
+        public async Task<ReturnResult> GetPaymentData(int id)
+        {
+            return await _billService.GetPaymentData(id);
+        }
+
+
+        [Route("v1/PayWithUserCredit")]
+        public async Task<ReturnResult> PayWithUserCredit(BillingPaymentModel model)
+        {
+            var tst = await _billService.PaywithUserCredit(model);
+            return tst;
+        }
 
     }
 }

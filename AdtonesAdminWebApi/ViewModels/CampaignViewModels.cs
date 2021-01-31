@@ -41,7 +41,7 @@ namespace AdtonesAdminWebApi.ViewModels
     }
 
 
-    public class CampaignProfile
+    public class CampaignProfileUpdate
     {
         public int UserId { get; set; }
 
@@ -61,6 +61,81 @@ namespace AdtonesAdminWebApi.ViewModels
 
 
         public float MaxDailyBudget { get; set; }
+
+        public float MaxMonthBudget { get; set; }
+
+        public float MaxWeeklyBudget { get; set; }
+
+        public float MaxHourlyBudget { get; set; }
+
+
+        public float MaxBid { get; set; }
+
+
+        public bool Active { get; set; }
+
+
+        public string EmailSubject { get; set; }
+
+
+        public string EmailBody { get; set; }
+
+        public int Status { get; set; }
+
+        public string EmailSenderAddress { get; set; }
+
+
+        public string SmsOriginator { get; set; }
+
+        public string SmsBody { get; set; }
+        
+        public DateTime UpdatedDateTime { get; set; }
+
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+        public decimal FundsAvailable { get; set; }
+        public string advertname { get; set; }
+        public int NumberInBatch { get; set; }
+        public bool IsAdminApproval { get; set; }
+
+        public string CurrencyCode { get; set; }
+
+        public int? CountryId { get; set; }
+
+        public int? CurrencyId { get; set; }
+
+        public int? CampaignCategoryId { get; set; }
+
+        public decimal MinBid { get; set; }
+    }
+
+    public class CampaignProfile
+    {
+        public int UserId { get; set; }
+
+        public int? ClientId { get; set; }
+
+        public int AdvertId { get; set; }
+        public int CampaignProfileId { get; set; }
+
+
+        public string CampaignName { get; set; }
+
+
+        public string CampaignDescription { get; set; }
+
+
+        public decimal TotalBudget { get; set; }
+        public decimal TotalCredit { get; set; }
+
+        public float MaxDailyBudget { get; set; }
+
+        public float MaxMonthBudget { get; set; }
+
+        public float MaxWeeklyBudget { get; set; }
+
+        public float MaxHourlyBudget { get; set; }
 
 
         public float MaxBid { get; set; }
@@ -125,7 +200,9 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public string EmailBody { get; set; }
 
+        public string EmailFileLocation { get; set; }
 
+        public string SMSFileLocation { get; set; }
         public int Status { get; set; }
 
         public string EmailSenderAddress { get; set; }
@@ -165,6 +242,8 @@ namespace AdtonesAdminWebApi.ViewModels
         public int? CurrencyId { get; set; }
 
         public int OperatorId { get; set; }
+
+        public int? CampaignCategoryId { get; set; }
     }
 
 

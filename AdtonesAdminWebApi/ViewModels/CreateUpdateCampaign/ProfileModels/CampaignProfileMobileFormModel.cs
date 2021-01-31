@@ -12,20 +12,20 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         public CampaignProfileMobileFormModel()
         {
-            ContractTypeQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {{"Don't Know", true}, {"Pay As You Go", false}, {"Monthly Contract", false}});
-            SpendQuestion =
-                CompileQuestions(new Dictionary<string, bool>
-                                     {
-                                         {"Don't Know", true},
-                                         {"0-9", true},
-                                         {"10-19", false},
-                                         {"20-29", false},
-                                         {"30-40", false},
-                                         {"40-49", false},
-                                         {"50+", false}
-                                     });
+            //ContractTypeQuestion =
+            //    CompileQuestions(new Dictionary<string, bool>
+            //                         {{"Don't Know", true}, {"Pay As You Go", false}, {"Monthly Contract", false}});
+            //SpendQuestion =
+            //    CompileQuestions(new Dictionary<string, bool>
+            //                         {
+            //                             {"Don't Know", true},
+            //                             {"0-9", true},
+            //                             {"10-19", false},
+            //                             {"20-29", false},
+            //                             {"30-40", false},
+            //                             {"40-49", false},
+            //                             {"50+", false}
+            //                         });
         }
 
         public CampaignProfileMobileFormModel(int CountryId, List<string> contractTypeProfileLabel, List<string> spendProfileLabel)
@@ -106,28 +106,28 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// <value>The type of the contract.</value>
         //// [Display(Name = "ContractType")]
         // [Display(Name = "Mobile plan")]
-        public string ContractType_Mobile
-        {
-            get
-            {
-                if (ContractTypeQuestion == null)
-                    ContractTypeQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(ContractTypeQuestion));
-            }
-            set
-            {
-                if (ContractTypeQuestion != null && ContractTypeQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        ContractTypeQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string ContractType_Mobile { get; set; }
+        //{
+        //    get
+        //    {
+        //        if (ContractTypeQuestion == null)
+        //            ContractTypeQuestion = new List<QuestionOptionModel>();
+        //        return CompileAnswers(SortList(ContractTypeQuestion));
+        //    }
+        //    set
+        //    {
+        //        if (ContractTypeQuestion != null && ContractTypeQuestion.Count() > 0)
+        //        {
+        //            if (value == null) return;
+        //            for (int i = 0; i < value.Length; i++)
+        //                ContractTypeQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
+        //        }
+        //        else
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
 
 
         /// <summary>
@@ -142,28 +142,28 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels
         /// </summary>
         /// <value>The spend.</value>
         // [Display(Name = "Average Monthly Spend")]
-        public string Spend_Mobile
-        {
-            get
-            {
-                if (SpendQuestion == null)
-                    SpendQuestion = new List<QuestionOptionModel>();
-                return CompileAnswers(SortList(SpendQuestion));
-            }
-            set
-            {
-                if (SpendQuestion != null && SpendQuestion.Count() > 0)
-                {
-                    if (value == null) return;
-                    for (int i = 0; i < value.Length; i++)
-                        SpendQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
+        public string Spend_Mobile { get; set; }
+        //{
+        //    get
+        //    {
+        //        if (SpendQuestion == null)
+        //            SpendQuestion = new List<QuestionOptionModel>();
+        //        return CompileAnswers(SortList(SpendQuestion));
+        //    }
+        //    set
+        //    {
+        //        if (SpendQuestion != null && SpendQuestion.Count() > 0)
+        //        {
+        //            if (value == null) return;
+        //            for (int i = 0; i < value.Length; i++)
+        //                SpendQuestion.Find(x => x.QuestionValue == value.Substring(i, 1)).Selected = true;
+        //        }
+        //        else
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
 
         public bool ContractType { get; set; }
         public bool AverageMonthlySpend { get; set; }

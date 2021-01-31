@@ -17,13 +17,11 @@ namespace AdtonesAdminWebApi.DAL
 
     public class AdvertiserFinancialDAL : BaseDAL, IAdvertiserFinancialDAL
     {
-        private readonly ICampaignDAL _campDAL;
 
-        public AdvertiserFinancialDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor, ICampaignDAL campDAL)
-                        : base(configuration, executers, connService, httpAccessor)
-        {
-            _campDAL = campDAL;
-        }
+        public AdvertiserFinancialDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, 
+                                        IHttpContextAccessor httpAccessor)
+                                        : base(configuration, executers, connService, httpAccessor)
+        {}
 
 
         
@@ -117,6 +115,21 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<decimal> GetAvailableCredit(int userId)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.QueryFirstOrDefault<decimal>(AdvertiserFinancialQuery.GetAvailableCredit,
+                                                                                                               new { Id = userId }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<int> UpdateUserCredit(AdvertiserCreditFormModel _creditmodel)
         {
             try
@@ -201,7 +214,7 @@ namespace AdtonesAdminWebApi.DAL
                                     conn => conn.QueryFirstOrDefault<decimal>(select2.RawSql, select2.Parameters));
 
                 await Task.WhenAll(credit, bill);
-
+                
                 return credit.Result - bill.Result;
             }
             catch
@@ -227,30 +240,58 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> InsertCampaignCredit(CampaignCreditResult model)
+
+        public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetById(int id)
         {
-            int countryId = 0;
-            var campaign = await _campDAL.GetCampaignResultSetById(model.CampaignProfileId);
-            foreach (var camp in campaign)
-            {
-                countryId = camp.CountryId;
-            }
+
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+
+            sb.Append(CampaignQuery.GetCampaignResultSet);
+            sb.Append(" WHERE camp.CampaignProfileId=@Id ");
+            builder.AddParameters(new { Id = id });
+
+
+            var select = builder.AddTemplate(sb.ToString());
 
             try
             {
-                model.AdtoneServerCampaignCreditPeriodId = await _executers.ExecuteCommand(_connStr,
+                // builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:SiteEmailAddress") });
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.Query<CampaignAdminResult>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> InsertCampaignCredit(CampaignCreditResult model)
+        {
+            int countryId = 0;
+            var campaign = await GetCampaignResultSetById(model.CampaignProfileId);
+
+            try
+            {
+                foreach (var camp in campaign)
+                {
+                    countryId = camp.CountryId;
+                    model.AdtoneServerCampaignCreditPeriodId = await _executers.ExecuteCommand(_connStr,
                                 conn => conn.ExecuteScalar<int>(AdvertiserFinancialQuery.InsertCampaignCredit, model));
 
-                var lst = await _connService.GetConnectionStringsByCountry(countryId);
-                List<string> conns = lst.ToList();
+                    var lst = await _connService.GetConnectionStringsByCountry(countryId);
+                    List<string> conns = lst.ToList();
 
-                foreach (string constr in conns)
-                {
-                    model.UserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.UserId, constr);
-                    model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+                    foreach (string constr in conns)
+                    {
+                        model.UserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.UserId, constr);
+                        model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
-                    var x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(AdvertiserFinancialQuery.InsertCampaignCredit, model));
+                        var x = await _executers.ExecuteCommand(constr,
+                                        conn => conn.ExecuteScalar<int>(AdvertiserFinancialQuery.InsertCampaignCredit, model));
+                    }
                 }
             }
             catch
@@ -278,19 +319,19 @@ namespace AdtonesAdminWebApi.DAL
 
 
                 int countryId = 0;
-                var campaign = await _campDAL.GetCampaignResultSetById(model.CampaignProfileId);
+                var campaign = await GetCampaignResultSetById(model.CampaignProfileId);
                 foreach (var camp in campaign)
                 {
                     countryId = camp.CountryId;
-                }
 
-                var lst = await _connService.GetConnectionStringsByCountry(countryId);
-                List<string> conns = lst.ToList();
+                    var lst = await _connService.GetConnectionStringsByCountry(countryId);
+                    List<string> conns = lst.ToList();
 
-                foreach (string constr in conns)
-                {
-                    x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(sbOp.ToString(), new { Id = model.CampaignCreditPeriodId, CreditPeriod = model.CreditPeriod }));
+                    foreach (string constr in conns)
+                    {
+                        x = await _executers.ExecuteCommand(constr,
+                                        conn => conn.ExecuteScalar<int>(sbOp.ToString(), new { Id = model.CampaignCreditPeriodId, CreditPeriod = model.CreditPeriod }));
+                    }
                 }
             }
             catch

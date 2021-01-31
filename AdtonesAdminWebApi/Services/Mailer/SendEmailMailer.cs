@@ -34,6 +34,10 @@ namespace AdtonesAdminWebApi.Services.Mailer
             //{
             //    message.To.Add(new MailboxAddress(two));
             //}
+            var test = _configuration.GetValue<bool>("Environment:Test");
+            if (test)
+                mail.SingleTo = "myinternet21@hotmail.com";
+
             message.To.Add(MailboxAddress.Parse(mail.SingleTo));
             if (operatorId == (int)Enums.OperatorTableId.Safaricom && roleId == 6)
                 message.From.Add(MailboxAddress.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SafaricomSiteEmailAddress").Value)); 
@@ -78,10 +82,6 @@ namespace AdtonesAdminWebApi.Services.Mailer
             {
 
                 var creds = GetCredentials(operatorId, roleId);
-                //var pwd = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPPassword").Value;
-                //var usr = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPEmail").Value;
-                //var srv = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerAddress").Value;
-                //var port = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerPort").Value);
 
                 using SmtpClient client = new SmtpClient();
                 {

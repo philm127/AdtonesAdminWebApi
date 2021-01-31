@@ -7,19 +7,19 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
 {
     public class NewClientFormModel
     {
-        public int ClientId { get; set; }
+        public int Id { get; set; }
 
         public int UserId { get; set; }
 
-        public string ClientName { get; set; }
+        public string Name { get; set; }
 
-        public string ClientDescription { get; set; }
+        public string Description { get; set; }
 
         public string ClientContactInfo { get; set; }
 
         public decimal ClientBudget { get; set; }
 
-        public string ClientEmail { get; set; }
+        public string Email { get; set; }
 
         public string ClientPhoneticAlphabet { get; set; }
 
@@ -31,7 +31,7 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
 
         public bool NextStatus { get; set; }
 
-        public string ClientContactPhone { get; set; }
+        public string ContactPhone { get; set; }
 
         public int? CountryId { get; set; }
 
