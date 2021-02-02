@@ -11,7 +11,7 @@ using MimeKit;
 
 namespace AdtonesAdminWebApi.Services
 {
-    public class ErrorLogging //: IErrorLogging
+    public class XErrorLogging //: IErrorLogging
     {
         public string PageName { get; set; }
         public string ProcedureName { get; set; }

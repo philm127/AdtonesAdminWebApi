@@ -46,14 +46,17 @@ namespace AdtonesAdminWebApi.Services
         private readonly IConfiguration _configuration;
        public static int Userjwt { get; private set; }
 
+        private readonly ILoggingService _logServ;
+
         // private readonly ICurrencyDAL _repository;
 
-        public CurrencyConversion(IConfiguration configuration, IHttpContextAccessor httpAccessor)
+        public CurrencyConversion(IConfiguration configuration, IHttpContextAccessor httpAccessor, ILoggingService logServ)
         {
             _configuration = configuration;
             _httpAccessor = httpAccessor;
             url = _configuration.GetValue<string>("AppSettings:CurrencyUrl"); 
              Userjwt = _httpAccessor.GetUserIdFromJWT();
+            _logServ = logServ;
         }
 
 
@@ -162,14 +165,12 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = "Failed to get Currency rate. Error: {ex.Message.ToString()}",
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "Service - CurrencyConversion",
-                    ProcedureName = "CallForRate"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = "Service - CurrencyConversion";
+                _logServ.ProcedureName = "CallForRate";
+                _logServ.LogError();
+                
                 return InvalidRate;
             }
         }

@@ -26,13 +26,15 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly ICampaignDAL _campDAL;
         private readonly IConfiguration _configuration;
         private readonly IPrematchProcess _preProcess;
+        private readonly ILoggingService _logServ;
         ReturnResult result = new ReturnResult();
+        const string PageName = "AdvertService";
 
 
         public AdvertService(IAdvertDAL advertDAL, IHttpContextAccessor httpAccessor, IConnectionStringService connService,
                                 IUserMatchDAL matchDAL, IAdTransferService transService, IPrematchProcess preProcess,
                                 IGenerateTicketService ticketService, ICampaignService campService, ISoapApiService soapApi,
-                                ISoapDAL soapDAL, ICampaignDAL campDAL, IConfiguration configuration)
+                                ISoapDAL soapDAL, ICampaignDAL campDAL, IConfiguration configuration, ILoggingService logServ)
         {
             _advertDAL = advertDAL;
             _httpAccessor = httpAccessor;
@@ -46,6 +48,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _campDAL = campDAL;
             _configuration = configuration;
             _preProcess = preProcess;
+            _logServ = logServ;
         }
 
 
@@ -62,14 +65,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "LoadAdvertDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadAdvertDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -85,14 +86,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "LoadAdvertDataTableForSales"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadAdvertDataTableForSales";
+                await _logServ.LogError();
+
                 result.result = 0;
             }
             return result;
@@ -112,14 +111,11 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "LoadAdvertDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadAdvertDataTable";
+                await _logServ.LogError();
                 result.result = 0;
             }
             return result;
@@ -135,14 +131,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "LoadAdvertDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadAdvertDetails";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -157,14 +151,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "LoadAdvertCategoryDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadAdvertCategoryDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -179,14 +171,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "DeleteAdvertCategory"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "DeleteAdvertCategory";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -201,14 +191,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "UpdateAdvertCategory"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateAdvertCategory";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -223,14 +211,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "GetAdvertCategoryDetails"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertCategoryDetails";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -245,15 +231,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "AddAdvertCategory"
-                };
-                _logging.LogError();
-                result.result = 0;
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddAdvertCategory";
+                await _logServ.LogError();
+                
             }
             return result;
         }
@@ -325,14 +308,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "ApproveRejectAdvert"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ApproveRejectAdvert";
+                await _logServ.LogError();
+                
                 result.result = 0;
 
             }
@@ -354,14 +335,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 catch (Exception ex)
                 {
-                    var _logging = new ErrorLogging()
-                    {
-                        ErrorMessage = ex.Message.ToString()  + " No Campaign details in CampaignAdverts Table",
-                        StackTrace = ex.StackTrace.ToString(),
-                        PageName = "AdvertService",
-                        ProcedureName = $"ApproveReject - ApproveAd - GetcampaignAdvert AdvertId={adModel.AdvertId}"
-                    };
-                    _logging.LogError();
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = $"ApproveReject - ApproveAd - GetcampaignAdvert AdvertId={adModel.AdvertId}";
+                    await _logServ.LogError();
+                    
                     return false;
                 }
 
@@ -413,14 +392,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "ApproveRejectApproveAd"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ApproveRejectApproveAd";
+                await _logServ.LogError();
+                
                 return false;
             }
         }
@@ -507,14 +484,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "ApproveRejectLiveFromPending"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ApproveRejectLiveFromPending";
+                await _logServ.LogError();
+                
                 return false;
             }
         }
@@ -534,14 +509,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "ApproveRejectSuspended"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ApproveRejectSuspended";
+                await _logServ.LogError();
+                
                 return false;
             }
         }
@@ -592,14 +565,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "ApproveRejectArchived"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ApproveRejectArchived";
+                await _logServ.LogError();
+                
                 return false;
             }
         }
@@ -624,14 +595,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "ApproveRejectRejected"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ApproveRejectRejected";
+                await _logServ.LogError();
+                
                 return false;
             }
         }

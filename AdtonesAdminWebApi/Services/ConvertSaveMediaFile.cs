@@ -20,11 +20,13 @@ namespace AdtonesAdminWebApi.Services
     {
         private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _configuration;
+        private readonly ILoggingService _logServ;
 
-        public ConvertSaveMediaFile(IWebHostEnvironment env, IConfiguration configuration)
+        public ConvertSaveMediaFile(IWebHostEnvironment env, IConfiguration configuration, ILoggingService logServ)
         {
             _env = env;
             _configuration = configuration;
+            _logServ = logServ;
         }
 
         public string ConvertAndSaveMediaFile(string audioFilePath, string extension, string outputFormat, string onlyFileName, string directoryName)
@@ -77,14 +79,12 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ConvertSaveMediaFile",
-                    ProcedureName = "ConvertAndSaveMediaFile"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = "ConvertSaveMediaFile";
+                _logServ.ProcedureName = "ConvertAndSaveMediaFile";
+                _logServ.LogError();
+                
                 return "fail";
             }
         }

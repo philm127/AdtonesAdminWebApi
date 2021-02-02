@@ -17,13 +17,16 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         private readonly IProfileMatchInfoDAL _profDAL;
         ReturnResult result = new ReturnResult();
+        private readonly ILoggingService _logServ;
+        const string PageName = "ProfileMatchInfoService";
 
 
-        public ProfileMatchInfoService(IConfiguration configuration, IProfileMatchInfoDAL profDAL)
+        public ProfileMatchInfoService(IConfiguration configuration, IProfileMatchInfoDAL profDAL, ILoggingService logServ)
 
         {
             _configuration = configuration;
             _profDAL = profDAL;
+            _logServ = logServ;
         }
 
 
@@ -54,14 +57,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ProfileMatchInfoService",
-                    ProcedureName = "FillProfileMatchInformationResult"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "FillProfileMatchInformationResult";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -87,14 +88,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ProfileMatchInfoService",
-                    ProcedureName = "GetprofileInfo"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetprofileInfo";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -142,14 +141,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ProfileMatchInfoService",
-                    ProcedureName = "UpdateProfileInfo"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateProfileInfo";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 result.error = "ProfileInfo was NOT added successfully";
             }
@@ -193,14 +190,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 catch (Exception ex)
                 {
-                    var _logging = new ErrorLogging()
-                    {
-                        ErrorMessage = ex.Message.ToString(),
-                        StackTrace = ex.StackTrace.ToString(),
-                        PageName = "ProfileMatchInfoService",
-                        ProcedureName = "AddProfileInfo"
-                    };
-                    _logging.LogError();
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = "AddProfileInfo";
+                    await _logServ.LogError();
+                    
                     result.result = 0;
                     result.error = "ProfileInfo was NOT added successfully";
                 }
@@ -224,14 +219,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ProfileMatchInfoService",
-                    ProcedureName = "DeleteProfileLabel"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "DeleteProfileLabel";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 return result;
             }
@@ -264,14 +257,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ProfileMatchInfoService",
-                    ProcedureName = "UpdateInsertProfileLabel"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateInsertProfileLabel";
+                await _logServ.LogError();
+                
                 return 0;
             }
             return 1;

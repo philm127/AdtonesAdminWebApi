@@ -43,6 +43,7 @@
     <Compile Remove="Model\CampaignProfile.cs" />
     <Compile Remove="OperatorSpecific\ExpressoPromotionalCampaign.cs" />
     <Compile Remove="Services\AuthenticationExtension.cs" />
+    <Compile Remove="Services\ErrorLogging.cs" />
     <Compile Remove="Services\ExpressoOperators.cs" />
     <Compile Remove="Services\GeneralPemissionAssignment.cs" />
     <Compile Remove="Services\PromotionalUserStatus.cs" />

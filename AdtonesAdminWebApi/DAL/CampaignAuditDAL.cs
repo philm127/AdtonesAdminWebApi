@@ -17,12 +17,14 @@ namespace AdtonesAdminWebApi.DAL
 
     public class CampaignAuditDAL : BaseDAL, ICampaignAuditDAL
     {
-        // private IMemoryCache _cache;
+        private readonly ILoggingService _logServ;
+        const string PageName = "CampaignAuditDAL";
 
-        public CampaignAuditDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor,
+        public CampaignAuditDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, 
+                                IHttpContextAccessor httpAccessor, ILoggingService logServ,
                                 IMemoryCache cache) : base(configuration, executers, connService, httpAccessor)
         {
-            //_cache = cache;
+            _logServ = logServ;
         }
 
 
@@ -75,15 +77,13 @@ namespace AdtonesAdminWebApi.DAL
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CampaignAuditDAL",
-                    ProcedureName = "CampaignDashboardSummariesOperators",
-                    LogLevel = select.RawSql
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "CampaignDashboardSummariesOperators";
+                _logServ.LogLevel = select.RawSql;
+                await _logServ.LogError();
+                
                 throw;
             }
         }
@@ -130,15 +130,13 @@ namespace AdtonesAdminWebApi.DAL
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CampaignAuditDAL",
-                    ProcedureName = "DashboardSummariesOperators",
-                    LogLevel = select.RawSql
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "DashboardSummariesOperators";
+                _logServ.LogLevel = select.RawSql;
+                await _logServ.LogError();
+                
                 throw;
             }
         }

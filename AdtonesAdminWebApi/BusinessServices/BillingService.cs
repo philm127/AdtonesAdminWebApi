@@ -26,13 +26,15 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         private readonly ICurrencyConversion _curConv;
         private readonly IConnectionStringService _conService;
+        private readonly ILoggingService _logServ;
         private static Random random = new Random();
         ReturnResult result = new ReturnResult();
+        const string PageName = "BillingService";
 
         public BillingService(IHttpContextAccessor httpAccessor, IUserManagementDAL userDAL, ICurrencyDAL currencyDAL, ICampaignDAL campDAL,
                                 IBillingDAL billDAL, IAdvertDAL advertDAL, IAdvertiserFinancialDAL userCredit, 
                                 IAdvertiserFinancialService userFin, IConfiguration configuration,
-                                ICurrencyConversion curConv, IConnectionStringService conService)
+                                ICurrencyConversion curConv, IConnectionStringService conService, ILoggingService logServ)
         {
             _httpAccessor = httpAccessor;
             _userDAL = userDAL;
@@ -45,6 +47,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _configuration = configuration;
             _curConv = curConv;
             _conService = conService;
+            _logServ = logServ;
         }
 
 
@@ -57,14 +60,13 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "BillingService",
-                    ProcedureName = "GetPaymentData"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetPaymentData";
+
+                await _logServ.LogError();
+
                 result.result = 0;
                 result.body = ex.Message.ToString();
                 return result;
@@ -272,14 +274,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "BillingService",
-                    ProcedureName = "PayWithUserCredit"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "PayWithUserCredit";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 result.body = ex.Message.ToString();
                 return result;

@@ -16,11 +16,13 @@ namespace AdtonesAdminWebApi.OperatorSpecific
 
         private readonly ISavePUToDatabase _putDB;
         private readonly IConfiguration _configuration;
+        private readonly ILoggingService _logServ;
 
-        public ExpressoProcessPromoUser(ISavePUToDatabase putDB, IConfiguration configuration)
+        public ExpressoProcessPromoUser(ISavePUToDatabase putDB, IConfiguration configuration, ILoggingService logServ)
         {
             _putDB = putDB;
             _configuration = configuration;
+            _logServ = logServ;
         }
 
         public async Task<ReturnResult> ProcPromotionalUser(HashSet<string> promoMsisdns, PromotionalUserFormModel model)
@@ -48,14 +50,12 @@ namespace AdtonesAdminWebApi.OperatorSpecific
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "Expresso",
-                    ProcedureName = "ProcPromotionalUser"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = "Expresso";
+                _logServ.ProcedureName = "ProcPromotionalUser";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 result.error = "Failed to process users";
                 return result;
@@ -105,14 +105,11 @@ namespace AdtonesAdminWebApi.OperatorSpecific
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "Expresso",
-                    ProcedureName = "ProcPromotionalUser"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = "Expresso";
+                _logServ.ProcedureName = "ProcPromotionalUser";
+                await _logServ.LogError();
                 throw;
             }
         }

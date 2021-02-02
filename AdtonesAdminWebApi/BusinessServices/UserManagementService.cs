@@ -24,10 +24,13 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly ISalesManagementDAL _salesManagement;
         private readonly ISendEmailMailer _mailer;
         ReturnResult result = new ReturnResult();
+        private readonly ILoggingService _logServ;
+        const string PageName = "UserManagementService";
 
-        
-        public UserManagementService(IConfiguration configuration, ILogonService logonService, IUserManagementDAL userDAL, 
-            IConnectionStringService connService, IHttpContextAccessor httpAccessor, ISalesManagementDAL salesManagement, ISendEmailMailer mailer)
+
+        public UserManagementService(IConfiguration configuration, ILogonService logonService, IUserManagementDAL userDAL,
+            IConnectionStringService connService, IHttpContextAccessor httpAccessor, ISalesManagementDAL salesManagement,
+                                ISendEmailMailer mailer, ILoggingService logServ)
         {
             _configuration = configuration;
             _logonService = logonService;
@@ -36,6 +39,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _httpAccessor = httpAccessor;
             _salesManagement = salesManagement;
             _mailer = mailer;
+            _logServ = logServ;
         }
 
 
@@ -80,14 +84,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "GetContactForm"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetContactForm";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -109,14 +111,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "AddContactInformation"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddContactInformation";
+                await _logServ.LogError();
+                
                 return 0;
             }
             return opConId;
@@ -131,14 +131,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "UpdateContactForm"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateContactForm";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -155,14 +153,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "GetProfileForm"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetProfileForm";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -177,14 +173,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "UpdateProfileForm"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateProfileForm";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -199,14 +193,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "GetCompanyForm"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetCompanyForm";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -231,14 +223,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "UpdateCompanyDetails"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateCompanyDetails";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -260,14 +250,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "AddCompanyDetails"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddCompanyDetails";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -282,14 +270,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "UpdateContactForm"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateUserPermission";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -408,14 +394,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                         }
                         catch (Exception ex)
                         {
-                            var _loggingA = new ErrorLogging()
-                            {
-                                ErrorMessage = ex.Message.ToString(),
-                                StackTrace = ex.StackTrace.ToString(),
-                                PageName = "UserManagementService",
-                                ProcedureName = "AddUser - UpdateOperator"
-                            };
-                            _loggingA.LogError();
+                            _logServ.ErrorMessage = ex.Message.ToString();
+                            _logServ.StackTrace = ex.StackTrace.ToString();
+                            _logServ.PageName = PageName;
+                            _logServ.ProcedureName = "AddUser - UpdateOperator";
+                            await _logServ.LogError();
+                            
                             result.error = ex.Message.ToString();
                             result.result = 0;
                         }
@@ -436,14 +420,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                         }
                         catch (Exception ex)
                         {
-                            var _loggingA = new ErrorLogging()
-                            {
-                                ErrorMessage = ex.Message.ToString(),
-                                StackTrace = ex.StackTrace.ToString(),
-                                PageName = "UserManagementService",
-                                ProcedureName = "AddUser - SendMail"
-                            };
-                            _loggingA.LogError();
+                            _logServ.ErrorMessage = ex.Message.ToString();
+                            _logServ.StackTrace = ex.StackTrace.ToString();
+                            _logServ.PageName = PageName;
+                            _logServ.ProcedureName = "AddUser - SendMail";
+                            await _logServ.LogError();
+                            
                             result.body = "User " + model.FirstName + " " + model.LastName + " was Succesfully Added. But Email failed";
                         }
 
@@ -461,14 +443,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                         }
                         catch (Exception ex)
                         {
-                            var _loggingC = new ErrorLogging()
-                            {
-                                ErrorMessage = ex.Message.ToString(),
-                                StackTrace = ex.StackTrace.ToString(),
-                                PageName = "UserManagementService",
-                                ProcedureName = "AddUser - AddToSalesTable"
-                            };
-                            _loggingC.LogError();
+                            _logServ.ErrorMessage = ex.Message.ToString();
+                            _logServ.StackTrace = ex.StackTrace.ToString();
+                            _logServ.PageName = PageName;
+                            _logServ.ProcedureName = "AddUser - AddToSalesTable";
+                            await _logServ.LogError();
+                            
                             result.result = 0;
                             result.body = "There was an issue adding to the sales table";
                             result.error = ex.Message.ToString();
@@ -479,14 +459,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "AddUser"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddUser";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -502,14 +480,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "UpdateUserStatus"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateUserStatus";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -565,14 +541,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "AddOperator-Adding"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddOperator-Adding";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 result.error = "Adding user failed";
             }
@@ -588,14 +562,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "GetOperatorAdmin"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetOperatorAdmin";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -611,14 +583,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "GetUserById"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetUserById";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -673,14 +643,11 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "SendConfirmationMail = Model Build"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "SendConfirmationMail = Model Build";
+                await _logServ.LogError();
 
                 var msg = ex.Message.ToString();
                 return false;
@@ -691,14 +658,11 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "SendConfirmationMail"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "SendConfirmationMail";
+                await _logServ.LogError();
 
                 var msg = ex.Message.ToString();
                 return false;
@@ -716,14 +680,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserManagementService",
-                    ProcedureName = "GetClientProfile"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetClientProfile";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;

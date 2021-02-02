@@ -17,13 +17,16 @@ namespace AdtonesAdminWebApi.BusinessServices
         ReturnResult result = new ReturnResult();
         private readonly ISaveGetFiles _saveFile;
         private readonly ICountryAreaDAL _caDAL;
+        private readonly ILoggingService _logServ;
+        const string PageName = "CountryAreaService";
 
-        public CountryAreaService(IConfiguration configuration, ISaveGetFiles saveFile, ICountryAreaDAL caDAL)
+        public CountryAreaService(IConfiguration configuration, ISaveGetFiles saveFile, ICountryAreaDAL caDAL, ILoggingService logServ)
 
         {
             _configuration = configuration;
             _saveFile = saveFile;
             _caDAL = caDAL;
+            _logServ = logServ;
         }
 
 
@@ -35,14 +38,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CountryService",
-                    ProcedureName = "LoadDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -57,14 +58,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CountryService",
-                    ProcedureName = "LoadDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetCountry";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -104,14 +103,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CountryService",
-                    ProcedureName = "AddCountry"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddCountry";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -147,14 +144,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CountryService",
-                    ProcedureName = "UpdateCountry"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateCountry";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -173,14 +168,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CountryAreaService",
-                    ProcedureName = "FillAreaResult"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "FillAreaResult";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -202,14 +195,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CountryAreaService",
-                    ProcedureName = "AddArea-CheckUnique"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddArea-CheckUnique";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
 
@@ -219,14 +210,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CountryAreaService",
-                    ProcedureName = "AddArea"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddArea";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 result.error = areamodel.AreaName + " Record was not inserted.";
                 return result;
@@ -243,14 +232,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CountryAreaService",
-                    ProcedureName = "GetArea"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetArea";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -266,14 +253,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CountryAreaService",
-                    ProcedureName = "UpdateArea"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateArea";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 result.error = areamodel.AreaName + " Record was not updated.";
                 return result;
@@ -289,14 +274,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CountryAreaService",
-                    ProcedureName = "DeleteArea"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "DeleteArea";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -314,14 +297,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CountryService",
-                    ProcedureName = "GetMinBid"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetMinBid";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;

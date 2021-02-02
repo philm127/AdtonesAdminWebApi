@@ -22,14 +22,18 @@ namespace AdtonesAdminWebApi.DAL
         private readonly IExecutionCommand _executers;
         private readonly IConnectionStringService _connService;
         private readonly ICampaignDAL _campDAL;
+        private readonly ILoggingService _logServ;
+        const string PageName = "UserMatchDAL";
 
-        public UserMatchDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, ICampaignDAL campDAL)
+        public UserMatchDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, ICampaignDAL campDAL,
+                            ILoggingService logServ)
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
             _executers = executers;
             _connService = connService;
             _campDAL = campDAL;
+            _logServ = logServ;
         }
 
 
@@ -83,14 +87,12 @@ namespace AdtonesAdminWebApi.DAL
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserMatchDAL",
-                    ProcedureName = "PrematchProcessForCampaign"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "PrematchProcessForCampaign";
+                await _logServ.LogError();
+                throw;
             }
 
         }
@@ -287,14 +289,11 @@ namespace AdtonesAdminWebApi.DAL
                 }
                 catch (Exception ex)
                 {
-                    var _logging = new ErrorLogging()
-                    {
-                        ErrorMessage = ex.Message.ToString(),
-                        StackTrace = ex.StackTrace.ToString(),
-                        PageName = "UserMatchDAL",
-                        ProcedureName = "InsertProfilePreference"
-                    };
-                    _logging.LogError();
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = "InsertProfilePreference";
+                    await _logServ.LogError();
                     throw;
                 }
             }
@@ -338,14 +337,12 @@ namespace AdtonesAdminWebApi.DAL
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserMatchDAL",
-                    ProcedureName = "UpdateGeographicProfile"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateGeographicProfile";
+                await _logServ.LogError();
+                
                 throw;
             }
             return x;

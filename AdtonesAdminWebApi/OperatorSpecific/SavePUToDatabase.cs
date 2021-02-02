@@ -21,10 +21,12 @@ namespace AdtonesAdminWebApi.OperatorSpecific
 
         ReturnResult result = new ReturnResult();
         private readonly IConnectionStringService _connService;
+        private readonly ILoggingService _logServ;
 
-        public SavePUToDatabase(IConnectionStringService connService)
+        public SavePUToDatabase(IConnectionStringService connService, ILoggingService logServ)
         {
             _connService = connService;
+            _logServ = logServ;
         }
 
         public async Task<bool> DoSaveToDatabase<T>(IEnumerable<T> source, Func<IEnumerable<T>, DataTable, List<DataRow>> rowConverter, int operatorId)
@@ -62,14 +64,12 @@ namespace AdtonesAdminWebApi.OperatorSpecific
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SavePUToDatabase For Operator " + operatorId.ToString(),
-                    ProcedureName = "DoSaveToDatabase"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = "SavePUToDatabase For Operator " + operatorId.ToString();
+                _logServ.ProcedureName = "DoSaveToDatabase";
+                await _logServ.LogError();
+                
                 throw;
             }
         }

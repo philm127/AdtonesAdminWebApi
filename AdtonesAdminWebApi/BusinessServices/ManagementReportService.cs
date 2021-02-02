@@ -30,10 +30,13 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConnectionStringService _connService;
         private readonly IConfiguration _config;
         ReturnResult result = new ReturnResult();
+        private readonly ILoggingService _logServ;
+        const string PageName = "ManagementReportService";
 
 
         public ManagementReportService(IManagementReportDAL reportDAL, ICurrencyConversion curConv, ICurrencyDAL curDAL, 
-            IHttpContextAccessor httpAccessor, IMemoryCache cache, IConnectionStringService connService, IConfiguration config)
+            IHttpContextAccessor httpAccessor, IMemoryCache cache, IConnectionStringService connService, IConfiguration config,
+                        ILoggingService logServ)
         {
             _reportDAL = reportDAL;
             _curConv = curConv;
@@ -42,6 +45,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _cache = cache;
             _connService = connService;
             _config = config;
+            _logServ = logServ;
         }
 
 
@@ -102,14 +106,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ManagementReportService",
-                    ProcedureName = "GetQueries"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetReportData";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -243,16 +245,11 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ManagementReportService",
-                    ProcedureName = "GetManReportsTestAsync"
-                };
-                _logging.LogError();
-                //                return Model;
-
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetManReportsTestAsync";
+                await _logServ.LogError();
             }
 
             return model;
@@ -405,80 +402,61 @@ namespace AdtonesAdminWebApi.BusinessServices
                                         }
                                         catch (Exception ex)
                                         {
-                                            var _logging = new ErrorLogging()
-                                            {
-                                                ErrorMessage = ex.Message.ToString(),
-                                                StackTrace = ex.StackTrace.ToString(),
-                                                PageName = "ManagementReportService",
-                                                ProcedureName = "Rewards"
-                                            };
-                                            _logging.LogError();
+                                            _logServ.ErrorMessage = ex.Message.ToString();
+                                            _logServ.StackTrace = ex.StackTrace.ToString();
+                                            _logServ.PageName = PageName;
+                                            _logServ.ProcedureName = "Rewards";
+                                            await _logServ.LogError();
 
                                         }
                                     }
                                     catch (Exception ex)
                                     {
-                                        var _logging = new ErrorLogging()
-                                        {
-                                            ErrorMessage = ex.Message.ToString(),
-                                            StackTrace = ex.StackTrace.ToString(),
-                                            PageName = "ManagementReportService",
-                                            ProcedureName = "Plays"
-                                        };
-                                        _logging.LogError();
-
+                                        _logServ.ErrorMessage = ex.Message.ToString();
+                                        _logServ.StackTrace = ex.StackTrace.ToString();
+                                        _logServ.PageName = PageName;
+                                        _logServ.ProcedureName = "Plays";
+                                        await _logServ.LogError();
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    var _logging = new ErrorLogging()
-                                    {
-                                        ErrorMessage = ex.Message.ToString(),
-                                        StackTrace = ex.StackTrace.ToString(),
-                                        PageName = "ManagementReportService",
-                                        ProcedureName = "Campaigns"
-                                    };
-                                    _logging.LogError();
+                                    _logServ.ErrorMessage = ex.Message.ToString();
+                                    _logServ.StackTrace = ex.StackTrace.ToString();
+                                    _logServ.PageName = PageName;
+                                    _logServ.ProcedureName = "Campaigns";
+                                    await _logServ.LogError();
 
                                 }
                             }
                             catch (Exception ex)
                             {
-                                var _logging = new ErrorLogging()
-                                {
-                                    ErrorMessage = ex.Message.ToString(),
-                                    StackTrace = ex.StackTrace.ToString(),
-                                    PageName = "ManagementReportService",
-                                    ProcedureName = "Subscribers"
-                                };
-                                _logging.LogError();
-
+                                _logServ.ErrorMessage = ex.Message.ToString();
+                                _logServ.StackTrace = ex.StackTrace.ToString();
+                                _logServ.PageName = PageName;
+                                _logServ.ProcedureName = "Subscribers";
+                                await _logServ.LogError();
+                                
                             }
                         }
                         catch (Exception ex)
                         {
-                            var _logging = new ErrorLogging()
-                            {
-                                ErrorMessage = ex.Message.ToString(),
-                                StackTrace = ex.StackTrace.ToString(),
-                                PageName = "ManagementReportService",
-                                ProcedureName = "Money - Spent"
-                            };
-                            _logging.LogError();
-
+                            _logServ.ErrorMessage = ex.Message.ToString();
+                            _logServ.StackTrace = ex.StackTrace.ToString();
+                            _logServ.PageName = PageName;
+                            _logServ.ProcedureName = "Money - Spent";
+                            await _logServ.LogError();
+                            
                         }
                     }
                     catch (Exception ex)
                     {
-                        var _logging = new ErrorLogging()
-                        {
-                            ErrorMessage = ex.Message.ToString(),
-                            StackTrace = ex.StackTrace.ToString(),
-                            PageName = "ManagementReportService",
-                            ProcedureName = "Money"
-                        };
-                        _logging.LogError();
-
+                        _logServ.ErrorMessage = ex.Message.ToString();
+                        _logServ.StackTrace = ex.StackTrace.ToString();
+                        _logServ.PageName = PageName;
+                        _logServ.ProcedureName = "Money";
+                        await _logServ.LogError();
+                        
                     }
                 }
                 else
@@ -489,15 +467,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ManagementReportService",
-                    ProcedureName = "GetManreportAsync"
-                };
-                _logging.LogError();
-
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetManreportAsync";
+                await _logServ.LogError();
+                
             }
             return model;
         }
@@ -701,7 +676,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var currency = creditList.Select(y => y.CurrencyCode).Distinct().ToList();
                 var currencySelectionData = await _curDAL.GetCurrencyUsingCurrencyIdAsync(search.currency);
                 toCurrencyCode = currencySelectionData.CurrencyCode;
-                
+
                 foreach (string cur in currency)
                 {
                     var cl = new CurrencyListing();
@@ -723,15 +698,11 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ManagementReportService",
-                    ProcedureName = "GetConvertedCurrency"
-                };
-                _logging.LogError();
-
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetConvertedCurrency";
+                await _logServ.LogError();
             }
             return clList;
         }
@@ -774,15 +745,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ManagementReportService",
-                    ProcedureName = "CalculateConvertedSpendCredit"
-                };
-                _logging.LogError();
-
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "CalculateConvertedSpendCredit";
+                await _logServ.LogError();
+                
             }
 
             return campaignAudit;

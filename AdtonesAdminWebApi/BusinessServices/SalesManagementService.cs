@@ -13,10 +13,13 @@ namespace AdtonesAdminWebApi.BusinessServices
     {
         private readonly ISalesManagementDAL _salesDAL;
         ReturnResult result = new ReturnResult();
+        private readonly ILoggingService _logServ;
+        const string PageName = "SalesManagementService";
 
-        public SalesManagementService(ISalesManagementDAL salesDAL)
+        public SalesManagementService(ISalesManagementDAL salesDAL, ILoggingService logServ)
         {
             _salesDAL = salesDAL;
+            _logServ = logServ;
         }
 
 
@@ -29,14 +32,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SalesManagerService",
-                    ProcedureName = "GetAllocatedAdvertisers"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAllocatedAdvertisers";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -52,14 +53,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SalesManagerService",
-                    ProcedureName = "GetAllocatedAdvertisersPrivate"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAllocatedAdvertisersPrivate";
+                await _logServ.LogError();
+                
 
                 var error = new List<AllocationList>();
                 return error;
@@ -76,14 +75,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SalesManagerService",
-                    ProcedureName = "GetDDSalesExec"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetDDSalesExec";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -104,14 +101,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SalesManagerService",
-                    ProcedureName = "GetDDSalesExec"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateSalesExecAllocation";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             if(success)
@@ -157,14 +152,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SalesManagerService",
-                    ProcedureName = "SalesExecAllocationProcess"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "SalesExecAllocationProcess";
+                await _logServ.LogError();
+                
                 return false;
             }
             return true;

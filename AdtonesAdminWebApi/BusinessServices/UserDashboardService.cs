@@ -18,16 +18,20 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         IHttpContextAccessor _httpAccessor;
         private readonly IUserDashboardDAL _dashboardDal;
+        private readonly ILoggingService _logServ;
+        const string PageName = "UserDashboardService";
 
 
         ReturnResult result = new ReturnResult();
 
 
-        public UserDashboardService(IConfiguration configuration, IHttpContextAccessor httpAccessor,IUserDashboardDAL dashboardDal)
+        public UserDashboardService(IConfiguration configuration, IHttpContextAccessor httpAccessor, IUserDashboardDAL dashboardDal,
+                                    ILoggingService logServ)
         {
             _configuration = configuration;
             _httpAccessor = httpAccessor;
             _dashboardDal = dashboardDal;
+            _logServ = logServ;
         }
 
 
@@ -46,14 +50,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserDashboardService",
-                    ProcedureName = "LoadAdvertiserDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadAdvertiserDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -72,14 +74,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserDashboardService",
-                    ProcedureName = "LoadSalesExecDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadSalesExecDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -94,14 +94,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserDashboardService",
-                    ProcedureName = "LoadOperatorDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadOperatorDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -116,14 +114,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserDashboardService",
-                    ProcedureName = "LoadAdminDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadAdminDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -138,14 +134,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserDashboardService",
-                    ProcedureName = "LoadAdvertisersForSales"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadAdvertisersForSales";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -160,14 +154,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "UserDashboardService",
-                    ProcedureName = "LoadSubscriberDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadSubscriberDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;

@@ -12,11 +12,14 @@ namespace AdtonesAdminWebApi.BusinessServices
         
         ReturnResult result = new ReturnResult();
         private readonly IRewardDAL _rewardDAL;
+        private readonly ILoggingService _logServ;
+        const string PageName = "RewardService";
 
-        public RewardsService(IRewardDAL rewardDAL)
+        public RewardsService(IRewardDAL rewardDAL, ILoggingService logServ)
 
         {
             _rewardDAL = rewardDAL;
+            _logServ = logServ;
         }
 
 
@@ -30,14 +33,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "RewardsService",
-                    ProcedureName = "LoadRewardsDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadRewardsDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -53,14 +54,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "RewardsService",
-                    ProcedureName = "GetOperatorConfig"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetReward";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -76,14 +75,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "RewardsService",
-                    ProcedureName = "AddReward"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddReward";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -98,14 +95,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "RewardsService",
-                    ProcedureName = "UpdateReward"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateReward";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -120,14 +115,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "RewardService",
-                    ProcedureName = "DeleteReward"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "DeleteReward";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;

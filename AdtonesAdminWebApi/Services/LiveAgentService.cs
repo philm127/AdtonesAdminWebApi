@@ -25,12 +25,15 @@ namespace AdtonesAdminWebApi.Services
         static string url;
         static string key;
         static string liveAgentEmail;
-        public LiveAgentService(IConfiguration configuration)
+        private readonly ILoggingService _logServ;
+        const string PageName = "LiveAgentService";
+        public LiveAgentService(IConfiguration configuration, ILoggingService logServ)
         {
             _configuration = configuration;
             url = _configuration.GetSection("AppSettings").GetSection("LiveAgent").GetSection("LiveAgentUrl").Value;
             key = _configuration.GetSection("AppSettings").GetSection("LiveAgent").GetSection("LiveAgentKey").Value;
             liveAgentEmail = _configuration.GetSection("AppSettings").GetSection("LiveAgent").GetSection("LiveAgentRecipient").Value;
+            _logServ = logServ;
         }
 
 
@@ -115,14 +118,12 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LiveAgentService",
-                    ProcedureName = "TransferTicket"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "TransferTicket";
+                _logServ.LogError();
+                
             }
         }
 
@@ -157,14 +158,12 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LiveAgentService",
-                    ProcedureName = "ReplyTicket"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ReplyTicket";
+                _logServ.LogError();
+                
             }
             return "error";
         }
@@ -190,14 +189,12 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LiveAgentService",
-                    ProcedureName = "GetAgent"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAgent";
+                _logServ.LogError();
+                
             }
             return "error";
         }
@@ -220,19 +217,17 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LiveAgentService",
-                    ProcedureName = "DeleteTicket"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "DeleteTicket";
+                _logServ.LogError();
+                
             }
         }
 
 
-        public static List<AgentModel> GetAllAgent()
+        public List<AgentModel> GetAllAgent()
         {
             try
             {
@@ -252,14 +247,12 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LiveAgentService",
-                    ProcedureName = "GetAllAgent"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAllAgent";
+                _logServ.LogError();
+                
                 return null;
             }
         }

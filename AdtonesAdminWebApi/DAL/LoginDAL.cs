@@ -74,7 +74,7 @@ namespace AdtonesAdminWebApi.DAL
             }
             catch (Exception ex)
             {
-                var msg = ex.Message.ToString();
+                //var msg = ex.Message.ToString();
                 throw;
             }
         }

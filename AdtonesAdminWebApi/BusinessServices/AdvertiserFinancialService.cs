@@ -25,11 +25,12 @@ namespace AdtonesAdminWebApi.BusinessServices
         private IWebHostEnvironment _env;
         private readonly ISendEmailMailer _mailer;
         private readonly ISaveGetFiles _getFiles;
-
+        private readonly ILoggingService _logServ;
         ReturnResult result = new ReturnResult();
+        const string PageName = "AdvertiserPaymentService";
 
         public AdvertiserFinancialService(IConfiguration configuration, ISharedSelectListsDAL sharedDal, IAdvertiserFinancialDAL invDAL,
-                                           IWebHostEnvironment env, ISaveGetFiles getFiles, ISendEmailMailer mailer)
+                                           IWebHostEnvironment env, ISaveGetFiles getFiles, ISendEmailMailer mailer, ILoggingService logServ)
 
         {
             _configuration = configuration;
@@ -38,6 +39,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _env = env;
             _mailer = mailer;
             _getFiles = getFiles;
+            _logServ = logServ;
         }
 
 
@@ -62,14 +64,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 catch (Exception ex)
                 {
-                    var _logging = new ErrorLogging()
-                    {
-                        ErrorMessage = ex.Message.ToString(),
-                        StackTrace = ex.StackTrace.ToString(),
-                        PageName = "AdvertiserPaymentService",
-                        ProcedureName = "SendInvoice-Getdata"
-                    };
-                    _logging.LogError();
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = "SendInvoice-Getdata";
+                    await _logServ.LogError();
+                    
                     result.result = 0;
                 }
                 var subject = "Adtones Invoice (" + pdfModel.InvoiceNumber + ") " +
@@ -142,14 +142,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 catch (Exception ex)
                 {
-                    var _logging = new ErrorLogging()
-                    {
-                        ErrorMessage = ex.Message.ToString(),
-                        StackTrace = ex.StackTrace.ToString(),
-                        PageName = "AdvertiserPaymentService",
-                        ProcedureName = "sendemailtoclient - SendEmail"
-                    };
-                    _logging.LogError();
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = "sendemailtoclient - SendEmail";
+                    await _logServ.LogError();
+                    
 
                     var msg = ex.Message.ToString();
                     result.result = 0;
@@ -158,14 +156,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertiserPaymentService",
-                    ProcedureName = "SendInvoice"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "SendInvoice";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -188,14 +184,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertiserFinancialService",
-                    ProcedureName = "GetToPayDetails"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetToPayDetails";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -213,14 +207,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertiserPaymentService",
-                    ProcedureName = "ReceivePayment"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ReceivePayment";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
 
@@ -264,14 +256,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertisersCreditService",
-                    ProcedureName = "AddCredit"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddPaymentToUserCredit";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 result.error = "Credit was not added successfully";
                 return result;
@@ -313,14 +303,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertisersCreditService",
-                    ProcedureName = "AddCredit"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddUserCredit";
+                await _logServ.LogError();
+
                 result.result = 0;
                 result.error = "Credit was not added successfully";
                 return result;
@@ -349,14 +337,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertisersCreditService",
-                    ProcedureName = "CreditDetails"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "CreditDetails";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 return result;
             }
@@ -373,14 +359,13 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertiserPaymentService",
-                    ProcedureName = "UpdateCampaignCredit"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateCampaignCredit";
+                await _logServ.LogError();
+
+                
                 result.result = 0;
             }
             return result;
@@ -396,14 +381,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertiserPaymentService",
-                    ProcedureName = "UpdateCampaignCredit"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddCampaignCredit";
+                await _logServ.LogError();
+
                 result.result = 0;
             }
             return result;

@@ -21,13 +21,16 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         private readonly IPermissionManagementDAL _permDAL;
         ReturnResult result = new ReturnResult();
+        private readonly ILoggingService _logServ;
+        const string PageName = "PermissionManagementService";
 
 
-        public PermisionManagementService(IConfiguration configuration, IPermissionManagementDAL permDAL)
+        public PermisionManagementService(IConfiguration configuration, IPermissionManagementDAL permDAL, ILoggingService logServ)
 
         {
             _configuration = configuration;
             _permDAL = permDAL;
+            _logServ = logServ;
         }
 
 
@@ -50,14 +53,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "PermissionManagementService",
-                    ProcedureName = "GetPermissionsByUser"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetPermissionsByUser";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -75,14 +76,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "PermissionManagementService",
-                    ProcedureName = "UpdateUserPermissionsById"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateUserPermissionsById";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -126,14 +125,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "PermissionManagementService",
-                    ProcedureName = "AddNewPage"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddNewPage";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
 
@@ -198,14 +195,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "PermissionManagementService",
-                    ProcedureName = "AddNewPage"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddNewElement";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
 
@@ -246,14 +241,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "PermissionManagementService",
-                    ProcedureName = "SelectListPermissionPages"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "SelectListPermissionPages";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -384,14 +377,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "PermissionManagementService",
-                    ProcedureName = "Compare2Permissions"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "Compare2Permissions";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
 
@@ -413,15 +404,11 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "PermissionManagementService",
-                    ProcedureName = "PermissionsByUser"
-                };
-                _logging.LogError();
-                
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "PermissionsByUser";
+                await _logServ.LogError();
             }
             return permList;
         }

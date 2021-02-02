@@ -19,11 +19,14 @@ namespace AdtonesAdminWebApi.Services.Mailer
     {
         private readonly IWebHostEnvironment env;
         private readonly IConfiguration _configuration;
+        private readonly ILoggingService _logServ;
+        const string PageName = "SendEmail";
 
-        public SendEmailMailer(IConfiguration configuration, IWebHostEnvironment _env)
+        public SendEmailMailer(IConfiguration configuration, IWebHostEnvironment _env, ILoggingService logServ)
         {
             env = _env;
             _configuration = configuration;
+            _logServ = logServ;
         }
 
 
@@ -93,15 +96,12 @@ namespace AdtonesAdminWebApi.Services.Mailer
                     }
                     catch (Exception ex)
                     {
-                        var _logging = new ErrorLogging()
-                        {
-                            ErrorMessage = ex.Message.ToString(),
-                            StackTrace = ex.StackTrace.ToString(),
-                            PageName = "Services-Mailer-SendEmailMailer",
-                            ProcedureName = "SendEmail"
-                        };
-                        _logging.LogError();
-                        // return new FormFile();
+                        _logServ.ErrorMessage = ex.Message.ToString();
+                        _logServ.StackTrace = ex.StackTrace.ToString();
+                        _logServ.PageName = PageName;
+                        _logServ.ProcedureName = "SendEmail";
+                        await _logServ.LogError();
+                        
                     }
                     finally
                     {

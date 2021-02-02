@@ -15,14 +15,17 @@ namespace AdtonesAdminWebApi.BusinessServices
     public class SystemConfigService : ISystemConfigService
     {
         private readonly IConfiguration _configuration;
-        
+        private readonly ILoggingService _logServ;
+        const string PageName = "SystemConfigService";
+
         ReturnResult result = new ReturnResult();
 
 
-        public SystemConfigService(IConfiguration configuration, IUserManagementService userService)
+        public SystemConfigService(IConfiguration configuration, IUserManagementService userService, ILoggingService logServ)
 
         {
             _configuration = configuration;
+            _logServ = logServ;
         }
 
 
@@ -42,14 +45,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SystemConfigService",
-                    ProcedureName = "LoadSystemConfigurationDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadSystemConfigurationDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -73,14 +74,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SystemConfigService",
-                    ProcedureName = "GetOperatorConfig"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetSystemConfig";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -103,14 +102,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SystemConfigService",
-                    ProcedureName = "AddSystemConfig"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddSystemConfig";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -131,14 +128,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SystemConfigService",
-                    ProcedureName = "DeleteSystemConfig"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "DeleteSystemConfig";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -161,14 +156,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SystemConfigService",
-                    ProcedureName = "UpdateOperatorConfig"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateSystemConfig";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;

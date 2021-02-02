@@ -21,11 +21,14 @@ namespace AdtonesAdminWebApi.Services
     {
         private readonly IWebHostEnvironment env;
         private readonly IConfiguration _configuration;
+        private readonly ILoggingService _logServ;
+        const string PageName = "Common-SaveFiles";
 
-        public SaveGetFiles(IWebHostEnvironment _env, IConfiguration configuration)
+        public SaveGetFiles(IWebHostEnvironment _env, IConfiguration configuration, ILoggingService logServ)
         {
             env = _env;
             _configuration = configuration;
+            _logServ = logServ;
         }
 
 
@@ -53,14 +56,12 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "Common-SaveFiles",
-                    ProcedureName = "SaveFileToSite"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "SaveFileToSite";
+                await _logServ.LogError();
+                
                 return "failed";
             }
         }
@@ -88,14 +89,12 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "Common-SaveFiles",
-                    ProcedureName = "SaveFileToSite"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "SaveFileToSite";
+                await _logServ.LogError();
+                
                 return "failed";
             }
         }
@@ -119,14 +118,12 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "Common-SaveFiles",
-                    ProcedureName = "DeleteFileByName"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "DeleteFileByName";
+                _logServ.LogError();
+                
                 return false;
             }
         }

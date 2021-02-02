@@ -18,12 +18,15 @@ namespace AdtonesAdminWebApi.BusinessServices
         IHttpContextAccessor _httpAccessor;
         private readonly ITicketDAL _ticketDAL;
         private readonly ISaveGetFiles _saveFile;
+        private readonly ILoggingService _logServ;
+        const string PageName = "TicketService";
 
-        public TicketService(IHttpContextAccessor httpAccessor, ITicketDAL ticketDAL, ISaveGetFiles saveFile)
+        public TicketService(IHttpContextAccessor httpAccessor, ITicketDAL ticketDAL, ISaveGetFiles saveFile, ILoggingService logServ)
         {
             _httpAccessor = httpAccessor;
             _ticketDAL = ticketDAL;
             _saveFile = saveFile;
+            _logServ = logServ;
         }
 
 
@@ -57,14 +60,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "TicketService",
-                    ProcedureName = "UpdateTicketStatus"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateTicketStatus";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -83,14 +84,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 catch (Exception ex)
                 {
-                    var _logging = new ErrorLogging()
-                    {
-                        ErrorMessage = ex.Message.ToString(),
-                        StackTrace = ex.StackTrace.ToString(),
-                        PageName = "TicketService",
-                        ProcedureName = "GetTicketList"
-                    };
-                    _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetTicketList";
+                await _logServ.LogError();
+                
                     result.result = 0;
                 }
             
@@ -106,14 +105,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "TicketService",
-                    ProcedureName = "GetTicketListSales"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetTicketListSales";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
 
@@ -143,14 +140,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "TicketService",
-                    ProcedureName = "GetTicketDetails"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetTicketDetails";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -170,14 +165,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "TicketService",
-                    ProcedureName = "GetOperatorTicketList"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetOperatorTicketList";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
 
@@ -235,14 +228,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "TicketService",
-                    ProcedureName = "AddComment"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddComment";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 return result;
             }
@@ -266,14 +257,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "TicketService",
-                    ProcedureName = "SaveCommentImage"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "SaveCommentImage";
+                await _logServ.LogError();
+                
                 return "fail";
             }
         }

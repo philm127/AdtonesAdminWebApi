@@ -20,16 +20,20 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly IConfiguration _configuration;
         private readonly ISharedSelectListsDAL _sharedDal;
+        private readonly ILoggingService _logServ;
+        const string PageName = "SharedSelectListsService";
 
         ReturnResult result = new ReturnResult();
         
 
-        public SharedSelectListsService(IConfiguration configuration, ISharedSelectListsDAL sharedDal, IHttpContextAccessor httpAccessor)
+        public SharedSelectListsService(IConfiguration configuration, ISharedSelectListsDAL sharedDal, IHttpContextAccessor httpAccessor,
+                                        ILoggingService logServ)
 
         {
             _configuration = configuration;
             _sharedDal = sharedDal;
             _httpAccessor = httpAccessor;
+            _logServ = logServ;
         }
 
 
@@ -41,14 +45,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetCountryList"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetCountryList";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -63,14 +65,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetOperatorList"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetOperatorList";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -85,14 +85,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetOrganisationTypeDropDown"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetOrganisationTypeDropDown";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -107,14 +105,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetAdvertCategoryDropDown"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertCategoryDropDown";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -129,14 +125,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetCampaignCategoryDropDown"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetCampaignCategoryDropDown";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -156,14 +150,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetCurrencyList"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetCurrencyList";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -179,14 +171,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetClientList"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetClientList";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -229,14 +219,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetUserCreditList"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetUserCreditList";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -264,14 +252,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetUsersnRoles"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetUsersnRoles";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -299,14 +285,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetUsersWPermissions"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetUsersWPermissions";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -325,14 +309,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetAddCreditUsersList"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAddCreditUsersList";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -364,14 +346,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "GetUserCreditList"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetUserCreditList";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -386,14 +366,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "FillUserPaymentDropdown"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "FillUserPaymentDropdown";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -408,14 +386,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "SharedSelectListsService",
-                    ProcedureName = "FillCampaignDropdown"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "FillCampaignDropdown";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;

@@ -24,9 +24,11 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         IHttpContextAccessor _httpAccessor;
         private readonly ICampaignDAL _campDAL;
+        private readonly ILoggingService _logServ;
+        const string PageName = "CampaignService";
 
         public CampaignService(IConfiguration configuration, IConnectionStringService connService, IHttpContextAccessor httpAccessor,
-                                ICampaignDAL campDAL) //ISaveFiles saveFile)
+                                ICampaignDAL campDAL, ILoggingService logServ) //ISaveFiles saveFile)
 
         {
             _configuration = configuration;
@@ -34,6 +36,7 @@ namespace AdtonesAdminWebApi.BusinessServices
            // _saveFile = saveFile;
             _httpAccessor = httpAccessor;
             _campDAL = campDAL;
+            _logServ = logServ;
         }
 
 
@@ -55,14 +58,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CampaignService",
-                    ProcedureName = "LoadCampaignDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadCampaignDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -77,14 +78,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CampaignService",
-                    ProcedureName = "LoadCampaignDataTableSalesExec"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadCampaignDataTableSalesExec";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -99,14 +98,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CampaignService",
-                    ProcedureName = "LoadCampaignDataTableById"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadCampaignDataTableById";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -143,14 +140,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CampaignService",
-                    ProcedureName = "UpdateStatus"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateStatus";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -213,14 +208,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "CampaignService",
-                    ProcedureName = "ChangeCampaignStatus"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ChangeCampaignStatus";
+                await _logServ.LogError();
+                
                 return false;
             }
             return true;
@@ -235,14 +228,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "AdvertService",
-                    ProcedureName = "AddAdvertCategory"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddAdvertCategory";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;

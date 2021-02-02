@@ -19,12 +19,15 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         private readonly IConnectionStringService _connService;
         ReturnResult result = new ReturnResult();
+        private readonly ILoggingService _logServ;
+        const string PageName = "OperatorConfigService";
 
-        public OperatorConfigService(IConfiguration configuration, IConnectionStringService connService)
+        public OperatorConfigService(IConfiguration configuration, IConnectionStringService connService, ILoggingService logServ)
 
         {
             _configuration = configuration;
             _connService = connService;
+            _logServ = logServ;
         }
 
 
@@ -44,14 +47,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "LoadOperatorConfigurationDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadOperatorConfigurationDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -75,14 +76,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "GetOperatorConfig"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetOperatorConfig";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -114,14 +113,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "AddOperatorConfig"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddOperatorConfig";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -157,14 +154,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "UpdateOperatorConfig"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateOperatorConfig";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;

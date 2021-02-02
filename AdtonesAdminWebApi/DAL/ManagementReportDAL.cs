@@ -16,10 +16,15 @@ namespace AdtonesAdminWebApi.DAL
 {
     public class ManagementReportDAL : BaseDAL, IManagementReportDAL
     {
+        private readonly ILoggingService _logServ;
+        const string PageName = "ManagementReportDAL";
 
-        public ManagementReportDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor)
+        public ManagementReportDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor,
+                                    ILoggingService logServe)
             : base(configuration, executers, connService, httpAccessor)
-        { }
+        {
+            _logServ = logServe;
+        }
 
 
 
@@ -53,15 +58,12 @@ namespace AdtonesAdminWebApi.DAL
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = query,
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ManagementReportDAL",
-                    ProcedureName = "GetReportInts"
-                };
-                _logging.LogError();
-
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetReportInts";
+                await _logServ.LogError();
+                
                 throw;
 
             }
@@ -98,16 +100,12 @@ namespace AdtonesAdminWebApi.DAL
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    LogLevel = select.RawSql,
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ManagementReportDAL",
-                    ProcedureName = "GetReportDoubleInts"
-                };
-                _logging.LogError();
-
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetReportDoubleInts";
+                await _logServ.LogError();
+                
                 throw;
 
             }
@@ -267,15 +265,12 @@ namespace AdtonesAdminWebApi.DAL
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    LogLevel = select.RawSql,
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ManagementReportDAL",
-                    ProcedureName = "GetTotalCreditCost"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetTotalCreditCost";
+                await _logServ.LogError();
+                
                 throw;
             }
         }
@@ -329,15 +324,12 @@ namespace AdtonesAdminWebApi.DAL
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    LogLevel = select.RawSql,
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "ManagementReportDAL",
-                    ProcedureName = "GetTotalCreditCost"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetTotalCreditCostProv";
+                await _logServ.LogError();
+               
                 throw;
             }
         }

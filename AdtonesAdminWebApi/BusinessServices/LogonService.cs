@@ -27,15 +27,19 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly IUserManagementDAL _userDAL;
         private readonly ISendEmailMailer _mailer;
+        private readonly ILoggingService _logServ;
         private IWebHostEnvironment _env;
         private readonly ILoginDAL _loginDAL;
+
+        const string PageName = "LogonService";
 
         ReturnResult result = new ReturnResult();
 
         private const int PASSWORD_HISTORY_LIMIT = 8;
 
         public LogonService(IConfiguration configuration, IOptions<AuthSettings> appSettings, IWebHostEnvironment env,
-                                ILoginDAL loginDAL, IHttpContextAccessor httpAccessor, IUserManagementDAL userDAL, ISendEmailMailer mailer)
+                                ILoginDAL loginDAL, IHttpContextAccessor httpAccessor, IUserManagementDAL userDAL, ISendEmailMailer mailer,
+                                ILoggingService logServ)
         {
             _configuration = configuration;
             _appSettings = appSettings.Value;
@@ -44,6 +48,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _httpAccessor = httpAccessor;
             _userDAL = userDAL;
             _mailer = mailer;
+            _logServ = logServ;
         }
 
 
@@ -94,7 +99,19 @@ namespace AdtonesAdminWebApi.BusinessServices
                     {
                         var jwt = new AuthService(_configuration);
                         user.Token = jwt.GenerateSecurityToken(user);
-                        var updateLastLoginTime = _loginDAL.UpdateLastLoggedIn(user.UserId);
+                        try
+                        {
+                            var updateLastLoginTime = _loginDAL.UpdateLastLoggedIn(user.UserId);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logServ.ErrorMessage = ex.Message.ToString();
+                            _logServ.StackTrace = ex.StackTrace.ToString();
+                            _logServ.PageName = "LogonService";
+                            _logServ.ProcedureName = "Login - updateLastLoginTime";
+                            //};
+                            await _logServ.LogError();
+                        }
                     }
                     else
                     {
@@ -116,14 +133,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LogonService",
-                    ProcedureName = "Login"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "Login";
+                await _logServ.LogError();
+
                 result.result = 0;
             }
             user.PasswordHash = null;
@@ -184,15 +199,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 catch (Exception ex)
                 {
-                    var _logging = new ErrorLogging()
-                    {
-                        ErrorMessage = ex.Message.ToString(),
-                        StackTrace = ex.StackTrace.ToString(),
-                        PageName = "LogonService",
-                        ProcedureName = "ForgotPassword - SendEmail"
-                    };
-                    _logging.LogError();
-
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = "ForgotPassword - SendEmail";
+                    await _logServ.LogError();
+                    
                     var msg = ex.Message.ToString();
                     result.result = 0;
                     result.error = "Email failed to send";
@@ -201,14 +213,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LogonService",
-                    ProcedureName = "ForgotPassword"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ForgotPassword";
+                    await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -268,28 +278,24 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 catch (Exception ex)
                 {
-                    var _logging = new ErrorLogging()
-                    {
-                        ErrorMessage = ex.Message.ToString(),
-                        StackTrace = ex.StackTrace.ToString(),
-                        PageName = "LogonService",
-                        ProcedureName = "ChangePassword - updateQuery"
-                    };
-                    _logging.LogError();
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = "ChangePassword - updateQuery";
+                    await _logServ.LogError();
+                    
                     result.result = 0;
                 }
 
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LogonService",
-                    ProcedureName = "ForgotPassword"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ForgotPassword";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -341,28 +347,24 @@ namespace AdtonesAdminWebApi.BusinessServices
                 }
                 catch (Exception ex)
                 {
-                    var _logging = new ErrorLogging()
-                    {
-                        ErrorMessage = ex.Message.ToString(),
-                        StackTrace = ex.StackTrace.ToString(),
-                        PageName = "LogonService",
-                        ProcedureName = "ChangePassword - updateQuery"
-                    };
-                    _logging.LogError();
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = "ChangePassword - updateQuery";
+                    await _logServ.LogError();
+                    
                     result.result = 0;
                 }
 
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LogonService",
-                    ProcedureName = "ForgotPassword"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ForgotPassword";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -388,14 +390,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LogonService",
-                    ProcedureName = "UpdatePasswordHistory"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdatePasswordHistory";
+                await _logServ.LogError();
+                
                 res = 0;
             }
             return res;
@@ -499,14 +499,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LogonService",
-                    ProcedureName = "ValidatePassword"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "ValidatePassword";
+                _logServ.LogError();
+                
                 result.result = 0;
                 return false;
             }
@@ -535,14 +533,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LogonService",
-                    ProcedureName = "InvalidLoginAttempts"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "InvalidLoginAttempts";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             result.body = user;
@@ -561,14 +557,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LogonService",
-                    ProcedureName = "BlockUser"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "BlockUser";
+                await _logServ.LogError();
+                
                 return 0;
             }
         }
@@ -593,14 +587,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "LogonService",
-                    ProcedureName = "RefreshAccessToken"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "RefreshAccessToken";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 return result;
             }

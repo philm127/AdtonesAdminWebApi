@@ -27,12 +27,14 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IAdTransferService _adTransfer;
         private readonly IConvertSaveMediaFile _convFile;
         private readonly IPromotionalCampaignDAL _provisionServer;
+        private readonly ILoggingService _logServ;
+        const string PageName = "PromotionalCampaignService";
 
         ReturnResult result = new ReturnResult();
 
         public PromotionalCampaignService(IWebHostEnvironment webHostEnvironment, IConnectionStringService connService, IPromotionalCampaignDAL provisionServer,
                                         IConfiguration configuration, IExpressoProcessPromoUser operatorExpresso, IConvertSaveMediaFile convFile,
-                                        ISaveGetFiles saveFile, IAdvertDAL advertDAL, IAdTransferService adTransfer) // ISafaricomProcessPromoUser operatorSafaricom,
+                                        ISaveGetFiles saveFile, IAdvertDAL advertDAL, IAdTransferService adTransfer, ILoggingService logServ) // ISafaricomProcessPromoUser operatorSafaricom,
         {
             _webHostEnvironment = webHostEnvironment;
             _provisionServer = provisionServer;
@@ -44,6 +46,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _advertDAL = advertDAL;
             _adTransfer = adTransfer;
             _convFile = convFile;
+            _logServ = logServ;
         }
 
 
@@ -94,14 +97,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "PromotionalUserService",
-                    ProcedureName = "SavePromotionalUser"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "SavePromotionalUser";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 result.error = "failed to process users";
                 return result;
@@ -178,14 +179,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                     }
                     catch (Exception ex)
                     {
-                        var _logging = new ErrorLogging()
-                        {
-                            ErrorMessage = ex.Message.ToString(),
-                            StackTrace = ex.StackTrace.ToString(),
-                            PageName = "PromotionalCampaignService",
-                            ProcedureName = "AddPromotionalCampaign - Add To Db"
-                        };
-                        _logging.LogError();
+                        _logServ.ErrorMessage = ex.Message.ToString();
+                        _logServ.StackTrace = ex.StackTrace.ToString();
+                        _logServ.PageName = PageName;
+                        _logServ.ProcedureName = "AddPromotionalCampaign - Add To Db";
+                        await _logServ.LogError();
+                        
                         result.result = 0;
                         result.error = "Failed to insert into Database.";
                         return result;
@@ -213,14 +212,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                     }
                     catch (Exception ex)
                     {
-                        var _logging = new ErrorLogging()
-                        {
-                            ErrorMessage = ex.Message.ToString(),
-                            StackTrace = ex.StackTrace.ToString(),
-                            PageName = "PromotionalCampaignService",
-                            ProcedureName = "AddPromotionalCampaign - Add Advert"
-                        };
-                        _logging.LogError();
+                        _logServ.ErrorMessage = ex.Message.ToString();
+                        _logServ.StackTrace = ex.StackTrace.ToString();
+                        _logServ.PageName = PageName;
+                        _logServ.ProcedureName = "AddPromotionalCampaign - Add Advert";
+                        await _logServ.LogError();
+                        
                         result.result = 0;
                         result.error = ex.Message.ToString();
                         return result;
@@ -235,14 +232,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "PromotionalCampaignService",
-                    ProcedureName = "AddPromotionalCampaign - Whole process"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddPromotionalCampaign - Whole process";
+                await _logServ.LogError();
+                
                 result.result = 0;
                 result.error = ex.Message.ToString();
                 return result;
@@ -259,14 +254,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "PromotionalCampaignService",
-                    ProcedureName = "UpdatePromotionalCampaignStatus"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdatePromotionalCampaignStatus";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -282,14 +275,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "PromotionalCampaignService",
-                    ProcedureName = "LoadPromoCampaignDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadPromoCampaignDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -304,14 +295,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "PromotionalCampaignService",
-                    ProcedureName = "GetPromoBatchIdList"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetPromoBatchIdList";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;

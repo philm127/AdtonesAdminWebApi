@@ -15,13 +15,15 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         private readonly IFinanceTablesDAL _invDAL;
         ReturnResult result = new ReturnResult();
+        private readonly ILoggingService _logServ;
+        const string PageName = "FinanceTableService";
 
-
-        public FinanceTablesService(IConfiguration configuration, IFinanceTablesDAL invDAL)
+        public FinanceTablesService(IConfiguration configuration, IFinanceTablesDAL invDAL, ILoggingService logServ)
 
         {
             _configuration = configuration;
             _invDAL = invDAL;
+            _logServ = logServ;
         }
 
 
@@ -37,14 +39,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "FinancialTableService",
-                    ProcedureName = "LoadData"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadInvoiceData";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -59,14 +59,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "FinancialTableService",
-                    ProcedureName = "LoadInvoiceDataTableForSales"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadInvoiceDataTableForSales";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -81,14 +79,11 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "FinancialTableService",
-                    ProcedureName = "LoadOutstandingInvoiceResultSet"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadOutstandingInvoiceResultSet";
+                await _logServ.LogError();
                 result.result = 0;
             }
             return result;
@@ -103,14 +98,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "FinancialTableService",
-                    ProcedureName = "LoadOutstandingInvoiceForSalesDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadOutstandingInvoiceForSalesDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -129,14 +122,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "FinanceTablesService",
-                    ProcedureName = "LoadUserCreditDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadUserCreditDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -151,14 +142,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "FinanceTablesService",
-                    ProcedureName = "LoadUserCreditDataTableForSales"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadUserCreditDataTableForSales";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -173,14 +162,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "FinancialTableService",
-                    ProcedureName = "LoadCampaignCreditPeriodTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadCampaignCreditPeriodTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;

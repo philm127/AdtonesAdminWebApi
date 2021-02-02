@@ -19,14 +19,16 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IUserManagementService _userService;
         private readonly IOperatorDAL _opDAL;
         ReturnResult result = new ReturnResult();
+        private readonly ILoggingService _logServ;
+        const string PageName = "OperatorService";
 
-
-        public OperatorService(IConfiguration configuration, IUserManagementService userService, IOperatorDAL opDAL)
+        public OperatorService(IConfiguration configuration, IUserManagementService userService, IOperatorDAL opDAL, ILoggingService logServ)
 
         {
             _configuration = configuration;
             _userService = userService;
             _opDAL = opDAL;
+            _logServ = logServ;
         }
 
 
@@ -38,14 +40,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "LoadOperatorDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadOperatorDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -67,14 +67,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "AddOperator"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddOperator";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             result.body = "Operator " + operatormodel.OperatorName + " added successfully.";
@@ -90,14 +88,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "GetOperator"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetOperator";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -113,14 +109,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "UpdateOperator"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateOperator";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             result.body = "Operator " + operatormodel.OperatorName + " updated successfully.";
@@ -137,14 +131,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "LoadOperatorMaxAdvertDataTable"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadOperatorMaxAdvertDataTable";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -166,14 +158,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "AddOperatorMaxAdverts"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddOperatorMaxAdverts";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             result.body = "Added successfully.";
@@ -189,14 +179,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "GetOperatorMaxAdvert"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetOperatorMaxAdvert";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             return result;
@@ -213,14 +201,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
             catch (Exception ex)
             {
-                var _logging = new ErrorLogging()
-                {
-                    ErrorMessage = ex.Message.ToString(),
-                    StackTrace = ex.StackTrace.ToString(),
-                    PageName = "OperatorService",
-                    ProcedureName = "UpdateOperatorMaxAdvert"
-                };
-                _logging.LogError();
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateOperatorMaxAdvert";
+                await _logServ.LogError();
+                
                 result.result = 0;
             }
             result.body = "Operator " + model.OperatorName + " updated successfully.";
