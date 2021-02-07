@@ -151,5 +151,20 @@ namespace AdtonesAdminWebApi.DAL
                          }));
             return x;
         }
+
+
+        public async Task<string> GetSalesExecInvoiceMailDets(int advertiserId)
+        {
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<string>(SalesManagementQuery.GetSalesExecInvDets, new { Id = advertiserId }));
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }

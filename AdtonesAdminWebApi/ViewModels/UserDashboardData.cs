@@ -43,6 +43,9 @@ namespace AdtonesAdminWebApi.ViewModels
         public double Creditlimit { get; set; }
         public double Outstandinginvoice { get; set; }
         public string MobileNumber { get; set; }
+        public string PhoneNumber { get; set; }
+        public string FixedLine { get; set; }
+        public string CompanyName { get; set; }
 
         public string CountryName { get; set; }
 

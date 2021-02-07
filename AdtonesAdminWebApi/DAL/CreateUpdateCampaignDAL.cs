@@ -186,7 +186,30 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<NewAdvertFormModel> CreateNewCampaignAdvert(NewAdvertFormModel model)
         {
             var newModel = new NewAdvertFormModel();
-            newModel = model;
+            newModel.AdtoneServerAdvertId = model.AdtoneServerAdvertId;
+            newModel.AdvertCategoryId = model.AdvertCategoryId;
+            newModel.AdvertId = model.AdvertId;
+            newModel.AdvertiserId = model.AdvertiserId;
+            newModel.AdvertName = model.AdvertName;
+            newModel.Brand = model.Brand;
+            newModel.CampaignProfileId = model.CampaignProfileId;
+            newModel.ClientId = model.ClientId;
+            newModel.CountryId = model.CountryId;
+            newModel.file = model.file;
+            newModel.IsAdminApproval = model.IsAdminApproval;
+            newModel.MediaFile = model.MediaFile;
+            newModel.MediaFileLocation = model.MediaFileLocation;
+            newModel.NextStatus = model.NextStatus;
+            newModel.Numberofadsinabatch = model.Numberofadsinabatch;
+            newModel.OperatorId = model.OperatorId;
+            newModel.PhoneticAlphabet = model.PhoneticAlphabet;
+            newModel.ScriptFile = model.ScriptFile;
+            newModel.ScriptFileLocation = model.ScriptFileLocation;
+            newModel.SmsScript = model.SmsScript;
+            newModel.Status = model.Status;
+            newModel.UpdatedBy = model.UpdatedBy;
+            newModel.UploadedToMediaServer = model.UploadedToMediaServer;
+
             try
             {
 
@@ -201,9 +224,14 @@ namespace AdtonesAdminWebApi.DAL
                     {
 
                         newModel.AdvertiserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.AdvertiserId, conn);
+                        newModel.UpdatedBy = await _connService.GetUserIdFromAdtoneIdByConnString(model.UpdatedBy, conn);
                         if (model.ClientId != null)
                             newModel.ClientId = await _connService.GetClientIdFromAdtoneIdByConnString(model.ClientId.Value, conn);
                         newModel.OperatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
+
+                        newModel.AdvertCategoryId = await _executers.ExecuteCommand(conn,
+                                conn => conn.ExecuteScalar<int>("SELECT AdvertCategoryId FROM AdvertCategories WHERE AdtoneServerAdvertCategoryId=@Id", new { Id = model.AdvertCategoryId }));
+
                         newModel.AdvertId = await _executers.ExecuteCommand(conn,
                                 conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewCampaignAdvert, newModel));
                     }

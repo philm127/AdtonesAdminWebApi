@@ -20,6 +20,9 @@ namespace AdtonesAdminWebApi.Services.Mailer
 
         public string attachment { get; set; }
 
+        // Used when otherpath already combined
+        public string attachmentExt { get; set; }
+
         public bool isBodyHTML { get; set; }
         public string Link { get; set; }
 

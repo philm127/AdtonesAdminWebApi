@@ -38,5 +38,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     WHERE AdvertiserId=@AdId";
 
         public static string GetSalesManagerId => @"SELECT ManId FROM SalesManager_SalesExec WHERE ExecId=@Id";
+
+
+        public static string GetSalesExecInvDets => @"SELECT u.Email FROM Users AS u INNER JOIN Advertisers_SalesTeam AS adsal 
+                                                        ON adsal.SalesExecId=u.UserId WHERE MailSupressed=1 AND IsActive=1
+                                                        AND AdvertiserId=@Id";
     }
 }

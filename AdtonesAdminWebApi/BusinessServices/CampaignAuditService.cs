@@ -28,7 +28,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
 
         public CampaignAuditService(IConfiguration configuration, IConnectionStringService connService, IHttpContextAccessor httpAccessor,
-                                ICampaignAuditDAL auditDAL, ICampaignDAL campDAL, IMemoryCache cache, LoggingService logServ)
+                                ICampaignAuditDAL auditDAL, ICampaignDAL campDAL, IMemoryCache cache, ILoggingService logServ)
 
         {
             _configuration = configuration;

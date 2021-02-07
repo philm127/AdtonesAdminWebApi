@@ -10,22 +10,18 @@
   <ItemGroup>
     <Compile Remove="DAL\**" />
     <Compile Remove="EmailTemplates\**" />
-    <Compile Remove="Invoice\**" />
     <Compile Remove="PromotionalUserCSV\**" />
     <Compile Remove="ViewModels\AdProfilrModels\**" />
     <Content Remove="DAL\**" />
     <Content Remove="EmailTemplates\**" />
-    <Content Remove="Invoice\**" />
     <Content Remove="PromotionalUserCSV\**" />
     <Content Remove="ViewModels\AdProfilrModels\**" />
     <EmbeddedResource Remove="DAL\**" />
     <EmbeddedResource Remove="EmailTemplates\**" />
-    <EmbeddedResource Remove="Invoice\**" />
     <EmbeddedResource Remove="PromotionalUserCSV\**" />
     <EmbeddedResource Remove="ViewModels\AdProfilrModels\**" />
     <None Remove="DAL\**" />
     <None Remove="EmailTemplates\**" />
-    <None Remove="Invoice\**" />
     <None Remove="PromotionalUserCSV\**" />
     <None Remove="ViewModels\AdProfilrModels\**" />
   </ItemGroup>

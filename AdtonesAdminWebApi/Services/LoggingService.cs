@@ -5,6 +5,10 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using MailKit.Net.Smtp;
+using MailKit;
+using MimeKit;
+using MailKit.Security;
 
 namespace AdtonesAdminWebApi.Services
 {
@@ -56,13 +60,11 @@ namespace AdtonesAdminWebApi.Services
         private string procedureName;
         private string stackTrace;
         private string logLevel;
-        private readonly ISendEmailMailer _mailer;
         private readonly IConfiguration _configuration;
 
 
-        public LoggingService(ISendEmailMailer mailer, IConfiguration configuration)
+        public LoggingService(IConfiguration configuration)
         {
-            _mailer = mailer;
             _configuration = configuration;
         }
 
@@ -85,7 +87,7 @@ namespace AdtonesAdminWebApi.Services
             var messageToWrite = LogMessageBuilder();
 
             await WriteTextAsync(filepath, messageToWrite);
-            await SendErrorEmail();
+            await CreateErrorEmail();
         }
 
 
@@ -102,7 +104,7 @@ namespace AdtonesAdminWebApi.Services
         }
 
 
-        public async Task SendErrorEmail()
+        public async Task CreateErrorEmail()
         {
             var test = _configuration.GetValue<string>("Environment:Location");
             var mail = new SendEmailModel();
@@ -123,7 +125,7 @@ namespace AdtonesAdminWebApi.Services
                 else
                     mail.Subject = "UAT Testing Adtone API error log at  " + DateTime.Now;
 
-                await _mailer.SendBasicEmail(mail);
+                await SendErrorEmail(mail);
             }
         }
 
@@ -166,6 +168,94 @@ namespace AdtonesAdminWebApi.Services
             var messageToWrite = LogMessageBuilder();
 
             await WriteTextAsync(filepath, messageToWrite);
+        }
+
+
+        public async Task SendErrorEmail(SendEmailModel mail)
+        {
+            var message = new MimeMessage();
+
+            var test = _configuration.GetValue<bool>("Environment:Test");
+            if (test)
+                mail.SingleTo = "myinternet21@hotmail.com";
+
+            message.To.Add(MailboxAddress.Parse(mail.SingleTo));
+            message.From.Add(MailboxAddress.Parse(mail.From));
+
+            if (mail.Bcc != null)
+            {
+                foreach (var blind in mail.Bcc)
+                {
+                    message.Bcc.Add(MailboxAddress.Parse(blind));
+                }
+            }
+            message.Bcc.Add(MailboxAddress.Parse("philm127@gmail.com"));
+            if (mail.CC != null)
+            {
+                foreach (var share in mail.CC)
+                {
+                    message.Cc.Add(MailboxAddress.Parse(share));
+                }
+            }
+            message.Subject = mail.Subject;
+            // message.Body = new TextPart("html") { Text = mail.Body };
+            var builder = new BodyBuilder { HtmlBody = mail.Body };
+            if (mail.attachment != null)
+            {
+                var otherpath = _configuration.GetValue<string>("AppSettings:adtonesServerDirPath");
+                var filePath = Path.Combine(otherpath, mail.attachment);
+                var filename = Path.GetFileName(filePath);
+                var ms = new MemoryStream();
+
+                using (var stream = new FileStream(filePath, FileMode.Open))
+                {
+                    await stream.CopyToAsync(ms);
+                    builder.Attachments.Add(filename, ms.ToArray());
+                }
+                ms.Dispose();
+            }
+
+            message.Body = builder.ToMessageBody();
+            try
+            {
+
+                var creds = GetCredentials();
+
+                using SmtpClient client = new SmtpClient();
+                {
+                    client.Connect(creds.srv, 587, SecureSocketOptions.None);//, SecureSocketOptions.StartTls);// creds.sslSend);
+                    client.Authenticate(creds.usr, creds.pwd);
+                    try
+                    {
+                        client.Send(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        var msg = ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        client.Disconnect(true);
+                    }
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        private SMTPCredentials GetCredentials()
+        {
+            var creds = new SMTPCredentials();
+
+            creds.pwd = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPPassword").Value;
+            creds.usr = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SMTPEmail").Value;
+            creds.srv = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerAddress").Value;
+            creds.port = int.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SmtpServerPort").Value);
+            creds.sslSend = bool.Parse(_configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("EnableEmailSending").Value);
+            return creds;
         }
     }
 }

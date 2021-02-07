@@ -137,14 +137,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             var model = new ManagementReportModel();
             var models = new List<ManagementReportModel>();
             search = SetDefaults(search);
-            //var _logging2 = new ErrorLogging()
-            //{
-            //    ErrorMessage = search.ToDate.ToString(),
-            //    LogLevel = search.FromDate.ToString(),
-            //    PageName = "ManagementReportService",
-            //    ProcedureName = "GetManReportAsync"
-            //};
-            //_logging2.LogInfo();
+            
             try
             {
 
@@ -271,16 +264,6 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 if (constring != null && constring.Length > 10)
                 {
-                    //var _logging = new ErrorLogging()
-                    //{
-                    //    ErrorMessage = op.ToString(),
-                    //    StackTrace = constring,
-                    //    PageName = "ManagementReportService",
-                    //    ProcedureName = "GetManReportAsync"
-                    //};
-                    //_logging.LogInfo();
-                    // search.connstring = constring;
-                    // search.singleOperator = op;
                     try
                     {
                         string rewardTot = string.Empty;

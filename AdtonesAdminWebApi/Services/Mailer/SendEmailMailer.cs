@@ -80,6 +80,20 @@ namespace AdtonesAdminWebApi.Services.Mailer
                 ms.Dispose();
             }
 
+            if (mail.attachmentExt != null)
+            {
+                var filePath = mail.attachmentExt;
+                var filename = Path.GetFileName(filePath);
+                var ms = new MemoryStream();
+
+                using (var stream = new FileStream(filePath, FileMode.Open))
+                {
+                    await stream.CopyToAsync(ms);
+                    builder.Attachments.Add(filename, ms.ToArray());
+                }
+                ms.Dispose();
+            }
+
             message.Body = builder.ToMessageBody();
             try
             {
@@ -96,12 +110,13 @@ namespace AdtonesAdminWebApi.Services.Mailer
                     }
                     catch (Exception ex)
                     {
+                        // var msg = ex.Message.ToString();
                         _logServ.ErrorMessage = ex.Message.ToString();
                         _logServ.StackTrace = ex.StackTrace.ToString();
                         _logServ.PageName = PageName;
                         _logServ.ProcedureName = "SendEmail";
                         await _logServ.LogError();
-                        
+
                     }
                     finally
                     {

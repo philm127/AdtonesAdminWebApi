@@ -12,11 +12,18 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                   ISNULL(camp.NoOfactivecampaign, 0) AS NoOfactivecampaign,ISNULL(co.Name, 'N/A') AS CountryName,
                                                    ISNULL(ad.NoOfunapprovedadverts, 0) AS NoOfunapprovedadverts,
                                                    ISNULL(cred.AssignCredit, 0) AS creditlimit,ISNULL(billit.outStandingInvoice, 0) AS outStandingInvoice,
-                                                   item.Activated,item.DateCreated,ISNULL(tkt.TicketCount, 0) AS TicketCount
+                                                   item.Activated,item.DateCreated,ISNULL(tkt.TicketCount, 0) AS TicketCount,
+                                                    CONCAT(item.MobileNumber,' ',item.FixedLine, ' ',item.PhoneNumber) AS MobileNumber,item.CompanyName
                                                    FROM
                                                         (SELECT item.UserId, item.RoleId, item.Email, item.DateCreated, item.Activated,
-                                                        item.FirstName,item.LastName
-                                                        FROM Users item Where item.VerificationStatus = 1 AND item.RoleId = 3) item
+                                                        item.FirstName,item.LastName,
+                                                        (Case WHEN LEN(con.MobileNumber)>7 THEN CONCAT('M:',REPLACE(con.MobileNumber,' ','')) ELSE NULL END) AS MobileNumber,
+                                                        (Case WHEN LEN(con.FixedLine)>7 THEN CONCAT('F:',REPLACE(con.FixedLine,' ','')) ELSE NULL END) AS FixedLine,
+                                                        (Case WHEN LEN(con.PhoneNumber)>7 THEN CONCAT('P:',REPLACE(con.PhoneNumber,' ','')) ELSE NULL END) AS PhoneNumber,
+                                                        com.CompanyName
+                                                        FROM Users AS item LEFT JOIN Contacts AS con ON con.UserId=item.UserId
+                                                        LEFT JOIN CompanyDetails AS com ON com.UserId=item.UserId
+                                                        WHERE item.VerificationStatus = 1 AND item.RoleId = 3) item
                                                     LEFT JOIN
                                                         (SELECT a.[UserId], b.[AssignCredit], a.[Id] 
                                                         FROM
@@ -98,11 +105,18 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                            ISNULL(ad.NoOfunapprovedadverts, 0) AS NoOfunapprovedadverts,
                                                            ISNULL(sales.SalesExec, 'UnAllocated') AS SalesExec,sales.UserId AS SUserId,
                                                            ISNULL(cred.AssignCredit, 0) AS creditlimit,ISNULL(billit.outStandingInvoice, 0) AS outStandingInvoice,
-                                                           item.Activated,item.DateCreated,ISNULL(tkt.TicketCount, 0) AS TicketCount
-                                                           FROM
+                                                           item.Activated,item.DateCreated,ISNULL(tkt.TicketCount, 0) AS TicketCount,
+                                                           CONCAT(item.MobileNumber,' ',item.FixedLine, ' ',item.PhoneNumber) AS MobileNumber,item.CompanyName
+                                                            FROM
                                                                 (SELECT item.UserId, item.RoleId, item.Email, item.DateCreated, item.Activated,
-                                                                item.FirstName,item.LastName
-                                                                FROM Users AS item WHERE item.VerificationStatus = 1 AND item.RoleId = 3) item
+                                                                item.FirstName,item.LastName,
+                                                                (Case WHEN LEN(con.MobileNumber)>7 THEN CONCAT('M:',REPLACE(con.MobileNumber,' ','')) ELSE NULL END) AS MobileNumber,
+                                                                (Case WHEN LEN(con.FixedLine)>7 THEN CONCAT('F:',REPLACE(con.FixedLine,' ','')) ELSE NULL END) AS FixedLine,
+                                                                (Case WHEN LEN(con.PhoneNumber)>7 THEN CONCAT('P:',REPLACE(con.PhoneNumber,' ','')) ELSE NULL END) AS PhoneNumber,
+                                                                com.CompanyName
+                                                                FROM Users AS item LEFT JOIN Contacts AS con ON con.UserId=item.UserId
+                                                                LEFT JOIN CompanyDetails AS com ON com.UserId=item.UserId
+                                                                        WHERE item.VerificationStatus = 1 AND item.RoleId = 3) item
                                                             LEFT JOIN
                                                                 (SELECT CONCAT(u.FirstName,' ',u.LastName) AS SalesExec,u.UserId,sales.AdvertiserId 
                                                                     FROM Users AS u INNER JOIN Advertisers_SalesTeam AS sales ON sales.SalesExecId=u.UserId
@@ -215,11 +229,18 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                   ISNULL(camp.NoOfactivecampaign, 0) AS NoOfactivecampaign,ISNULL(co.Name, 'N/A') AS CountryName,
                                                    ISNULL(ad.NoOfunapprovedadverts, 0) AS NoOfunapprovedadverts,
                                                    ISNULL(cred.AssignCredit, 0) AS creditlimit,ISNULL(billit.outStandingInvoice, 0) AS outStandingInvoice,
-                                                   item.Activated,item.DateCreated,ISNULL(tkt.TicketCount, 0) AS TicketCount
+                                                   item.Activated,item.DateCreated,ISNULL(tkt.TicketCount, 0) AS TicketCount,
+                                                    CONCAT(item.MobileNumber,' ',item.FixedLine, ' ',item.PhoneNumber) AS MobileNumber,item.CompanyName
                                                    FROM
                                                         (SELECT item.UserId, item.RoleId, item.Email, item.DateCreated, item.Activated,
-                                                        item.FirstName,item.LastName
-                                                        FROM Users item Where item.VerificationStatus = 1 AND item.RoleId = 3) item
+                                                        item.FirstName,item.LastName,
+                                                        (Case WHEN LEN(con.MobileNumber)>7 THEN CONCAT('M:',REPLACE(con.MobileNumber,' ','')) ELSE NULL END) AS MobileNumber,
+                                                        (Case WHEN LEN(con.FixedLine)>7 THEN CONCAT('F:',REPLACE(con.FixedLine,' ','')) ELSE NULL END) AS FixedLine,
+                                                        (Case WHEN LEN(con.PhoneNumber)>7 THEN CONCAT('P:',REPLACE(con.PhoneNumber,' ','')) ELSE NULL END) AS PhoneNumber,
+                                                        com.CompanyName
+                                                        FROM Users AS item LEFT JOIN Contacts AS con ON con.UserId=item.UserId
+                                                        LEFT JOIN CompanyDetails AS com ON com.UserId=item.UserId 
+                                                        Where item.VerificationStatus = 1 AND item.RoleId = 3) item
                                                     LEFT JOIN
                                                         (SELECT a.[UserId], b.[AssignCredit], a.[Id] 
                                                         FROM

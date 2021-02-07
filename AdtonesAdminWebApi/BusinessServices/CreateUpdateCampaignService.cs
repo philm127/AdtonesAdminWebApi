@@ -480,7 +480,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                             await _matchDAL.UpdateMediaLocation(ConnString, adName, campaignProfileDetails);
                             await _matchProcess.PrematchProcessForCampaign(model.CampaignProfileId, ConnString);
                         }
-                        // _adEmail.SendMail(model);
+                        _adEmail.SendMail(model);
 
                         if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
                         {

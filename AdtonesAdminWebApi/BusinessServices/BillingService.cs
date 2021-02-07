@@ -8,6 +8,9 @@ using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using Microsoft.Extensions.Configuration;
+using AdtonesAdminWebApi.Services.Mailer;
+using System.Globalization;
+using System.Text;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -27,6 +30,8 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly ICurrencyConversion _curConv;
         private readonly IConnectionStringService _conService;
         private readonly ILoggingService _logServ;
+        private readonly ISalesManagementDAL _salesMan;
+        private readonly ISendEmailMailer _mailer;
         private static Random random = new Random();
         ReturnResult result = new ReturnResult();
         const string PageName = "BillingService";
@@ -34,7 +39,8 @@ namespace AdtonesAdminWebApi.BusinessServices
         public BillingService(IHttpContextAccessor httpAccessor, IUserManagementDAL userDAL, ICurrencyDAL currencyDAL, ICampaignDAL campDAL,
                                 IBillingDAL billDAL, IAdvertDAL advertDAL, IAdvertiserFinancialDAL userCredit, 
                                 IAdvertiserFinancialService userFin, IConfiguration configuration,
-                                ICurrencyConversion curConv, IConnectionStringService conService, ILoggingService logServ)
+                                ICurrencyConversion curConv, IConnectionStringService conService, ILoggingService logServ, ISalesManagementDAL salesMan,
+                                ISendEmailMailer mailer)
         {
             _httpAccessor = httpAccessor;
             _userDAL = userDAL;
@@ -48,6 +54,8 @@ namespace AdtonesAdminWebApi.BusinessServices
             _curConv = curConv;
             _conService = conService;
             _logServ = logServ;
+            _salesMan = salesMan;
+            _mailer = mailer;
         }
 
 
@@ -259,7 +267,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                     if (creditStatus.result == 1)
                     {
-                        result.body = "Payment received successfully for " + model.InvoiceNumber;
+                        result.body = $"Payment received successfully against Campaign: {campaignDetails.CampaignName} with Invoice Number: {model.InvoiceNumber}";
 
                         var currencySymbol1 = _curConv.GetCurrencySymbol(campaignCurrencyCode);
                         var pdfStatus = CreatePDF(model, CountryId, 1, "CreditPayment", currencySymbol1, fromCurrencyCode, toCurrencyCode);
@@ -378,11 +386,24 @@ namespace AdtonesAdminWebApi.BusinessServices
                 GenerateInvoicePDF pdf = new GenerateInvoicePDF(_curConv);
                 pdf.Invoice = invoice;
                 string path = pdf.CreatePDF(otherpath + "/Invoice", fromCurrencyCode, toCurrencyCode);
+                var mail = new SendEmailModel();
+                mail.attachmentExt = path;
+                mail.From = _configuration.GetSection("AppSettings").GetSection("EmailSettings").GetSection("SiteEmailAddress").Value;
+                mail.Subject = $"Adtones Invoice ({invoice.InvoiceNumber}) ({DateTime.Parse(billingDetails.SettledDate.ToString(), new CultureInfo("en-US")).Day}) (" + DateTime.Parse(billingDetails.SettledDate.ToString(), new CultureInfo("en-US")).Month + ") (" + DateTime.Parse(billingDetails.SettledDate.ToString(), new CultureInfo("en-US")).Year + ")";
+                mail.Body = InvoiceTemplate(billingDetails.FullName);
+                var mailAddr = string.Empty;
+                var ytr = _httpAccessor.GetRoleIdFromJWT();
+                if (ytr == (int)Enums.UserRole.SalesExec)
+                {
+                    mailAddr = _salesMan.GetSalesExecInvoiceMailDets(model.AdvertiserId).Result;
+                    if (mailAddr == null || mailAddr.Length < 3)
+                        mailAddr = billingDetails.Email;
+                }
+                    mail.SingleTo = mailAddr;
 
-                string[] mailto = new string[1];
-                mailto[0] = billingDetails.Email;
-                string[] attachment = new string[1];
-                attachment[0] = path;
+                _mailer.SendBasicEmail(mail);
+                //string[] attachment = new string[1];
+                //attachment[0] = path;
                 //sendemailtoclient(userdetails.Email, userdetails.FirstName, userdetails.LastName, 
                 //    "Adtones Invoice (" + invoice.InvoiceNumber + ") (" + DateTime.Parse(billingdetails.SettledDate.ToString(), new CultureInfo("en-US")).Day + ") (" + DateTime.Parse(billingdetails.SettledDate.ToString(), new CultureInfo("en-US")).Month + ") (" + DateTime.Parse(billingdetails.SettledDate.ToString(), new CultureInfo("en-US")).Year + ")", 
                 //    2, mailto, null, null, attachment, true, DateTime.Now.ToString(), paymentMethod, invoice.SettledDate, invoice.InvoiceNumber);
@@ -399,6 +420,41 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             const string chars = "0123456789";
             return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+
+        private string InvoiceTemplate(string fname)
+        {
+            var sb = new StringBuilder();
+            sb.Append("<table width='580' border='0' cellpadding='2' cellspacing='0' style='border-collapse: collapse'>");
+            string template = $"<tr><td>Dear {fname},</td></tr>";
+            sb.Append(template);
+            string template2 = @"<tr>
+                                    <td>
+                                        Thank you for the campaign payment, please find attached your invoice.
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Thank you for trusting us with your campaign.
+                                    </td>
+                                </tr>
+          
+                                <tr>
+                                    <td>
+                                        Sincerely,
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Adtones Team<br />
+                                        support@adtones.com
+                                    </td>
+                                </tr>
+                            </table>";
+            sb.Append(template2);
+            return sb.ToString();
         }
 
     }
