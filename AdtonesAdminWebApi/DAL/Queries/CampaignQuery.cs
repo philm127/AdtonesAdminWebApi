@@ -8,8 +8,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
 														op.OperatorName,ctry.Name AS CountryName,
 														camp.ClientId, ISNULL(cl.Name,'-') AS ClientName,CampaignName,camp.CreatedDateTime AS CreatedDate,
 														camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,camp.TotalBudget,u.Organisation,
-														CASE WHEN bill.Id>0 THEN camp.Status ELSE 8 END AS Status,play.AvgBidValue,play.TotalSpend,bill.CurrencyCode,
-														(camp.TotalBudget - play.TotalSpend) AS FundsAvailable,play.ct AS finaltotalplays,con.MobileNumber
+														CASE WHEN bill.Id>0 THEN camp.Status ELSE 8 END AS Status,bill.CurrencyCode,
+														ro.Spend AS TotalSpend,ro.FundsAvailable, ro.MoreSixSecPlays AS finaltotalplays,ro.AvgBid AS AvgBidValue,
+														con.MobileNumber
 														FROM CampaignProfile AS camp LEFT JOIN Users As u ON u.UserId=camp.UserId
 														LEFT JOIN Client AS cl ON camp.ClientId=cl.Id
 														LEFT JOIN CampaignAdverts AS campAd ON campAd.CampaignProfileId=camp.CampaignProfileId
@@ -19,14 +20,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 																	(SELECT MAX(Id) FROM Billing GROUP BY CampaignProfileId,CurrencyCode)
 																) AS bill 
 														ON bill.CampaignProfileId=camp.CampaignProfileId
-														LEFT JOIN 
-																(SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-																	CAST(ISNULL((ISNULL(SUM(BidValue),0))+(ISNULL(SUM(SMSCost),0))+(ISNULL(SUM(EmailCost),0)),0) AS NUMERIC(36,2)) AS TotalSpend 
-																	FROM CampaignAudit
-																	WHERE LOWER(Status)='played' AND PlayLengthTicks>6000
-																	GROUP BY CampaignProfileId
-																) AS play
-														ON camp.CampaignProfileId=play.CampaignProfileId
+														LEFT JOIN RollupsCampaign AS ro ON ro.CampaignId=camp.CampaignProfileId
 														LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
 														LEFT JOIN Contacts AS con ON con.UserId=camp.UserId
 														LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId ";
@@ -36,17 +30,11 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 ,CampaignName,camp.CreatedDateTime AS CreatedDate
                                                 ,camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,
                                                 camp.Status AS Status,
-                                                play.ct AS finaltotalplays
+                                                ro.MoreSixSecPlays AS finaltotalplays
                                                 FROM CampaignProfile AS camp
                                                 LEFT JOIN CampaignAdverts AS campAd ON campAd.CampaignProfileId=camp.CampaignProfileId
 												LEFT JOIN Advert AS ad ON ad.AdvertId=campAd.AdvertId
-                                                LEFT JOIN 
-		                                                (SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct 
-			                                                FROM CampaignAudit
-			                                                WHERE LOWER(Status)='played' AND PlayLengthTicks>6000
-			                                                GROUP BY CampaignProfileId
-		                                                ) AS play
-                                                ON camp.CampaignProfileId=play.CampaignProfileId
+                                                LEFT JOIN RollupsCampaign AS ro ON ro.CampaignId=camp.CampaignProfileId
 												LEFT JOIN CampaignProfileExt AS ext ON ext.CampaignProfileId=camp.CampaignProfileId
 												LEFT JOIN CampaignCategory AS cat ON cat.CampaignCategoryId=ext.CampaignCategoryId
                                                 LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
@@ -54,76 +42,77 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId ";
 
 
-		public static string GetCampaignResultSetFromProv => @"SELECT camp.CampaignProfileId,ct,AvgBidValue,TotalSpend
-										FROM CampaignProfile AS camp
-										INNER JOIN (
-												SELECT DISTINCT CampaignProfileId,SUM(ct) AS ct,CAST(AVG(AvgBidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-												SUM(CAST(ISNULL(ToTalSpend,0) AS NUMERIC(36,2))) AS TotalSpend 
-												FROM 
-												(
-													SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit 
-													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
-													UNION ALL
-													SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit2 
-													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+		//public static string GetCampaignResultSetFromProv => @"SELECT camp.CampaignProfileId,ct,AvgBidValue,TotalSpend
+		//								FROM CampaignProfile AS camp
+		//								INNER JOIN (
+		//										SELECT DISTINCT CampaignProfileId,SUM(ct) AS ct,CAST(AVG(AvgBidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+		//										SUM(CAST(ISNULL(ToTalSpend,0) AS NUMERIC(36,2))) AS TotalSpend 
+		//										FROM 
+		//										(
+		//											SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+		//											SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit 
+		//											WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+		//											UNION ALL
+		//											SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+		//											SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit2 
+		//											WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
 
-													UNION ALL
-													SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit3 
-													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+		//											UNION ALL
+		//											SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+		//											SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit3 
+		//											WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
 
-													UNION ALL
-														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit4 
-													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+		//											UNION ALL
+		//												SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+		//											SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit4 
+		//											WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
 
-													UNION ALL
-														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit5 
-													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+		//											UNION ALL
+		//												SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+		//											SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit5 
+		//											WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
 
-													UNION ALL
-														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit6 
-													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+		//											UNION ALL
+		//												SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+		//											SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit6 
+		//											WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
 
-													UNION ALL
-														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit7 
-													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+		//											UNION ALL
+		//												SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+		//											SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit7 
+		//											WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
 
-													UNION ALL
-														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit8 
-													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+		//											UNION ALL
+		//												SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+		//											SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit8 
+		//											WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
 
-													UNION ALL
-														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit9 
-													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+		//											UNION ALL
+		//												SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+		//											SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit9 
+		//											WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
 
-													UNION ALL
-														SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-													SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit10 
-													WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
-													) as x
-												GROUP BY CampaignProfileId ) AS play
-												ON camp.CampaignProfileId=play.CampaignProfileId
-                                                LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
-                                                LEFT JOIN Contacts AS con ON con.UserId=camp.UserId
-                                                LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId ";
+		//											UNION ALL
+		//												SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
+		//											SUM(CAST(ISNULL(ToTalCost,0) AS NUMERIC(36,2))) AS TotalSpend FROM CampaignAudit10 
+		//											WHERE PlayLengthTicks >= 6000 GROUP BY CampaignProfileId
+		//											) as x
+		//										GROUP BY CampaignProfileId ) AS play
+		//										ON camp.CampaignProfileId=play.CampaignProfileId
+  //                                              LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
+  //                                              LEFT JOIN Contacts AS con ON con.UserId=camp.UserId
+  //                                              LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId ";
 
 
 
 		public static string GetCampaignResultSetForSales => @"SELECT camp.CampaignProfileId,camp.UserId,u.Email,CONCAT(u.FirstName,' ',u.LastName) AS UserName,op.OperatorName
                                                 ,camp.ClientId, ISNULL(cl.Name,'-') AS ClientName,CampaignName,camp.CreatedDateTime AS CreatedDate
                                                 ,camp.IsAdminApproval,ad.AdvertId, ad.AdvertName,camp.TotalBudget,u.Organisation,ctry.Name AS CountryName,
-                                                CASE WHEN bill.Id>0 THEN camp.Status ELSE 8 END AS Status,play.AvgBidValue,play.TotalSpend,bill.CurrencyCode,
-                                                (camp.TotalBudget - play.TotalSpend) AS FundsAvailable,play.ct AS finaltotalplays,con.MobileNumber,
+                                                CASE WHEN bill.Id>0 THEN camp.Status ELSE 8 END AS Status,bill.CurrencyCode,
+                                                con.MobileNumber,
                                                 CASE WHEN sexcs.FirstName IS NULL THEN 'UnAllocated' ELSE CONCAT(sexcs.FirstName,' ',sexcs.LastName) 
-                                                    END AS SalesExec,sexcs.UserId AS sUserId
+                                                    END AS SalesExec,sexcs.UserId AS sUserId,
+												ro.Spend AS TotalSpend,ro.FundsAvailable, ro.MoreSixSecPlays AS finaltotalplays,ro.AvgBid AS AvgBidValue
                                                 FROM CampaignProfile AS camp LEFT JOIN Users As u ON u.UserId=camp.UserId
                                                 LEFT JOIN Client AS cl ON camp.ClientId=cl.Id
                                                 LEFT JOIN CampaignAdverts AS campAd ON campAd.CampaignProfileId=camp.CampaignProfileId
@@ -133,14 +122,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 			                                                (SELECT MAX(Id) FROM Billing GROUP BY CampaignProfileId,CurrencyCode)
 		                                                ) AS bill 
                                                 ON bill.CampaignProfileId=camp.CampaignProfileId
-                                                LEFT JOIN 
-		                                                (SELECT CampaignProfileId,COUNT(CampaignProfileId) AS ct,CAST(AVG(BidValue) AS NUMERIC(36,2)) AS AvgBidValue,
-                                                            CAST(ISNULL((ISNULL(SUM(BidValue),0))+(ISNULL(SUM(SMSCost),0))+(ISNULL(SUM(EmailCost),0)),0) AS NUMERIC(36,2)) AS TotalSpend 
-			                                                FROM CampaignAudit
-			                                                WHERE LOWER(Status)='played' AND PlayLengthTicks>6000
-			                                                GROUP BY CampaignProfileId
-		                                                ) AS play
-                                                ON camp.CampaignProfileId=play.CampaignProfileId
+                                                LEFT JOIN RollupsCampaign AS ro ON ro.CampaignId=camp.CampaignProfileId
                                                 LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
                                                 LEFT JOIN Contacts AS con ON con.UserId=camp.UserId
                                                 LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId 

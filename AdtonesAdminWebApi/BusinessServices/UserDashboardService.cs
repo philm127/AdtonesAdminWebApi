@@ -86,6 +86,26 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> LoadSalesExecForAdminDataTable()
+        {
+            try
+            {
+                result.body = await _dashboardDal.GetSalesExecForAdminDashboard();
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadSalesExecForAdminDataTable";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
+        }
+
+
         public async Task<ReturnResult> LoadOperatorDataTable()
         {
             try

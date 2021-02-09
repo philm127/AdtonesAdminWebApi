@@ -224,6 +224,53 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         ON adsales.AdvertiserId = x.UserId ";
 
 
+        public static string SalesExecForAdminResultQuery => @"SELECT u.UserId,u.Email, u.DateCreated, u.Activated,co.Name AS CountryName,
+                                                                u.FirstName,u.LastName,CONCAT(um.FirstName,' ',um.LastName) AS SalesManager,
+                                                                COUNT(x.UserId) As NoAdvertisers,SUM(x.NoOfactivecampaign) AS NoOfactivecampaign,
+                                                                SUM(x.NoOfunapprovedadverts) AS NoOfunapprovedadverts,
+                                                                SUM(x.outStandingInvoice) AS outStandingInvoice
+                                                                FROM Users AS u 
+                                                                LEFT JOIN Advertisers_SalesTeam AS adsales ON adsales.SalesExecId=u.UserId
+                                                                LEFT JOIN SalesManager_SalesExec AS ss ON u.UserId=ss.ExecId
+                                                                LEFT JOIN Users AS um ON um.UserId=ss.ManId
+                                                                LEFT JOIN Contacts AS con ON con.UserId=u.UserId
+                                                                LEFT JOIN Country AS co ON co.Id=con.CountryId
+                                                                LEFT JOIN
+                                                                (
+                                                                SELECT item.UserId,
+                                                                ISNULL(camp.NoOfactivecampaign, 0) AS NoOfactivecampaign,
+                                                                ISNULL(ad.NoOfunapprovedadverts, 0) AS NoOfunapprovedadverts,
+                                                                ISNULL(billit.outStandingInvoice, 0) AS outStandingInvoice
+                                                                FROM
+                                                                    (SELECT item.UserId
+                                                                    FROM Users item Where item.VerificationStatus = 1 AND item.RoleId = 3) item
+                                                                LEFT JOIN
+                                                                    (SELECT COUNT(CampaignProfileId) AS NoOfactivecampaign,UserId FROM Campaignprofile 
+                                                                        WHERE Status IN (4, 3, 2, 1) GROUP BY UserId) camp
+                                                                ON item.UserId = camp.UserId
+                                                                LEFT JOIN
+                                                                    (SELECT COUNT(AdvertId) AS NoOfunapprovedadverts,UserId FROM Advert 
+                                                                        WHERE Status = 4 GROUP BY UserId) ad
+                                                                ON item.UserId = ad.UserId
+                                                                LEFT JOIN
+                                                                    (SELECT COUNT(bill3.UserId) AS outStandingInvoice,bill3.UserId
+                                                                    FROM
+                                                                        (SELECT SUM(FundAmount) AS totalAmount, CampaignProfileId, UserId
+                                                                        FROM Billing WHERE PaymentMethodId = 1 GROUP BY CampaignProfileId, UserId) bill3
+                                                                    LEFT JOIN
+                                                                        (SELECT sum(Amount) AS paidAmount, UserId, CampaignProfileId
+                                                                        FROM UsersCreditPayment GROUP BY CampaignProfileId, UserId) uc
+                                                                    ON bill3.UserId = uc.UserId AND bill3.CampaignProfileId = uc.CampaignProfileId
+                                                                    WHERE (ISNULL(bill3.totalAmount, 0) - ISNULL(uc.paidAmount, 0)) > 0
+                                                                    GROUP BY bill3.UserId) billit
+                                                                ON item.UserId = billit.UserId
+                                                                ) AS x
+                                                                ON adsales.AdvertiserId = x.UserId
+                                                                WHERE u.RoleId=9 
+                                                                GROUP BY u.UserId,adsales.SalesExecId,u.Email, u.DateCreated, u.Activated,
+                                                                u.FirstName, u.LastName,um.FirstName, um.LastName,co.Name";
+
+
 
         public static string AdvertiserForSalesTeamResultQuery => @"SELECT item.UserId,item.RoleId,item.Email,item.FirstName,item.LastName,
                                                   ISNULL(camp.NoOfactivecampaign, 0) AS NoOfactivecampaign,ISNULL(co.Name, 'N/A') AS CountryName,

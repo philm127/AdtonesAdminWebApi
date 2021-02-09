@@ -144,6 +144,22 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+
+        public async Task<IEnumerable<AdvertiserDashboardResult>> GetSalesExecForAdminDashboard()
+        {
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.Query<AdvertiserDashboardResult>(UserDashboardQuery.SalesExecForAdminResultQuery));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<IEnumerable<AdvertiserDashboardResult>> GetAdvertiserDashboardForSales(int userId = 0)
         {
             var sb = new StringBuilder(UserDashboardQuery.SalesManagerAdvertiserResultQuery);

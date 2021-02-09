@@ -31,3 +31,6 @@ exit
 git checkout master
 git merge advertiserManagement
 exit
+git checkout master
+git merge loggingService
+exit
