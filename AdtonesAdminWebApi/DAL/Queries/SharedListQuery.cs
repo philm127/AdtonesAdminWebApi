@@ -16,7 +16,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string GetOperators => @"SELECT c.OperatorId AS Value,c.OperatorName AS Text FROM Operators AS c WHERE IsActive=1";
 
-        public static string GetAdvertCategory => @"SELECT AdvertCategoryId AS Value, Name AS Text FROM AdvertCategories;";
+        public static string GetAdvertCategory => @"SELECT AdvertCategoryId AS Value, Name AS Text FROM AdvertCategories WHERE CountryId=@Id;";
 
         public static string GetCampaignCategory => @"SELECT CampaignCategoryId AS Value, CategoryName AS Text FROM CampaignCategory WHERE Active=1;";
 
@@ -56,6 +56,12 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         public static string GetClientList => @"SELECT Id AS Value,Name AS Text FROM Client WHERE UserId=@Id ";
+
+
+        public static string GetPaymentTypeList => @"SELECT Id AS Value, Name AS Text FROM PaymentMethod";
+
+
+        public static string GetQuestionSubject => @"SELECT SubjectId AS Value, Name AS Text FROM QuestionSubject";
 
     }
 }

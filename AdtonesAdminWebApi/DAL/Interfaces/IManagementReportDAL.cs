@@ -17,7 +17,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<ManRepUsers> GetManReportsForUsers(ManagementReportsSearch search, string query, int ops, string conn);
         Task<IEnumerable<int>> GetAllOperators();
         Task<IEnumerable<string>> GetOperatorNames(ManagementReportsSearch search);
-        Task<TwoDigitsManRep> GetreportDoubleInts(ManagementReportsSearch search, string query, int ops, string conn);
+        Task<TwoDigitsManRep> GetreportDoubleInts(ManagementReportsSearch search, string query, int ops, string conn, bool useOpId = false);
         Task<RewardsManModel> GetReportRewards(ManagementReportsSearch search, string query, int ops, string conn);
     }
 }

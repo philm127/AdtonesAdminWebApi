@@ -73,6 +73,20 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        [HttpGet("v1/GetTicketStatusList")]
+        public ReturnResult GetTicketStatusList()
+        {
+            return _sharedList.GetTicketStatus();
+        }
+
+
+        [HttpGet("v1/GetTicketSubjectList")]
+        public async Task<ReturnResult> GetTicketSubjectList()
+        {
+            return await _sharedList.GetTicketSubjectList();
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -81,6 +95,13 @@ namespace AdtonesAdminWebApi.Controllers
         public async Task<ReturnResult> GetClientList(int userId)
         {
             return await _sharedList.GetClientList(userId);
+        }
+
+
+        [HttpGet("v1/FillPaymentTypeDropDown")]
+        public async Task<ReturnResult> FillPaymentTypeDropDown()
+        {
+            return await _sharedList.FillPaymentTypeDropdown();
         }
 
 
@@ -118,10 +139,15 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [HttpGet("v1/FillAdvertCategoryDropDown")]
-        public async Task<ReturnResult> FillAdvertCategoryDropDown()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">countryId</param>
+        /// <returns></returns>
+        [HttpGet("v1/FillAdvertCategoryDropDown/{id}")]
+        public async Task<ReturnResult> FillAdvertCategoryDropDown(int id)
         {
-            return await _sharedList.GetAdvertCategoryDropDown();
+            return await _sharedList.GetAdvertCategoryDropDown(id);
         }
 
 

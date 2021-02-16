@@ -194,9 +194,8 @@ namespace AdtonesAdminWebApi.Services
                 _logServ.PageName = PageName;
                 _logServ.ProcedureName = "GetAgent";
                 _logServ.LogError();
-                
+                return ex.Message.ToString();
             }
-            return "error";
         }
 
 

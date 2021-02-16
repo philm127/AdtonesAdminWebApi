@@ -157,7 +157,40 @@ namespace AdtonesAdminWebApi.DAL.Shared
         }
 
 
-        public async Task<IEnumerable<SharedSelectListViewModel>> GetAdvertCategory()
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetPaymentTypeList()
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connStr))
+                {
+                    connection.Open();
+                    return await connection.QueryAsync<SharedSelectListViewModel>(SharedListQuery.GetPaymentTypeList);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetTicketSubjectList()
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connStr))
+                {
+                    connection.Open();
+                    return await connection.QueryAsync<SharedSelectListViewModel>(SharedListQuery.GetQuestionSubject);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<SharedSelectListViewModel>> GetAdvertCategory(int countryId)
         {
 
             try
@@ -165,7 +198,7 @@ namespace AdtonesAdminWebApi.DAL.Shared
                 using (var connection = new SqlConnection(_connStr))
                 {
                     connection.Open();
-                    return await connection.QueryAsync<SharedSelectListViewModel>(SharedListQuery.GetAdvertCategory);
+                    return await connection.QueryAsync<SharedSelectListViewModel>(SharedListQuery.GetAdvertCategory, new { Id = countryId });
                 }
             }
             catch

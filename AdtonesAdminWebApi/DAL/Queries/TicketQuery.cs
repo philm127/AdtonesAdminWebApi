@@ -18,7 +18,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 LEFT JOIN CampaignProfile AS camp ON camp.CampaignProfileId=q.CampaignProfileId
                                                 LEFT JOIN QuestionSubject AS qs ON qs.SubjectId=q.SubjectId
                                                 LEFT JOIN Operators AS op ON camp.CountryId=op.CountryId
-                                                LEFT JOIN PaymentMethod AS pay ON pay.Id=q.PaymentMethodId";
+                                                LEFT JOIN PaymentMethod AS pay ON pay.Id=q.PaymentMethodId
+                                                WHERE q.Status < 4 ";
 
 
         public static string GetTicketDatatableForSales => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,ISNULL(pay.Name,'-') AS PaymentMethod,
@@ -41,7 +42,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 	                                                        (SELECT AdvertiserId,SalesExecId FROM Advertisers_SalesTeam WHERE IsActive=1) AS sales 
                                                         ON q.UserId=sales.AdvertiserId 
                                                         LEFT JOIN Users AS sexcs ON sexcs.UserId=sales.SalesExecId 
-                                                        WHERE u.RoleId=3 ";
+                                                        WHERE u.RoleId=3 AND q.Status < 4";
 
 
         public static string GetOperatorLoadTicketTable => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,q.ClientId,qs.Name AS QuestionSubject,
@@ -59,8 +60,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                     (SELECT UserId FROM Contacts WHERE CountryId IN
                                                                     (SELECT CountryId FROM Operators WHERE OperatorId=@operatorId)))
                                                 AND q.SubjectId IN(@opadrev,@cred,@aderr,@adreview)
-                                                AND q.Status < 4
-                                                ORDER BY q.Id DESC;";
+                                                AND q.Status < 4 ";
 
         public static string GetTicketDetails => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,q.ClientId,PaymentMethodId,ISNULL(pay.Name,'-') AS PaymentMethod,
                                                     ISNULL(CONCAT(u.FirstName,' ',u.LastName), '-') AS UserName,
@@ -88,9 +88,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                 WHERE qc.QuestionId=@questionId ORDER BY qc.Id DESC";
         
         
-        public static string UpdateTicketStatus => "UPDATE Question SET UpdatedDate=GETDATE(),UpdatedBy=@UpdatedBy,Status=@Status,LastResponseDateTime=GETDATE() where Id= @Id";
-
-
         public static string CreateNewHelpTicket => @"INSERT INTO dbo.Question(UserId,QNumber,SubjectId,ClientId,CampaignProfileId,PaymentMethodId,
                                                         Title,Description,CreatedDate,UpdatedDate,Status,Email,AdvertId,LastResponseDateTimeByUser,
                                                         LastResponseDateTime,UpdatedBy)
@@ -114,6 +111,10 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string InsertCommentImage => @"INSERT INTO QuestionCommentImages(QuestionCommentId,UploadImages) VALUES(@QuestionCommentId,@UploadImages)";
 
 
+        public static string GetEmailForLiveServer => @"SELECT u.Email FROM QuestionComment AS c 
+                                                        INNER JOIN Users AS u ON u.UserId=c.UserId
+                                                         WHERE u.RoleId NOT IN(1,6,4,5) AND c.QuestionId=@Id";
     }
 
 }
+

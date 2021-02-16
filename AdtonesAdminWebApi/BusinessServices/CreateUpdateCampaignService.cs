@@ -239,7 +239,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     _logServ.PageName = PageName;
                     _logServ.ProcedureName = "CreateNewCampaign - AddDataToMain";
                     await _logServ.LogError();
-                    
+                    result.error = ex.Message.ToString();
                     result.result = 0;
                     return result;
                 }
@@ -254,7 +254,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     _logServ.PageName = PageName;
                     _logServ.ProcedureName = "CreateNewCampaign - Update Time Settings";
                     await _logServ.LogError();
-                    
+                    result.error = ex.Message.ToString();
                     result.result = 0;
                     return result;
                 }
@@ -271,7 +271,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     _logServ.PageName = PageName;
                     _logServ.ProcedureName = "CreateNewCampaign - AddUserMatch Data";
                     await _logServ.LogError();
-                    
+                    result.error = ex.Message.ToString();
                     result.result = 0;
                     return result;
                 }
@@ -286,7 +286,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     _logServ.PageName = PageName;
                     _logServ.ProcedureName = "CreateNewCampaign - PrematchProcessForCampaign";
                     await _logServ.LogError();
-                    
+                    result.error = ex.Message.ToString();
                     result.result = 0;
                     return result;
                 }
@@ -302,8 +302,9 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logServ.PageName = PageName;
                 _logServ.ProcedureName = "CreateNewCampaign";
                 await _logServ.LogError();
-                
+                result.error = ex.Message.ToString();
                 result.result = 0;
+                return result;
             }
             return result;
         }
@@ -509,8 +510,9 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logServ.PageName = PageName;
                 _logServ.ProcedureName = "CreateNewCampaign_Advert - Insert CampaignAdvert";
                 await _logServ.LogError();
-                
+                result.error = ex.Message.ToString();
                 result.result = 0;
+                return result;
             }
             #endregion
 
@@ -547,6 +549,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 await _logServ.LogError();
                 
                 result.result = 0;
+                return result;
             }
 
             try
@@ -651,7 +654,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public async Task<ReturnResult> CheckIfCampaignNameExists(NewCampaignProfileFormModel model)
         {
-
+            // Actually uses advertiser Id
             var CampaignNameexists = await _campaignDAL.CheckCampaignNameExists(model.CampaignName, model.UserId);
 
             if (CampaignNameexists)

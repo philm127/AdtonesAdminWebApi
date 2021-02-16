@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -19,14 +20,19 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly ITicketDAL _ticketDAL;
         private readonly ISaveGetFiles _saveFile;
         private readonly ILoggingService _logServ;
+        private readonly ILiveAgentService _agentService;
+        private readonly IConfiguration _configuration;
         const string PageName = "TicketService";
 
-        public TicketService(IHttpContextAccessor httpAccessor, ITicketDAL ticketDAL, ISaveGetFiles saveFile, ILoggingService logServ)
+        public TicketService(IHttpContextAccessor httpAccessor, ITicketDAL ticketDAL, ISaveGetFiles saveFile, ILoggingService logServ,
+                        ILiveAgentService agentService, IConfiguration configuration)
         {
             _httpAccessor = httpAccessor;
             _ticketDAL = ticketDAL;
             _saveFile = saveFile;
             _logServ = logServ;
+            _agentService = agentService;
+            _configuration = configuration;
         }
 
 
@@ -56,7 +62,23 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 result.body = await _ticketDAL.UpdateTicketStatus(question);
-                return result;
+                if(status == 3)
+                {
+                    var item = await _ticketDAL.GetTicketDetails(id);
+                    string email = "";
+
+                    email = await _ticketDAL.GetEmailForLiveServer(id);
+
+                    if (email == null || email.Length == 0)
+                        email = item.Email;
+
+                    var test = _configuration.GetValue<string>("Environment:Location");
+                    if (test != "development")
+                    {
+                        string agentEmail = _agentService.GetAgent();
+                        string ticketCode = _agentService.ReplyTicket(item.QuestionTitle, item.Description, email, "R", agentEmail, (int)Enums.UserRole.Admin);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -71,12 +93,52 @@ namespace AdtonesAdminWebApi.BusinessServices
             return result;
         }
 
+
+        //public async Task<ReturnResult> CloseQuestion(int questionId)
+        //{
+        //    var item = await _ticketDAL.GetTicketDetails(questionId);
+        //    var question = new TicketListModel();
+        //    question.Status = (int)Enums.QuestionStatus.Closed;
+        //    question.UpdatedBy = _httpAccessor.GetUserIdFromJWT();
+        //    question.Id = questionId;
+
+        //    try
+        //    {
+        //        result.body = await _ticketDAL.UpdateTicketStatus(question);
+        //        string email = "";
+
+        //        email = await _ticketDAL.GetEmailForLiveServer(questionId);
+
+        //        if (email == null || email.Length == 0)
+        //            email = item.Email;
+
+        //        var test = _configuration.GetValue<string>("Environment:Location");
+        //        if (test != "development")
+        //        {
+        //            string agentEmail = _agentService.GetAgent();
+        //            string ticketCode = _agentService.ReplyTicket(item.QuestionTitle, item.Description, email, "R", agentEmail, (int)Enums.UserRole.Admin);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logServ.ErrorMessage = ex.Message.ToString();
+        //        _logServ.StackTrace = ex.StackTrace.ToString();
+        //        _logServ.PageName = PageName;
+        //        _logServ.ProcedureName = "CloseTicket";
+        //        await _logServ.LogError();
+
+        //        result.result = 0;
+        //    }
+        //    return result;
+        //}
+
+
         public async Task<ReturnResult> GetTicketList(int id = 0)
         {
             var roleName = _httpAccessor.GetRoleFromJWT();
 
-                if (roleName.ToLower().Contains("operator"))
-                    return await GetOperatorTicketList();
+                //if (roleName.ToLower().Contains("operator"))
+                //    return await GetOperatorTicketList();
 
                 try
                 {
@@ -93,6 +155,34 @@ namespace AdtonesAdminWebApi.BusinessServices
                     result.result = 0;
                 }
             
+            return result;
+        }
+
+
+        public async Task<ReturnResult> GetTicketListAsync(PagingSearchClass paging)
+        {
+            var roleName = _httpAccessor.GetRoleFromJWT();
+
+            if (roleName.ToLower().Contains("operator"))
+                return await GetOperatorTicketList(paging);
+
+            try
+            {
+                var res = await _ticketDAL.GetTicketListAsync(paging);
+                result.recordcount = res.Count();
+                result.body = res.Skip(paging.page * paging.pageSize).Take(paging.pageSize);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetTicketListAsync";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+
             return result;
         }
 
@@ -152,16 +242,15 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetOperatorTicketList(int operatorId = 0)
+        public async Task<ReturnResult> GetOperatorTicketList(PagingSearchClass paging)
         {
-            if(operatorId == 0)
-            {
-                operatorId = _httpAccessor.GetOperatorFromJWT();
-            }
+                paging.elementId = _httpAccessor.GetOperatorFromJWT();
 
             try
             {
-                result.body = await _ticketDAL.GetOperatorTicketList(operatorId);
+                var res = await _ticketDAL.GetOperatorTicketList(paging);
+                result.recordcount = res.Count();
+                result.body = res.Skip(paging.page * paging.pageSize).Take(paging.pageSize);
             }
             catch (Exception ex)
             {
@@ -190,7 +279,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 // If updated by and userid are same will update as user.
                 // If not will update as Admin or other than original user.
-                var x = await _ticketDAL.UpdateTicketByUser(ticket);
+                var x = await _ticketDAL.UpdateTicketStatus(ticket);
 
                 model.UserId = userId;
 

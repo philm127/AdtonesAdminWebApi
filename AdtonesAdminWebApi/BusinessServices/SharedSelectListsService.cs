@@ -97,11 +97,11 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetAdvertCategoryDropDown()
+        public async Task<ReturnResult> GetAdvertCategoryDropDown(int countryId)
         {
             try
             {
-                result.body = await _sharedDal.GetAdvertCategory();
+                result.body = await _sharedDal.GetAdvertCategory(countryId);
             }
             catch (Exception ex)
             {
@@ -183,6 +183,27 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> GetTicketSubjectList()
+        {
+
+            try
+            {
+                result.body = await _sharedDal.GetTicketSubjectList();
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetTicketSubjectList";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
+        }
+
+
         public ReturnResult GetUserRole()
         {
             IEnumerable<UserRole> userroleTypes = Enum.GetValues(typeof(UserRole))
@@ -207,6 +228,20 @@ namespace AdtonesAdminWebApi.BusinessServices
                         Text = action.ToString(),
                         Value = ((int)action).ToString()
                     }).ToList();
+            return result;
+        }
+
+
+        public ReturnResult GetTicketStatus()
+        {
+            IEnumerable<QuestionStatus> userTypes = Enum.GetValues(typeof(QuestionStatus))
+                                                     .Cast<QuestionStatus>();
+            result.body = (from action in userTypes
+                           select new SharedSelectListViewModel
+                           {
+                               Text = action.ToString(),
+                               Value = ((int)action).ToString()
+                           }).ToList();
             return result;
         }
 
@@ -372,6 +407,26 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logServ.ProcedureName = "FillUserPaymentDropdown";
                 await _logServ.LogError();
                 
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        public async Task<ReturnResult> FillPaymentTypeDropdown()
+        {
+            try
+            {
+                result.body = await _sharedDal.GetPaymentTypeList();
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "FillPaymentTypeDropdown";
+                await _logServ.LogError();
+
                 result.result = 0;
             }
             return result;

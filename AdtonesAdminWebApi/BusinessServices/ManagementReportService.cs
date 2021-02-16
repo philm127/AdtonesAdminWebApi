@@ -299,14 +299,14 @@ namespace AdtonesAdminWebApi.BusinessServices
                             try
                             {
                                 /// Subscribers
-                                Task<ManRepUsers> totUser = _reportDAL.GetManReportsForUsers(search, ManagementReportQuery.TotalUsers, op, constring);
-                                Task<TwoDigitsManRep> totListen = _reportDAL.GetreportDoubleInts(search, ManagementReportQuery.TotalListened, op, constring);
+                                Task<ManRepUsers> totUser = _reportDAL.GetManReportsForUsers(search, ManagementReportQuery.TotalUsers, op, mainConstring);
+                                Task<TwoDigitsManRep> totListen = _reportDAL.GetreportDoubleInts(search, ManagementReportQuery.TotalListened, op, mainConstring,true);
                                 
                                 try
                                 {
                                     /// Campaigns & Adverts
-                                    Task<TwoDigitsManRep> totads = _reportDAL.GetreportDoubleInts(search, ManagementReportQuery.TotalAdsProvisioned, op, constring);
-                                    Task<TwoDigitsManRep> totCam = _reportDAL.GetreportDoubleInts(search, ManagementReportQuery.TotalLiveCampaign, op, constring);
+                                    Task<TwoDigitsManRep> totads = _reportDAL.GetreportDoubleInts(search, ManagementReportQuery.TotalAdsProvisioned, op, mainConstring, true);
+                                    Task<TwoDigitsManRep> totCam = _reportDAL.GetreportDoubleInts(search, ManagementReportQuery.TotalLiveCampaign, op, mainConstring, true);
                                     
                                     try
                                     {
@@ -691,20 +691,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        //private string GetCurrencySymbol(string currencyCode)
-        //{
-        //    switch (currencyCode)
-        //    {
-        //        case "GBP": return "£";
-        //        case "USD": return "$";
-        //        case "XOF": return "CFA";
-        //        case "EUR": return "€";
-        //        case "KES": return "Ksh";
-        //        default: return "£";
-        //    }
-        //}
-
-        
         private async Task<TotalCostCredit> CalculateConvertedSpendCredit(List<SpendCredit> creditList, ManagementReportsSearch search)
         {
             TotalCostCredit campaignAudit = new TotalCostCredit();
@@ -733,42 +719,56 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logServ.PageName = PageName;
                 _logServ.ProcedureName = "CalculateConvertedSpendCredit";
                 await _logServ.LogError();
-                
+
             }
 
             return campaignAudit;
         }
 
-        //private async Task<List<CurrencyListing>> GetConvertedCurrency(List<SpendCredit> creditList)
-        //{
-        //    string toCurrencyCode = "GBP";
-        //    var currency = creditList.Select(y => y.CurrencyCode).Distinct().ToList();
-        //    if (!currency.Contains("GBP"))
-        //        currency.Add("GBP");
-
-        //    var clList = new List<CurrencyListing>();
-        //    foreach (string cur in currency)
-        //    {
-        //        var cl = new CurrencyListing();
-
-        //        if (cur == "GBP")
-        //        {
-        //            cl.CurrencyCode = "GBP";
-        //            cl.CurrencyRate = 1;
-        //            clList.Add(cl);
-        //        }
-        //        else
-        //        {
-        //            cl.CurrencyCode = cur;
-
-        //            cl.CurrencyRate = GetCurrencyRateModel(cur, toCurrencyCode);
-        //            clList.Add(cl);
-        //        }
-        //    }
-        //    return clList;
-        //}
-
-
-
     }
 }
+
+//private string GetCurrencySymbol(string currencyCode)
+//{
+//    switch (currencyCode)
+//    {
+//        case "GBP": return "£";
+//        case "USD": return "$";
+//        case "XOF": return "CFA";
+//        case "EUR": return "€";
+//        case "KES": return "Ksh";
+//        default: return "£";
+//    }
+//}
+
+
+
+//private async Task<List<CurrencyListing>> GetConvertedCurrency(List<SpendCredit> creditList)
+//{
+//    string toCurrencyCode = "GBP";
+//    var currency = creditList.Select(y => y.CurrencyCode).Distinct().ToList();
+//    if (!currency.Contains("GBP"))
+//        currency.Add("GBP");
+
+//    var clList = new List<CurrencyListing>();
+//    foreach (string cur in currency)
+//    {
+//        var cl = new CurrencyListing();
+
+//        if (cur == "GBP")
+//        {
+//            cl.CurrencyCode = "GBP";
+//            cl.CurrencyRate = 1;
+//            clList.Add(cl);
+//        }
+//        else
+//        {
+//            cl.CurrencyCode = cur;
+
+//            cl.CurrencyRate = GetCurrencyRateModel(cur, toCurrencyCode);
+//            clList.Add(cl);
+//        }
+//    }
+//    return clList;
+//}
+

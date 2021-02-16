@@ -10,7 +10,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int elementId { get; set; }
         public int page { get; set; } = 1;
         public int pageSize { get; set; } = 20;
-        public string sort { get; set; } = "PlayLengthTicks";
+        public string sort { get; set; }
         public string direction { get; set; } = "ASC";
 
         public string search { get; set; }
@@ -29,8 +29,8 @@ namespace AdtonesAdminWebApi.ViewModels
         public string Operator { get; set; }
         public string country { get; set; }
         public string TypeName { get; set; }
-        public DateTime DateFrom { get; set; }
-        public DateTime DateTo { get; set; }
+        public DateTime? DateFrom { get; set; }
+        public DateTime? DateTo { get; set; }
         public double? NumberFrom { get; set; }
         public double? NumberTo { get; set; }
         public double? NumberFrom2 { get; set; }

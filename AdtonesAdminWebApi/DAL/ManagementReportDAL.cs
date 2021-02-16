@@ -69,10 +69,23 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
-
-        public async Task<TwoDigitsManRep> GetreportDoubleInts(ManagementReportsSearch search, string query, int ops, string conn)
+        /// <summary>
+        /// For brevity gets two intergers of varying values depending on the SELECT script that is passed in
+        /// </summary>
+        /// <param name="search">The search based parameters</param>
+        /// <param name="query">The SQL SELECT script to be used</param>
+        /// <param name="ops">The operator Id</param>
+        /// <param name="conn">The connection string to be used</param>
+        /// <param name="useOpId">If is the main connection string uses the operator Id as passed otherwise will get the operator Id from the relevant connection string</param>
+        /// <returns></returns>
+        public async Task<TwoDigitsManRep> GetreportDoubleInts(ManagementReportsSearch search, string query, int ops, string conn, bool useOpId = false)
         {
-            var op = await _connService.GetOperatorIdFromAdtoneId(ops);
+            int op = 0;
+            if (useOpId)
+                op = ops;
+            else
+                op = await _connService.GetOperatorIdFromAdtoneId(ops);
+
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(query);
@@ -115,11 +128,11 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<ManRepUsers> GetManReportsForUsers(ManagementReportsSearch search, string query, int ops, string conn)
         {
             
-            var op = await _connService.GetOperatorIdFromAdtoneId(ops);
+            //var op = await _connService.GetOperatorIdFromAdtoneId(ops);
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(query);
-            builder.AddParameters(new { searchOperators = op});
+            builder.AddParameters(new { searchOperators = ops});
             // builder.AddParameters(new { searchOperators = search.operators.ToArray() });
              builder.AddParameters(new { start = search.FromDate });
              builder.AddParameters(new { end = search.ToDate });
