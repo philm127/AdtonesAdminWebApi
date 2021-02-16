@@ -166,6 +166,7 @@
   <ItemGroup>
     <Folder Include="Handlers\" />
     <Folder Include="Logging\" />
+    <Folder Include="Media\" />
   </ItemGroup>
 
   <ItemGroup>
