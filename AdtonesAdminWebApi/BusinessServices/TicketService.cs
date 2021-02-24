@@ -94,44 +94,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        //public async Task<ReturnResult> CloseQuestion(int questionId)
-        //{
-        //    var item = await _ticketDAL.GetTicketDetails(questionId);
-        //    var question = new TicketListModel();
-        //    question.Status = (int)Enums.QuestionStatus.Closed;
-        //    question.UpdatedBy = _httpAccessor.GetUserIdFromJWT();
-        //    question.Id = questionId;
-
-        //    try
-        //    {
-        //        result.body = await _ticketDAL.UpdateTicketStatus(question);
-        //        string email = "";
-
-        //        email = await _ticketDAL.GetEmailForLiveServer(questionId);
-
-        //        if (email == null || email.Length == 0)
-        //            email = item.Email;
-
-        //        var test = _configuration.GetValue<string>("Environment:Location");
-        //        if (test != "development")
-        //        {
-        //            string agentEmail = _agentService.GetAgent();
-        //            string ticketCode = _agentService.ReplyTicket(item.QuestionTitle, item.Description, email, "R", agentEmail, (int)Enums.UserRole.Admin);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logServ.ErrorMessage = ex.Message.ToString();
-        //        _logServ.StackTrace = ex.StackTrace.ToString();
-        //        _logServ.PageName = PageName;
-        //        _logServ.ProcedureName = "CloseTicket";
-        //        await _logServ.LogError();
-
-        //        result.result = 0;
-        //    }
-        //    return result;
-        //}
-
 
         public async Task<ReturnResult> GetTicketList(int id = 0)
         {

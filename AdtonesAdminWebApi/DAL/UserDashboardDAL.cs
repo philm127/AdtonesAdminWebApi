@@ -11,6 +11,7 @@ using AdtonesAdminWebApi.DAL.Queries;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using AdtonesAdminWebApi.Services;
+using Newtonsoft.Json;
 
 namespace AdtonesAdminWebApi.DAL
 {
@@ -101,12 +102,24 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<SubscriberDashboardResult>> GetSubscriberDashboard()
+        public async Task<IEnumerable<SubscriberDashboardResult>> GetSubscriberDashboard(PagingSearchClass paging, string conn)
         {
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+
+            sb.Append(UserDashboardQuery.SubscriberResultQuery);
+
+            var searched = CreateSeachParams(sb, builder, paging);
+
+            sb = searched.Item1;
+            builder = searched.Item2;
+
+            var select = builder.AddTemplate(sb.ToString());
+
             try
             {
-                return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<SubscriberDashboardResult>(UserDashboardQuery.SubscriberResultQuery));
+                return await _executers.ExecuteCommand(conn,
+                                    conn => conn.Query<SubscriberDashboardResult>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -184,6 +197,67 @@ namespace AdtonesAdminWebApi.DAL
 
 
         #endregion
+
+
+        private (StringBuilder sbuild, SqlBuilder build) CreateSeachParams(StringBuilder sb, SqlBuilder builder, PagingSearchClass param)
+        {
+            PageSearchModel searchList = null;
+
+            if (param.search != null && param.search.Length > 3)
+            {
+                searchList = JsonConvert.DeserializeObject<PageSearchModel>(param.search);
+
+                if (searchList.fullName != null)
+                {
+                    string likefull = searchList.fullName + "%";
+                    sb.Append(" AND CONCAT(u.FirstName,' ',u.LastName) LIKE @likefull ");
+                    builder.AddParameters(new { likefull = likefull });
+                }
+
+                if (searchList.DateFrom != null && (searchList.DateTo == null || searchList.DateTo >= searchList.DateFrom))
+                {
+                    sb.Append(" AND u.DateCreated >= @datefrom ");
+                    builder.AddParameters(new { datefrom = searchList.DateFrom });
+                }
+
+                if (searchList.DateTo != null && (searchList.DateFrom == null || searchList.DateFrom <= searchList.DateTo))
+                {
+                    sb.Append(" AND u.DateCreated <= @dateto");
+                    builder.AddParameters(new { dateto = searchList.DateTo });
+                }
+
+                if (searchList.Name != null)
+                {
+                    string likeMsisdn = searchList.Name + "%";
+                    sb.Append(" AND p.MSISDN LIKE @likeMsisdn ");
+                    builder.AddParameters(new { likeMsisdn = likeMsisdn });
+                }
+
+                if (searchList.Email != null)
+                {
+                    var likeMail = searchList.Email;
+                    sb.Append(" AND u.Email=@likeMail ");
+                    builder.AddParameters(new { likeMail = likeMail });
+                }
+
+
+                if (searchList.Status != null)
+                {
+                    int stat = 0;
+                    Enums.QuestionStatus choice;
+                    if (Enums.UserStatus.TryParse(searchList.Status, out choice))
+                    {
+                        stat = (int)choice;
+                        sb.Append(" AND u.Activated = @status ");
+                        builder.AddParameters(new { status = stat });
+                    }
+                }
+
+            }
+
+            return (sb, builder);
+        }
+
 
     }
 }

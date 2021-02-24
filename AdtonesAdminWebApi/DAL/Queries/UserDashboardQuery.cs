@@ -171,11 +171,12 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
 
-        public static string SubscriberResultQuery => @"SELECT u.UserId,u.Activated,u.DateCreated,FirstName,LastName,p.MSISDN,u.OperatorName,u.Email,u.Activated
+        public static string SubscriberResultQuery => @"SELECT u.UserId,u.Activated,u.DateCreated,FirstName,LastName,p.MSISDN,op.OperatorName,u.Email,u.Activated,
+                                                  co.Name AS CountryName
                                                   FROM Users AS u LEFT JOIN UserProfile AS p ON p.UserId=u.UserId
                                                   INNER JOIN Operators AS op ON op.OperatorId=u.OperatorId
-                                                  WHERE u.RoleId=2 AND u.VerificationStatus=1 AND u.OperatorId IS NOT NULL
-                                                  ORDER BY u.DateCreated DESC;";
+                                                  INNER JOIN Country AS co ON co.Id=op.CountryId
+                                                  WHERE u.RoleId=2 AND u.VerificationStatus=1 ";
 
 
 

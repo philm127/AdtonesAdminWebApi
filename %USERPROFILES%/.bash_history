@@ -34,3 +34,10 @@ exit
 git checkout master
 git merge loggingService
 exit
+git add -A && git commit -m "changes to tickets an updated advert category"
+git checkout master
+git merge ticketChanges
+git push
+exit
+git checkout -b advertAdmin
+exit

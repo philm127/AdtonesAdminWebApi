@@ -1,23 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.ViewModels;
-using System;
-using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using AdtonesAdminWebApi.Model;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Security.Claims;
-using System.Linq;
-using System.IO;
-using Microsoft.Extensions.FileProviders;
-using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace AdtonesAdminWebApi.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     [ApiController]
     public class SharedListController : ControllerBase
     {
@@ -34,7 +24,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <returns>body contains List SharedSelectListViewModel</returns>
         [HttpGet("v1/GetCountryList")]
-        public async Task<ReturnResult> GetCountryList()
+        public async Task<ActionResult<ReturnResult>> GetCountryList()
         {
             return await _sharedList.GetCountryList();
         }
@@ -56,7 +46,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <returns>body contains List SharedSelectListViewModel</returns>
         [HttpGet("v1/GetUserPermissionList")]
-        public async Task<ReturnResult> GetUserPermissionList()
+        public async Task<ActionResult<ReturnResult>> GetUserPermissionList()
         {
             return await _sharedList.GetUsersWPermissions();
         }
@@ -81,7 +71,7 @@ namespace AdtonesAdminWebApi.Controllers
 
 
         [HttpGet("v1/GetTicketSubjectList")]
-        public async Task<ReturnResult> GetTicketSubjectList()
+        public async Task<ActionResult<ReturnResult>> GetTicketSubjectList()
         {
             return await _sharedList.GetTicketSubjectList();
         }
@@ -92,14 +82,14 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <returns>body contains List SharedSelectListViewModel</returns>
         [HttpGet("v1/GetClientList/{id}")]
-        public async Task<ReturnResult> GetClientList(int userId)
+        public async Task<ActionResult<ReturnResult>> GetClientList(int id)
         {
-            return await _sharedList.GetClientList(userId);
+            return await _sharedList.GetClientList(id);
         }
 
 
         [HttpGet("v1/FillPaymentTypeDropDown")]
-        public async Task<ReturnResult> FillPaymentTypeDropDown()
+        public async Task<ActionResult<ReturnResult>> FillPaymentTypeDropDown()
         {
             return await _sharedList.FillPaymentTypeDropdown();
         }
@@ -111,7 +101,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// <param name="id">CountryId</param>
         /// <returns>body contains List SharedSelectListViewModel</returns>
         [HttpGet("v1/GetOperatorList/{id}")]
-        public async Task<ReturnResult> GetOperatorList(int id = 0)
+        public async Task<ActionResult<ReturnResult>> GetOperatorList(int id = 0)
         {
             return await _sharedList.GetOperatorList(id);
         }
@@ -124,7 +114,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// <returns>body contains List SharedSelectListViewModel
         /// or a single one if id entered</returns>
         [HttpGet("v1/GetCurrencyList/{id}")]
-        public async Task<ReturnResult> GetCurrencyList(int id)
+        public async Task<ActionResult<ReturnResult>> GetCurrencyList(int id)
         {
             //_sharedList.CurrentUserId = int.Parse(User.FindFirst("userId")?.Value);
             // _sharedList.RoleName = User.FindFirst(ClaimTypes.Role)?.Value;
@@ -133,7 +123,7 @@ namespace AdtonesAdminWebApi.Controllers
 
 
         [HttpGet("v1/FillOrganisationTypeDropDown")]
-        public async Task<ReturnResult> FillOrganisationTypeDropDown()
+        public async Task<ActionResult<ReturnResult>> FillOrganisationTypeDropDown()
         {
             return await _sharedList.GetOrganisationTypeDropDown();
         }
@@ -145,16 +135,21 @@ namespace AdtonesAdminWebApi.Controllers
         /// <param name="id">countryId</param>
         /// <returns></returns>
         [HttpGet("v1/FillAdvertCategoryDropDown/{id}")]
-        public async Task<ReturnResult> FillAdvertCategoryDropDown(int id)
+        public async Task<ActionResult<ReturnResult>> FillAdvertCategoryDropDown(int id)
         {
             return await _sharedList.GetAdvertCategoryDropDown(id);
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">countryId</param>
+        /// <returns></returns>
         [HttpGet("v1/FillCampaignCategoryDropDown/{id}")]
-        public async Task<ReturnResult> FillCampaignCategoryDropDown(int countryId)
+        public async Task<ActionResult<ReturnResult>> FillCampaignCategoryDropDown(int id)
         {
-            return await _sharedList.GetCampaignCategoryDropDown(countryId);
+            return await _sharedList.GetCampaignCategoryDropDown(id);
         }
 
         /// <summary>
@@ -163,7 +158,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// <returns>body contains 3 List SharedSelectListViewModel
         /// Country, Currency and Credit Users</returns>
         [HttpGet("v1/GetUserDetailCreditList")]
-        public async Task<ReturnResult> GetUserDetailCreditList()
+        public async Task<ActionResult<ReturnResult>> GetUserDetailCreditList()
         {
             return await _sharedList.GetUserDetailCreditList();
         }
@@ -174,7 +169,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <returns>body contains List SharedSelectListViewModel</returns>
         [HttpGet("v1/GetAddUserCreditList")]
-        public async Task<ReturnResult> GetAddUserCreditList()
+        public async Task<ActionResult<ReturnResult>> GetAddUserCreditList()
         {
             return await _sharedList.GetAddCreditUsersList();
         }
@@ -186,7 +181,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// <returns>body contains List SharedSelectListViewModel
         /// or a single one if id entered</returns>
         [HttpGet("v1/GetUserCreditList")]
-        public async Task<ReturnResult> GetUserCreditList()
+        public async Task<ActionResult<ReturnResult>> GetUserCreditList()
         {
             return await _sharedList.GetUserCreditList();
         }
@@ -198,7 +193,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// <returns>body contains List SharedSelectListViewModel
         /// or a single one if id entered</returns>
         [HttpGet("v1/GetUsersnRoles")]
-        public async Task<ReturnResult> GetUsersnRoles()
+        public async Task<ActionResult<ReturnResult>> GetUsersnRoles()
         {
             return await _sharedList.GetUsersnRoles();
         }
@@ -208,7 +203,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <returns>body contains List SharedSelectListViewModel</returns>
         [HttpGet("v1/FillUserPaymentDropdown")]
-        public async Task<ReturnResult> FillUserPaymentDropdown()
+        public async Task<ActionResult<ReturnResult>> FillUserPaymentDropdown()
         {
             return await _sharedList.FillUserPaymentDropdown();
         }
@@ -219,7 +214,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// </summary>
         /// <returns>body contains List SharedSelectListViewModel</returns>
         [HttpGet("v1/FillCampaignDropdown/{id}")]
-        public async Task<ReturnResult> FillCampaignDropdown(int id=0)
+        public async Task<ActionResult<ReturnResult>> FillCampaignDropdown(int id=0)
         {
             return await _sharedList.FillCampaignDropdown(id);
         }

@@ -129,6 +129,7 @@ namespace AdtonesAdminWebApi
             services.AddTransient<ICurrencyConversion, CurrencyConversion> ();
             services.AddTransient<IAdvertEmail, AdvertEmail>();
             services.AddTransient<ILoggingService, LoggingService>();
+            services.AddScoped<ICreateInvoicePDF, CreateInvoicePDF>();
 
             #endregion
 

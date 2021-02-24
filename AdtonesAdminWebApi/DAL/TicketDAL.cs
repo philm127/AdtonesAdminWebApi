@@ -103,88 +103,11 @@ namespace AdtonesAdminWebApi.DAL
 
             sb.Append(TicketQuery.GetLoadTicketDatatable);
 
-            //PageSearchModel searchList = null;
-
-            //if (param.search != null && param.search.Length > 3)
-            //{
-            //    searchList = JsonConvert.DeserializeObject<PageSearchModel>(param.search);
-
-            //    if (searchList.fullName != null)
-            //    {
-            //        string likefull = searchList.fullName + "%";
-            //        sb.Append(" AND CONCAT(u.FirstName,' ',u.LastName) LIKE @likefull ");
-            //        builder.AddParameters(new { likefull = likefull });
-            //    }
-
-            //    if (searchList.Name != null)
-            //    {
-            //        string likeq = searchList.Name + "%";
-            //        sb.Append(" AND QNumber LIKE @qNumber ");
-            //        builder.AddParameters(new { qNumber = likeq });
-            //    }
-
-            //    if (searchList.Status != null)
-            //    {
-            //        int stat = 0;
-            //        Enums.QuestionStatus choice;
-            //        if (Enums.QuestionStatus.TryParse(searchList.Status, out choice))
-            //        {
-            //            stat = (int)choice;
-            //            sb.Append(" AND q.Status = @status ");
-            //            builder.AddParameters(new { status = stat });
-            //        }
-            //    }
-
-
-            //    if (searchList.responseFrom != null && (searchList.responseTo == null || searchList.responseTo >= searchList.responseFrom))
-            //    {
-            //        sb.Append(" AND LastResponseDateTime >= @startfrom ");
-            //        builder.AddParameters(new { startfrom = searchList.responseFrom });
-            //    }
-
-            //    if (searchList.responseTo != null && (searchList.responseFrom == null || searchList.responseFrom <= searchList.responseTo))
-            //    {
-            //        sb.Append(" AND LastResponseDateTime <= @startto");
-            //        builder.AddParameters(new { startto = searchList.responseTo });
-            //    }
-
-
-            //    if (searchList.DateFrom != null && (searchList.DateTo == null || searchList.DateTo >= searchList.DateFrom))
-            //    {
-            //        sb.Append(" AND q.CreatedDate >= @datefrom ");
-            //        builder.AddParameters(new { datefrom = searchList.DateFrom });
-            //    }
-
-            //    if (searchList.DateTo != null && (searchList.DateFrom == null || searchList.DateFrom <= searchList.DateTo))
-            //    {
-            //        sb.Append(" AND q.CreatedDate <= @dateto");
-            //        builder.AddParameters(new { dateto = searchList.DateTo });
-            //    }
-
-            //    if (searchList.Client != null)
-            //    {
-            //        string likeClient = searchList.Client + "%";
-            //        sb.Append(" AND cl.Name LIKE @likeClient ");
-            //        builder.AddParameters(new { likeClient = likeClient });
-            //    }
-
-
-            //    if (searchList.Payment != null && int.Parse(searchList.Payment) > 0)
-            //    {
-            //        var likePay = int.Parse(searchList.Payment);
-            //        sb.Append(" AND pay.Id = @likePay ");
-            //        builder.AddParameters(new { likePay = likePay });
-            //    }
-
-
-            //    if (searchList.TypeName != null)
-            //    {
-            //        var likeSub = int.Parse(searchList.TypeName);
-            //        sb.Append(" AND qs.SubjectId=@likeSub ");
-            //        builder.AddParameters(new { likeSub = likeSub });
-            //    }
-
-            //}
+            var role = _httpAccessor.GetRoleFromJWT();
+            if (role == Enums.UserRole.UserAdmin.ToString())
+                sb.Append(" AND u.RoleId = 2 ");
+            else if(role == Enums.UserRole.AdvertAdmin.ToString())
+                sb.Append(" AND q.SubjectId IN(3,10) ");
 
             var searched = CreateSeachParams(sb, builder, param);
 
@@ -205,91 +128,7 @@ namespace AdtonesAdminWebApi.DAL
 
             sb = CreateSortParams(sb,param);
 
-            //sb.Append(" ORDER BY ");
-
-            //switch (param.sort)
-            //{
-            //    case "userName":
-            //        if (param.direction.ToLower() == "asc")
-            //            sb.Append(" u.FirstName  ASC ");
-            //        else
-            //            sb.Append(" u.FirstName  DESC ");
-            //        break;
-            //    case "email":
-            //        if (param.direction.ToLower() == "asc")
-            //            sb.Append(" u.Email  ASC ");
-            //        else
-            //            sb.Append(" u.Email  DESC ");
-            //        break;
-            //    case "organisation":
-            //        if (param.direction.ToLower() == "asc")
-            //            sb.Append(" u.Organisation  ASC ");
-            //        else
-            //            sb.Append(" u.Organisation  DESC ");
-            //        break;
-            //    case "qNumber":
-            //        if (param.direction.ToLower() == "asc")
-            //            sb.Append(" QNumber  ASC ");
-            //        else
-            //            sb.Append(" QNumber  DESC ");
-            //        break;
-            //    case "clientName":
-            //        if (param.direction.ToLower() == "asc")
-            //            sb.Append(" cl.Name  ASC ");
-            //        else
-            //            sb.Append(" cl.Name  DESC ");
-            //        break;
-            //    case "campaignName":
-            //        if (param.direction.ToLower() == "asc")
-            //            sb.Append(" camp.CampaignName  ASC ");
-            //        else
-            //            sb.Append(" camp.CampaignName  DESC ");
-            //        break;
-            //    case "createdDate":
-            //        if (param.direction.ToLower() == "asc")
-            //            sb.Append(" q.CreatedDate  ASC ");
-            //        else
-            //            sb.Append(" q.CreatedDate  DESC ");
-            //        break;
-            //    case "questionTitle":
-            //        if (param.direction.ToLower() == "asc")
-            //            sb.Append(" Title  ASC ");
-            //        else
-            //            sb.Append(" Title  DESC ");
-            //        break;
-            //    case "questionSubject":
-            //        if (param.direction.ToLower() == "asc")
-            //            sb.Append(" qs.Name  ASC ");
-            //        else
-            //            sb.Append(" qs.Name  DESC ");
-            //        break;
-
-
-            //    case "paymentMethod":
-            //        if (param.direction.ToLower() == "asc")
-            //            sb.Append(" pay.Name  ASC ");
-            //        else
-            //            sb.Append(" pay.Name  DESC ");
-            //        break;
-            //    case "lastResponseDatetime":
-            //        if (param.direction.ToLower() == "asc")
-            //            sb.Append(" LastResponseDateTime  ASC ");
-            //        else
-            //            sb.Append(" LastResponseDateTime  DESC ");
-            //        break;
-            //    case "rStatus":
-            //        if (param.direction.ToLower() == "asc")
-            //            sb.Append(" q.Status  ASC ");
-            //        else
-            //            sb.Append(" q.Status  DESC ");
-            //        break;
-            //    default:
-            //        sb.Append(" q.Id  DESC ");
-            //        break;
-            //}
-
-
-
+            
 
             var select = builder.AddTemplate(sb.ToString());
 
@@ -457,7 +296,6 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
         }
-
 
 
         public async Task<int> AddNewComment(TicketComments ticket)

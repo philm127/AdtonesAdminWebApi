@@ -68,10 +68,10 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [HttpGet("v1/GetSubscriberTable")]
-        public async Task<ReturnResult> GetSubscriberTable()
+        [HttpPut("v1/GetSubscriberTable")]
+        public async Task<ReturnResult> GetSubscriberTable(PagingSearchClass paging)
         {
-            return await _dashboardService.LoadSubscriberDataTable();
+            return await _dashboardService.LoadSubscriberDataTable(paging);
         }
 
 
