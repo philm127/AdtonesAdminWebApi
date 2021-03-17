@@ -18,7 +18,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string GetAdvertCategory => @"SELECT AdvertCategoryId AS Value, Name AS Text FROM AdvertCategories WHERE CountryId=@Id;";
 
-        public static string GetCampaignCategory => @"SELECT CampaignCategoryId AS Value, CategoryName AS Text FROM CampaignCategory WHERE Active=1;";
+        public static string GetCampaignCategory => @"SELECT CampaignCategoryId AS Value, CategoryName AS Text FROM CampaignCategory WHERE Active=1 ";
 
         public static string GetOrganisationTypes => @"SELECT OrganisationTypeId AS Value, Type AS Text FROM OrganisationTypes;";
 

@@ -225,9 +225,11 @@ namespace AdtonesAdminWebApi.DAL
 
                         newModel.AdvertiserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.AdvertiserId, conn);
                         newModel.UpdatedBy = await _connService.GetUserIdFromAdtoneIdByConnString(model.UpdatedBy, conn);
+                        newModel.OperatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
+                        newModel.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(model.CampaignProfileId, conn);
                         if (model.ClientId != null)
                             newModel.ClientId = await _connService.GetClientIdFromAdtoneIdByConnString(model.ClientId.Value, conn);
-                        newModel.OperatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
+                        
 
                         newModel.AdvertCategoryId = await _executers.ExecuteCommand(conn,
                                 conn => conn.ExecuteScalar<int>("SELECT AdvertCategoryId FROM AdvertCategories WHERE AdtoneServerAdvertCategoryId=@Id", new { Id = model.AdvertCategoryId }));

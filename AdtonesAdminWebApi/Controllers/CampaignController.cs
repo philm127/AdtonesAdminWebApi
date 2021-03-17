@@ -35,14 +35,14 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAdvertList/{id}")]
         public async Task<ReturnResult> GetAdvertList(int id=0)
         {
-            return await _advertService.LoadAdvertDataTable(id);
+            return await _advertService.GetAdvertDataTable(id);
         }
 
 
         [HttpGet("v1/GetAdvertListForSales/{id}")]
         public async Task<ReturnResult> GetAdvertListForSales(int id = 0)
         {
-            return await _advertService.LoadAdvertDataTableForSales(id);
+            return await _advertService.GetAdvertDataTableForSales(id);
         }
 
 
@@ -55,7 +55,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAdvertListById/{id}")]
         public async Task<ReturnResult> GetAdvertListById(int id = 0)
         {
-            return await _advertService.LoadAdvertDataTableById(id);
+            return await _advertService.GetAdvertDataTableById(id);
         }
 
 
@@ -66,7 +66,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAdvertDetail/{id}")]
         public async Task<ReturnResult> GetAdvertDetail(int id)
         {
-            return await _advertService.LoadAdvertDetails(id);
+            return await _advertService.GetAdvertDetails(id);
         }
 
 
@@ -77,7 +77,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAdvertCategoryList")]
         public async Task<ReturnResult> GetAdvertCategoryList()
         {
-            return await _advertService.LoadAdvertCategoryDataTable();
+            return await _advertService.GetAdvertCategoryDataTable();
         }
 
 

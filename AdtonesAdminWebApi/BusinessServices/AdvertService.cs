@@ -56,11 +56,12 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// Populate the datatable, requires getting siteAddress to fill the Script Addresses.
         /// </summary>
         /// <returns></returns>
-        public async Task<ReturnResult> LoadAdvertDataTable(int id=0)
+        public async Task<ReturnResult> GetAdvertDataTable(int id=0)
         {
             try
             {
                 result.body = await _advertDAL.GetAdvertResultSet(id);
+                return result;
 
             }
             catch (Exception ex)
@@ -68,20 +69,21 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logServ.ErrorMessage = ex.Message.ToString();
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
-                _logServ.ProcedureName = "LoadAdvertDataTable";
+                _logServ.ProcedureName = "GetAdvertDataTable";
                 await _logServ.LogError();
                 
                 result.result = 0;
+                return result;
             }
-            return result;
         }
 
 
-        public async Task<ReturnResult> LoadAdvertDataTableForSales(int id = 0)
+        public async Task<ReturnResult> GetAdvertDataTableForSales(int id = 0)
         {
             try
             {
                 result.body = await _advertDAL.GetAdvertForSalesResultSet(id);
+                return result;
 
             }
             catch (Exception ex)
@@ -89,12 +91,12 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logServ.ErrorMessage = ex.Message.ToString();
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
-                _logServ.ProcedureName = "LoadAdvertDataTableForSales";
+                _logServ.ProcedureName = "GetAdvertDataTableForSales";
                 await _logServ.LogError();
 
                 result.result = 0;
+                return result;
             }
-            return result;
         }
 
 
@@ -102,11 +104,12 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// Gets a single Advert as Result list when clicked through from Campaign Page.
         /// </summary>
         /// <returns></returns>
-        public async Task<ReturnResult> LoadAdvertDataTableById(int id = 0)
+        public async Task<ReturnResult> GetAdvertDataTableById(int id = 0)
         {
             try
             {
                 result.body = await _advertDAL.GetAdvertResultSetById(id);
+                return result;
 
             }
             catch (Exception ex)
@@ -114,19 +117,20 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logServ.ErrorMessage = ex.Message.ToString();
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
-                _logServ.ProcedureName = "LoadAdvertDataTable";
+                _logServ.ProcedureName = "GetAdvertDataTableById";
                 await _logServ.LogError();
                 result.result = 0;
+                return result;
             }
-            return result;
         }
 
 
-        public async Task<ReturnResult> LoadAdvertDetails(int id = 0)
+        public async Task<ReturnResult> GetAdvertDetails(int id = 0)
         {
             try
             {
                 result.body = await _advertDAL.GetAdvertDetail(id);
+                return result;
 
             }
             catch (Exception ex)
@@ -134,32 +138,33 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logServ.ErrorMessage = ex.Message.ToString();
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
-                _logServ.ProcedureName = "LoadAdvertDetails";
+                _logServ.ProcedureName = "GetAdvertDetails";
                 await _logServ.LogError();
                 
                 result.result = 0;
+                return result;
             }
-            return result;
         }
 
 
-        public async Task<ReturnResult> LoadAdvertCategoryDataTable()
+        public async Task<ReturnResult> GetAdvertCategoryDataTable()
         {
             try
             {
                 result.body = await _advertDAL.GetAdvertCategoryList();
+                return result;
             }
             catch (Exception ex)
             {
                 _logServ.ErrorMessage = ex.Message.ToString();
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
-                _logServ.ProcedureName = "LoadAdvertCategoryDataTable";
+                _logServ.ProcedureName = "GetAdvertCategoryDataTable";
                 await _logServ.LogError();
                 
                 result.result = 0;
+                return result;
             }
-            return result;
         }
 
 
@@ -168,6 +173,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 result.body = await _advertDAL.RemoveAdvertCategory(model);
+                return result;
             }
             catch (Exception ex)
             {
@@ -178,8 +184,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 await _logServ.LogError();
                 
                 result.result = 0;
+                return result;
             }
-            return result;
         }
 
 
@@ -188,6 +194,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 result.body = await _advertDAL.UpdateAdvertCategory(model);
+                return result;
             }
             catch (Exception ex)
             {
@@ -198,8 +205,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 await _logServ.LogError();
                 
                 result.result = 0;
+                return result;
             }
-            return result;
         }
 
 
@@ -208,6 +215,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 result.body = await _advertDAL.GetAdvertCategoryDetails(id);
+                return result;
             }
             catch (Exception ex)
             {
@@ -218,8 +226,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 await _logServ.LogError();
                 
                 result.result = 0;
+                return result;
             }
-            return result;
         }
 
 
@@ -255,12 +263,29 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 if (adModel.Status == (int)Enums.AdvertStatus.Live && adModel.PrevStatus != (int)Enums.AdvertStatus.Pending)
                 {
+                    _logServ.ErrorMessage = "Entered Approve OR reject 1= pending";
+                    _logServ.StackTrace = "";
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = $"ApproveReject - ApproveAd AdvertId={adModel.AdvertId}";
+                    await _logServ.LogInfo();
+
                     adModel.Status = (int)Enums.AdvertStatus.Pending;
-                    bool update = false;
+                    string update = string.Empty;
                     update = await ApproveAd(adModel, ConnString);
 
-                    if (update)
-                        result.body = "Advert " + adModel.AdvertName + " is approved successfully.";
+                    if (update == "true")
+                        result.body = $"Advert {adModel.AdvertName} is approved successfully.";
+                    else
+                    {
+                        result.body = $"There was an issue approving the advert {adModel.AdvertName}";
+                        result.result = 0;
+
+                        _logServ.ErrorMessage = $"Approve != pending result from ApproveAd function -  {update}";
+                        _logServ.StackTrace = "";
+                        _logServ.PageName = PageName;
+                        _logServ.ProcedureName = "ApproveRejectAdvert Approve != pending";
+                        await _logServ.LogError();
+                    }
 
                     return result;
                 }
@@ -321,7 +346,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        private async Task<bool> ApproveAd(UserAdvertResult adModel, string ConnString)
+        private async Task<string> ApproveAd(UserAdvertResult adModel, string ConnString)
         {
             try
             {
@@ -331,7 +356,17 @@ namespace AdtonesAdminWebApi.BusinessServices
                 try
                 {
                     campaignAdvert = await _campDAL.GetCampaignAdvertDetailsById(adModel.AdvertId, 0);
-                    var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
+                    //
+                    _logServ.ErrorMessage = $"Entered ApproveAd Got campaignAdvert which is {campaignAdvert}";
+                    _logServ.StackTrace = "";
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = $"ApproveAd AdvertId={adModel.AdvertId}";
+                    await _logServ.LogInfo();
+                    //
+                    // campaignAdvert = await _campDAL.GetCampaignAdvertDetailsById(25000, 0);
+                    if (campaignAdvert == null)
+                        return "The CampaignAdverts do not contain an entry";
+                    // var campaignProfile = await _campDAL.GetCampaignProfileDetail(campaignAdvert.CampaignProfileId);
                 }
                 catch (Exception ex)
                 {
@@ -341,10 +376,17 @@ namespace AdtonesAdminWebApi.BusinessServices
                     _logServ.ProcedureName = $"ApproveReject - ApproveAd - GetcampaignAdvert AdvertId={adModel.AdvertId}";
                     await _logServ.LogError();
                     
-                    return false;
+                    return ex.Message.ToString();
                 }
 
                 var updstatus = UpdateStatus(adModel,uid,adId);
+                //
+                _logServ.ErrorMessage = $"Entered ApproveAd Ran UpdateStatus got {updstatus}";
+                _logServ.StackTrace = "";
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = $"ApproveAd AdvertId={adModel.AdvertId}";
+                await _logServ.LogInfo();
+                //
 
                 var operatordId = adModel.OperatorId;
 
@@ -388,7 +430,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 var t = RemoveRejections(adModel, adId, ConnString);
 
-                return true;
+                return "true";
             }
             catch (Exception ex)
             {
@@ -398,7 +440,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logServ.ProcedureName = "ApproveRejectApproveAd";
                 await _logServ.LogError();
                 
-                return false;
+                return ex.Message.ToString();
             }
         }
 
@@ -608,8 +650,21 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         private async Task<bool> UpdateStatus(UserAdvertResult adModel, int adtoneUser, int adtoneAd)
         {
-            var x = await _advertDAL.ChangeAdvertStatus(adModel);
-            var y = await _advertDAL.ChangeAdvertStatusOperator(adModel, adtoneUser, adtoneAd);
+            try
+            {
+                var x = await _advertDAL.ChangeAdvertStatus(adModel);
+                var y = await _advertDAL.ChangeAdvertStatusOperator(adModel, adtoneUser, adtoneAd);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateStatus";
+                await _logServ.LogError();
+
+                return false;
+            }
             return true;
         }
 

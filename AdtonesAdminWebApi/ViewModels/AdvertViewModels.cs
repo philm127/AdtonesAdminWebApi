@@ -64,6 +64,8 @@ namespace AdtonesAdminWebApi.ViewModels
         public string RejectionReason { get; set; }
         public int UpdatedBy { get; set; }
         public int OperatorId { get; set; }
+        public string OperatorName { get; set; }
+        public string CountryName { get; set; }
         public bool UploadedToMediaServer { get; set; }
         public string SoapToneId { get; set; }
         public string SoapToneCode { get; set; }

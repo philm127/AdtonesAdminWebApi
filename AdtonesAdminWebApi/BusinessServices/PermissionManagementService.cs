@@ -1,12 +1,8 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.DAL.Interfaces;
-using AdtonesAdminWebApi.Enums;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
-using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-// using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,9 +28,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             _permDAL = permDAL;
             _logServ = logServ;
         }
-
-
-        
 
 
         /// <summary>
@@ -93,8 +86,8 @@ namespace AdtonesAdminWebApi.BusinessServices
             List<PermissionChangeModel> perms = new List<PermissionChangeModel>();
             try
             {
-
                 int[] Roles = model.roles.Length > 0 ? Array.ConvertAll(model.roles, int.Parse) : new int[] { };
+                // int[] Users = model.users.Length > 0 ? Array.ConvertAll(model.users, int.Parse) : new int[] { };
 
                 var page = new PermissionModel();
                 page.pageName = model.pageName;
@@ -208,6 +201,43 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> UpdateMenu(AddNewPermissionPart model)
+        {
+            List<PermissionChangeModel> perms = new List<PermissionChangeModel>();
+            var els = new List<PermElement>();
+            els = model.elements;
+            try
+            {
+                var iqPerms = await _permDAL.GetPermissionsByRoleId(Array.ConvertAll(model.roles, int.Parse));
+                perms = iqPerms.ToList();
+
+                foreach (var perm in perms)
+                {
+                    List<PermissionModel> pgs = new List<PermissionModel>();
+                    if (perm.permissions != null && perm.permissions.Length > 0)
+                        pgs = JsonSerializer.Deserialize<List<PermissionModel>>(perm.permissions);
+                    pgs.Find(x => x.pageName == model.pageName).elements = els;
+
+                    var str = JsonSerializer.Serialize(pgs);
+
+                    var x = await _permDAL.UpdateUserPermissions(perm.UserId, str);
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddNewElement";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
+        }
+
+
         public async Task<ReturnResult> SelectListPermissionPages(int roleid)
         {
             // var pages = new List<string>();
@@ -217,27 +247,25 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 var permList = await _permDAL.GetPermissionsForSelectList(roleid);
-                pg = JsonSerializer.Deserialize<List<PermissionModel>>(permList);
-
-                foreach (PermissionModel mod in pg)
+                if (permList == null || permList.Length == 0)
                 {
-                    var itemModel = new SharedSelectListViewModel();
-                    itemModel.Value = mod.pageName;
-                    itemModel.Text = mod.pageName;
-                    selectedList.Add(itemModel);
-                    // pages.Add(mod.pageName);
+                    result.result = 0;
                 }
+                else
+                {
+                    pg = JsonSerializer.Deserialize<List<PermissionModel>>(permList);
 
-                
+                    foreach (PermissionModel mod in pg)
+                    {
+                        var itemModel = new SharedSelectListViewModel();
+                        itemModel.Value = mod.pageName;
+                        itemModel.Text = mod.pageName;
+                        selectedList.Add(itemModel);
+                        // pages.Add(mod.pageName);
+                    }
 
-                //foreach (var item in pages)
-                //{
-                //    var itemModel = new SharedSelectListViewModel();
-                //    itemModel.Value = item.ToString();
-                //    itemModel.Text = item.ToString();
-                //    selectedList.Add(itemModel);
-                //}
-                result.body = selectedList;
+                    result.body = selectedList;
+                }
             }
             catch (Exception ex)
             {
@@ -247,6 +275,56 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logServ.ProcedureName = "SelectListPermissionPages";
                 await _logServ.LogError();
                 
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+
+        public async Task<ReturnResult> SelectListPermissionMenu(int roleid)
+        {
+            // var pages = new List<string>();
+            List<PermissionModel> pgs = new List<PermissionModel>();
+            List<SharedSelectListViewModel> selectedList = new List<SharedSelectListViewModel>();
+
+            try
+            {
+                var permList = await _permDAL.GetPermissionsForSelectList(roleid);
+                if (permList == null || permList.Length == 0)
+                {
+                    result.result = 0;
+                }
+                else
+                {
+                    pgs = JsonSerializer.Deserialize<List<PermissionModel>>(permList);
+
+                    var pg = pgs.Find(x => x.pageName == "MainMenu");
+
+                    var itemDefault = new SharedSelectListViewModel();
+                    itemDefault.Value = "0";
+                    itemDefault.Text = "Add New";
+                    selectedList.Add(itemDefault);
+
+                    foreach (var mod in pg.elements)
+                    {
+                        var itemModel = new SharedSelectListViewModel();
+                        itemModel.Value = mod.name;
+                        itemModel.Text = mod.name;
+                        selectedList.Add(itemModel);
+                    }
+
+                    result.body = pg; // selectedList;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "SelectListPermissionPages";
+                await _logServ.LogError();
+
                 result.result = 0;
             }
             return result;

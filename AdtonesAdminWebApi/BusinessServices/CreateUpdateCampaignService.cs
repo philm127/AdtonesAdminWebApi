@@ -488,7 +488,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                             var adModel = new UserAdvertResult();
 
                             // Is really the Main 168 AdvertId
-                            adModel.AdvertId = model.AdtoneServerAdvertId.Value;
+                            adModel.AdvertId = newModel.AdtoneServerAdvertId.Value;
                             adModel.CampaignProfileId = model.CampaignProfileId;
                             adModel.OperatorId = model.OperatorId;
                             adModel.AdvertName = model.AdvertName;

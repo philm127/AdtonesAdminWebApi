@@ -20,6 +20,7 @@ namespace AdtonesAdminWebApi.Services
         public string StackTrace { get; set; }
         public string LogLevel { get; set; }
         Task LogError();
+        Task LogInfo();
     }
 
 
@@ -91,6 +92,20 @@ namespace AdtonesAdminWebApi.Services
         }
 
 
+        public async Task LogInfo()
+        {
+            string webroot = RootPath();
+            // string MainFolderPath = "Logging\\";
+            string ResolvePath = "";
+            ResolvePath = string.Concat(webroot + "InfoLogs.txt");
+            var filepath = ResolvePath;
+
+            var messageToWrite = LogMessageBuilder();
+
+            await WriteTextAsync(filepath, messageToWrite);
+        }
+
+
         static async Task WriteTextAsync(string filePath, string text)
         {
             byte[] encodedText = Encoding.UTF8.GetBytes(text);
@@ -157,18 +172,7 @@ namespace AdtonesAdminWebApi.Services
         }
 
 
-        public async void LogInfo()
-        {
-            string webroot = RootPath();
-            // string MainFolderPath = "Logging\\";
-            string ResolvePath = "";
-            ResolvePath = string.Concat(webroot + "InfoLogs.txt");
-            var filepath = ResolvePath;
-
-            var messageToWrite = LogMessageBuilder();
-
-            await WriteTextAsync(filepath, messageToWrite);
-        }
+        
 
 
         public async Task SendErrorEmail(SendEmailModel mail)

@@ -64,10 +64,28 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
+        // <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains integer</returns>
+        [HttpPost("v1/UpdateMenu")]
+        public async Task<ReturnResult> UpdateMenu(AddNewPermissionPart model)
+        {
+            return await _permService.UpdateMenu(model);
+        }
+
+
         [HttpGet("v1/GetPermissionPagesList/{roleid}")]
         public async Task<ReturnResult> GetPermissionPagesList(int roleid)
         {
             return await _permService.SelectListPermissionPages(roleid);
+        }
+
+
+        [HttpGet("v1/GetPermissionMenuList/{roleid}")]
+        public async Task<ReturnResult> GetPermissionMenuList(int roleid)
+        {
+            return await _permService.SelectListPermissionMenu(roleid);
         }
 
 

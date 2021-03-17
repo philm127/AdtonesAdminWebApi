@@ -14,7 +14,9 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 
         Task<ReturnResult> AddNewPage(AddNewPermissionPart model);
         Task<ReturnResult> AddNewElement(AddNewPermissionPart model);
+        Task<ReturnResult> UpdateMenu(AddNewPermissionPart model);
         Task<ReturnResult> SelectListPermissionPages(int roleid);
+        Task<ReturnResult> SelectListPermissionMenu(int roleid);
         Task<ReturnResult> Compare2Permissions(IdCollectionViewModel model);
     }
 }

@@ -16,6 +16,10 @@
     <Content Remove="EmailTemplates\**" />
     <Content Remove="PromotionalUserCSV\**" />
     <Content Remove="ViewModels\AdProfilrModels\**" />
+	<Content Update="appsettings*.json" CopyToPublishDirectory="Never" />
+	<Content Update="TempGenPermissions\**" CopyToPublishDirectory="Never" />
+	<Content Update="wwwroot\**" CopyToPublishDirectory="Never" />
+	<Content Remove="web.config" />
     <EmbeddedResource Remove="DAL\**" />
     <EmbeddedResource Remove="EmailTemplates\**" />
     <EmbeddedResource Remove="PromotionalUserCSV\**" />

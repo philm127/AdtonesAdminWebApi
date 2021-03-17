@@ -126,7 +126,7 @@ namespace AdtonesAdminWebApi
             services.AddTransient<ISendEmailMailer, SendEmailMailer>();
             services.AddTransient<IPrematchProcess, PrematchProcess>();
             services.AddTransient<IConvertSaveMediaFile, ConvertSaveMediaFile>();
-            services.AddTransient<ICurrencyConversion, CurrencyConversion> ();
+            services.AddScoped<ICurrencyConversion, CurrencyConversion> ();
             services.AddTransient<IAdvertEmail, AdvertEmail>();
             services.AddTransient<ILoggingService, LoggingService>();
             services.AddScoped<ICreateInvoicePDF, CreateInvoicePDF>();

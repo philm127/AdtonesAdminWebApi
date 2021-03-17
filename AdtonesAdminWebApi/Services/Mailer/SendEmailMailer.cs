@@ -37,8 +37,8 @@ namespace AdtonesAdminWebApi.Services.Mailer
             //{
             //    message.To.Add(new MailboxAddress(two));
             //}
-            var test = _configuration.GetValue<bool>("Environment:Test");
-            if (test)
+            var test = _configuration.GetValue<string>("Environment:Location");
+            if (test == "development")
                 mail.SingleTo = "myinternet21@hotmail.com";
 
             message.To.Add(MailboxAddress.Parse(mail.SingleTo));
@@ -124,8 +124,9 @@ namespace AdtonesAdminWebApi.Services.Mailer
                     }
                 }
             }
-            catch
+            catch(Exception exp)
             {
+                var msg = exp.Message.ToString();
                 throw;
             }
         }

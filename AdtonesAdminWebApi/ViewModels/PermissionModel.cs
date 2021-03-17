@@ -57,30 +57,4 @@ namespace AdtonesAdminWebApi.ViewModels
         public List<PermElement> elements { get; set; }
     }
 
-
-    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
-    //public class Element
-    //{
-    //    public string name { get; set; }
-    //    public bool visible { get; set; }
-    //    public bool enabled { get; set; }
-    //    public string route { get; set; }
-    //    public object arrayId { get; set; }
-    //    public string type { get; set; }
-    //    public List<object> elements { get; set; }
-    //}
-
-    //public class PageData
-    //{
-    //    public string pageName { get; set; }
-    //    public bool visible { get; set; }
-    //    public List<Element> elements { get; set; }
-    //}
-
-    //public class Root
-    //{
-    //    public List<PageData> pageData { get; set; }
-    //}
-
-
 }
