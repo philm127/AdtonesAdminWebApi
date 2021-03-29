@@ -17,6 +17,12 @@ using AdtonesAdminWebApi.UserMatchServices;
 using AdtonesAdminWebApi.Services.Mailer;
 using System.Collections.Generic;
 using AutoMapper;
+using AdtonesAdminWebApi.CRM.Repositories;
+using AdtonesAdminWebApi.CRM.Business;
+using AdtonesAdminWebApi.CRM.Models.Subscriber;
+using AdtonesAdminWebApi.CrmApp.Application;
+using AdtonesAdminWebApi.CrmApp.Data;
+using AdtonesAdminWebApi.CrmApp.Data.Users;
 
 namespace AdtonesAdminWebApi
 {
@@ -44,10 +50,22 @@ namespace AdtonesAdminWebApi
 
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddMemoryCache();
-            
+            services.AddApplication();
+            services.AddData();
+            services.AddDataUsers();
+
             services.AddControllers().AddNewtonsoftJson();
             services.AddHttpContextAccessor();
+            //// Auto Mapper Configurations
+            //var mapperConfig = new MapperConfiguration(mc =>
+            //{
+            //    mc.AddProfile(new SubscriberProfile());
+            //});
+
+            //IMapper mapper = mapperConfig.CreateMapper();
+            //services.AddSingleton(mapper);
             services.AddAutoMapper(typeof(Startup));
+            // services.AddAutoMapper(typeof(SubscriberProfile));
 
             #region Business Services
 
@@ -76,6 +94,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ICreateUpdateCampaignService, CreateUpdateCampaignService>();
             services.AddScoped<ICreateCheckSaveProfileModels, CreateCheckSaveProfileModels>();
             services.AddScoped<IBillingService, BillingService>();
+            services.AddScoped<ISubscriberService, SubscriberService>();
 
             #endregion
 
@@ -108,6 +127,7 @@ namespace AdtonesAdminWebApi
             services.AddScoped<ISalesManagementDAL, SalesManagementDAL>();
             services.AddScoped<IBillingDAL, BillingDAL>();
             services.AddScoped<ICreateUpdateCampaignDAL, CreateUpdateCampaignDAL>();
+            services.AddScoped<ISubscriberRepositorry, SubscriberRepositorry>();
 
             #endregion
 
