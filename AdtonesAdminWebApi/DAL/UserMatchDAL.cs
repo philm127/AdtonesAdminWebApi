@@ -270,22 +270,18 @@ namespace AdtonesAdminWebApi.DAL
                             AdtoneServerCampaignProfilePrefId = adpref
                         }));
 
-                    var lst = await _connService.GetConnectionStringsByCountry(model.CountryId);
-                    List<string> conns = lst.ToList();
+                    var constr = await _connService.GetConnectionStringByOperator(model.OperatorId);
 
-                    foreach (string constr in conns)
-                    {
-                        var countryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId, constr);
-                        var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+                    var countryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId, constr);
+                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
-                        preferenceId = await _executers.ExecuteCommand(constr,
-                                        conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertProfilePreference, new
-                                        {
-                                            CountryId = countryId,
-                                            CampaignProfileId = campaignId,
-                                            AdtoneServerCampaignProfilePrefId = preferenceId
-                                        }));
-                    }
+                    preferenceId = await _executers.ExecuteCommand(constr,
+                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertProfilePreference, new
+                                    {
+                                        CountryId = countryId,
+                                        CampaignProfileId = campaignId,
+                                        AdtoneServerCampaignProfilePrefId = preferenceId
+                                    }));
                 }
                 catch (Exception ex)
                 {
@@ -307,9 +303,8 @@ namespace AdtonesAdminWebApi.DAL
         #region GeographicProfile
 
         
-        public async Task<int> UpdateGeographicProfile(CreateOrUpdateCampaignProfileGeographicCommand model, List<string> conns)
+        public async Task<int> UpdateGeographicProfile(CreateOrUpdateCampaignProfileGeographicCommand model, string conns)
         {
-            int preferenceId = 0;
             var x = 0;
             try
             {
@@ -322,18 +317,16 @@ namespace AdtonesAdminWebApi.DAL
                                         }));
 
 
-                foreach (string constr in conns)
-                {
-                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+                
+                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, conns);
 
-                    x += await _executers.ExecuteCommand(constr,
+                    x += await _executers.ExecuteCommand(conns,
                                     conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateGeographicProfile, new
                                     {
                                         PostCode = model.PostCode,
                                         Location_Demographics = model.Location_Demographics,
                                         Id = campaignId
                                     }));
-                }
             }
             catch (Exception ex)
             {
@@ -349,23 +342,21 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateMatchCampaignGeographic(CreateOrUpdateCampaignProfileGeographicCommand model, List<string> conns)
+        public async Task<int> UpdateMatchCampaignGeographic(CreateOrUpdateCampaignProfileGeographicCommand model, string constr)
         {
             int x = 0;
             try
             {
 
-                foreach (string constr in conns)
-                {
-                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
-                    x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignGeographic, new
-                                    {
-                                        Id = campaignId,
-                                        Location_Demographics = model.Location_Demographics,
-                                    }));
-                }
+                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+
+                x = await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignGeographic, new
+                                {
+                                    Id = campaignId,
+                                    Location_Demographics = model.Location_Demographics,
+                                }));
             }
             catch
             {
@@ -380,7 +371,7 @@ namespace AdtonesAdminWebApi.DAL
         #region DemographicProfile
 
 
-        public async Task<int> UpdateDemographicProfile(CreateOrUpdateCampaignProfileDemographicsCommand model, List<string> conns)
+        public async Task<int> UpdateDemographicProfile(CreateOrUpdateCampaignProfileDemographicsCommand model, string constr)
         {
             var x = 0;
             try
@@ -403,25 +394,22 @@ namespace AdtonesAdminWebApi.DAL
                 var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
 
 
-                foreach (string constr in conns)
-                {
-                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
-                    x += await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateDemographicProfile, new
-                                    {
-                                        DOBEnd_Demographics = model.DOBEnd_Demographics,
-                                        DOBStart_Demographics = model.DOBStart_Demographics,
-                                        Age_Demographics = model.Age_Demographics,
-                                        Education_Demographics = model.Education_Demographics,
-                                        Gender_Demographics = model.Gender_Demographics,
-                                        HouseholdStatus_Demographics = model.HouseholdStatus_Demographics,
-                                        IncomeBracket_Demographics = model.IncomeBracket_Demographics,
-                                        RelationshipStatus_Demographics = model.RelationshipStatus_Demographics,
-                                        WorkingStatus_Demographics = model.WorkingStatus_Demographics,
-                                        Id = campaignId
-                                    }));
-                }
+                x += await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateDemographicProfile, new
+                                {
+                                    DOBEnd_Demographics = model.DOBEnd_Demographics,
+                                    DOBStart_Demographics = model.DOBStart_Demographics,
+                                    Age_Demographics = model.Age_Demographics,
+                                    Education_Demographics = model.Education_Demographics,
+                                    Gender_Demographics = model.Gender_Demographics,
+                                    HouseholdStatus_Demographics = model.HouseholdStatus_Demographics,
+                                    IncomeBracket_Demographics = model.IncomeBracket_Demographics,
+                                    RelationshipStatus_Demographics = model.RelationshipStatus_Demographics,
+                                    WorkingStatus_Demographics = model.WorkingStatus_Demographics,
+                                    Id = campaignId
+                                }));
             }
             catch
             {
@@ -431,31 +419,27 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateMatchCampaignDemographic(CreateOrUpdateCampaignProfileDemographicsCommand model, List<string> conns)
+        public async Task<int> UpdateMatchCampaignDemographic(CreateOrUpdateCampaignProfileDemographicsCommand model, string constr)
         {
             int x = 0;
             try
             {
                 var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
 
+                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
-                foreach (string constr in conns)
-                {
-                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-
-                    x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignDemographic, new
-                                    {
-                                        Id = campaignId,
-                                        Age_Demographics = model.Age_Demographics,
-                                        Education_Demographics = model.Education_Demographics,
-                                        Gender_Demographics = model.Gender_Demographics,
-                                        HouseholdStatus_Demographics = model.HouseholdStatus_Demographics,
-                                        IncomeBracket_Demographics = model.IncomeBracket_Demographics,
-                                        RelationshipStatus_Demographics = model.RelationshipStatus_Demographics,
-                                        WorkingStatus_Demographics = model.WorkingStatus_Demographics
-                                    }));
-                }
+                x = await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignDemographic, new
+                                {
+                                    Id = campaignId,
+                                    Age_Demographics = model.Age_Demographics,
+                                    Education_Demographics = model.Education_Demographics,
+                                    Gender_Demographics = model.Gender_Demographics,
+                                    HouseholdStatus_Demographics = model.HouseholdStatus_Demographics,
+                                    IncomeBracket_Demographics = model.IncomeBracket_Demographics,
+                                    RelationshipStatus_Demographics = model.RelationshipStatus_Demographics,
+                                    WorkingStatus_Demographics = model.WorkingStatus_Demographics
+                                }));
             }
             catch
             {
@@ -472,7 +456,7 @@ namespace AdtonesAdminWebApi.DAL
         #region TimeSettingProfile
 
 
-        public async Task<int> InsertTimeSettingsProfile(CampaignProfileTimeSetting timeSettings, List<string> conns)
+        public async Task<int> InsertTimeSettingsProfile(CampaignProfileTimeSetting timeSettings, string constr)
         {
 
             var prefs = await GetCampaignTimeSettings(timeSettings.CampaignProfileId);
@@ -498,24 +482,21 @@ namespace AdtonesAdminWebApi.DAL
 
                     var campaignDetails = await _campDAL.GetCampaignProfileDetail(timeSettings.CampaignProfileId);
 
-                    foreach (string constr in conns)
-                    {
-                        var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(timeSettings.CampaignProfileId, constr);
+                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(timeSettings.CampaignProfileId, constr);
 
-                        var x = await _executers.ExecuteCommand(constr,
-                                        conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertTimeSettingsProfile, new
-                                        {
-                                            Monday = timeSettings.Monday,
-                                            Tuesday = timeSettings.Tuesday,
-                                            Wednesday = timeSettings.Wednesday,
-                                            Thursday = timeSettings.Thursday,
-                                            Friday = timeSettings.Friday,
-                                            Saturday = timeSettings.Saturday,
-                                            Sunday = timeSettings.Sunday,
-                                            CampaignProfileId = campaignId,
-                                            AdtoneServerCampaignProfileTimeId = preferenceId
-                                        }));
-                    }
+                    var x = await _executers.ExecuteCommand(constr,
+                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertTimeSettingsProfile, new
+                                    {
+                                        Monday = timeSettings.Monday,
+                                        Tuesday = timeSettings.Tuesday,
+                                        Wednesday = timeSettings.Wednesday,
+                                        Thursday = timeSettings.Thursday,
+                                        Friday = timeSettings.Friday,
+                                        Saturday = timeSettings.Saturday,
+                                        Sunday = timeSettings.Sunday,
+                                        CampaignProfileId = campaignId,
+                                        AdtoneServerCampaignProfileTimeId = preferenceId
+                                    }));
                 }
                 catch
                 {
@@ -525,13 +506,13 @@ namespace AdtonesAdminWebApi.DAL
             else
             {
                 timeSettings.CampaignProfileTimeSettingsId = prefs.CampaignProfileTimeSettingsId;
-                preferenceId = await UpdateTimeSettingsProfile(timeSettings, conns);
+                preferenceId = await UpdateTimeSettingsProfile(timeSettings, constr);
             }
             return preferenceId;
         }
 
 
-        public async Task<int> UpdateTimeSettingsProfile(CampaignProfileTimeSetting timeSettings, List<string> conns)
+        public async Task<int> UpdateTimeSettingsProfile(CampaignProfileTimeSetting timeSettings, string constr)
         {
             var x = 0;
             try
@@ -549,23 +530,20 @@ namespace AdtonesAdminWebApi.DAL
                                             Id = timeSettings.CampaignProfileId
                                         }));
 
-                foreach (string constr in conns)
-                {
-                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(timeSettings.CampaignProfileId, constr);
+                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(timeSettings.CampaignProfileId, constr);
 
-                    x += await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateTimeSettingsProfile, new
-                                    {
-                                        Monday = timeSettings.Monday,
-                                        Tuesday = timeSettings.Tuesday,
-                                        Wednesday = timeSettings.Wednesday,
-                                        Thursday = timeSettings.Thursday,
-                                        Friday = timeSettings.Friday,
-                                        Saturday = timeSettings.Saturday,
-                                        Sunday = timeSettings.Sunday,
-                                        Id = campaignId
-                                    }));
-                }
+                x += await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateTimeSettingsProfile, new
+                                {
+                                    Monday = timeSettings.Monday,
+                                    Tuesday = timeSettings.Tuesday,
+                                    Wednesday = timeSettings.Wednesday,
+                                    Thursday = timeSettings.Thursday,
+                                    Friday = timeSettings.Friday,
+                                    Saturday = timeSettings.Saturday,
+                                    Sunday = timeSettings.Sunday,
+                                    Id = campaignId
+                                }));
             }
             catch
             {
@@ -599,7 +577,7 @@ namespace AdtonesAdminWebApi.DAL
         #region MobileProfile
 
 
-        public async Task<int> UpdateMobileProfile(CreateOrUpdateCampaignProfileMobileCommand model, List<string> conns)
+        public async Task<int> UpdateMobileProfile(CreateOrUpdateCampaignProfileMobileCommand model, string constr)
         {
             var x = 0;
             try
@@ -614,18 +592,15 @@ namespace AdtonesAdminWebApi.DAL
 
                 var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
 
-                foreach (string constr in conns)
-                {
-                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
-                    x += await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMobileProfile, new
-                                    {
-                                        Id = campaignId,
-                                        ContractType_Mobile = model.ContractType_Mobile,
-                                        Spend_Mobile = model.Spend_Mobile
-                                    }));
-                }
+                x += await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMobileProfile, new
+                                {
+                                    Id = campaignId,
+                                    ContractType_Mobile = model.ContractType_Mobile,
+                                    Spend_Mobile = model.Spend_Mobile
+                                }));
             }
             catch
             {
@@ -635,25 +610,22 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateMatchCampaignMobile(CreateOrUpdateCampaignProfileMobileCommand model, List<string> conns)
+        public async Task<int> UpdateMatchCampaignMobile(CreateOrUpdateCampaignProfileMobileCommand model, string constr)
         {
             int x = 0;
             try
             {
                 var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
 
-                foreach (string constr in conns)
-                {
-                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
-                    x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignMobile, new
-                                    {
-                                        Id = campaignId,
-                                        ContractType_Mobile = model.ContractType_Mobile,
-                                        Spend_Mobile = model.Spend_Mobile
-                                    }));
-                }
+                x = await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignMobile, new
+                                {
+                                    Id = campaignId,
+                                    ContractType_Mobile = model.ContractType_Mobile,
+                                    Spend_Mobile = model.Spend_Mobile
+                                }));
             }
             catch
             {
@@ -670,7 +642,7 @@ namespace AdtonesAdminWebApi.DAL
 
         
 
-        public async Task<int> UpdateQuestionnaireProfile(CreateOrUpdateCampaignProfileSkizaCommand model, List<string> conns)
+        public async Task<int> UpdateQuestionnaireProfile(CreateOrUpdateCampaignProfileSkizaCommand model, string constr)
         {
             var x = 0;
             try
@@ -687,21 +659,18 @@ namespace AdtonesAdminWebApi.DAL
 
                 var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
 
-                foreach (string constr in conns)
-                {
-                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
 
-                    x += await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateQuestionnaireProfile, new
-                                    {
-                                        Id = campaignId,
-                                        DiscerningProfessionals_AdType = model.DiscerningProfessionals_AdType,
-                                        MassQuestion = model.MassQuestion,
-                                        Hustlers_AdType = model.Hustlers_AdType,
-                                        Youth_AdType = model.Youth_AdType
-                                    }));
-                }
+                x += await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateQuestionnaireProfile, new
+                                {
+                                    Id = campaignId,
+                                    DiscerningProfessionals_AdType = model.DiscerningProfessionals_AdType,
+                                    MassQuestion = model.MassQuestion,
+                                    Hustlers_AdType = model.Hustlers_AdType,
+                                    Youth_AdType = model.Youth_AdType
+                                }));
             }
             catch
             {
@@ -711,27 +680,24 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateMatchCampaignQuestionnaire(CreateOrUpdateCampaignProfileSkizaCommand model, List<string> conns)
+        public async Task<int> UpdateMatchCampaignQuestionnaire(CreateOrUpdateCampaignProfileSkizaCommand model, string constr)
         {
             int x = 0;
             try
             {
                 var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
 
-                foreach (string constr in conns)
-                {
-                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
-                    x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignQuestionnaire, new
-                                    {
-                                        Id = campaignId,
-                                        DiscerningProfessionals_AdType = model.DiscerningProfessionals_AdType,
-                                        MassQuestion = model.MassQuestion,
-                                        Hustlers_AdType = model.Hustlers_AdType,
-                                        Youth_AdType = model.Youth_AdType
-                                    }));
-                }
+                x = await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignQuestionnaire, new
+                                {
+                                    Id = campaignId,
+                                    DiscerningProfessionals_AdType = model.DiscerningProfessionals_AdType,
+                                    MassQuestion = model.MassQuestion,
+                                    Hustlers_AdType = model.Hustlers_AdType,
+                                    Youth_AdType = model.Youth_AdType
+                                }));
             }
             catch
             {
@@ -748,7 +714,7 @@ namespace AdtonesAdminWebApi.DAL
         #region AdvertProfile
  
 
-        public async Task<int> UpdateAdvertProfile(CreateOrUpdateCampaignProfileAdvertCommand model, List<string> conns)
+        public async Task<int> UpdateAdvertProfile(CreateOrUpdateCampaignProfileAdvertCommand model, string constr)
         {
             var x = 0;
             var cid = model.CampaignProfileId;
@@ -759,16 +725,12 @@ namespace AdtonesAdminWebApi.DAL
 
                 var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
 
+                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
-                foreach (string constr in conns)
-                {
-                    var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+                model.CampaignProfileId = campaignId;
 
-                    model.CampaignProfileId = campaignId;
-
-                    x += await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateAdvertProfile, model));
-                }
+                x += await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateAdvertProfile, model));
             }
             catch
             {
@@ -779,7 +741,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateMatchCampaignAdvert(CreateOrUpdateCampaignProfileAdvertCommand model, List<string> conns)
+        public async Task<int> UpdateMatchCampaignAdvert(CreateOrUpdateCampaignProfileAdvertCommand model, string constr)
         {
             var cid = model.CampaignProfileId;
             int x = 0;
@@ -787,13 +749,10 @@ namespace AdtonesAdminWebApi.DAL
             {
                 var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
 
-                foreach (string constr in conns)
-                {
-                    model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+                model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
 
-                    x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignAdvert, model));
-                }
+                x = await _executers.ExecuteCommand(constr,
+                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignAdvert, model));
             }
             catch
             {

@@ -23,30 +23,30 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> GetCampaignProfilePreferenceId(int campaignId);
         Task<int> InsertProfilePreference(NewAdProfileMappingFormModel model);
         // Task<int> InsertGeographicProfile(CreateOrUpdateCampaignProfileGeographicCommand model);
-        Task<int> UpdateGeographicProfile(CreateOrUpdateCampaignProfileGeographicCommand model, List<string> conns);
-        // Task<int> InsertMatchCampaignGeographic(CreateOrUpdateCampaignProfileGeographicCommand model, List<string> connString);
-        Task<int> UpdateMatchCampaignGeographic(CreateOrUpdateCampaignProfileGeographicCommand model, List<string> connString);
+        Task<int> UpdateGeographicProfile(CreateOrUpdateCampaignProfileGeographicCommand model, string constr);
+        // Task<int> InsertMatchCampaignGeographic(CreateOrUpdateCampaignProfileGeographicCommand model, string constr);
+        Task<int> UpdateMatchCampaignGeographic(CreateOrUpdateCampaignProfileGeographicCommand model, string constr);
         // Task<int> InsertDemographicProfile(CreateOrUpdateCampaignProfileDemographicsCommand model);
-        Task<int> UpdateDemographicProfile(CreateOrUpdateCampaignProfileDemographicsCommand mode, List<string> conns);
+        Task<int> UpdateDemographicProfile(CreateOrUpdateCampaignProfileDemographicsCommand mode, string constr);
         //Task<int> InsertMatchCampaignDemographic(CampaignProfileDemographicsFormModel model);
-        Task<int> UpdateMatchCampaignDemographic(CreateOrUpdateCampaignProfileDemographicsCommand model, List<string> connString);
+        Task<int> UpdateMatchCampaignDemographic(CreateOrUpdateCampaignProfileDemographicsCommand model, string constr);
         Task<CampaignProfileTimeSetting> GetCampaignTimeSettings(int campaignId);
 
-        Task<int> InsertTimeSettingsProfile(CampaignProfileTimeSetting timeSettings, List<string> conns);
-        Task<int> UpdateTimeSettingsProfile(CampaignProfileTimeSetting timeSettings, List<string> conns);
+        Task<int> InsertTimeSettingsProfile(CampaignProfileTimeSetting timeSettings, string constr);
+        Task<int> UpdateTimeSettingsProfile(CampaignProfileTimeSetting timeSettings, string constr);
 
         // Task<int> InsertMobileProfile(CreateOrUpdateCampaignProfileMobileCommand model);
-        Task<int> UpdateMobileProfile(CreateOrUpdateCampaignProfileMobileCommand model, List<string> conns);
-        Task<int> UpdateMatchCampaignMobile(CreateOrUpdateCampaignProfileMobileCommand model, List<string> connString);
+        Task<int> UpdateMobileProfile(CreateOrUpdateCampaignProfileMobileCommand model, string constr);
+        Task<int> UpdateMatchCampaignMobile(CreateOrUpdateCampaignProfileMobileCommand model, string constr);
 
 
         // Task<int> InsertQuestionnaireProfile(CampaignProfileSkizaFormModel model);
-        Task<int> UpdateQuestionnaireProfile(CreateOrUpdateCampaignProfileSkizaCommand model, List<string> connString);
-        Task<int> UpdateMatchCampaignQuestionnaire(CreateOrUpdateCampaignProfileSkizaCommand model, List<string> connString);
+        Task<int> UpdateQuestionnaireProfile(CreateOrUpdateCampaignProfileSkizaCommand model, string constr);
+        Task<int> UpdateMatchCampaignQuestionnaire(CreateOrUpdateCampaignProfileSkizaCommand model, string constr);
 
 
         // Task<int> InsertAdvertProfile(CampaignProfileAdvertFormModel model);
-        Task<int> UpdateAdvertProfile(CreateOrUpdateCampaignProfileAdvertCommand model, List<string> conns);
-        Task<int> UpdateMatchCampaignAdvert(CreateOrUpdateCampaignProfileAdvertCommand model, List<string> connString);
+        Task<int> UpdateAdvertProfile(CreateOrUpdateCampaignProfileAdvertCommand model, string constr);
+        Task<int> UpdateMatchCampaignAdvert(CreateOrUpdateCampaignProfileAdvertCommand model, string constr);
     }
 }

@@ -88,12 +88,5 @@ namespace AdtonesAdminWebApi.DAL.Queries
         public static string GetAdvertAdminOperator => @"SELECT Email FROM Users WHERE Activated=1 AND RoleId=@RoleId ";
 
 
-        public static string GetClientDetails => @"SELECT Id, Name, UserId, Description, Email, ContactPhone FROM Client WHERE Id=@Id";
-
-
-        public static string InsertNewClient => @"INSERT INTO Client(Name, UserId, Description, Email,CountryId, ContactPhone,AdtoneServerClientId,CreatedDate,UpdatedDate,Status,Budget)
-                                                VALUES(@Name, @UserId, @Description, @Email,@CountryId,@ContactPhone,@AdtoneServerClientId,GETDATE(),GETDATE(),1,0.00);
-                                                SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
     }
 }

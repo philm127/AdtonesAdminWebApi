@@ -91,7 +91,8 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<string> GetOperatorConnectionByUserId(int id)
+
+        public async Task<List<string>> GetConnectionStringsByUserId(int id)
         {
 
             string select_query = @"SELECT ConnectionString FROM CountryConnectionStrings AS conn 
@@ -100,7 +101,8 @@ namespace AdtonesAdminWebApi.DAL
             using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
                 await connection.OpenAsync();
-                return await connection.QueryFirstOrDefaultAsync<string>(select_query, new { userId = id });
+                var lst = await connection.QueryAsync<string>(select_query, new { userId = id }); 
+                return lst.ToList();
             }
         }
 

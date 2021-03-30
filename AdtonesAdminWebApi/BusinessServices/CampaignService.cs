@@ -171,29 +171,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                     var roleId = _httpAccessor.GetRoleIdFromJWT();
                     if (exists || roleId == (int)Enums.UserRole.ProfileAdmin)
                     {
+                        _campProfile.Status = CheckStartDateOfCampaign(_campProfile);
 
-                        if (_campProfile.StartDate == null && _campProfile.EndDate == null)
-                        {
-                            _campProfile.Status = (int)Enums.CampaignStatus.Play;
-                        }
-                        else
-                        {
-                            if (_campProfile.StartDate != null)
-                            {
-                                if (_campProfile.StartDate == DateTime.Now.Date)
-                                {
-                                    _campProfile.Status = (int)Enums.CampaignStatus.Play;
-                                }
-                                else
-                                {
-                                    _campProfile.Status = (int)Enums.CampaignStatus.Planned;
-                                }
-                            }
-                            else
-                            {
-                                _campProfile.Status = (int)Enums.CampaignStatus.Planned;
-                            }
-                        }
                     }
                     else
                     {
@@ -217,6 +196,35 @@ namespace AdtonesAdminWebApi.BusinessServices
                 return false;
             }
             return true;
+        }
+
+
+        private static int CheckStartDateOfCampaign(CampaignProfile _campProfile)
+        {
+            int status = 0;
+            if (_campProfile.StartDate == null && _campProfile.EndDate == null)
+            {
+               status = (int)Enums.CampaignStatus.Play;
+            }
+            else
+            {
+                if (_campProfile.StartDate != null)
+                {
+                    if (_campProfile.StartDate == DateTime.Now.Date)
+                    {
+                        status = (int)Enums.CampaignStatus.Play;
+                    }
+                    else
+                    {
+                        status = (int)Enums.CampaignStatus.Planned;
+                    }
+                }
+                else
+                {
+                    status = (int)Enums.CampaignStatus.Planned;
+                }
+            }
+            return status;
         }
 
 

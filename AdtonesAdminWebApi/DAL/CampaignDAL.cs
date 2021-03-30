@@ -346,8 +346,7 @@ namespace AdtonesAdminWebApi.DAL
         /// <returns></returns>
         public async Task<int> ChangeCampaignProfileStatusOperator(CampaignProfile model)
         {
-            int country = (int)model.CountryId;
-            var operatorConnectionString = await _connService.GetConnectionStringsByCountry(country);
+            var operatorConnectionString = await _connService.GetConnectionStringByOperator((int)model.OperatorId);
 
             var sb = new StringBuilder();
             sb.Append(CampaignQuery.UpdateCampaignProfileStatus);
@@ -360,17 +359,12 @@ namespace AdtonesAdminWebApi.DAL
                 builder.AddParameters(new { Id = model.CampaignProfileId });
                 builder.AddParameters(new { Status = model.Status });
 
-                var lst = await _connService.GetConnectionStringsByCountry(country);
-                List<string> conns = lst.ToList();
 
                 int x = 0;
 
-                foreach (string constr in conns)
-                {
 
-                    x = await _executers.ExecuteCommand(constr,
+                    x = await _executers.ExecuteCommand(operatorConnectionString,
                                     conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
-                }
                 return x;
             }
             catch

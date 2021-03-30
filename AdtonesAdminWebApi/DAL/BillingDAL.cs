@@ -42,33 +42,36 @@ namespace AdtonesAdminWebApi.DAL
                                         AdtoneServerBillingId = command.AdtoneServerBillingId
                                     }));
 
-                var constr = await _connService.GetOperatorConnectionByUserId(command.AdvertiserId);
-                if (constr != null && constr.Length > 10)
+                var strLst = await _connService.GetConnectionStringsByUserId(command.AdvertiserId);
+                if (strLst != null && strLst.Count > 0)
                 {
                     try
                     {
-                        var campId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(command.CampaignProfileId, constr);
+                        foreach (var constr in strLst)
+                        {
+                            var campId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(command.CampaignProfileId, constr);
 
-                        var userId = await _executers.ExecuteCommand(constr,
-                                                                    conn => conn.ExecuteScalar<int>("SELECT UserId FROM Users WHERE AdtoneServerUserId=@Id",
-                                                                                                        new { Id = command.AdvertiserId }));
+                            var userId = await _executers.ExecuteCommand(constr,
+                                                                        conn => conn.ExecuteScalar<int>("SELECT UserId FROM Users WHERE AdtoneServerUserId=@Id",
+                                                                                                            new { Id = command.AdvertiserId }));
 
-                        var x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(BillingQuery.InsertIntoBilling, new
-                                    {
-                                        UserId = userId,
-                                        CampaignProfileId = campId,
-                                        PaymentMethodId = command.PaymentMethodId,
-                                        Status = command.Status,
-                                        InvoiceNumber = command.InvoiceNumber,
-                                        PONumber = command.PONumber,
-                                        Fundamount = command.Fundamount,
-                                        TaxPercantage = command.TaxPercantage,
-                                        TotalAmount = command.TotalAmount,
-                                        SettledDate = command.SettledDate,
-                                        CurrencyCode = command.CurrencyCode,
-                                        AdtoneServerBillingId = billId
-                                    }));
+                            var x = await _executers.ExecuteCommand(constr,
+                                        conn => conn.ExecuteScalar<int>(BillingQuery.InsertIntoBilling, new
+                                        {
+                                            UserId = userId,
+                                            CampaignProfileId = campId,
+                                            PaymentMethodId = command.PaymentMethodId,
+                                            Status = command.Status,
+                                            InvoiceNumber = command.InvoiceNumber,
+                                            PONumber = command.PONumber,
+                                            Fundamount = command.Fundamount,
+                                            TaxPercantage = command.TaxPercantage,
+                                            TotalAmount = command.TotalAmount,
+                                            SettledDate = command.SettledDate,
+                                            CurrencyCode = command.CurrencyCode,
+                                            AdtoneServerBillingId = billId
+                                        }));
+                        }
                     }
                     catch
                     {

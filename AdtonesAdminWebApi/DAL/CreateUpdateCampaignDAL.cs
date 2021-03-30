@@ -26,40 +26,40 @@ namespace AdtonesAdminWebApi.DAL
         
 
 
-        public async Task<int> AddProfileTimeSettings(CampaignProfileTimeSetting model, int countryId, int provCampaignId)
-        {
-            var x = 0;
+        //public async Task<int> AddProfileTimeSettings(CampaignProfileTimeSetting model, int countryId, int provCampaignId)
+        //{
+        //    var x = 0;
 
-            try
-            {
+        //    try
+        //    {
 
-                x = await _executers.ExecuteCommand(_connStr,
-                                conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.AddProfileTimeSettings,model));
+        //        x = await _executers.ExecuteCommand(_connStr,
+        //                        conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.AddProfileTimeSettings,model));
 
-                if(x > 0)
-                {
-                    var connList = await _connService.GetConnectionStringsByCountry(countryId);
-                    if (connList != null)
-                    {
-                        foreach (var conn in connList)
-                        {
-                            model.CampaignProfileId = provCampaignId;
-                            model.AdtoneServerCampaignProfileTimeId = x;
+        //        if(x > 0)
+        //        {
+        //            var connList = await _connService.GetConnectionStringsByCountry(countryId);
+        //            if (connList != null)
+        //            {
+        //                foreach (var conn in connList)
+        //                {
+        //                    model.CampaignProfileId = provCampaignId;
+        //                    model.AdtoneServerCampaignProfileTimeId = x;
 
-                            x = await _executers.ExecuteCommand(conn,
-                                    conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.AddProfileTimeSettings, model));
-                        }
+        //                    x = await _executers.ExecuteCommand(conn,
+        //                            conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.AddProfileTimeSettings, model));
+        //                }
 
-                    }
-                }
-            }
-            catch
-            {
-                throw;
-            }
+        //            }
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        throw;
+        //    }
 
-            return x;
-        }
+        //    return x;
+        //}
 
 
 
@@ -85,7 +85,7 @@ namespace AdtonesAdminWebApi.DAL
 
                 if (model.AdtoneServerCampaignProfileId != null && model.AdtoneServerCampaignProfileId > 0)
                 {
-                    var conn = await _connService.GetConnectionStringsByCountryId(model.CountryId);
+                    var conn = await _connService.GetConnectionStringByOperator(model.OperatorId);
                     if (conn != null && conn.Length > 10)
                     {
 
@@ -146,7 +146,7 @@ namespace AdtonesAdminWebApi.DAL
                                     CampaignCategoryId = model.CampaignCategoryId.GetValueOrDefault()
                                 }));
 
-                var conn = await _connService.GetConnectionStringsByCountryId(model.CountryId);
+                var conn = await _connService.GetConnectionStringByOperator(model.OperatorId);
                 if (conn != null && conn.Length > 10)
                 {
 
@@ -180,6 +180,50 @@ namespace AdtonesAdminWebApi.DAL
             }
 
             return x;
+        }
+
+
+        public async Task<int> InsertNewClient(ClientViewModel model)
+        {
+            int x = 0;
+            try
+            {
+                x = await _executers.ExecuteCommand(_connStr,
+                     conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewClient, model));
+
+                var constr = await _connService.GetConnectionStringByOperator(model.OperatorId);
+                if (constr != null && constr.Length > 10)
+                {
+                    model.AdtoneServerClientId = x;
+                    model.UserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.UserId, constr);
+                    model.CountryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId, constr);
+
+
+                    var y = await _executers.ExecuteCommand(constr,
+                         conn => conn.ExecuteScalar<int>(CreateUpdateCampaignQuery.InsertNewClient, model));
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            return x;
+        }
+
+
+        public async Task<ClientViewModel> GetClientDetails(int clientId)
+        {
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                    conn => conn.QueryFirstOrDefault<ClientViewModel>(CreateUpdateCampaignQuery.GetClientDetails, new { Id = clientId }));
+
+            }
+            catch
+            {
+                throw;
+            }
         }
 
 

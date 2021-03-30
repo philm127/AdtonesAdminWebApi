@@ -20,6 +20,7 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
         public string CampaignDescription { get; set; }
 
         public int CountryId { get; set; }
+        public int OperatorId { get; set; }
 
         public bool Clientcheck { get; set; }
 

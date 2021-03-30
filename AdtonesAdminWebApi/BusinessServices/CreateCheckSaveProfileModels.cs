@@ -93,7 +93,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<bool> SaveGeographicWizard(CampaignProfileGeographicFormModel model, List<string> connString)
+        public async Task<bool> SaveGeographicWizard(CampaignProfileGeographicFormModel model, string connString)
         {
             try
             {
@@ -202,7 +202,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<bool> SaveTimeSettingsWizard(CampaignProfileTimeSettingFormModel model, List<string> connString)
+        public async Task<bool> SaveTimeSettingsWizard(CampaignProfileTimeSettingFormModel model, string connString)
         {
 
             var timeSettings = new CampaignProfileTimeSetting();
@@ -474,7 +474,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
 
         // Update Demographics from Ads Profile Mapping
-        public async Task<bool> SaveDemographicsWizard(CampaignProfileDemographicsFormModel model, List<string> connString)
+        public async Task<bool> SaveDemographicsWizard(CampaignProfileDemographicsFormModel model, string connString)
         {
             try
             {
@@ -568,7 +568,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<bool> SaveMobileWizard(CampaignProfileMobileFormModel model, List<string> connString)
+        public async Task<bool> SaveMobileWizard(CampaignProfileMobileFormModel model, string connString)
         {
 
 
@@ -675,7 +675,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<bool> SaveQuestionnaireWizard(CampaignProfileSkizaFormModel model, List<string> connString)
+        public async Task<bool> SaveQuestionnaireWizard(CampaignProfileSkizaFormModel model, string connString)
         {
             var command = new CreateOrUpdateCampaignProfileSkizaCommand();
 
@@ -1218,7 +1218,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<bool> SaveAdvertsWizard(CampaignProfileAdvertFormModel model, List<string> connString)
+        public async Task<bool> SaveAdvertsWizard(CampaignProfileAdvertFormModel model, string connString)
         {
             var command = new CreateOrUpdateCampaignProfileAdvertCommand();
             command.CampaignProfileId = model.CampaignProfileId;

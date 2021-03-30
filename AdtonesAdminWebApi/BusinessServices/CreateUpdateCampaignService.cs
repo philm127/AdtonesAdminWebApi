@@ -217,9 +217,10 @@ namespace AdtonesAdminWebApi.BusinessServices
                             Email = model.newClientFormModel.Email,
                             ContactPhone = model.newClientFormModel.ContactPhone,
                             CountryId = model.newClientFormModel.CountryId.Value,
-                            UserId = model.newClientFormModel.UserId
+                            UserId = model.newClientFormModel.UserId,
+                            OperatorId = model.OperatorId
                         };
-                        model.ClientId = await _userDAL.InsertNewClient(clientModel);
+                        model.ClientId = await _createDAL.InsertNewClient(clientModel);
                     }
                 }
 
@@ -258,7 +259,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     result.result = 0;
                     return result;
                 }
-                var operatorString = await _connService.GetConnectionStringsByCountryId(model.CountryId);
+                var operatorString = await _connService.GetConnectionStringByOperator(model.OperatorId);
 
                 try
                 {
@@ -525,9 +526,9 @@ namespace AdtonesAdminWebApi.BusinessServices
         public async Task<ReturnResult> InsertProfileInformation(NewAdProfileMappingFormModel model)
         {
             int y = 0;
+            var connString = await _connService.GetConnectionStringByOperator(model.OperatorId);
             try
             {
-                var connString = await _connService.GetConnectionStringsByCountry(model.CountryId);
                 y = await _matchDAL.InsertProfilePreference(model);
 
                 var x = await _profileService.SaveGeographicWizard(model.CampaignProfileGeographicModel, connString);
@@ -556,12 +557,11 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                 var campaignProfile = await _campaignDAL.GetCampaignProfileDetail(model.CampaignProfileId);
 
-                var ConnString = await _connService.GetConnectionStringsByCountryId(campaignProfile.CountryId.Value);
-                if (ConnString != null)
+                if (connString != null)
                 {
                     if (campaignProfile.Status == (int)Enums.CampaignStatus.Play && campaignProfile.IsAdminApproval == true)
                     {
-                        await _matchProcess.PrematchProcessForCampaign(model.CampaignProfileId, ConnString);
+                        await _matchProcess.PrematchProcessForCampaign(model.CampaignProfileId, connString);
                     }
                 }
             }
@@ -598,7 +598,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 return result;
             }
 
-            var operatorString = await _connService.GetConnectionStringsByCountryId(model.CountryId);
+            var operatorString = await _connService.GetConnectionStringByOperator(model.OperatorId);
 
             try
             {

@@ -14,6 +14,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string Email { get; set; }
         public string ContactPhone { get; set; }
         public int CountryId { get; set; }
+        public int OperatorId { get; set; }
         public int? AdtoneServerClientId { get; set; }
 
     }
