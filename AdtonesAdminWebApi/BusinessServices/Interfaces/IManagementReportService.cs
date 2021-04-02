@@ -11,5 +11,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     {
         Task<ReturnResult> GetReportData(ManagementReportsSearch search);
         // Task<XLWorkbook> GenerateExcelReport(ManagementReportsSearch search);
+        Task<ManagementReportModel> GetCachedOrNewReportData(ManagementReportsSearch search);
     }
 }

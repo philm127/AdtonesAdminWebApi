@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
+using AdtonesAdminWebApi.BusinessServices.ManagementReports;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -19,11 +20,13 @@ namespace AdtonesAdminWebApi.Controllers
     {
         private readonly ICampaignAuditService _auditService;
         private readonly IManagementReportService _manService;
+        private readonly ICreateExelManagementReport _excelService;
 
-        public CampaignAuditController(ICampaignAuditService auditService, IManagementReportService manService)
+        public CampaignAuditController(ICampaignAuditService auditService, IManagementReportService manService, ICreateExelManagementReport excelService)
         {
             _auditService = auditService;
             _manService = manService;
+            _excelService = excelService;
         }
 
 
@@ -34,50 +37,13 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        //[HttpPut("v1/GenerateManReport")]
-        //public async Task<IActionResult> GenerateManReport(ManagementReportsSearch search)
-        //{
-        //    string fileName = "Management_Report.xlsx";// + DateTime.Now.ToString("yyyy -MM-dd HH':'mm':'ss") + ".xlsx";
-        //    var wb = await _manService.GenerateExcelReport(search);
-        //    byte[] filebyte;
-        //    try
-        //    {
-        //        using (MemoryStream memoryStream = new MemoryStream())
-        //        {
-        //            wb.SaveAs(memoryStream);
-        //            filebyte = memoryStream.ToArray();
-        //            //string s = Convert.ToBase64String(filebyte);
-        //            //var FileName = ContentDispositionHeaderValue.Parse(fileName.Trim('"'));
-
-        //            //var result = new HttpResponseMessage(HttpStatusCode.OK)
-        //            //{
-        //            //    Content = new ByteArrayContent(memoryStream.ToArray())
-        //            //};
-        //            //result.Content.Headers.ContentDisposition =
-        //            //    new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
-        //            //    {
-        //            //        FileName = fileName
-        //            //    };
-        //            //result.Content.Headers.ContentType =
-        //            //    new MediaTypeHeaderValue("application/vnd.ms-excel");
-
-        //            return File(filebyte, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var _logging = new ErrorLogging()
-        //        {
-        //            ErrorMessage = ex.Message.ToString(),
-        //            StackTrace = ex.StackTrace.ToString(),
-        //            PageName = "CampaignAuditController",
-        //            ProcedureName = "GenerateManReport"
-        //        };
-        //        _logging.LogError();
-        //        return null;
-        //    }
-
-        //}
+        [HttpPut("v1/GenerateManReport")]
+        public async Task<IActionResult> GenerateManReport(ManagementReportsSearch search)
+        {
+            string fileName = "Management_Report.xlsx";// + DateTime.Now.ToString("yyyy -MM-dd HH':'mm':'ss") + ".xlsx";
+            byte[] filebyte = await _excelService.GenerateExcelManagementReport(search);
+            return File(filebyte, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
 
 
         /// <summary>

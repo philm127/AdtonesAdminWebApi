@@ -48,36 +48,36 @@ namespace AdtonesAdminWebApi
             services.AddControllers().AddNewtonsoftJson();
             services.AddHttpContextAccessor();
             services.AddAutoMapper(typeof(Startup));
+            services.AddBusinessServices();
+            //#region Business Services
 
-            #region Business Services
+            //// Business Services
+            //services.AddScoped<ISharedSelectListsService, SharedSelectListsService>();
+            //services.AddScoped<IUserManagementService, UserManagementService>();
+            //// services.AddScoped<IAdvertiserCreditService, AdvertiserCreditService>();
+            //services.AddScoped<IPromotionalCampaignService, PromotionalCampaignService>();
+            //services.AddScoped<ISalesManagementService, SalesManagementService>();
+            //services.AddScoped<IProfileMatchInfoService, ProfileMatchInfoService>();
+            //services.AddScoped<ICountryAreaService, CountryAreaService>();
+            //services.AddScoped<IFinanceTablesService, FinanceTablesService>();
+            //services.AddScoped<IAdvertiserFinancialService, AdvertiserFinancialService>();
+            //services.AddScoped<IUserDashboardService, UserDashboardService>();
+            //services.AddScoped<IOperatorConfigService, OperatorConfigService>();
+            //services.AddScoped<IOperatorService, OperatorService>();
+            //services.AddScoped<ISystemConfigService, SystemConfigService>();
+            //services.AddScoped<IRewardsService, RewardsService>();
+            //services.AddScoped<ITicketService, TicketService>();
+            //services.AddScoped<IAdvertService, AdvertService>();
+            //services.AddScoped<ICampaignService, CampaignService>();
+            //services.AddScoped<IUserProfileService, UserProfileService>();
+            //services.AddScoped<ICampaignAuditService, CampaignAuditService>();
+            //services.AddScoped<IPermissionManagementService, PermisionManagementService>();
+            //services.AddScoped<IManagementReportService, ManagementReportService>();
+            //services.AddScoped<ICreateUpdateCampaignService, CreateUpdateCampaignService>();
+            //services.AddScoped<ICreateCheckSaveProfileModels, CreateCheckSaveProfileModels>();
+            //services.AddScoped<IBillingService, BillingService>();
 
-            // Business Services
-            services.AddScoped<ISharedSelectListsService, SharedSelectListsService>();
-            services.AddScoped<IUserManagementService, UserManagementService>();
-            // services.AddScoped<IAdvertiserCreditService, AdvertiserCreditService>();
-            services.AddScoped<IPromotionalCampaignService, PromotionalCampaignService>();
-            services.AddScoped<ISalesManagementService, SalesManagementService>();
-            services.AddScoped<IProfileMatchInfoService, ProfileMatchInfoService>();
-            services.AddScoped<ICountryAreaService, CountryAreaService>();
-            services.AddScoped<IFinanceTablesService, FinanceTablesService>();
-            services.AddScoped<IAdvertiserFinancialService, AdvertiserFinancialService>();
-            services.AddScoped<IUserDashboardService, UserDashboardService>();
-            services.AddScoped<IOperatorConfigService, OperatorConfigService>();
-            services.AddScoped<IOperatorService, OperatorService>();
-            services.AddScoped<ISystemConfigService, SystemConfigService>();
-            services.AddScoped<IRewardsService, RewardsService>();
-            services.AddScoped<ITicketService, TicketService>();
-            services.AddScoped<IAdvertService, AdvertService>();
-            services.AddScoped<ICampaignService, CampaignService>();
-            services.AddScoped<IUserProfileService, UserProfileService>();
-            services.AddScoped<ICampaignAuditService, CampaignAuditService>();
-            services.AddScoped<IPermissionManagementService, PermisionManagementService>();
-            services.AddScoped<IManagementReportService, ManagementReportService>();
-            services.AddScoped<ICreateUpdateCampaignService, CreateUpdateCampaignService>();
-            services.AddScoped<ICreateCheckSaveProfileModels, CreateCheckSaveProfileModels>();
-            services.AddScoped<IBillingService, BillingService>();
-
-            #endregion
+            //#endregion
 
             #region DAL Access
 
