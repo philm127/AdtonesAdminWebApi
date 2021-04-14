@@ -39,7 +39,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
             services.AddTransient<ICalculateConvertedSpendCredit, CalculateConvertedSpendCredit>();
             services.AddTransient<IGenerateReportDataByOperator, GenerateReportDataByOperator>();
             services.AddTransient<ISetDefaultParameters, SetDefaultParameters>();
-            services.AddTransient<ICreateExelManagementReport, CreateExelManagementReport>();
+            // services.AddTransient<ICreateExelManagementReport, CreateExelManagementReport>();
             
 
             services.AddTransient<ITotalSubscribers, TotalSubscribers>();

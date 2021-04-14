@@ -1,12 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.BusinessServices.ManagementReports;
-using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,13 +14,13 @@ namespace AdtonesAdminWebApi.Controllers
     {
         private readonly ICampaignAuditService _auditService;
         private readonly IManagementReportService _manService;
-        private readonly ICreateExelManagementReport _excelService;
+        //private readonly ICreateExelManagementReport _excelService;
 
-        public CampaignAuditController(ICampaignAuditService auditService, IManagementReportService manService, ICreateExelManagementReport excelService)
+        public CampaignAuditController(ICampaignAuditService auditService, IManagementReportService manService)//, ICreateExelManagementReport excelService)
         {
             _auditService = auditService;
             _manService = manService;
-            _excelService = excelService;
+            //_excelService = excelService;
         }
 
 
@@ -37,13 +31,13 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [HttpPut("v1/GenerateManReport")]
-        public async Task<IActionResult> GenerateManReport(ManagementReportsSearch search)
-        {
-            string fileName = "Management_Report.xlsx";// + DateTime.Now.ToString("yyyy -MM-dd HH':'mm':'ss") + ".xlsx";
-            byte[] filebyte = await _excelService.GenerateExcelManagementReport(search);
-            return File(filebyte, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
-        }
+        //[HttpPut("v1/GenerateManReport")]
+        //public async Task<IActionResult> GenerateManReport(ManagementReportsSearch search)
+        //{
+        //    string fileName = "Management_Report.xlsx";// + DateTime.Now.ToString("yyyy -MM-dd HH':'mm':'ss") + ".xlsx";
+        //    byte[] filebyte = await _excelService.GenerateExcelManagementReport(search);
+        //    return File(filebyte, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        //}
 
 
         /// <summary>

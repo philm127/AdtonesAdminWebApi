@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace AdtonesAdminWebApi.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     [ApiController]
     public class SharedListController : ControllerBase
     {

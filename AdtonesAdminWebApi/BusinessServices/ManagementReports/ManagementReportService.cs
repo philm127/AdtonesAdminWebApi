@@ -1,24 +1,13 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
-using AdtonesAdminWebApi.DAL.Interfaces;
-using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
-using ClosedXML.Excel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Text.Json;
-using System.Threading;
-using System.Collections.Concurrent;
-using Microsoft.Extensions.Configuration;
-using System.Globalization;
-using AdtonesAdminWebApi.BusinessServices.ManagementReports;
 
-namespace AdtonesAdminWebApi.BusinessServices
+namespace AdtonesAdminWebApi.BusinessServices.ManagementReports
 {
     
     public class ManagementReportService : IManagementReportService
