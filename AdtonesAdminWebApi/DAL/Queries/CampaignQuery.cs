@@ -140,7 +140,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 													CASE WHEN SMSFileLocation IS NULL THEN SMSFileLocation 
 														ELSE CONCAT(@siteAddress,SMSFileLocation) END AS SMSFileLocation,
 													Active,NumberOfPlays,
-                                                    AverageDailyPlays,SmsRequests,EmailsDelievered,EmailSubject,EmailBody,SmsBody,
+                                                    AverageDailyPlays,SmsRequests,EmailsDelievered,EmailSubject,EmailBody,SmsOriginator,SmsBody,
                                                     CreatedDateTime,UpdatedDateTime,Status,StartDate,EndDate,
                                                     camp.CountryId,IsAdminApproval,ProvidendSpendAmount,AdtoneServerCampaignProfileId,
                                                     CurrencyCode,CurrencyId,CampaignCategoryId, ISNULL(min.MinBid,0) AS MinBid

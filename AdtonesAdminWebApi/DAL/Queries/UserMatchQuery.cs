@@ -123,11 +123,13 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                     AdtoneServerCampaignProfileTimeId)
                                                             VALUES
                                                                 (@CampaignProfileId,@Monday,@Tuesday,@Wednesday,@Thursday,@Friday,@Saturday,
-                                                                    @Sunday,@AdtoneServerCampaignProfileTimeId)";
+                                                                    @Sunday,@AdtoneServerCampaignProfileTimeId);
+                                                            SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
         public static string UpdateTimeSettingsProfile => @"UPDATE CampaignProfileTimeSetting SET Monday=@Monday,Tuesday=@Tuesday,Wednesday=@Wednesday,
                                                                     Thursday=@Thursday,Friday=@Friday,Saturday=@Saturday,Sunday=@Sunday
-                                                                    WHERE CampaignProfileId=@Id";
+                                                                    WHERE CampaignProfileId=@Id;";
+                                                                    
 
 
         public static string UpdateMobileProfile => @"UPDATE CampaignProfilePreference SET ContractType_Mobile=@ContractType_Mobile,
