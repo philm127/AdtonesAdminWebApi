@@ -41,3 +41,8 @@ git push
 exit
 git checkout -b advertAdmin
 exit
+git branch
+git checkout crmProject
+git add -A && git commit -m "changes to man reports"
+git checkout crmProject
+exit

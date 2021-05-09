@@ -216,6 +216,8 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             if (!string.IsNullOrEmpty(timeSettings.Monday))
                 timeSettings.Monday = timeSettings.Monday.Substring(0, timeSettings.Monday.Length - 1);
+            else
+                timeSettings.Monday = string.Empty;
 
             timeSettings.Tuesday = null;
             foreach (var item in model.TuesdaySelectedTimes)
@@ -226,6 +228,8 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             if (!string.IsNullOrEmpty(timeSettings.Tuesday))
                 timeSettings.Tuesday = timeSettings.Tuesday.Substring(0, timeSettings.Tuesday.Length - 1);
+            else
+                timeSettings.Tuesday = string.Empty;
 
             timeSettings.Wednesday = null;
             foreach (var item in model.WednesdaySelectedTimes)
@@ -236,6 +240,8 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             if (!string.IsNullOrEmpty(timeSettings.Wednesday))
                 timeSettings.Wednesday = timeSettings.Wednesday.Substring(0, timeSettings.Wednesday.Length - 1);
+            else
+                timeSettings.Wednesday = string.Empty;
 
             timeSettings.Thursday = null;
             foreach (var item in model.ThursdaySelectedTimes)
@@ -246,6 +252,8 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             if (!string.IsNullOrEmpty(timeSettings.Thursday))
                 timeSettings.Thursday = timeSettings.Thursday.Substring(0, timeSettings.Thursday.Length - 1);
+            else
+                timeSettings.Thursday = string.Empty;
 
             timeSettings.Friday = null;
             foreach (var item in model.FridaySelectedTimes)
@@ -256,6 +264,8 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             if (!string.IsNullOrEmpty(timeSettings.Friday))
                 timeSettings.Friday = timeSettings.Friday.Substring(0, timeSettings.Friday.Length - 1);
+            else
+                timeSettings.Friday = string.Empty;
 
             timeSettings.Saturday = null;
             foreach (var item in model.SaturdaySelectedTimes)
@@ -266,6 +276,8 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             if (!string.IsNullOrEmpty(timeSettings.Saturday))
                 timeSettings.Saturday = timeSettings.Saturday.Substring(0, timeSettings.Saturday.Length - 1);
+            else
+                timeSettings.Saturday = string.Empty;
 
             timeSettings.Sunday = null;
             foreach (var item in model.SundaySelectedTimes)
@@ -276,6 +288,8 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             if (!string.IsNullOrEmpty(timeSettings.Sunday))
                 timeSettings.Sunday = timeSettings.Sunday.Substring(0, timeSettings.Sunday.Length - 1);
+            else
+                timeSettings.Sunday = string.Empty;
 
             timeSettings.CampaignProfileId = model.CampaignProfileId;
             timeSettings.CampaignProfileTimeSettingsId = model.CampaignProfileTimeSettingsId;
