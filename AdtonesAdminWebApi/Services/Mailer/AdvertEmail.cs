@@ -1,6 +1,7 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
-using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign;
+using AdtonesAdminWebApi.ViewModels.DTOs;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -51,7 +52,7 @@ namespace AdtonesAdminWebApi.Services.Mailer
                 string advertURL = "";
                 string siteAddress = _configuration.GetValue<string>("AppSettings:siteAddress");
 
-                CampaignProfile campaignDetails = _campDAL.GetCampaignProfileDetail(model.CampaignProfileId).Result;
+                CampaignProfileDto campaignDetails = _campDAL.GetCampaignProfileDetail(model.CampaignProfileId).Result;
                 var countryDetails = _countryDAL.GetCountryById(campaignDetails.CountryId.Value).Result;
                 var operatorDetails = _operatorDAL.GetOperatorById(model.OperatorId).Result;
 

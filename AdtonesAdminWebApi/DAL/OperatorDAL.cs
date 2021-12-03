@@ -93,24 +93,24 @@ namespace AdtonesAdminWebApi.DAL
                                                                                                         AdtoneServerOperatorId = model.AdtoneServerOperatorId
                                                                                                     }));
 
-                var countryId = 0;
-                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId);
-                List<string> conns = lst.ToList();
+                //var countryId = 0;
+                //var lst = await _connService.GetConnectionStringsByCountry(model.CountryId);
+                //List<string> conns = lst.ToList();
 
-                foreach (string constr in conns)
-                {
-                    countryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId, constr);
-                    x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(OperatorQuery.AddNewOperator, new
-                                                                                                    {
-                                                                                                        OperatorName = model.OperatorName.Trim(),
-                                                                                                        CountryId = countryId,
-                                                                                                        EmailCost = model.EmailCost,
-                                                                                                        SmsCost = model.SmsCost,
-                                                                                                        CurrencyId = model.CurrencyId,
-                                                                                                        AdtoneServerOperatorId = model.AdtoneServerOperatorId
-                                                                                                    }));
-                }
+                //foreach (string constr in conns)
+                //{
+                //    countryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId, constr);
+                //    x = await _executers.ExecuteCommand(constr,
+                //                    conn => conn.ExecuteScalar<int>(OperatorQuery.AddNewOperator, new
+                //                                                                                    {
+                //                                                                                        OperatorName = model.OperatorName.Trim(),
+                //                                                                                        CountryId = countryId,
+                //                                                                                        EmailCost = model.EmailCost,
+                //                                                                                        SmsCost = model.SmsCost,
+                //                                                                                        CurrencyId = model.CurrencyId,
+                //                                                                                        AdtoneServerOperatorId = model.AdtoneServerOperatorId
+                //                                                                                    }));
+                //}
             }
             catch
             {
@@ -146,29 +146,24 @@ namespace AdtonesAdminWebApi.DAL
             {
                 x = await _executers.ExecuteCommand(_connStr,
                                                     conn => conn.ExecuteScalar<int>(OperatorQuery.UpdateOperator, new
-                                                                                                                {
-                                                                                                                    IsActive = model.IsActive,
-                                                                                                                    EmailCost = model.EmailCost,
-                                                                                                                    SmsCost = model.SmsCost,
-                                                                                                                    OperatorId = model.OperatorId
-                                                                                                                }));
+                                                    {
+                                                        IsActive = model.IsActive,
+                                                        EmailCost = model.EmailCost,
+                                                        SmsCost = model.SmsCost,
+                                                        OperatorId = model.OperatorId
+                                                    }));
 
                 var operatorId = 0;
-                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId);
-                List<string> conns = lst.ToList();
-
-                foreach (string constr in conns)
-                {
-                    operatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
-                    x = await _executers.ExecuteCommand(constr,
-                                                    conn => conn.ExecuteScalar<int>(OperatorQuery.UpdateOperator, new
-                                                                                                                {
-                                                                                                                    IsActive = model.IsActive,
-                                                                                                                    EmailCost = model.EmailCost,
-                                                                                                                    SmsCost = model.SmsCost,
-                                                                                                                    OperatorId = operatorId
-                                                                                                                }));
-                }
+                var constr = await _connService.GetConnectionStringByOperator(model.OperatorId);
+                operatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
+                x = await _executers.ExecuteCommand(constr,
+                                                conn => conn.ExecuteScalar<int>(OperatorQuery.UpdateOperator, new
+                                                {
+                                                    IsActive = model.IsActive,
+                                                    EmailCost = model.EmailCost,
+                                                    SmsCost = model.SmsCost,
+                                                    OperatorId = operatorId
+                                                }));
             }
             catch
             {

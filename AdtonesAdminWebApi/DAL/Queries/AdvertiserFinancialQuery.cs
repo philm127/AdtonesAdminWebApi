@@ -29,11 +29,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         WHERE bil.Id=@billingId;";
 
 
-        public static string UpdateUserCreditPayment => @"INSERT INTO UsersCreditPayment(UserId,BillingId,Amount,Description,Status,CreatedDate,UpdatedDate,
-                                                            CampaignprofileId)
-                                                          VALUES(@UserId,@BillingId,@Amount,@Description,@Status,GETDATE(),GETDATE(),
-                                                            @CampaignprofileId);";
-
         public static string UpdateInvoiceSettledDate => @"UPDATE Billing SET SettledDate=GETDATE() WHERE Id=@Id";
 
 
@@ -64,43 +59,9 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                                 ON payit.BillingId=bilit.Id";
 
 
-
-        public static string CheckIfUserExists => @"SELECT COUNT(1) FROM UsersCredit WHERE UserId=@userId";
-
-        public static string UpdateUserCredit => @"UPDATE UsersCredit SET AssignCredit=@AssignCredit, AvailableCredit=@AvailableCredit, UpdatedDate=GETDATE()
-                                                WHERE Id = @Id";
-
-
-        public static string AddUserCredit => @"INSERT INTO UsersCredit(UserId,AssignCredit,AvailableCredit,UpdatedDate,CreatedDate,CurrencyId) 
-                                            VALUES(@UserId,@AssignCredit,@AssignCredit,GETDATE(),GETDATE(),@CurrencyId)";
-
-
-        public static string UserCreditDetails => @"SELECT uc.Id,uc.UserId,AssignCredit,
-                                                    ISNULL(CAST(AvailableCredit AS decimal(18,2)),0) AS AvailableCredit,
-                                                    CreatedDate,uc.CurrencyId,c.CountryId 
-                                                    FROM  UsersCredit AS uc LEFT JOIN Currencies AS c ON c.CurrencyId=uc.CurrencyId
-                                                    WHERE uc.UserId=@Id";
-
         public static string GetPaymentHistory => @"SELECT ucp.Id, ucp.Amount, ucp.CreatedDate, bil.InvoiceNumber 
                                                     FROM UsersCreditPayment AS ucp  LEFT JOIN Billing AS bil ON bil.Id=ucp.BillingId 
                                                     WHERE ucp.UserId=@userid ORDER BY CreatedDate Desc";
-
-
-        public static string GetTotalPaymentsByUser => @"SELECT sum(Amount) FROM UsersCreditPayment WHERE UserId=@UserId GROUP BY UserId";
-
-
-        public static string GetTotalBilledByUser => @"SELECT sum(TotalAmount) FROM Billing WHERE PaymentMethodId=1 AND UserId=@UserId GROUP BY UserId";
-
-
-        public static string UpdateCampaignCredit => @"UPDATE CampaignCreditPeriods SET CreditPeriod=@CreditPeriod WHERE ";
-
-
-        public static string InsertCampaignCredit => @"INSERT INTO CampaignCreditPeriods(CreditPeriod,UserId,CampaignProfileId,UpdatedDate,CreatedDate,AdtoneServerCampaignCreditPeriodId)
-                                                                VALUES(@CreditPeriod,@UserId,@CampaignProfileId, GETDATE(),GETDATE(),@AdtoneServerCampaignCreditPeriodId);
-                                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-
-        public static string GetAvailableCredit => @"SELECT AvailableCredit FROM UsersCredit WHERE UserId=@Id";
 
 
     }

@@ -77,7 +77,7 @@ namespace AdtonesAdminWebApi.DAL
             }
             else
             {
-                sb.Append(" WHERE q.UserId=@userId ");
+                sb.Append(" AND q.UserId=@userId ");
                 sb.Append(" ORDER BY q.Id DESC;");
                 builder.AddParameters(new { userId = id });
             }
@@ -218,28 +218,6 @@ namespace AdtonesAdminWebApi.DAL
                 throw;
             }
         }
-
-
-        //public async Task<IEnumerable<TicketListModel>> GetOperatorTicketList(int operatorId)
-        //{
-        //    var builder = new SqlBuilder();
-        //    var select = builder.AddTemplate(TicketQuery.GetOperatorLoadTicketTable);
-        //    builder.AddParameters(new { operatorId = operatorId });
-        //    builder.AddParameters(new { opadrev = (int)Enums.QuestionSubjectStatus.OperatorAdreview });
-        //    builder.AddParameters(new { cred = (int)Enums.QuestionSubjectStatus.OperatorCreditRequest });
-        //    builder.AddParameters(new { aderr = (int)Enums.QuestionSubjectStatus.AdvertError });
-        //    builder.AddParameters(new { adreview = (int)Enums.QuestionSubjectStatus.Adreview });
-
-        //    try
-        //    {
-        //        return await _executers.ExecuteCommand(_connStr,
-        //                            conn => conn.Query<TicketListModel>(select.RawSql, select.Parameters));
-        //    }
-        //    catch
-        //    {
-        //        throw;
-        //    }
-        //}
 
 
         public async Task<string> CreateNewHelpTicket(TicketFormModel ticket)

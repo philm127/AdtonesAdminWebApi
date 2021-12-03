@@ -31,25 +31,6 @@ namespace AdtonesAdminWebApi.Controllers
         }
 
 
-        [HttpPost("v1/CheckIfAdvertNameExists")]
-        public async Task<ReturnResult> CheckIfAdvertNameExists(NewAdvertFormModel advertName)
-        {
-            return await _campService.CheckIfAdvertNameExists(advertName);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns>body contains number 1 on success</returns>
-        [HttpPost("v1/CreateCampaignAdvert")]
-        public async Task<ReturnResult> CreateCampaignAdvert([FromForm] NewAdvertFormModel model)
-        {
-            return await _campService.CreateNewCampaign_Advert(model);
-        }
-
-
         /// <summary>
         /// 
         /// </summary>

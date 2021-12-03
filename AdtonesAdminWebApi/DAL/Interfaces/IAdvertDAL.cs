@@ -1,5 +1,8 @@
 ﻿using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign;
+using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels;
+using AdtonesAdminWebApi.ViewModels.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,12 +12,13 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     {
         Task<IEnumerable<UserAdvertResult>> GetAdvertResultSet(int id = 0);
         Task<IEnumerable<UserAdvertResult>> GetAdvertForSalesResultSet(int id = 0);
+        Task<IEnumerable<AdvertTableAdvertiserDto>> GetAdvertForAdvertiserResultSet(int id);
+        Task<AdvertiserAdvertTableDashboardDto> GetAdvertForAdvertiserDashboard(int id);
         Task<IEnumerable<UserAdvertResult>> GetAdvertResultSetById(int id = 0);
-        Task<IEnumerable<AdvertCategoryResult>> GetAdvertCategoryList();
-        Task<AdvertCategoryResult> GetAdvertCategoryDetails(int id);
-        Task<int> UpdateAdvertCategory(AdvertCategoryResult model);
-        Task<int> InsertAdvertCategory(AdvertCategoryResult model);
-        Task<int> RemoveAdvertCategory(IdCollectionViewModel model);
+        Task<NewAdvertFormModel> CreateNewAdvert(NewAdvertFormModel model);
+        Task<NewAdvertFormModel> CreateNewOperatorAdvert(NewAdvertFormModel model);
+        Task<NewAdvertFormModel> GetAdvertForUpdateModel(int id);
+        Task<int> UpdateAdvert(NewAdvertFormModel model);
         Task<UserAdvertResult> GetAdvertDetail(int id = 0);
         Task<int> ChangeAdvertStatus(UserAdvertResult command);
         Task<int> ChangeAdvertStatusOperator(UserAdvertResult model, int userId, int adId);

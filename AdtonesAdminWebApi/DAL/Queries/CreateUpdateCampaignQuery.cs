@@ -61,23 +61,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     FROM CampaignProfile WHERE CampaignProfileId=@Id ";
 
 
-        public static string InsertNewCampaignAdvert => @"INSERT INTO Advert(UserId,ClientId,AdvertName,Brand,MediaFileLocation,
-                                                            UploadedToMediaServer,CreatedDateTime,UpdatedDateTime,Status,Script,ScriptFileLocation,
-                                                            IsAdminApproval,AdvertCategoryId,CountryId,PhoneticAlphabet,NextStatus,CampProfileId,
-                                                            AdtoneServerAdvertId,UpdatedBy,OperatorId)
-                                                          VALUES(@AdvertiserId,@ClientId,@AdvertName,@Brand,@MediaFileLocation,
-                                                            @UploadedToMediaServer,GETDATE(),GETDATE(),@Status,@SmsScript,@ScriptFileLocation,
-                                                            @IsAdminApproval,@AdvertCategoryId,@CountryId,@PhoneticAlphabet,@NextStatus,@CampaignProfileId,
-                                                            @AdtoneServerAdvertId,@UpdatedBy,@OperatorId);
-                                                            SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-
-        public static string InsertNewIntoCampaignAdverts => @"INSERT INTO CampaignAdverts(CampaignProfileId, AdvertId, NextStatus, 
-                                                                        AdtoneServerCampaignAdvertId)
-                                                               VALUES(@CampaignProfileId, @AdvertId, @NextStatus,@AdtoneServerCampaignAdvertId);
-                                                                SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-
         public static string GetProfileTimeSettingsByCampId => @"SELECT CampaignProfileTimeSettingsId,CampaignProfileId,Monday,Tuesday
                                                                 ,Wednesday,Thursday,Friday,Saturday,Sunday,AdtoneServerCampaignProfileTimeId
                                                                 FROM CampaignProfileTimeSetting WHERE CampaignProfileId=@Id ";
@@ -92,7 +75,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         public static string AddCampaignProfileEx => @"INSERT INTO CampaignProfileExt (CampaignProfileId,NonBillable,IsProfileCampaign,CampaignCategoryId)
-                                                                VALUES(@CampaignProfileId,@NonBillable,@IsProfileCampaign,@CampaignCategoryId)";
+                                                                VALUES(@CampaignProfileId,@NonBillable,@IsProfileCampaign,@CampaignCategoryId);
+                                                                SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
 
         public static string UpdateCampaignProfileEx => @"UPDATE CampaignProfileExt SET CampaignCategoryId=@CampaignCategoryId

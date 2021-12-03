@@ -15,8 +15,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 
         Task<NewCampaignProfileFormModel> CreateNewCampaign(NewCampaignProfileFormModel model);
         Task<int> UpdateCampaignDetails(NewCampaignProfileFormModel model);
-        Task<NewAdvertFormModel> CreateNewCampaignAdvert(NewAdvertFormModel model);
-        Task<CampaignAdvertFormModel> CreateNewIntoCampaignAdverts(CampaignAdvertFormModel model, int operatorId, int provAdId);
 
         Task<int> InsertNewClient(ClientViewModel model);
         Task<ClientViewModel> GetClientDetails(int clientId);

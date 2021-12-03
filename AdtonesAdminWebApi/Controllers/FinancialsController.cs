@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
+using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.ViewModels.Command;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,15 +19,24 @@ namespace AdtonesAdminWebApi.Controllers
     public class FinancialsController : ControllerBase
     {
 
-        private readonly IFinanceTablesService _invoiceService;
-        private readonly IAdvertiserFinancialService _paymentService;
         private readonly IBillingService _billService;
+        private readonly IUserCreditService _creditService;
+        private readonly IBillingDAL _billDAL;
+        private readonly IUserCreditDAL _creditDAL;
+        private readonly ILoggingService _logServ;
+        ReturnResult result = new ReturnResult();
+        const string PageName = "FinancialsController";
+        private readonly IFinanceTablesDAL _invDAL;
 
-        public FinancialsController(IFinanceTablesService invoiceService, IAdvertiserFinancialService paymentService, IBillingService billService)
+        public FinancialsController(IBillingDAL billDAL, IBillingService billService, IUserCreditService creditService,
+                                    ILoggingService logServ, IFinanceTablesDAL invDAL, IUserCreditDAL creditDAL)
         {
-            _invoiceService = invoiceService;
-            _paymentService = paymentService;
             _billService = billService;
+            _creditService = creditService;
+            _billDAL = billDAL;
+            _logServ = logServ;
+            _invDAL = invDAL;
+            _creditDAL = creditDAL;
         }
 
 
@@ -35,28 +47,105 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetInvoiceData")]
         public async Task<ReturnResult> GetInvoiceData()
         {
-            return await _invoiceService.LoadInvoiceDataTable();
+            try
+            {
+                result.body = await _invDAL.LoadInvoiceResultSet();
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetInvoiceData";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
         [HttpGet("v1/GetInvoicListForSales/{id}")]
         public async Task<ReturnResult> GetInvoicListForSales(int id=0)
         {
-            return await _invoiceService.LoadInvoiceDataTableForSales(id);
+            try
+            {
+                result.body = await _invDAL.LoadInvoiceResultSetForSales(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetInvoicListForSales";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        [HttpGet("v1/GetBillingListForAdvertiser/{id}")]
+        public async Task<ReturnResult> GetBillingListForAdvertiser(int id)
+        {
+            try
+            {
+                result.body = await _invDAL.LoadAdvertiserBillingDetails(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetBillingListForAdvertiser";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
         [HttpGet("v1/GetOutstandingInvoicListForSales/{id}")]
         public async Task<ReturnResult> GetOutstandingInvoicListForSales(int id = 0)
         {
-            return await _invoiceService.LoadOutstandingInvoiceForSalesDataTable(id);
+            try
+            {
+                result.body = await _invDAL.LoadOutstandingInvoiceForSalesResultSet(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetOutstandingInvoicListForSales";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
         [HttpGet("v1/GetAdvertiserCreditListForSales/{id}")]
         public async Task<ReturnResult> GetAdvertiserCreditListForSales(int id = 0)
         {
-            return await _invoiceService.LoadUserCreditDataTableForSales(id);
+            try
+            {
+                result.body = await _invDAL.LoadUserCreditForSalesResultSet(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertiserCreditListForSales";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -68,7 +157,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/SendInvoice")]
         public async Task<ReturnResult> SendInvoice(IdCollectionViewModel model)
         {
-            return await _paymentService.SendInvoice(model);
+            return await _billService.SendInvoice(model);
         }
 
 
@@ -79,7 +168,20 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetOutstandingInvoiceData")]
         public async Task<ReturnResult> GetOutstandingInvoiceData()
         {
-            return await _invoiceService.LoadOutstandingInvoiceDataTable();
+            try
+            {
+                result.body = await _invDAL.LoadOutstandingInvoiceResultSet();
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetOutstandingInvoiceData";
+                await _logServ.LogError();
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -90,17 +192,31 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetCampaignCreditPeriodData/{id}")]
         public async Task<ReturnResult> GetCampaignCreditPeriodData(int id = 0)
         {
-            return await _invoiceService.LoadCampaignCreditPeriodTable(id);
+            try
+            {
+                result.body = await _invDAL.LoadCampaignCreditResultSet(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetCampaignCreditPeriodData";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns>body contains empty result</returns>
-        [HttpPut("v1/UpdateCampaignCredit")]
-        public async Task<ReturnResult> UpdateCampaignCredit(CampaignCreditResult model)
+        [HttpPut("v1/UpdateCampaignCreditPeriod")]
+        public async Task<ReturnResult> UpdateCampaignCreditPeriod(CampaignCreditPeriodCommand model)
         {
-            return await _paymentService.UpdateCampaignCredit(model);
+            return await _billService.UpdateCampaignCreditPeriod(model);
         }
 
 
@@ -108,10 +224,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains empty result</returns>
-        [HttpPost("v1/InsertCampaignCredit")]
-        public async Task<ReturnResult> InsertCampaignCredit(CampaignCreditResult model)
+        [HttpPost("v1/InsertCampaignCreditPeriod")]
+        public async Task<ReturnResult> InsertCampaignCreditPeriod(CampaignCreditPeriodCommand model)
         {
-            return await _paymentService.AddCampaignCredit(model);
+            return await _billService.AddCampaignCreditPeriod(model);
         }
 
         ///// <summary>
@@ -134,7 +250,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetToPayDetails/{id}")]
         public async Task<ReturnResult> GetToPayDetails(int id)
         {
-            return await _paymentService.GetToPayDetails(id);
+            return await _billService.GetToPayDetails(id);
         }
 
 
@@ -156,9 +272,9 @@ namespace AdtonesAdminWebApi.Controllers
         /// <param name="model"></param>
         /// <returns>body contains success message</returns>
         [HttpPost("v1/ReceivePayment")]
-        public async Task<ReturnResult> ReceivePayment(AdvertiserCreditFormModel model)
+        public async Task<ReturnResult> ReceivePayment(AdvertiserCreditFormCommand model)
         {
-            return await _paymentService.ReceivePayment(model);
+            return await _billService.ReceivePayment(model);
         }
 
 
@@ -169,8 +285,21 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetCreditData")]
         public async Task<ReturnResult> GetCreditData()
         {
-            var tst = await _invoiceService.LoadUserCreditDataTable();
-            return tst;
+            try
+            {
+                result.body = await _invDAL.LoadUserCreditResultSet();
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetCreditData";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -180,9 +309,9 @@ namespace AdtonesAdminWebApi.Controllers
         /// <param name="_creditmodel"></param>
         /// <returns>body contains nothing</returns>
         [HttpPost("v1/AddCredit")]
-        public async Task<ReturnResult> AddCredit(AdvertiserCreditFormModel _creditmodel)
+        public async Task<ReturnResult> AddCredit(AdvertiserCreditFormCommand _creditmodel)
         {
-            var tst = await _paymentService.AddUserCredit(_creditmodel);
+            var tst = await _creditService.AddUserCredit(_creditmodel);
             return tst;
         }
 
@@ -195,7 +324,28 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetCreditDetails/{id}")]
         public async Task<ReturnResult> GetCreditDetails(int id)
         {
-            return await _paymentService.GetCreditDetails(id);
+            string select_query = string.Empty;
+
+            try
+            {
+                var creddet = await _creditDAL.GetUserCreditDetail(id);
+                var credhist = await _billDAL.GetUserCreditPaymentHistory(id);
+                creddet.PaymentHistory = credhist.ToList();
+
+                result.body = creddet;
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "CreditDetails";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
+            return result;
         }
 
 
@@ -231,12 +381,29 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetPaymentData/{id}")]
         public async Task<ReturnResult> GetPaymentData(int id)
         {
-            return await _billService.GetPaymentData(id);
+            try
+            {
+                result.body = await _billDAL.GetCampaignBillingData(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetPaymentData";
+
+                await _logServ.LogError();
+
+                result.result = 0;
+                result.body = ex.Message.ToString();
+                return result;
+            }
+            return result;
         }
 
 
         [Route("v1/PayWithUserCredit")]
-        public async Task<ReturnResult> PayWithUserCredit(BillingPaymentModel model)
+        public async Task<ReturnResult> PayWithUserCredit(UserPaymentCommand model)
         {
             var tst = await _billService.PaywithUserCredit(model);
             return tst;

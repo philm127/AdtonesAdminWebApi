@@ -131,7 +131,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
 
-        public static string GetCampaignProfileById => @"SELECT camp.CampaignProfileId,UserId,ClientId,CampaignName,CampaignDescription,
+        public static string GetCampaignProfileById => @"SELECT camp.CampaignProfileId,camp.UserId,camp.ClientId,CampaignName,CampaignDescription,
                                                     TotalBudget,MaxBid,MaxHourlyBudget,MaxDailyBudget,MaxWeeklyBudget,MaxMonthBudget,
 													TotalCredit,SpendToDate,AvailableCredit,PlaysToDate,
                                                     CancelledToDate,SmsToDate,EmailToDate,
@@ -139,13 +139,15 @@ namespace AdtonesAdminWebApi.DAL.Queries
 														ELSE CONCAT(@siteAddress,EmailFileLocation) END AS EmailFileLocation,
 													CASE WHEN SMSFileLocation IS NULL THEN SMSFileLocation 
 														ELSE CONCAT(@siteAddress,SMSFileLocation) END AS SMSFileLocation,
-													Active,NumberOfPlays,
+													camp.Active,NumberOfPlays,ad.OperatorId,
                                                     AverageDailyPlays,SmsRequests,EmailsDelievered,EmailSubject,EmailBody,SmsOriginator,SmsBody,
-                                                    CreatedDateTime,UpdatedDateTime,Status,StartDate,EndDate,
-                                                    camp.CountryId,IsAdminApproval,ProvidendSpendAmount,AdtoneServerCampaignProfileId,
+                                                    camp.CreatedDateTime,camp.UpdatedDateTime,camp.Status,StartDate,EndDate,
+                                                    camp.CountryId,camp.IsAdminApproval,ProvidendSpendAmount,AdtoneServerCampaignProfileId,
                                                     CurrencyCode,CurrencyId,CampaignCategoryId, ISNULL(min.MinBid,0) AS MinBid
-                                                    FROM CampaignProfile AS camp 
-                                                    LEFT JOIN Operators AS op ON camp.CountryId=op.CountryId
+                                                    FROM CampaignProfile AS camp
+													LEFT JOIN CampaignAdverts AS ca ON ca.CampaignProfileId=camp.CampaignProfileId
+													LEFT JOIN Advert AS ad ON ad.AdvertId=ca.AdvertId
+                                                    LEFT JOIN Operators AS op ON ad.OperatorId=op.OperatorId
 													LEFT JOIN CampaignProfileExt as ext ON ext.CampaignProfileId=camp.CampaignProfileId
 													LEFT JOIN CountryMinBid AS min ON min.CountryId=camp.CountryId
                                                     WHERE camp.CampaignProfileId=@Id";
@@ -166,12 +168,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
 		public static string CheckCampaignNameExists => @"SELECT COUNT(1) FROM CampaignProfile WHERE LOWER(CampaignName)=@Id AND UserId=@UserId;";
 
 
-		public static string UpdateCampaignMatchStatus => @"UPDATE CampaignMatches SET Status=@Status WHERE MSCampaignProfileId=@Id";
-
-
         public static string GetAdvertIdFromCampaignAd => @"SELECT AdvertId FROM CampaignAdvert WHERE CampaignProfileId=@Id";
-
-        public static string UpdateCampaignMatchFromBilling => @"UPDATE CampaignMatches SET UpdatedDateTime=GETDATE(), Status=@Status, NextStatus=0 WHERE MSCampaignProfileId=@Id";
 
 
         public static string UpdateCampaignBilling => @"UPDATE CampaignProfile SET UpdatedDateTime=GETDATE(), Status=@Status, TotalCredit=@TotalCredit,TotalBudget=@TotalBudget,AvailableCredit=@AvailableCredit WHERE CampaignProfileId=@Id";

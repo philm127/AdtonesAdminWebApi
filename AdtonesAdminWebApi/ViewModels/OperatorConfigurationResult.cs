@@ -14,5 +14,6 @@ namespace AdtonesAdminWebApi.ViewModels
         public int OperatorId { get; set; }
         public string OperatorName { get; set; }
         public string CountryName { get; set; }
+        public int? AdtoneServerOperatorConfigurationId { get; set; }
     }
 }

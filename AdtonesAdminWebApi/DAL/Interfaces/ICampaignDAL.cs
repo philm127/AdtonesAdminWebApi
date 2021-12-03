@@ -1,5 +1,7 @@
 ﻿using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.ViewModels.Command;
+using AdtonesAdminWebApi.ViewModels.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,20 +14,20 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         int[] GetOperatorFromPermissionForProv();
         Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(int id=0);
         Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetProv(int operatorId, int id = 0);
-
         Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetById(int id);
-        Task<CampaignProfile> GetCampaignProfileDetail(int id = 0);
-        Task<CampaignProfileUpdate> GetCampaignProfileDetailUpdate(int campaignId);
-        Task<int> ChangeCampaignProfileStatus(CampaignProfile model);
-        Task<int> ChangeCampaignProfileStatusOperator(CampaignProfile model);
+        // Task<CampaignProfile> GetCampaignProfileDetail(int id = 0);
+        Task<CampaignProfileDto> GetCampaignProfileDetail(int campaignId);
+        Task<int> ChangeCampaignProfileStatus(CampaignProfileDto model);
+        Task<int> ChangeCampaignProfileStatusOperator(CampaignProfileDto model);
         Task<CampaignAdverts> GetCampaignAdvertDetailsById(int adId = 0, int campId = 0);
         Task<bool> CheckCampaignBillingExists(int campaignId);
 
         Task<bool> CheckCampaignNameExists(string campaignName, int userId);
-        Task<int> UpdateCampaignMatch(CampaignProfile model);
+        // Task<int> UpdateCampaignMatch(CampaignProfile model);
         Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetBySalesExec(int id = 0);
-        Task<int> UpdateCampaignMatchesforBilling(int id = 0, string constr = null);
-        Task<int> UpdateCampaignCredit(BillingPaymentModel model, string constr);
+        Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetByAdvertiser(int id);
+
+        Task<int> UpdateCampaignCredit(CampaignCreditCommand model, string constr);
         Task<int> InsertCampaignCategory(CampaignCategoryResult model);
     }
 }

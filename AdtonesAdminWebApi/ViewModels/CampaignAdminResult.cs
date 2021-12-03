@@ -10,13 +10,15 @@ namespace AdtonesAdminWebApi.ViewModels
         public int UserId { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
+        public string SalesExec { get; set; }
+        public int sUserId { get; set; }
         public int? ClientId { get; set; }
         public string ClientName { get; set; }
         public int AdvertId { get; set; }
         public string AdvertName { get; set; }
         public int CampaignProfileId { get; set; }
         public string CampaignName { get; set; }
-
+        public string categoryName { get; set; }
         public decimal TotalBudget { get; set; }
         public int finaltotalplays { get; set; }
         public decimal FundsAvailable { get; set; }
@@ -34,6 +36,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string MobileNumber { get; set; }
         public string Organisation { get; set; }
         public string CountryName { get; set; }
+        public string CurrencyCode { get; set; }
 
     }
 }

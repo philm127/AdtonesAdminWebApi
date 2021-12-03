@@ -2,6 +2,7 @@
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.ViewModels.DTOs;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -155,11 +156,26 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<AdvertiserCreditResult>> LoadUserCreditResultSet()
+        public async Task<IEnumerable<AdvertiserCreditResultDto>> LoadUserCreditResultSet()
         {
+            string LoadUserCreditDataTable = @"SELECT u.Id,u.UserId,usrs.Email,usrs.FullName,usrs.Organisation,u.CreatedDate,bil.CurrencyCode,
+                                                 u.AssignCredit AS Credit,u.AvailableCredit,ISNULL(bil.TotalAmount,0) AS TotalUsed,ISNULL(pay.Amount,0) AS TotalPaid,
+                                                 (ISNULL(bil.TotalAmount,0) - ISNULL(pay.Amount,0)) AS RemainingAmount,ISNULL(ctry.Name,'None') AS CountryName
+                                                 FROM UsersCredit AS u
+                                                 LEFT JOIN 
+                                                 (SELECT UserId,SUM(TotalAmount) AS TotalAmount,CurrencyCode FROM Billing WHERE PaymentMethodId=1 GROUP BY UserId,CurrencyCode) bil
+                                                 ON u.UserId=bil.UserId
+                                                 LEFT JOIN
+                                                 (SELECT UserId,SUM(Amount) AS Amount from UsersCreditPayment GROUP BY UserId) pay
+                                                 ON u.UserId=pay.UserId
+                                                 LEFT JOIN
+                                                 (SELECT UserId,Email,CONCAT(FirstName,' ',LastName) AS FullName,Organisation FROM Users) usrs
+                                                 ON usrs.UserId=u.UserId
+                                                LEFT JOIN Currencies AS ad ON u.CurrencyId=ad.CurrencyId
+                                                LEFT JOIN Country AS ctry ON ctry.Id=ad.CountryId";
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(FinancialTablesQuery.LoadUserCreditDataTable);
+            sb.Append(LoadUserCreditDataTable);
             sb.Append(" WHERE 1=1 ");
             var values = CheckGeneralFile(sb, builder, pais: "ad");
             sb = values.Item1;
@@ -171,7 +187,7 @@ namespace AdtonesAdminWebApi.DAL
             {
 
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.Query<AdvertiserCreditResult>(select.RawSql, select.Parameters));
+                                conn => conn.Query<AdvertiserCreditResultDto>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -180,11 +196,30 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<AdvertiserCreditResult>> LoadUserCreditForSalesResultSet(int id = 0)
+        public async Task<IEnumerable<AdvertiserCreditResultDto>> LoadUserCreditForSalesResultSet(int id = 0)
         {
+            string LoadUserCreditForSalesDataTable = @"SELECT u.Id,u.UserId,usrs.Email,usrs.FullName,usrs.Organisation,u.CreatedDate,bil.CurrencyCode,
+                                                 u.AssignCredit AS Credit,u.AvailableCredit,ISNULL(bil.TotalAmount,0) AS TotalUsed,ISNULL(pay.Amount,0) AS TotalPaid,
+                                                CASE WHEN sexcs.FirstName IS NULL THEN 'UnAllocated' 
+                                                    ELSE CONCAT(sexcs.FirstName,' ',sexcs.LastName) END AS SalesExec,sexcs.UserId AS SUserId,s
+                                                 (ISNULL(bil.TotalAmount,0) - ISNULL(pay.Amount,0)) AS RemainingAmount,ISNULL(ctry.Name,'None') AS CountryName
+                                                 FROM UsersCredit AS u
+                                                 LEFT JOIN 
+                                                 (SELECT UserId,SUM(TotalAmount) AS TotalAmount,CurrencyCode FROM Billing WHERE PaymentMethodId=1 GROUP BY UserId,CurrencyCode) bil
+                                                 ON u.UserId=bil.UserId
+                                                 LEFT JOIN
+                                                 (SELECT UserId,SUM(Amount) AS Amount from UsersCreditPayment GROUP BY UserId) pay
+                                                 ON u.UserId=pay.UserId
+                                                 LEFT JOIN
+                                                 (SELECT UserId,Email,CONCAT(FirstName,' ',LastName) AS FullName,Organisation FROM Users) usrs
+                                                 ON usrs.UserId=u.UserId
+                                                LEFT JOIN Currencies AS ad ON u.CurrencyId=ad.CurrencyId
+                                                LEFT JOIN Country AS ctry ON ctry.Id=ad.CountryId
+                                                LEFT JOIN Advertisers_SalesTeam AS sales ON usrs.UserId=sales.AdvertiserId 
+                                                LEFT JOIN Users AS sexcs ON sexcs.UserId=sales.SalesExecId";
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(FinancialTablesQuery.LoadUserCreditForSalesDataTable);
+            sb.Append(LoadUserCreditForSalesDataTable);
             if (id == 0)
             {
                 sb.Append(" WHERE 1=1 ");
@@ -205,7 +240,7 @@ namespace AdtonesAdminWebApi.DAL
             {
 
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.Query<AdvertiserCreditResult>(select.RawSql, select.Parameters));
+                                conn => conn.Query<AdvertiserCreditResultDto>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -214,13 +249,43 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<InvoicePDFEmailModel> GetInvoiceToPDF(int billingId, int UsersCreditPaymentID)
+        public async Task<IEnumerable<AdvertiserBillingResultDto>> LoadAdvertiserBillingDetails(int id)
+        {
+            string GetOutstandingInvoiceForSalesResultSet = @"SELECT bil.Id AS BillingId,bil.UserId,bil.InvoiceNumber,bil.PONumber,
+                                                                CONCAT(@siteAddress,'/Invoice/Adtones_invoice_',bil.InvoiceNumber,'.pdf') AS InvoicePath,
+                                                                ISNULL(cl.Name, '-') AS ClientName,bil.CampaignProfileId,cp.CampaignName,
+                                                                bil.PaymentDate AS CreatedDate,bil.TotalAmount,bil.Status,bil.SettledDate,
+                                                                bil.PaymentMethodId,pay.Name AS PaymentMethod,bil.CurrencyCode
+                                                                FROM Billing AS bil LEFT JOIN Client AS cl ON cl.Id=bil.ClientId
+                                                                INNER JOIN CampaignProfile AS cp ON cp.CampaignProfileId=bil.CampaignProfileId
+                                                                INNER JOIN PaymentMethod AS pay ON pay.Id=bil.PaymentMethodId
+                                                                LEFT JOIN Contacts AS con ON bil.UserId=con.UserId WHERE bil.UserId=@Id ORDER BY u.Id DESC;";
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.Query<AdvertiserBillingResultDto>(GetOutstandingInvoiceForSalesResultSet,
+                                                                new
+                                                                {
+                                                                    siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress"),
+                                                                    id = id
+                                                                }
+                                                                ));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<InvoicePDFEmailDto> GetInvoiceToPDF(int billingId, int UsersCreditPaymentID)
         {
 
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<InvoicePDFEmailModel>(FinancialTablesQuery.GetInvoiceToPDF, 
+                                conn => conn.QueryFirstOrDefault<InvoicePDFEmailDto>(FinancialTablesQuery.GetInvoiceToPDF, 
                                                                                 new { billingId = billingId, ucpId = UsersCreditPaymentID }));
             }
             catch

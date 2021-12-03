@@ -1,0 +1,23 @@
+﻿using Domain.Model;
+using Domain.ViewModels;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace BusinessServices.Interfaces.Repository;
+{
+    public interface ICountryAreaDAL
+    {
+        Task<IEnumerable<CountryResult>> LoadCountryResultSet();
+        Task<CountryResult> GetCountryById(int id);
+        Task<bool> CheckCountryExists(CountryResult model);
+        Task<int> AddCountry(CountryResult model);
+        Task<int> UpdateCountry(CountryResult model);
+        Task<IEnumerable<AreaResult>> LoadAreaResultSet();
+        Task<int> AddArea(AreaResult areamodel);
+        Task<AreaResult> GetAreaById(int id);
+        Task<int> DeleteAreaById(int id);
+        Task<int> UpdateArea(AreaResult model);
+        Task<bool> CheckAreaExists(AreaResult areamodel);
+        Task<decimal> GetMinBidByCountry(int countryId);
+    }
+}

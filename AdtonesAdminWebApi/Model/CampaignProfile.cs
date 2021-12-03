@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdtonesAdminWebApi.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,11 @@ namespace AdtonesAdminWebApi.Model
 {
     public class CampaignProfile
     {
+
+        public CampaignProfile()
+        {
+            Adverts = new HashSet<UserAdvertResult>();
+        }
         public int UserId { get; set; }
 
         public int? ClientId { get; set; }
@@ -28,13 +34,12 @@ namespace AdtonesAdminWebApi.Model
 
 
         public float MaxBid { get; set; }
-
+        public decimal TotalCredit { get; set; }
 
         public float AvailableCredit { get; set; }
 
 
         public int PlaysToDate { get; set; }
-
 
         public int PlaysLastMonth { get; set; }
 
@@ -129,5 +134,10 @@ namespace AdtonesAdminWebApi.Model
         public int? CurrencyId { get; set; }
 
         public int OperatorId { get; set; }
+
+        public int? CampaignCategoryId { get; set; }
+
+        public virtual Client Client { get; set; }
+        public virtual ICollection<UserAdvertResult> Adverts { get; set; }
     }
 }

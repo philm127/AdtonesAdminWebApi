@@ -9,8 +9,10 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     public interface IProfileMatchInfoDAL
     {
         Task<IEnumerable<ProfileMatchInformationFormModel>> LoadProfileResultSet();
+        Task<IEnumerable<ProfileMatchInformationFormModel>> GetProfileMatchInformation(int countryId);
         Task<ProfileMatchInformationFormModel> GetProfileById(int id);
-        Task<IEnumerable<ProfileMatchLabelFormModel>> GetProfileLabelById(int id);
+        Task<ProfileMatchLabelFormModel> GetProfileLabelById(int id);
+        Task<IEnumerable<ProfileMatchLabelFormModel>> GetListProfileLabelById(int id);
         Task<int> UpdateProfileInfo(ProfileMatchInformationFormModel model);
         Task<int> AddProfileInfo(ProfileMatchInformationFormModel model);
         Task<int> AddProfileInfoLabel(ProfileMatchLabelFormModel model);

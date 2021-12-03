@@ -24,13 +24,14 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConnectionStringService _connService;
         private readonly IPrematchProcess _matchProcess;
         private readonly IUserMatchDAL _matchDAL;
+        private readonly ICampaignMatchDAL _campMatchDAL;
         private readonly IMapper _mapper;
         public readonly IConfiguration _configuration;
         ReturnResult result = new ReturnResult();
 
 
         public CreateCheckSaveProfileModels(IHttpContextAccessor httpAccessor, ICampaignDAL campaignDAL, IPrematchProcess matchProcess,
-                                            ICreateUpdateCampaignDAL createDAL, IConnectionStringService connService,
+                                            ICreateUpdateCampaignDAL createDAL, IConnectionStringService connService, ICampaignMatchDAL campMatchDAL,
                                             IUserMatchDAL matchDAL, IMapper mapper, IConfiguration configuration)
         {
             _httpAccessor = httpAccessor;
@@ -39,6 +40,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _connService = connService;
             _matchProcess = matchProcess;
             _matchDAL = matchDAL;
+            _campMatchDAL = campMatchDAL;
             _mapper = mapper;
             _configuration = configuration;
         }
@@ -106,7 +108,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 var result = await _matchDAL.UpdateGeographicProfile(command, connString);
 
-                var result2 = await _matchDAL.UpdateMatchCampaignGeographic(command, connString);
+                var result2 = await _campMatchDAL.UpdateMatchCampaignGeographic(command, connString);
             }
             catch
             {
@@ -506,7 +508,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 command.WorkingStatus_Demographics = CompileAnswers(SortList(model.WorkingStatusQuestion));
 
                 var prefId = await _matchDAL.UpdateDemographicProfile(command, connString);
-                var result2 = await _matchDAL.UpdateMatchCampaignDemographic(command, connString);
+                var result2 = await _campMatchDAL.UpdateMatchCampaignDemographic(command, connString);
             }
             catch
             {
@@ -595,7 +597,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             var prefId = await _matchDAL.UpdateMobileProfile(command, connString);
 
-            var result2 = await _matchDAL.UpdateMatchCampaignMobile(command, connString);
+            var result2 = await _campMatchDAL.UpdateMatchCampaignMobile(command, connString);
 
             return true;   
         }
@@ -702,7 +704,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             var prefId = await _matchDAL.UpdateQuestionnaireProfile(command, connString);
 
-            var result2 = await _matchDAL.UpdateMatchCampaignQuestionnaire(command, connString);
+            var result2 = await _campMatchDAL.UpdateMatchCampaignQuestionnaire(command, connString);
 
             return true;
         }
@@ -1283,7 +1285,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
             var prefId = await _matchDAL.UpdateAdvertProfile(command, connString);
 
-            var result2 = await _matchDAL.UpdateMatchCampaignAdvert(command, connString);
+            var result2 = await _campMatchDAL.UpdateMatchCampaignAdvert(command, connString);
 
             return true;
         }

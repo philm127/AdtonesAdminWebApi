@@ -1,4 +1,5 @@
 ﻿using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.ViewModels.Command;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,14 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
     public interface IBillingService
     {
-        Task<ReturnResult> PaywithUserCredit(BillingPaymentModel model);
-        Task<ReturnResult> GetPaymentData(int campaignId);
+        Task<ReturnResult> PaywithUserCredit(UserPaymentCommand model);
+
+        Task<ReturnResult> SendInvoice(IdCollectionViewModel model);
+        Task<ReturnResult> ReceivePayment(AdvertiserCreditFormCommand model);
+
+        
+        Task<ReturnResult> AddCampaignCreditPeriod(CampaignCreditPeriodCommand model);
+        Task<ReturnResult> UpdateCampaignCreditPeriod(CampaignCreditPeriodCommand model);
+        Task<ReturnResult> GetToPayDetails(int billingId);
     }
 }

@@ -554,47 +554,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetOperatorAdmin(int userId)
-        {
-            try
-            {
-                result.body = await _userDAL.getOperatorAdmin(userId);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetOperatorAdmin";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> GetUserById(int userId)
-        {
-
-            try
-            {
-                result.body = await _userDAL.GetUserById(userId);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetUserById";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
         private async Task<bool> SendConfirmationMail(UserAddFormModel user, string alt_email = null)
         {
             string url = string.Empty;
@@ -668,27 +627,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                 return false;
             }
             return true;
-        }
-
-
-        public async Task<ReturnResult> GetClientProfile(int clientId)
-        {
-
-            try
-            {
-                result.body = await _userDAL.GetClientDetails(clientId);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetClientProfile";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
         }
 
 

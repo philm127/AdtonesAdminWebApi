@@ -20,6 +20,7 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public int CurrencyId { get; set; }
         public string  CountryName { get; set; }
+        public int? AdtoneServerOperatorId { get; set; }
 
     }
 }

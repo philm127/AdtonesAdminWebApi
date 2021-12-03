@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>88812aa9-acbf-4f14-aa7f-2bfa97011cf4</UserSecretsId>
 	<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
@@ -13,13 +13,13 @@
     <Compile Remove="DAL\**" />
     <Compile Remove="EmailTemplates\**" />
     <Compile Remove="PromotionalUserCSV\**" />
-    <Compile Remove="ViewModels\AdProfilrModels\**" />
+    <Compile Remove="RollUpData\**" />
     <Content Remove="CrmApp\**" />
     <Content Remove="CRM\**" />
     <Content Remove="DAL\**" />
     <Content Remove="EmailTemplates\**" />
     <Content Remove="PromotionalUserCSV\**" />
-    <Content Remove="ViewModels\AdProfilrModels\**" />
+    <Content Remove="RollUpData\**" />
 	<Content Update="appsettings*.json" CopyToPublishDirectory="Never" />
 	<Content Update="TempGenPermissions\**" CopyToPublishDirectory="Never" />
 	<Content Update="wwwroot\**" CopyToPublishDirectory="Never" />
@@ -29,62 +29,58 @@
     <EmbeddedResource Remove="DAL\**" />
     <EmbeddedResource Remove="EmailTemplates\**" />
     <EmbeddedResource Remove="PromotionalUserCSV\**" />
-    <EmbeddedResource Remove="ViewModels\AdProfilrModels\**" />
+    <EmbeddedResource Remove="RollUpData\**" />
     <None Remove="CrmApp\**" />
     <None Remove="CRM\**" />
     <None Remove="DAL\**" />
     <None Remove="EmailTemplates\**" />
     <None Remove="PromotionalUserCSV\**" />
-    <None Remove="ViewModels\AdProfilrModels\**" />
+    <None Remove="RollUpData\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="BusinessServices\AddNewCampaign.cs" />
     <Compile Remove="BusinessServices\AdvertiserCreditService.cs" />
+    <Compile Remove="BusinessServices\AdvertiserFinancialService.cs" />
     <Compile Remove="BusinessServices\CountryTaxService.cs" />
     <Compile Remove="BusinessServices\ExpressoPromotionalUserService.cs" />
     <Compile Remove="BusinessServices\Interfaces\IAdvertiserCreditService.cs" />
+    <Compile Remove="BusinessServices\Interfaces\IAdvertiserFinancialService.cs" />
     <Compile Remove="BusinessServices\SafaricomPromotionalUserService.cs" />
     <Compile Remove="Controllers\AreaController.cs" />
     <Compile Remove="Controllers\RewardController.cs" />
     <Compile Remove="Controllers\WeatherForecastController.cs" />
-    <Compile Remove="Model\CampaignProfile.cs" />
     <Compile Remove="OperatorSpecific\ExpressoPromotionalCampaign.cs" />
     <Compile Remove="Services\AuthenticationExtension.cs" />
     <Compile Remove="Services\ErrorLogging.cs" />
     <Compile Remove="Services\ExpressoOperators.cs" />
     <Compile Remove="Services\GeneralPemissionAssignment.cs" />
     <Compile Remove="Services\PromotionalUserStatus.cs" />
-    <Compile Remove="Model\UsersModel.cs" />
-    <Compile Remove="ViewModels\AdvertCategoryResult.cs" />
     <Compile Remove="ViewModels\AdvertiserCreditFormModel.cs" />
-    <Compile Remove="ViewModels\AdvertiserCreditPaymentFormModel.cs" />
     <Compile Remove="ViewModels\AdvertiserCreditPaymentResult.cs" />
     <Compile Remove="ViewModels\AdvertiserCreditResult.cs" />
-    <Compile Remove="ViewModels\AdvertiserCreditSharedListsModel.cs" />
-    <Compile Remove="ViewModels\AreaResult.cs" />
-    <Compile Remove="ViewModels\CampaignAdminResult.cs" />
-    <Compile Remove="ViewModels\CampaignAdverts.cs" />
-    <Compile Remove="ViewModels\CampaignCreditResult.cs" />
-    <Compile Remove="ViewModels\OperatorConfigurationResult.cs" />
-    <Compile Remove="ViewModels\OperatorFormModel.cs" />
-    <Compile Remove="ViewModels\OperatorMaxAdvertsFormModel.cs" />
-    <Compile Remove="ViewModels\OperatorResult.cs" />
-    <Compile Remove="ViewModels\ProfileMatchLabelFormModel.cs" />
-    <Compile Remove="ViewModels\PromotionalCampaignResult.cs" />
-    <Compile Remove="ViewModels\PromotionalUserFormModel.cs" />
-    <Compile Remove="ViewModels\UserAdvertResult.cs" />
+    <Compile Remove="ViewModels\AdvertiserCreditViewModels.cs" />
+    <Compile Remove="ViewModels\InvoiceForPDF.cs" />
     <Compile Remove="WeatherForecast.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="DAL\AdvertCategoryDAL.cs" />
     <Compile Include="DAL\BillingDAL.cs" />
+    <Compile Include="DAL\CampaignAdvertDAL.cs" />
+    <Compile Include="DAL\CampaignMatchDAL.cs" />
     <Compile Include="DAL\CampaignProfilesDAL.cs" />
     <Compile Include="DAL\CreateUpdateCampaignDAL.cs" />
+    <Compile Include="DAL\DependencyInjection.cs" />
+    <Compile Include="DAL\Interfaces\IAdvertCategoryDAL.cs" />
     <Compile Include="DAL\Interfaces\IBillingDAL.cs" />
+    <Compile Include="DAL\Interfaces\ICampaignAdvertDAL.cs" />
+    <Compile Include="DAL\Interfaces\ICampaignMatchDAL.cs" />
     <Compile Include="DAL\Interfaces\ICreateUpdateCampaignDAL.cs" />
     <Compile Include="DAL\Interfaces\IOperatorDAL.cs" />
     <Compile Include="DAL\Interfaces\ISalesManagementDAL.cs" />
+    <Compile Include="DAL\Interfaces\IUserCreditDAL.cs" />
+    <Compile Include="DAL\Interfaces\IUserProfileDAL.cs" />
     <Compile Include="DAL\OperatorDAL.cs" />
     <Compile Include="DAL\Interfaces\IProfileMatchInfoDAL.cs" />
     <Compile Include="DAL\ProfileMatchInfoDAL.cs" />
@@ -97,9 +93,7 @@
     <Compile Include="DAL\Queries\SalesManagementQuery.cs" />
     <Compile Include="DAL\RewardDAL.cs" />
     <Compile Include="DAL\BaseDAL.cs" />
-    <Compile Include="DAL\AdvertiserFinancialDAL.cs" />
     <Compile Include="DAL\Interfaces\IFinanceTablesDAL.cs" />
-    <Compile Include="DAL\Interfaces\IAdvertiserFinancialDAL.cs" />
     <Compile Include="DAL\FinanceTablesDAL.cs" />
     <Compile Include="DAL\Interfaces\IManagementReportDAL.cs" />
     <Compile Include="DAL\Interfaces\IPermissionManagementDAL.cs" />
@@ -150,33 +144,40 @@
     <Compile Include="DAL\SharedSelectListsDAL.cs" />
     <Compile Include="DAL\AdvertDAL.cs" />
     <Compile Include="DAL\TicketDAL.cs" />
+    <Compile Include="DAL\UserCreditDAL.cs" />
     <Compile Include="DAL\UserDashboardDAL.cs" />
     <Compile Include="DAL\UserManagementDAL.cs" />
     <Compile Include="DAL\UserMatchDAL.cs" />
+    <Compile Include="DAL\UserProfileDAL.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
-    <PackageReference Include="ClosedXML" Version="0.95.0" />
-    <PackageReference Include="Dapper" Version="2.0.35" />
-    <PackageReference Include="Dapper.SqlBuilder" Version="2.0.35" />
-    <PackageReference Include="FluentValidation" Version="9.5.3" />
-    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="9.5.3" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+    <PackageReference Include="ClosedXML" Version="0.95.4" />
+    <PackageReference Include="Dapper" Version="2.0.90" />
+    <PackageReference Include="Dapper.SqlBuilder" Version="2.0.78" />
+    <PackageReference Include="FluentValidation" Version="10.3.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="10.3.1" />
     <PackageReference Include="iTextSharp" Version="5.5.13.2" />
-    <PackageReference Include="MailKit" Version="2.10.0" />
+    <PackageReference Include="MailKit" Version="2.15.0" />
     <PackageReference Include="MediatR" Version="9.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="5.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
-    <PackageReference Include="RestSharp" Version="106.10.1" />
-    <PackageReference Include="SSH.NET" Version="2016.1.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
+    <PackageReference Include="PayPal" Version="1.9.1" />
+    <PackageReference Include="Paypal-Base" Version="1.0.0" />
+    <PackageReference Include="PayPalCoreSDK" Version="1.7.1" />
+    <PackageReference Include="PayPalMerchantSDK" Version="2.16.250" />
+    <PackageReference Include="PayPalPermissionsSDK" Version="2.8.109" />
+    <PackageReference Include="RestSharp" Version="106.12.0" />
+    <PackageReference Include="SSH.NET" Version="2020.0.1" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

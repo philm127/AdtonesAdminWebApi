@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace AdtonesAdminWebApi.DAL
 {
-    public static class CampaignProfilesDAL
+    public static class CampaignProfileDAL
     {
         private static readonly string _connStr = ConfigHelper.AppSetting("DefaultConnection");
 

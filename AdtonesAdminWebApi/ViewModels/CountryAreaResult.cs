@@ -29,15 +29,15 @@ namespace AdtonesAdminWebApi.ViewModels
     }
 
 
-    public class AreaResult
-    {
-        public int AreaId { get; set; }
-        public string AreaName { get; set; }
+    //public class AreaResult
+    //{
+    //    public int AreaId { get; set; }
+    //    public string AreaName { get; set; }
 
-        public int? CountryId { get; set; }
-        public string CountryName { get; set; }
-        public bool IsActive { get; set; }
-    }
+    //    public int? CountryId { get; set; }
+    //    public string CountryName { get; set; }
+    //    public bool IsActive { get; set; }
+    //}
 
 
 }

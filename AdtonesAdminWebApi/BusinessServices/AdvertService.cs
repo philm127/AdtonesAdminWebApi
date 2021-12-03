@@ -1,6 +1,7 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -9,6 +10,10 @@ using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.UserMatchServices;
 using System.Linq;
+using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign;
+using System.IO;
+using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels;
+using AdtonesAdminWebApi.Services.Mailer;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -27,6 +32,12 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IConfiguration _configuration;
         private readonly IPrematchProcess _preProcess;
         private readonly ILoggingService _logServ;
+        private readonly ISaveGetFiles _saveFile;
+        private readonly IConvertSaveMediaFile _convFile;
+        private readonly ICampaignAdvertDAL _campAdDal;
+        private readonly IAdvertEmail _adEmail;
+        private readonly IPrematchProcess _matchProcess;
+        private readonly ICampaignMatchDAL _campMatchDAL;
         ReturnResult result = new ReturnResult();
         const string PageName = "AdvertService";
 
@@ -34,7 +45,9 @@ namespace AdtonesAdminWebApi.BusinessServices
         public AdvertService(IAdvertDAL advertDAL, IHttpContextAccessor httpAccessor, IConnectionStringService connService,
                                 IUserMatchDAL matchDAL, IAdTransferService transService, IPrematchProcess preProcess,
                                 IGenerateTicketService ticketService, ICampaignService campService, ISoapApiService soapApi,
-                                ISoapDAL soapDAL, ICampaignDAL campDAL, IConfiguration configuration, ILoggingService logServ)
+                                ISoapDAL soapDAL, ICampaignDAL campDAL, IConfiguration configuration, ILoggingService logServ, 
+                                ISaveGetFiles saveFile, IConvertSaveMediaFile convFile, ICampaignAdvertDAL campAdDal, ICampaignMatchDAL campMatchDAL,
+                                IAdvertEmail adEmail, IPrematchProcess matchProcess)
         {
             _advertDAL = advertDAL;
             _httpAccessor = httpAccessor;
@@ -49,6 +62,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             _configuration = configuration;
             _preProcess = preProcess;
             _logServ = logServ;
+            _saveFile = saveFile;
+            _convFile = convFile;
+            _campAdDal = campAdDal;
+            _adEmail = adEmail;
+            _matchProcess = matchProcess;
+            _campMatchDAL = campMatchDAL;
         }
 
 
@@ -92,6 +111,50 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
                 _logServ.ProcedureName = "GetAdvertDataTableForSales";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
+        }
+
+
+        public async Task<ReturnResult> GetAdvertDataTableForAdvertiser(int id)
+        {
+            try
+            {
+                result.body = await _advertDAL.GetAdvertForAdvertiserResultSet(id);
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertDataTableForAdvertiser";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
+        }
+
+
+        public async Task<ReturnResult> GetAdvertDataTableForAdvertiserSummary(int id)
+        {
+            try
+            {
+                result.body = await _advertDAL.GetAdvertForAdvertiserDashboard(id);
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertDataTableForAdvertiserSummary";
                 await _logServ.LogError();
 
                 result.result = 0;
@@ -146,109 +209,385 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
         }
 
-
-        public async Task<ReturnResult> GetAdvertCategoryDataTable()
+        public async Task<ReturnResult> GetAdvertDetailsByCampaignId(int id = 0)
         {
             try
             {
-                result.body = await _advertDAL.GetAdvertCategoryList();
+                var advertId = await _advertDAL.GetAdvertIdByCampid(id);
+                var advert = await GetAdvertDetails(advertId);
+                result.body = advert.body;
                 return result;
+
             }
             catch (Exception ex)
             {
                 _logServ.ErrorMessage = ex.Message.ToString();
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetAdvertCategoryDataTable";
+                _logServ.ProcedureName = "GetAdvertDetailsByCampaignId";
                 await _logServ.LogError();
-                
+
                 result.result = 0;
                 return result;
             }
         }
 
 
-        public async Task<ReturnResult> DeleteAdvertCategory(IdCollectionViewModel model)
+        public async Task<ReturnResult> CheckIfAdvertNameExists(NewAdvertFormModel model)
         {
+
+            var AdvertNameexists = await _advertDAL.CheckAdvertNameExists(model.AdvertName, model.AdvertiserId);
+
+            if (AdvertNameexists)
+            {
+                result.result = 0;
+                result.error = "The Advert Name already exists";
+                return result;
+            }
+            else
+                return result;
+        }
+
+        public async Task<ReturnResult> CreateNewCampaign_Advert(NewAdvertFormModel model)
+        {
+            int mainOperatorId = model.OperatorId;
+            var AdvertNameexists = await _advertDAL.CheckAdvertNameExists(model.AdvertName, model.AdvertiserId);
+
+            if (AdvertNameexists)
+            {
+                result.result = 0;
+                result.error = "The Advert Name already exists";
+                return result;
+            }
+            if (model.MediaFile == null)
+            {
+                result.result = 0;
+                result.error = "A media file is required to proceed";
+                return result;
+            }
+
+            IFormFile mediaFile = model.MediaFile;
+            IFormFile scriptFile = model.ScriptFile;
+
+            #region Media
+            if (mediaFile.Length > 0)
+            {
+                model.MediaFileLocation = await CreateMediaFile(mediaFile, model.AdvertiserId, model.OperatorId);
+            }
+            else
+            {
+                result.result = 0;
+                result.error = "Advert media file must be included please update the campaign";
+                return result;
+            }
+
+            #endregion
+
+            #region Script
+
+            if (scriptFile != null && scriptFile.Length != 0)
+            {
+
+                string fileName = Guid.NewGuid().ToString();
+                string extension = Path.GetExtension(scriptFile.FileName);
+
+                string directoryName = "Script";
+                directoryName = Path.Combine(directoryName, model.AdvertiserId.ToString());
+
+                string path = Path.Combine(directoryName, fileName + extension);
+                await _saveFile.SaveFileToSite(directoryName, mediaFile);
+
+                string archiveDirectoryName = "Script/Archive/";
+
+
+                await _saveFile.SaveFileToSite(archiveDirectoryName, mediaFile);
+
+                model.ScriptFileLocation = string.Format("/Script/{0}/{1}", model.AdvertiserId.ToString(),
+                                                                        fileName + extension);
+
+            }
+            else
+            {
+                model.ScriptFileLocation = "";
+            }
+            #endregion
+
+            #region Add Records
+
+            var campaign = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
+            int campaignId = 0;
+
+            if (campaign != null)
+            {
+                campaignId = Convert.ToInt32(campaign.CampaignProfileId);
+            }
+
+            if (campaign.ClientId == 0 || campaign.ClientId != null)
+            {
+                model.ClientId = null;
+            }
+
+            model.UploadedToMediaServer = false;
+            model.Status = (int)Enums.AdvertStatus.Waitingforapproval;
+            model.IsAdminApproval = true;
+            model.CountryId = campaign.CountryId.Value;
+            model.PhoneticAlphabet = PhoneticString();
+            model.NextStatus = false;
+            model.AdtoneServerAdvertId = null;
+            model.UpdatedBy = _httpAccessor.GetUserIdFromJWT();
             try
             {
-                result.body = await _advertDAL.RemoveAdvertCategory(model);
-                return result;
+                var newModel = await _advertDAL.CreateNewAdvert(model);
+                model.OperatorId = mainOperatorId;
+
+                CampaignAdvertFormModel _campaignAdvert = new CampaignAdvertFormModel();
+                _campaignAdvert.AdvertId = newModel.AdtoneServerAdvertId.Value;
+                _campaignAdvert.CampaignProfileId = model.CampaignProfileId;
+                _campaignAdvert.NextStatus = false;
+                _campaignAdvert.AdtoneServerCampaignAdvertId = null;
+                var newAdCamp = await _campAdDal.CreateNewCampaignAdvert(_campaignAdvert, model.OperatorId, newModel.AdvertId);
+
+                if (newAdCamp != null)
+                {
+                    if (campaign != null)
+                    {
+
+                        string adName = "";
+                        if (model.MediaFileLocation == null || model.MediaFileLocation == "")
+                        {
+                            adName = "";
+                        }
+                        else
+                        {
+
+                            var operatorFTPDetails = await _advertDAL.GetFtpDetails(model.OperatorId);
+                            adName = operatorFTPDetails.FtpRoot + "/" + model.MediaFileLocation.Split('/')[3];
+                        }
+                        var ConnString = await _connService.GetConnectionStringByOperator(model.OperatorId);
+
+
+                        var campaignProfileDetails = await _connService.GetCampaignProfileIdFromAdtoneId(model.CampaignProfileId, model.OperatorId);
+                        if (campaignProfileDetails != 0)
+                        {
+                            await _campMatchDAL.UpdateMediaLocation(ConnString, adName, campaignProfileDetails);
+                            await _matchProcess.PrematchProcessForCampaign(model.CampaignProfileId, ConnString);
+                        }
+                        _adEmail.SendMail(model);
+
+                        if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
+                        {
+                            var adModel = new UserAdvertResult();
+
+                            // Is really the Main 168 AdvertId
+                            adModel.AdvertId = newModel.AdtoneServerAdvertId.Value;
+                            adModel.CampaignProfileId = model.CampaignProfileId;
+                            adModel.OperatorId = model.OperatorId;
+                            adModel.AdvertName = model.AdvertName;
+                            adModel.Brand = model.Brand;
+                            adModel.ClientId = model.ClientId;
+                            adModel.MediaFileLocation = model.MediaFileLocation;
+                            adModel.PrevStatus = model.Status;
+                            adModel.UpdatedBy = model.UpdatedBy;
+                            adModel.Status = (int)Enums.AdvertStatus.Live;
+                            var otraResult = await ApproveORRejectAdvert(adModel);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
                 _logServ.ErrorMessage = ex.Message.ToString();
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
-                _logServ.ProcedureName = "DeleteAdvertCategory";
+                _logServ.ProcedureName = "CreateNewCampaign_Advert - Insert CampaignAdvert";
                 await _logServ.LogError();
-                
+                result.error = ex.Message.ToString();
                 result.result = 0;
                 return result;
             }
-        }
+            #endregion
 
 
-        public async Task<ReturnResult> UpdateAdvertCategory(AdvertCategoryResult model)
-        {
-            try
-            {
-                result.body = await _advertDAL.UpdateAdvertCategory(model);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "UpdateAdvertCategory";
-                await _logServ.LogError();
-                
-                result.result = 0;
-                return result;
-            }
-        }
 
-
-        public async Task<ReturnResult> GetAdvertCategoryDetails(int id)
-        {
-            try
-            {
-                result.body = await _advertDAL.GetAdvertCategoryDetails(id);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetAdvertCategoryDetails";
-                await _logServ.LogError();
-                
-                result.result = 0;
-                return result;
-            }
-        }
-
-
-        public async Task<ReturnResult> AddAdvertCategory(AdvertCategoryResult model)
-        {
-            try
-            {
-                result.body = await _advertDAL.InsertAdvertCategory(model);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "AddAdvertCategory";
-                await _logServ.LogError();
-                
-            }
             return result;
         }
 
+
+        public async Task<ReturnResult> UpdateAdvert(NewAdvertFormModel model)
+        {
+            int mainOperatorId = model.OperatorId;
+            IFormFile mediaFile = model.MediaFile;
+            IFormFile scriptFile = model.ScriptFile;
+            var existingAdvert = new NewAdvertFormModel();
+            existingAdvert = await _advertDAL.GetAdvertForUpdateModel(model.AdvertId);
+
+            existingAdvert.CampaignProfileId = await _campAdDal.GetCampaignIdByAdvertId(model.AdvertId);
+
+            var adverIdFromOp = await _connService.GetAdvertIdFromAdtoneId(model.AdvertId, existingAdvert.OperatorId);
+
+            #region Media
+            if (mediaFile != null && mediaFile.Length > 0)
+            {
+                model.FileUpdate = true;
+                existingAdvert.FileUpdate = true;
+                existingAdvert.MediaFileLocation = await CreateMediaFile(mediaFile, model.AdvertiserId, model.OperatorId);
+            }
+
+            #endregion
+
+
+            #region Add Records
+
+            var campaign = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
+            int campaignId = 0;
+
+            if (campaign != null)
+            {
+                campaignId = Convert.ToInt32(campaign.CampaignProfileId);
+            }
+
+            if (campaign.ClientId == 0 || campaign.ClientId != null)
+            {
+                 existingAdvert.ClientId = null;
+            }
+            if (model.FileUpdate) 
+            {
+                existingAdvert.UploadedToMediaServer = false;
+                existingAdvert.Status = (int)Enums.AdvertStatus.Waitingforapproval;
+            }
+            existingAdvert.UpdatedBy = _httpAccessor.GetUserIdFromJWT();
+            existingAdvert.AdvertName = model.AdvertName;
+            existingAdvert.AdvertCategoryId = model.AdvertCategoryId;
+            existingAdvert.Brand = model.Brand;
+            try
+            {
+                if(adverIdFromOp == 0)
+                {
+                    existingAdvert.AdtoneServerAdvertId = model.AdvertId;
+                    var newModel = await _advertDAL.CreateNewOperatorAdvert(existingAdvert);
+                }
+                var result = await _advertDAL.UpdateAdvert(existingAdvert);
+
+                CampaignAdvertFormModel _campaignAdvert = new CampaignAdvertFormModel();
+                _campaignAdvert.AdvertId = model.AdvertId;
+                _campaignAdvert.CampaignProfileId = model.CampaignProfileId;
+                _campaignAdvert.NextStatus = false;
+                _campaignAdvert.AdtoneServerCampaignAdvertId = null;
+                var newAdCamp = await _campAdDal.CreateOnUpdateCampaignAdvert(_campaignAdvert, model.OperatorId);
+
+                if (campaign != null && model.FileUpdate)
+                {
+
+                    string adName = "";
+                    if (existingAdvert.MediaFileLocation == null || existingAdvert.MediaFileLocation == "")
+                    {
+                        adName = "";
+                    }
+                    else
+                    {
+
+                        var operatorFTPDetails = await _advertDAL.GetFtpDetails(existingAdvert.OperatorId);
+                        adName = operatorFTPDetails.FtpRoot + "/" + existingAdvert.MediaFileLocation.Split('/')[3];
+                    }
+                    var ConnString = await _connService.GetConnectionStringByOperator(existingAdvert.OperatorId);
+
+
+                    var campaignProfileDetails = await _connService.GetCampaignProfileIdFromAdtoneId(existingAdvert.CampaignProfileId, existingAdvert.OperatorId);
+                    if (campaignProfileDetails != 0)
+                    {
+                        await _campMatchDAL.UpdateMediaLocation(ConnString, adName, campaignProfileDetails);
+                        await _matchProcess.PrematchProcessForCampaign(existingAdvert.CampaignProfileId, ConnString);
+                    }
+                    _adEmail.SendMail(existingAdvert);
+
+                    if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
+                    {
+                        var adModel = new UserAdvertResult();
+
+                        // Is really the Main 168 AdvertId
+                        adModel.AdvertId = existingAdvert.AdtoneServerAdvertId.Value;
+                        adModel.CampaignProfileId = existingAdvert.CampaignProfileId;
+                        adModel.OperatorId = existingAdvert.OperatorId;
+                        adModel.AdvertName = existingAdvert.AdvertName;
+                        adModel.Brand = existingAdvert.Brand;
+                        adModel.ClientId = existingAdvert.ClientId;
+                        adModel.MediaFileLocation = existingAdvert.MediaFileLocation;
+                        adModel.PrevStatus = existingAdvert.Status;
+                        adModel.UpdatedBy = existingAdvert.UpdatedBy;
+                        adModel.Status = (int)Enums.AdvertStatus.Live;
+                        var otraResult = await ApproveORRejectAdvert(adModel);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateAdvert";
+                await _logServ.LogError();
+                result.error = ex.Message.ToString();
+                result.result = 0;
+                return result;
+            }
+            #endregion
+
+            return result;
+
+        }
+
+        private async Task<string> CreateMediaFile(IFormFile mediaFile, int advertiserId, int operatorId)
+        {
+            string MediaFileLocation = string.Empty;
+            var firstAudioName = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Second.ToString();
+
+            string fileName = firstAudioName;
+
+            string fileName2 = null;
+
+            string extension = Path.GetExtension(mediaFile.FileName);
+            var onlyFileName = Path.GetFileNameWithoutExtension(mediaFile.FileName);
+            string outputFormat = "wav";
+
+            var audioFormatExtension = "." + outputFormat;
+            //
+            string actualDirectoryName = "Media";
+            string directoryName = Path.Combine(actualDirectoryName, advertiserId.ToString());
+            string newfile;
+            //
+            if (extension != audioFormatExtension)
+            {
+                string tempDirectoryName = @"Media\Temp\";
+                string tempFile = await _saveFile.SaveFileToSite(tempDirectoryName, mediaFile);
+
+                newfile = _convFile.ConvertAndSaveMediaFile(tempDirectoryName + tempFile, extension, outputFormat, onlyFileName, directoryName);
+
+                MediaFileLocation = string.Format("/Media/{0}/{1}", advertiserId.ToString(),
+                                                                        fileName + "." + outputFormat);
+            }
+            else
+            {
+                newfile = await _saveFile.SaveFileToSite(directoryName, mediaFile, fileName + audioFormatExtension);
+
+                string archiveDirectoryName = @"Media\Archive";
+
+                await _saveFile.SaveFileToSite(archiveDirectoryName, mediaFile, fileName + audioFormatExtension);
+
+
+                MediaFileLocation = string.Format("/Media/{0}/{1}", advertiserId.ToString(),
+                                                                            fileName + audioFormatExtension);
+            }
+
+            if (Convert.ToInt32(operatorId) == (int)Enums.OperatorTableId.Safaricom)
+            {
+                var secondAudioName = Convert.ToInt64(firstAudioName) + 1;
+                fileName2 = secondAudioName.ToString();
+                string directory2Name = Path.Combine(directoryName, "SecondAudioFile");
+                newfile = await _saveFile.SaveFileToSite(directory2Name, mediaFile, secondAudioName + audioFormatExtension);
+            }
+
+            return MediaFileLocation;
+        }
 
         public async Task<ReturnResult> ApproveORRejectAdvert(UserAdvertResult model)
         {
@@ -422,7 +761,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                                 }
                             }
 
-                            var z = await _matchDAL.UpdateMediaLocation(ConnString, adName, campaigndetailsid);
+                            var z = await _campMatchDAL.UpdateMediaLocation(ConnString, adName, campaigndetailsid);
                             await _matchDAL.PrematchProcessForCampaign(campaignAdvert.CampaignProfileId, ConnString);
                         }
                     }
@@ -688,7 +1027,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var campaigndetailsid = await _connService.GetCampaignProfileIdFromAdtoneId(campaignAdvert.CampaignProfileId, adModel.OperatorId);
                 if (campaigndetailsid != 0)
                 {
-                    var f = await _matchDAL.UpdateMediaLocation(ConnString, null, campaigndetailsid);
+                    var f = await _campMatchDAL.UpdateMediaLocation(ConnString, null, campaigndetailsid);
                     await _preProcess.PrematchProcessForCampaign(campaignAdvert.CampaignProfileId, ConnString);
                 }
             }
@@ -696,7 +1035,24 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        
+        private static string PhoneticString()
+        {
+            var str1 = RandomString(3);
+            var str2 = RandomString(3);
+            var str3 = RandomString(3);
+
+            string phonetic = phonetic = str1.ToLower() + "-" + str2.ToLower() + "-" + str3.ToLower();
+
+            return phonetic;
+        }
+
+        private static Random random = new Random();
+        private static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
 
         //public async Task<ReturnResult> RejectAdvert(UserAdvertResult model)
         //{
@@ -912,7 +1268,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         //    //return Json("error");
         //}
 
-        
+
 
     }
 }

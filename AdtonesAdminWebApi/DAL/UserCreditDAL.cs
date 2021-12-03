@@ -1,0 +1,105 @@
+﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.ViewModels.Command;
+using AdtonesAdminWebApi.ViewModels.DTOs;
+using Dapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace AdtonesAdminWebApi.DAL
+{
+    public class UserCreditDAL : BaseDAL, IUserCreditDAL
+    {
+
+        public UserCreditDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor)
+            : base(configuration, executers, connService, httpAccessor)
+        { }
+
+        public async Task<int> UpdateUserCredit(AdvertiserCreditFormCommand _creditmodel)
+        {
+            string UpdateUserCredit = @"UPDATE UsersCredit SET AssignCredit=@AssignCredit, AvailableCredit=@AvailableCredit, UpdatedDate=GETDATE()
+                                                WHERE Id = @Id";
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<int>(UpdateUserCredit,
+                             new { Id = _creditmodel.Id, AssignCredit = _creditmodel.AssignCredit, AvailableCredit = _creditmodel.AvailableCredit }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> AddUserCredit(AdvertiserCreditFormCommand _creditmodel)
+        {
+            string AddUserCredit = @"INSERT INTO UsersCredit(UserId,AssignCredit,AvailableCredit,UpdatedDate,CreatedDate,CurrencyId) 
+                                            VALUES(@UserId,@AssignCredit,@AssignCredit,GETDATE(),GETDATE(),@CurrencyId)";
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<int>(AddUserCredit, _creditmodel));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<UserCreditDetailsDto> GetUserCreditDetail(int id)
+        {
+            string UserCreditDetails = @"SELECT uc.Id,uc.UserId,AssignCredit,
+                                                    ISNULL(CAST(AvailableCredit AS decimal(18,2)),0) AS AvailableCredit,
+                                                    CreatedDate,uc.CurrencyId,c.CountryId 
+                                                    FROM  UsersCredit AS uc LEFT JOIN Currencies AS c ON c.CurrencyId=uc.CurrencyId
+                                                    WHERE uc.UserId=@Id";
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.QueryFirstOrDefault<UserCreditDetailsDto>(UserCreditDetails, new { Id = id }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<bool> CheckUserCreditExist(int userId)
+        {
+            string CheckIfUserExists = @"SELECT COUNT(1) FROM UsersCredit WHERE UserId=@userId";
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<bool>(CheckIfUserExists,
+                                                                    new { userId = userId }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<decimal> GetAvailableCredit(int userId)
+        {
+            string GetAvailableCredit = @"SELECT AvailableCredit FROM UsersCredit WHERE UserId=@Id";
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                             conn => conn.QueryFirstOrDefault<decimal>(GetAvailableCredit,new { Id = userId }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+    }
+}

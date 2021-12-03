@@ -10,13 +10,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.OperatorSpecific;
-using AdtonesAdminWebApi.DAL.Interfaces;
-using AdtonesAdminWebApi.DAL.Shared;
 using AdtonesAdminWebApi.DAL;
 using AdtonesAdminWebApi.UserMatchServices;
 using AdtonesAdminWebApi.Services.Mailer;
-using System.Collections.Generic;
-using AutoMapper;
 
 namespace AdtonesAdminWebApi
 {
@@ -49,71 +45,7 @@ namespace AdtonesAdminWebApi
             services.AddHttpContextAccessor();
             services.AddAutoMapper(typeof(Startup));
             services.AddBusinessServices();
-            //#region Business Services
-
-            //// Business Services
-            //services.AddScoped<ISharedSelectListsService, SharedSelectListsService>();
-            //services.AddScoped<IUserManagementService, UserManagementService>();
-            //// services.AddScoped<IAdvertiserCreditService, AdvertiserCreditService>();
-            //services.AddScoped<IPromotionalCampaignService, PromotionalCampaignService>();
-            //services.AddScoped<ISalesManagementService, SalesManagementService>();
-            //services.AddScoped<IProfileMatchInfoService, ProfileMatchInfoService>();
-            //services.AddScoped<ICountryAreaService, CountryAreaService>();
-            //services.AddScoped<IFinanceTablesService, FinanceTablesService>();
-            //services.AddScoped<IAdvertiserFinancialService, AdvertiserFinancialService>();
-            //services.AddScoped<IUserDashboardService, UserDashboardService>();
-            //services.AddScoped<IOperatorConfigService, OperatorConfigService>();
-            //services.AddScoped<IOperatorService, OperatorService>();
-            //services.AddScoped<ISystemConfigService, SystemConfigService>();
-            //services.AddScoped<IRewardsService, RewardsService>();
-            //services.AddScoped<ITicketService, TicketService>();
-            //services.AddScoped<IAdvertService, AdvertService>();
-            //services.AddScoped<ICampaignService, CampaignService>();
-            //services.AddScoped<IUserProfileService, UserProfileService>();
-            //services.AddScoped<ICampaignAuditService, CampaignAuditService>();
-            //services.AddScoped<IPermissionManagementService, PermisionManagementService>();
-            //services.AddScoped<IManagementReportService, ManagementReportService>();
-            //services.AddScoped<ICreateUpdateCampaignService, CreateUpdateCampaignService>();
-            //services.AddScoped<ICreateCheckSaveProfileModels, CreateCheckSaveProfileModels>();
-            //services.AddScoped<IBillingService, BillingService>();
-
-            //#endregion
-
-            #region DAL Access
-
-            // Use DAL. 
-            services.AddScoped<IConnectionStringService, ConnectionStringService>();
-            services.AddScoped<ISharedSelectListsDAL, SharedSelectListsDAL>();
-            services.AddScoped<ITicketDAL, TicketDAL>();
-            services.AddScoped<IAdvertDAL, AdvertDAL>();
-            services.AddScoped<ICountryAreaDAL, CountryAreaDAL>();
-            services.AddScoped<ICampaignDAL, CampaignDAL>();
-            services.AddScoped<IUserDashboardDAL, UserDashboardDAL>();
-            services.AddScoped<IPromotionalCampaignDAL, PromotionalCampaignDAL>();
-            services.AddScoped<ILoginDAL, LoginDAL>();
-            services.AddScoped<IUserManagementDAL, UserManagementDAL>();
-            services.AddScoped<IUserMatchDAL, UserMatchDAL>();
-            // services.AddScoped<IUserProfileDAL, UserProfileDAL>();
-            services.AddScoped<ISoapDAL, SoapDAL>();
-            services.AddScoped<ICampaignAuditDAL, CampaignAuditDAL>();
-            services.AddScoped<ICurrencyDAL, CurrencyDAL>();
-            // services.AddScoped<IAdvertiserCreditDAL, AdvertiserCreditDAL>();
-            services.AddScoped<IAdvertiserFinancialDAL, AdvertiserFinancialDAL>();
-            services.AddScoped<IPermissionManagementDAL, PermissionManagementDAL>();
-            services.AddScoped<IManagementReportDAL, ManagementReportDAL>();
-            services.AddScoped<IFinanceTablesDAL, FinanceTablesDAL>();
-            services.AddScoped<IRewardDAL, RewardDAL>();
-            services.AddScoped<IProfileMatchInfoDAL,ProfileMatchInfoDAL>();
-            services.AddScoped<IOperatorDAL, OperatorDAL>();
-            services.AddScoped<ISalesManagementDAL, SalesManagementDAL>();
-            services.AddScoped<IBillingDAL, BillingDAL>();
-            services.AddScoped<ICreateUpdateCampaignDAL, CreateUpdateCampaignDAL>();
-
-            #endregion
-
-
-            // DAL Query Execution.
-            services.AddTransient<IExecutionCommand, ExecutionCommand>();
+            services.AddDAL();
 
             #region Special Services
 
@@ -128,8 +60,10 @@ namespace AdtonesAdminWebApi
             services.AddTransient<IConvertSaveMediaFile, ConvertSaveMediaFile>();
             services.AddScoped<ICurrencyConversion, CurrencyConversion> ();
             services.AddTransient<IAdvertEmail, AdvertEmail>();
+            services.AddTransient<ISageCreditCardPaymentService, SageCreditCardPaymentService>();
             services.AddTransient<ILoggingService, LoggingService>();
             services.AddScoped<ICreateInvoicePDF, CreateInvoicePDF>();
+            //services.AddTransient<IStatsProvider, StatsProvider>();
 
             #endregion
 
@@ -167,7 +101,6 @@ namespace AdtonesAdminWebApi
             });
 
             #endregion
-        
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

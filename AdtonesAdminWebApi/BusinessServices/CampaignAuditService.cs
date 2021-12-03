@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -221,6 +222,45 @@ namespace AdtonesAdminWebApi.BusinessServices
                 return result;
             }
         }
+
+        public async Task<ReturnResult> GetDashboardSummaryForAdvertiser(int campaignId=0)
+        {
+            try
+            {
+                var advertiserId = _httpAccessor.GetUserIdFromJWT();
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(30));
+                string key = $"SALES_DASHBOARD_STATS_{advertiserId}";
+                var summaries = await _cache.GetOrCreateAsync<CampaignDashboardChartPREResult>(key, cacheEntry =>
+                {
+                    cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
+                    return _auditDAL.GetCampaignDashboardSummariesAdvertisers(advertiserId, campaignId);
+                });
+
+
+                if (summaries != null)
+                {
+                    result.body = GetDashboardSummariesToCovert(summaries);
+                }
+                else
+                {
+                    result.result = 0;
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetDashboardSummaryForSalesAdvertiser";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
+        }
+
 
 
         private CampaignDashboardChartResult GetDashboardSummariesToCovert(CampaignDashboardChartPREResult summaries)

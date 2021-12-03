@@ -4,6 +4,7 @@ using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign;
 using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels;
+using AdtonesAdminWebApi.ViewModels.DTOs.UserProfile;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -34,25 +35,6 @@ namespace AdtonesAdminWebApi.DAL
             _connService = connService;
             _campDAL = campDAL;
             _logServ = logServ;
-        }
-
-
-        public async Task<int> UpdateMediaLocation(string conn, string media, int id)
-        {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(UserMatchQuery.UpdateMediaLocation);
-            try
-            {
-                builder.AddParameters(new { media = media });
-                builder.AddParameters(new { campaignProfileId = id });
-
-                return await _executers.ExecuteCommand(conn,
-                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
-            }
-            catch
-            {
-                throw;
-            }
         }
 
 
@@ -109,7 +91,6 @@ namespace AdtonesAdminWebApi.DAL
 
         }
 
-
         public async Task<IEnumerable<string>> GetProfileMatchLabels(int infoId)
         {
             using (var connection = new SqlConnection(_connStr))
@@ -157,41 +138,7 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
-
-        public async Task<int> AddCampaignMatchData(NewCampaignProfileFormModel model, string conn)
-        {
-            try
-            {
-
-                return await _executers.ExecuteCommand(conn,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertNewCampaignMatchData, model));
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-
-        public async Task<int> UpdateCampaignMatchData(NewCampaignProfileFormModel model, string conn)
-        {
-            var campId = model.CampaignProfileId;
-            var x = 0;
-            try
-            {
-                model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(model.CampaignProfileId, conn);
-
-                x = await _executers.ExecuteCommand(conn,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateCampaignMatchData, model));
-            }
-            catch
-            {
-                throw;
-            }
-            model.CampaignProfileId = campId;
-            return x;
-        }
-
+        
 
         public async Task PrematchUserProcess(int campaignId, string conn)
         {
@@ -342,29 +289,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateMatchCampaignGeographic(CreateOrUpdateCampaignProfileGeographicCommand model, string constr)
-        {
-            int x = 0;
-            try
-            {
-
-
-                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-
-                x = await _executers.ExecuteCommand(constr,
-                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignGeographic, new
-                                {
-                                    Id = campaignId,
-                                    Location_Demographics = model.Location_Demographics,
-                                }));
-            }
-            catch
-            {
-                throw;
-            }
-            return x;
-        }
-
+        
         #endregion
 
 
@@ -419,37 +344,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateMatchCampaignDemographic(CreateOrUpdateCampaignProfileDemographicsCommand model, string constr)
-        {
-            int x = 0;
-            try
-            {
-                var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
-
-                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-
-                x = await _executers.ExecuteCommand(constr,
-                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignDemographic, new
-                                {
-                                    Id = campaignId,
-                                    Age_Demographics = model.Age_Demographics,
-                                    Education_Demographics = model.Education_Demographics,
-                                    Gender_Demographics = model.Gender_Demographics,
-                                    HouseholdStatus_Demographics = model.HouseholdStatus_Demographics,
-                                    IncomeBracket_Demographics = model.IncomeBracket_Demographics,
-                                    RelationshipStatus_Demographics = model.RelationshipStatus_Demographics,
-                                    WorkingStatus_Demographics = model.WorkingStatus_Demographics
-                                }));
-            }
-            catch
-            {
-                throw;
-            }
-            return x;
-        }
-
-
-
+        
         #endregion
 
 
@@ -610,31 +505,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateMatchCampaignMobile(CreateOrUpdateCampaignProfileMobileCommand model, string constr)
-        {
-            int x = 0;
-            try
-            {
-                var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
-
-                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-
-                x = await _executers.ExecuteCommand(constr,
-                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignMobile, new
-                                {
-                                    Id = campaignId,
-                                    ContractType_Mobile = model.ContractType_Mobile,
-                                    Spend_Mobile = model.Spend_Mobile
-                                }));
-            }
-            catch
-            {
-                throw;
-            }
-            return x;
-        }
-
-
+        
         #endregion
 
 
@@ -652,7 +523,7 @@ namespace AdtonesAdminWebApi.DAL
                                         {
                                             Id = model.CampaignProfileId,
                                             DiscerningProfessionals_AdType = model.DiscerningProfessionals_AdType,
-                                            MassQuestion = model.MassQuestion,
+                                            Mass_AdType = model.Mass_AdType,
                                             Hustlers_AdType = model.Hustlers_AdType,
                                             Youth_AdType = model.Youth_AdType
                                         }));
@@ -667,7 +538,7 @@ namespace AdtonesAdminWebApi.DAL
                                 {
                                     Id = campaignId,
                                     DiscerningProfessionals_AdType = model.DiscerningProfessionals_AdType,
-                                    MassQuestion = model.MassQuestion,
+                                    Mass_AdType = model.Mass_AdType,
                                     Hustlers_AdType = model.Hustlers_AdType,
                                     Youth_AdType = model.Youth_AdType
                                 }));
@@ -678,35 +549,6 @@ namespace AdtonesAdminWebApi.DAL
             }
             return x;
         }
-
-
-        public async Task<int> UpdateMatchCampaignQuestionnaire(CreateOrUpdateCampaignProfileSkizaCommand model, string constr)
-        {
-            int x = 0;
-            try
-            {
-                var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
-
-                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-
-                x = await _executers.ExecuteCommand(constr,
-                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignQuestionnaire, new
-                                {
-                                    Id = campaignId,
-                                    DiscerningProfessionals_AdType = model.DiscerningProfessionals_AdType,
-                                    MassQuestion = model.MassQuestion,
-                                    Hustlers_AdType = model.Hustlers_AdType,
-                                    Youth_AdType = model.Youth_AdType
-                                }));
-            }
-            catch
-            {
-                throw;
-            }
-            return x;
-        }
-
-
 
         #endregion
 
@@ -741,328 +583,8 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateMatchCampaignAdvert(CreateOrUpdateCampaignProfileAdvertCommand model, string constr)
-        {
-            var cid = model.CampaignProfileId;
-            int x = 0;
-            try
-            {
-                var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
-
-                model.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-
-                x = await _executers.ExecuteCommand(constr,
-                                conn => conn.ExecuteScalar<int>(UserMatchQuery.UpdateMatchCampaignAdvert, model));
-            }
-            catch
-            {
-                throw;
-            }
-            model.CampaignProfileId = cid;
-            return x;
-        }
-
-
-
+       
         #endregion
-
-        //public async Task<int> InsertMatchCampaignGeographic(CreateOrUpdateCampaignProfileGeographicCommand model, List<string> conns)
-        //{
-        //    int x = 0;
-        //    try
-        //    {
-        //        foreach (string constr in conns)
-        //        {
-        //            var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-
-        //            var matchDetails = await _executers.ExecuteCommand(constr,
-        //                            conn => conn.Query<NewCampaignProfileFormModel>(UserMatchQuery.GetCampaignMatchesDetailsById, new
-        //                            {
-        //                                Id = campaignId
-        //                            }));
-
-        //            if (matchDetails == null)
-        //                x = await _executers.ExecuteCommand(constr,
-        //                                conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertMatchCampaignGeographic, new
-        //                                {
-        //                                    Id = campaignId,
-        //                                    Location_Demographics = model.Location_Demographics,
-        //                                }));
-        //            else
-        //                x = await UpdateMatchCampaignGeographic(model, conns);
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        throw;
-        //    }
-        //    return x;
-        //}
-
-        //public async Task<int> InsertMobileProfile(CreateOrUpdateCampaignProfileMobileCommand model)
-        //{
-
-        //    var prefs = await GetCampaignProfilePreferenceId(model.CampaignProfileId);
-        //    int preferenceId = 0;
-        //    if (prefs == 0)
-        //    {
-        //        string adpref = null;
-        //        try
-        //        {
-        //            preferenceId = await _executers.ExecuteCommand(_connStr,
-        //                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertMobileProfile, new
-        //                                    {
-        //                                        CampaignProfileId = model.CampaignProfileId,
-        //                                        ContractType_Mobile = model.ContractType_Mobile,
-        //                                        Spend_Mobile = model.Spend_Mobile,
-        //                                        AdtoneServerCampaignProfilePrefId = adpref
-        //                                    }));
-
-        //            var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
-
-        //            var lst = await _connService.GetConnectionStringsByCountry(campaignDetails.CountryId.Value);
-        //            List<string> conns = lst.ToList();
-
-        //            foreach (string constr in conns)
-        //            {
-        //                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-
-        //                preferenceId = await _executers.ExecuteCommand(constr,
-        //                                conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertMobileProfile, new
-        //                                {
-        //                                    CampaignProfileId = campaignId,
-        //                                    ContractType_Mobile = model.ContractType_Mobile,
-        //                                    Spend_Mobile = model.Spend_Mobile,
-        //                                    AdtoneServerCampaignProfilePrefId = preferenceId
-        //                                }));
-        //            }
-        //        }
-        //        catch
-        //        {
-        //            throw;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        model.CampaignProfileMobileId = prefs;
-        //        preferenceId = await UpdateMobileProfile(model);
-        //    }
-        //    return preferenceId;
-        //}
-
-
-        //public async Task<int> InsertDemographicProfile(CreateOrUpdateCampaignProfileDemographicsCommand model)
-        //{
-        //    var prefs = await GetCampaignProfilePreferenceId(model.CampaignProfileId);
-        //    int preferenceId = 0;
-        //    if (prefs == 0)
-        //    {
-        //        string adpref = null;
-        //        try
-        //        {
-        //            preferenceId = await _executers.ExecuteCommand(_connStr,
-        //                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertDemographicProfile, new
-        //                                    {
-        //                                        CampaignProfileId = model.CampaignProfileId,
-        //                                        DOBEnd_Demographics = model.DOBEnd_Demographics,
-        //                                        DOBStart_Demographics = model.DOBStart_Demographics,
-        //                                        Age_Demographics = model.Age_Demographics,
-        //                                        Education_Demographics = model.Education_Demographics,
-        //                                        Gender_Demographics = model.Gender_Demographics,
-        //                                        HouseholdStatus_Demographics = model.HouseholdStatus_Demographics,
-        //                                        IncomeBracket_Demographics = model.IncomeBracket_Demographics,
-        //                                        RelationshipStatus_Demographics = model.RelationshipStatus_Demographics,
-        //                                        WorkingStatus_Demographics = model.WorkingStatus_Demographics,
-        //                                        AdtoneServerCampaignProfilePrefId = adpref
-        //                                    }));
-
-        //            var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
-
-        //            var lst = await _connService.GetConnectionStringsByCountry(campaignDetails.CountryId.Value);
-        //            List<string> conns = lst.ToList();
-
-        //            foreach (string constr in conns)
-        //            {
-        //                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-
-        //                preferenceId = await _executers.ExecuteCommand(constr,
-        //                                conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertDemographicProfile, new
-        //                                {
-        //                                    CampaignProfileId = campaignId,
-        //                                    AdtoneServerCampaignProfilePrefId = preferenceId,
-        //                                    DOBEnd_Demographics = model.DOBEnd_Demographics,
-        //                                    DOBStart_Demographics = model.DOBStart_Demographics,
-        //                                    Age_Demographics = model.Age_Demographics,
-        //                                    Education_Demographics = model.Education_Demographics,
-        //                                    Gender_Demographics = model.Gender_Demographics,
-        //                                    HouseholdStatus_Demographics = model.HouseholdStatus_Demographics,
-        //                                    IncomeBracket_Demographics = model.IncomeBracket_Demographics,
-        //                                    RelationshipStatus_Demographics = model.RelationshipStatus_Demographics,
-        //                                    WorkingStatus_Demographics = model.WorkingStatus_Demographics
-        //                                }));
-        //            }
-        //        }
-        //        catch
-        //        {
-        //            throw;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        model.Id = prefs;
-        //        preferenceId = await UpdateDemographicProfile(model);
-        //    }
-        //    return preferenceId;
-        //}
-
-
-
-        //public async Task<int> InsertAdvertProfile(CampaignProfileAdvertFormModel model)
-        //{
-
-        //    var prefs = await GetCampaignProfilePreferenceId(model.CampaignProfileId);
-        //    int preferenceId = 0;
-        //    if (prefs == 0)
-        //    {
-        //        try
-        //        {
-        //            preferenceId = await _executers.ExecuteCommand(_connStr,
-        //                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertAdvertProfile, model));
-
-        //            var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
-
-        //            var lst = await _connService.GetConnectionStringsByCountry(campaignDetails.CountryId.Value);
-        //            List<string> conns = lst.ToList();
-
-        //            foreach (string constr in conns)
-        //            {
-        //                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-
-        //                model.CampaignProfileId = campaignId;
-
-        //                var x = await _executers.ExecuteCommand(constr,
-        //                                conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertAdvertProfile, model));
-        //            }
-        //        }
-        //        catch
-        //        {
-        //            throw;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        model.CampaignProfileAdvertsId = prefs;
-        //        preferenceId = await UpdateAdvertProfile(model);
-        //    }
-        //    return preferenceId;
-        //}
-
-
-
-
-        //public async Task<int> InsertMatchCampaignDemographic(CampaignProfileDemographicsFormModel model)
-        //{
-        //    int x = 0;
-        //    try
-        //    {
-        //        var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
-
-        //        var lst = await _connService.GetConnectionStringsByCountry(campaignDetails.CountryId.Value);
-        //        List<string> conns = lst.ToList();
-
-        //        foreach (string constr in conns)
-        //        {
-        //            var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-
-        //            var matchDetails = await _executers.ExecuteCommand(constr,
-        //                            conn => conn.Query<NewCampaignProfileFormModel>(UserMatchQuery.GetCampaignMatchesDetailsById, new
-        //                            {
-        //                                Id = campaignId
-        //                            }));
-
-        //            if (matchDetails == null)
-        //                x = await _executers.ExecuteCommand(constr,
-        //                                conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertMatchCampaignDemographic, new
-        //                                {
-        //                                    Id = campaignId,
-        //                                    Age_Demographics = model.Age_Demographics,
-        //                                    Education_Demographics = model.Education_Demographics,
-        //                                    Gender_Demographics = model.Gender_Demographics,
-        //                                    HouseholdStatus_Demographics = model.HouseholdStatus_Demographics,
-        //                                    IncomeBracket_Demographics = model.IncomeBracket_Demographics,
-        //                                    RelationshipStatus_Demographics = model.RelationshipStatus_Demographics,
-        //                                    WorkingStatus_Demographics = model.WorkingStatus_Demographics,
-        //                                }));
-        //            else
-        //                x = await UpdateMatchCampaignDemographic(model);
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        throw;
-        //    }
-        //    return x;
-        //}
-
-
-        //public async Task<int> InsertQuestionnaireProfile(CampaignProfileSkizaFormModel model)
-        //{
-
-        //    var prefs = await GetCampaignProfilePreferenceId(model.CampaignProfileId);
-        //    int preferenceId = 0;
-        //    if (prefs == 0)
-        //    {
-        //        string adpref = null;
-        //        try
-        //        {
-        //            preferenceId = await _executers.ExecuteCommand(_connStr,
-        //                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertQuestionnaireProfile, new
-        //                                    {
-        //                                        CampaignProfileId = model.CampaignProfileId,
-        //                                        CountryId = model.CountryId,
-        //                                        DiscerningProfessionals_AdType = model.DiscerningProfessionals_AdType,
-        //                                        MassQuestion = model.MassQuestion,
-        //                                        Hustlers_AdType = model.Hustlers_AdType,
-        //                                        Youth_AdType = model.Youth_AdType,
-        //                                        AdtoneServerCampaignProfilePrefId = adpref
-        //                                    }));
-
-        //            var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
-
-        //            var lst = await _connService.GetConnectionStringsByCountry(campaignDetails.CountryId.Value);
-        //            List<string> conns = lst.ToList();
-
-        //            foreach (string constr in conns)
-        //            {
-        //                var campaignId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-        //                var countryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId, constr);
-
-        //                var x = await _executers.ExecuteCommand(constr,
-        //                                conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertQuestionnaireProfile, new
-        //                                {
-        //                                    CampaignProfileId = campaignId,
-        //                                    CountryId = countryId,
-        //                                    DiscerningProfessionals_AdType = model.DiscerningProfessionals_AdType,
-        //                                    MassQuestion = model.MassQuestion,
-        //                                    Hustlers_AdType = model.Hustlers_AdType,
-        //                                    Youth_AdType = model.Youth_AdType,
-        //                                    AdtoneServerCampaignProfilePrefId = preferenceId
-        //                                }));
-        //            }
-        //        }
-        //        catch
-        //        {
-        //            throw;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        model.CampaignProfileSKizaId = prefs;
-        //        preferenceId = await UpdateQuestionnaireProfile(model);
-        //    }
-        //    return preferenceId;
-        //}
-
 
 
     }

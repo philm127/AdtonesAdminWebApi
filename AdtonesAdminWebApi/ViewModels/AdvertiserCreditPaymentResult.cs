@@ -11,7 +11,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int UserId { get; set; }
         public string Email { get; set; }
         public string FullName { get; set; }
-
+        public int BillingId { get; set; }
         public string Organisation { get; set; }
         public string InvoiceNumber { get; set; }
         public string Description { get; set; }

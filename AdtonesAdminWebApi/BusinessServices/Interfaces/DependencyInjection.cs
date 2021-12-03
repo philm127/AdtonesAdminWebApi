@@ -15,8 +15,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
             services.AddTransient<ISalesManagementService, SalesManagementService>();
             services.AddTransient<IProfileMatchInfoService, ProfileMatchInfoService>();
             services.AddTransient<ICountryAreaService, CountryAreaService>();
-            services.AddTransient<IFinanceTablesService, FinanceTablesService>();
-            services.AddTransient<IAdvertiserFinancialService, AdvertiserFinancialService>();
             services.AddTransient<IUserDashboardService, UserDashboardService>();
             services.AddTransient<IOperatorConfigService, OperatorConfigService>();
             services.AddTransient<IOperatorService, OperatorService>();
@@ -24,10 +22,12 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
             services.AddTransient<IRewardsService, RewardsService>();
             services.AddTransient<ITicketService, TicketService>();
             services.AddTransient<IAdvertService, AdvertService>();
+            services.AddTransient<IAdvertCategoryService, AdvertCategoryService>();
             services.AddTransient<ICampaignService, CampaignService>();
             services.AddTransient<IUserProfileService, UserProfileService>();
             services.AddTransient<ICampaignAuditService, CampaignAuditService>();
             services.AddTransient<IPermissionManagementService, PermisionManagementService>();
+            services.AddTransient<IUserCreditService, UserCreditService>();
             
             services.AddTransient<ICreateUpdateCampaignService, CreateUpdateCampaignService>();
             services.AddTransient<ICreateCheckSaveProfileModels, CreateCheckSaveProfileModels>();

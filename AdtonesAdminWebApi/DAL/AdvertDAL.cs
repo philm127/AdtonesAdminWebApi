@@ -2,6 +2,9 @@
 using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign;
+using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels;
+using AdtonesAdminWebApi.ViewModels.DTOs;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -92,6 +95,56 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<IEnumerable<AdvertTableAdvertiserDto>> GetAdvertForAdvertiserResultSet(int id)
+        {
+            string GetAdvertSalesExecResultSet = @"SELECT ad.AdvertId,ad.UserId,ad.ClientId,ad.AdvertName,ad.Brand,
+                                                ISNULL(cl.Name,'-') AS ClientName,ad.OperatorId,cad.CampaignProfileId,ad.UpdatedBy,
+                                                ad.CreatedDateTime AS CreatedDate,cprof.CampaignName,
+                                                ad.Script,ad.Status,ad.MediaFileLocation,cprof.CountryId,
+                                                CASE WHEN ad.MediaFileLocation IS NULL THEN ad.MediaFileLocation 
+                                                    ELSE CONCAT(@siteAddress,ad.MediaFileLocation) END AS MediaFile,
+                                                ro.MoreSixSecPlays AS TotalPlays,CAST(ro.AvgBid AS NUMERIC(36,2)) AS AverageBid
+                                                FROM Advert AS ad LEFT JOIN Client AS cl ON ad.ClientId=cl.Id
+                                                LEFT JOIN Users AS usr ON usr.UserId=ad.UserId
+                                                LEFT JOIN CampaignAdverts AS cad ON cad.AdvertId=ad.AdvertId
+                                                LEFT JOIN CampaignProfile AS cprof ON cprof.CampaignProfileId=cad.CampaignProfileId
+                                                LEFT JOIN RollupsCampaign AS ro ON ro.CampaignId=cprof.CampaignProfileId
+                                                WHERE ad.UserId = @Id ORDER BY ad.CreatedDateTime DESC, ad.Status DESC;";
+            
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.Query<AdvertTableAdvertiserDto>(GetAdvertSalesExecResultSet, new { Id = id, 
+                                                                                                    siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<AdvertiserAdvertTableDashboardDto> GetAdvertForAdvertiserDashboard(int id)
+        {
+            string GetAdvertSalesExecResultSet = @"select SUM(TotalSMS) AS TotalSMS,SUM(TotalEmail) AS TotalEmail,
+                                                    SUM(TotalPlays) AS TotalPlays,
+                                                    CAST((AVG(AvgPlayLength)/1000) AS NUMERIC(36,2)) AS AvgPlayLength
+                                                    from RollupsCampaign where DetailLevel='C' and AdvertiserId=@Id;";
+
+            try
+            {
+
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<AdvertiserAdvertTableDashboardDto>(GetAdvertSalesExecResultSet, new
+                                { Id = id }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<bool> CheckAdvertNameExists(string advertName, int userId)
         {
             var builder = new SqlBuilder();
@@ -167,163 +220,185 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<IEnumerable<AdvertCategoryResult>> GetAdvertCategoryList()
+        public async Task<NewAdvertFormModel> GetAdvertForUpdateModel(int id)
         {
+            string selectQuery = @"SELECT AdvertId, UserId AS AdvertiserId,ClientId,AdvertName,Brand,MediaFileLocation,
+                                    UploadedToMediaServer,CreatedDateTime,UpdatedDateTime,Status,Script,ScriptFileLocation,
+                                    IsAdminApproval,AdvertCategoryId,CountryId,PhoneticAlphabet,NextStatus,CampProfileId,
+                                    AdtoneServerAdvertId,UpdatedBy,OperatorId FROM Advert
+                                    WHERE AdvertId=@Id;";
+            return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<NewAdvertFormModel>(selectQuery, new { Id = id }));
+        }
+
+        public async Task<NewAdvertFormModel> CreateNewAdvert(NewAdvertFormModel model)
+        {
+            string InsertNewCampaignAdvert = @"INSERT INTO Advert(UserId,ClientId,AdvertName,Brand,MediaFileLocation,
+                                                    UploadedToMediaServer,CreatedDateTime,UpdatedDateTime,Status,Script,ScriptFileLocation,
+                                                    IsAdminApproval,AdvertCategoryId,CountryId,PhoneticAlphabet,NextStatus,CampProfileId,
+                                                    AdtoneServerAdvertId,UpdatedBy,OperatorId)
+                                                VALUES(@AdvertiserId,@ClientId,@AdvertName,@Brand,@MediaFileLocation,
+                                                    @UploadedToMediaServer,GETDATE(),GETDATE(),@Status,@Script,@ScriptFileLocation,
+                                                    @IsAdminApproval,@AdvertCategoryId,@CountryId,@PhoneticAlphabet,@NextStatus,@CampaignProfileId,
+                                                    @AdtoneServerAdvertId,@UpdatedBy,@OperatorId);
+                                                            SELECT CAST(SCOPE_IDENTITY() AS INT);";
+            try
+            {
+
+                model.AdtoneServerAdvertId = await _executers.ExecuteCommand(_connStr,
+                                conn => conn.ExecuteScalar<int>(InsertNewCampaignAdvert, model));
+
+                try
+                {
+                    return await CreateNewOperatorAdvert(model);
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<NewAdvertFormModel> CreateNewOperatorAdvert(NewAdvertFormModel model)
+        {
+            string InsertNewCampaignAdvert = @"INSERT INTO Advert(UserId,ClientId,AdvertName,Brand,MediaFileLocation,
+                                                            UploadedToMediaServer,CreatedDateTime,UpdatedDateTime,Status,Script,ScriptFileLocation,
+                                                            IsAdminApproval,AdvertCategoryId,CountryId,PhoneticAlphabet,NextStatus,CampProfileId,
+                                                            AdtoneServerAdvertId,UpdatedBy,OperatorId)
+                                                          VALUES(@AdvertiserId,@ClientId,@AdvertName,@Brand,@MediaFileLocation,
+                                                            @UploadedToMediaServer,GETDATE(),GETDATE(),@Status,@Script,@ScriptFileLocation,
+                                                            @IsAdminApproval,@AdvertCategoryId,@CountryId,@PhoneticAlphabet,@NextStatus,@CampaignProfileId,
+                                                            @AdtoneServerAdvertId,@UpdatedBy,@OperatorId);
+                                                            SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+            var newModel = new NewAdvertFormModel();
+            newModel.AdtoneServerAdvertId = model.AdtoneServerAdvertId;
+            newModel.AdvertCategoryId = model.AdvertCategoryId;
+            newModel.AdvertId = model.AdvertId;
+            newModel.AdvertiserId = model.AdvertiserId;
+            newModel.AdvertName = model.AdvertName;
+            newModel.Brand = model.Brand;
+            newModel.CampaignProfileId = model.CampaignProfileId;
+            newModel.ClientId = model.ClientId;
+            newModel.CountryId = model.CountryId;
+            newModel.file = model.file;
+            newModel.IsAdminApproval = model.IsAdminApproval;
+            newModel.MediaFile = model.MediaFile;
+            newModel.MediaFileLocation = model.MediaFileLocation;
+            newModel.NextStatus = model.NextStatus;
+            newModel.Numberofadsinabatch = model.Numberofadsinabatch;
+            newModel.OperatorId = model.OperatorId;
+            newModel.PhoneticAlphabet = model.PhoneticAlphabet;
+            newModel.ScriptFile = model.ScriptFile;
+            newModel.ScriptFileLocation = model.ScriptFileLocation;
+            newModel.Script = model.Script;
+            newModel.Status = model.Status;
+            newModel.UpdatedBy = model.UpdatedBy;
+            newModel.UploadedToMediaServer = model.UploadedToMediaServer;
+
+            try
+            {
+
+                    var conn = await _connService.GetConnectionStringByOperator(model.OperatorId);
+                    if (conn != null && conn.Length > 10)
+                    {
+
+                        newModel.AdvertiserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.AdvertiserId, conn);
+                        newModel.UpdatedBy = await _connService.GetUserIdFromAdtoneIdByConnString(model.UpdatedBy, conn);
+                        newModel.OperatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
+                        newModel.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(model.CampaignProfileId, conn);
+                        if (model.ClientId != null)
+                            newModel.ClientId = await _connService.GetClientIdFromAdtoneIdByConnString(model.ClientId.Value, conn);
+
+
+                        newModel.AdvertCategoryId = await _executers.ExecuteCommand(conn,
+                                conn => conn.ExecuteScalar<int>("SELECT AdvertCategoryId FROM AdvertCategories WHERE AdtoneServerAdvertCategoryId=@Id", new { Id = model.AdvertCategoryId }));
+
+                        newModel.AdvertId = await _executers.ExecuteCommand(conn,
+                                conn => conn.ExecuteScalar<int>(InsertNewCampaignAdvert, newModel));
+                    }
+            }
+            catch
+            {
+                throw;
+            }
+
+            return newModel;
+        }
+
+
+        public async Task<int> UpdateAdvert(NewAdvertFormModel model)
+        {
+            var retVal = 0;
             var sb = new StringBuilder();
-            var builder = new SqlBuilder();
-            sb.Append(AdvertQuery.GetAdvertCategoryDataTable);
-
-            var values = CheckGeneralFile(sb, builder, pais: "ad", ops: "op");
-            sb = values.Item1;
-            builder = values.Item2;
-            var select = builder.AddTemplate(sb.ToString());
+            string updateMainAdvert = @"UPDATE Advert SET ClientId=@ClientId,AdvertName=@AdvertName,Brand=@Brand,UpdatedDateTime=GETDATE(),
+                                        Script=@Script,AdvertCategoryId=@AdvertCategoryId,UpdatedBy=@UpdatedBy";
+            sb.Append(updateMainAdvert);
+            if (model.FileUpdate)
+                sb.Append(@",MediaFileLocation=@MediaFileLocation,UploadedToMediaServer=@UploadedToMediaServer, Status=@Status,
+                            IsAdminApproval=@IsAdminApproval,NextStatus=@NextStatus ");
+            sb.Append(" WHERE AdvertId=@AdvertId");
 
             try
             {
-                return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<AdvertCategoryResult>(select.RawSql, select.Parameters));
+
+                var uid = await _executers.ExecuteCommand(_connStr,
+                                conn => conn.ExecuteScalar<int>(sb.ToString(), model));
             }
             catch
             {
                 throw;
             }
-        }
 
-
-        public async Task<int> RemoveAdvertCategory(IdCollectionViewModel model)
-        {
-            int x = 0;
-            try
+            var conn = await _connService.GetConnectionStringByOperator(model.OperatorId);
+            if (conn != null && conn.Length > 10)
             {
-                x = await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(AdvertQuery.DeleteAdvertCategory + " AdvertCategoryId=@Id;",
-                                                                                                                    new { Id = model.id }));
+                var newModel = new NewAdvertFormModel();
+                newModel.AdtoneServerAdvertId = model.AdvertId;
+                newModel.AdvertName = model.AdvertName;
+                newModel.Brand = model.Brand;
+                newModel.IsAdminApproval = model.IsAdminApproval;
+                newModel.MediaFile = model.MediaFile;
+                newModel.MediaFileLocation = model.MediaFileLocation;
+                newModel.NextStatus = model.NextStatus;
+                newModel.PhoneticAlphabet = model.PhoneticAlphabet;
+                newModel.ScriptFile = model.ScriptFile;
+                newModel.ScriptFileLocation = model.ScriptFileLocation;
+                newModel.Script = model.Script;
+                newModel.Status = model.Status;
+                newModel.UploadedToMediaServer = model.UploadedToMediaServer;
+                newModel.AdvertId = await _executers.ExecuteCommand(conn,
+                                conn => conn.ExecuteScalar<int>("SELECT AdvertId FROM Advert WHERE AdtoneServerAdvertId=@Id", new { Id = model.AdvertId }));
+                newModel.AdvertiserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.AdvertiserId, conn);
+                newModel.UpdatedBy = await _connService.GetUserIdFromAdtoneIdByConnString(model.UpdatedBy, conn);
+                newModel.OperatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
+                newModel.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(model.CampaignProfileId, conn);
+                if (model.ClientId != null)
+                    newModel.ClientId = await _connService.GetClientIdFromAdtoneIdByConnString(model.ClientId.Value, conn);
 
-                var lst = await _connService.GetConnectionStringsByCountry(model.countryId);
-                List<string> conns = lst.ToList();
+                newModel.AdvertCategoryId = await _executers.ExecuteCommand(conn,
+                        conn => conn.ExecuteScalar<int>("SELECT AdvertCategoryId FROM AdvertCategories WHERE AdtoneServerAdvertCategoryId=@Id", new { Id = model.AdvertCategoryId }));
 
-                foreach (string constr in conns)
+                try
                 {
-                    x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(AdvertQuery.DeleteAdvertCategory + " AdtoneServerAdvertCategoryId=@Id;",
-                                                                                                                     new { Id = model.id }));
+                    return await _executers.ExecuteCommand(conn,
+                        conn => conn.ExecuteScalar<int>(sb.ToString(), newModel));
+
                 }
-            }
-            catch
-            {
-                throw;
-            }
-            return x;
-        }
-
-
-        public async Task<int> UpdateAdvertCategory(AdvertCategoryResult model)
-        {
-            var sb = new StringBuilder();
-            var sb1 = new StringBuilder();
-            int x = 0;
-            try
-            {
-                sb.Append(AdvertQuery.UpdateAdvertCategory);
-                sb.Append(" AdvertCategoryId=@Id;");
-                x = await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(sb.ToString(), new
-                                    {
-                                        Id = model.AdvertCategoryId,
-                                        countryId = model.CountryId,
-                                        name = model.CategoryName
-                                    }));
-
-                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.GetValueOrDefault());
-                List<string> conns = lst.ToList();
-                sb1.Append(AdvertQuery.UpdateAdvertCategory);
-                sb1.Append(" AdtoneServerAdvertCategoryId=@Id;");
-                foreach (string constr in conns)
+                catch
                 {
-
-                    var countryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId.GetValueOrDefault(), constr);
-
-                    x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(sb1.ToString(), new
-                                    {
-                                        Id = model.AdvertCategoryId,
-                                        countryId = countryId,
-                                        name = model.CategoryName
-                                    }));
-                }
-            }
-            catch
-            {
-                throw;
-            }
-            return x;
-        }
-
-
-        public async Task<AdvertCategoryResult> GetAdvertCategoryDetails(int id)
-        {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertQuery.GetAdvertCategoryDataTable + " WHERE AdvertCategoryId=@Id");
-            try
-            {
-                builder.AddParameters(new { Id = id });
-
-
-                return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.QueryFirstOrDefault<AdvertCategoryResult>(select.RawSql, select.Parameters));
-
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-
-        public async Task<int> InsertAdvertCategory(AdvertCategoryResult model)
-        {
-            int x = 0;
-            int y = 0;
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertQuery.AddAdvertCategory);
-            try
-            {
-                builder.AddParameters(new { countryId = model.CountryId });
-                builder.AddParameters(new { name = model.CategoryName });
-                builder.AddParameters(new { Id = model.AdtoneServerAdvertCategoryId });
-
-
-                model.AdtoneServerAdvertCategoryId = await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
-
-
-                var builder2 = new SqlBuilder();
-                var select2 = builder2.AddTemplate(AdvertQuery.AddAdvertCategory);
-
-                builder2.AddParameters(new { name = model.CategoryName });
-                builder2.AddParameters(new { Id = model.AdtoneServerAdvertCategoryId });
-
-
-                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.GetValueOrDefault());
-                List<string> conns = lst.ToList();
-
-                foreach (string constr in conns)
-                {
-                    var countryId = await _connService.GetCountryIdFromAdtoneId(model.CountryId.GetValueOrDefault(), constr);
-
-                    builder2.AddParameters(new { countryId = countryId });
-
-                    y += await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(select2.RawSql, select2.Parameters));
+                    throw;
                 }
 
             }
-            catch
-            {
-                throw;
-            }
-            return x;
+            return retVal;
         }
+
 
 
         public async Task<int> ChangeAdvertStatus(UserAdvertResult model)

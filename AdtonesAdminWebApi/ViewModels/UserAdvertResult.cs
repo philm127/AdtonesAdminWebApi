@@ -36,5 +36,10 @@ namespace AdtonesAdminWebApi.ViewModels
         public bool UploadedToMediaServer { get; set; }
         public string SoapToneId { get; set; }
         public string SoapToneCode { get; set; }
+
+        public string SalesExec { get; set; }
+        public int SUserId { get; set; }
+
+        public int AdvertCategoryId { get; set; }
     }
 }

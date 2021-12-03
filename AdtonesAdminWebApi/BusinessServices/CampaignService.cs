@@ -10,7 +10,10 @@ using System;
 using System.ComponentModel;
 using System.Data;
 using System.Threading.Tasks;
-
+using System.Linq;
+using System.Collections.Generic;
+using System.Reflection;
+using AdtonesAdminWebApi.ViewModels.DTOs;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -21,14 +24,16 @@ namespace AdtonesAdminWebApi.BusinessServices
         public IConnectionStringService _connService { get; }
         // private readonly ISaveFiles _saveFile;
         ReturnResult result = new ReturnResult();
-
+        private readonly ICurrencyDAL _currencyConversion;
         IHttpContextAccessor _httpAccessor;
         private readonly ICampaignDAL _campDAL;
+        private readonly ICampaignMatchDAL _campMatchDAL;
         private readonly ILoggingService _logServ;
         const string PageName = "CampaignService";
 
         public CampaignService(IConfiguration configuration, IConnectionStringService connService, IHttpContextAccessor httpAccessor,
-                                ICampaignDAL campDAL, ILoggingService logServ) //ISaveFiles saveFile)
+                                ICampaignDAL campDAL, ILoggingService logServ, ICampaignMatchDAL campMatchDAL,
+                                ICurrencyDAL currencyConversion) //ISaveFiles saveFile)
 
         {
             _configuration = configuration;
@@ -36,7 +41,9 @@ namespace AdtonesAdminWebApi.BusinessServices
            // _saveFile = saveFile;
             _httpAccessor = httpAccessor;
             _campDAL = campDAL;
+            _campMatchDAL = campMatchDAL;
             _logServ = logServ;
+            _currencyConversion = currencyConversion;
         }
 
 
@@ -89,6 +96,25 @@ namespace AdtonesAdminWebApi.BusinessServices
             return result;
         }
 
+        public async Task<ReturnResult> LoadCampaignDataTableAdvertiser(int id)
+        {
+            try
+            {
+                result.body = await _campDAL.GetCampaignResultSetByAdvertiser(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadCampaignDataTableAdvertiser";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
+        }
+
 
         public async Task<ReturnResult> LoadCampaignDataTableById(int id)
         {
@@ -122,7 +148,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 // Need to do this to get OperatorId
-                CampaignProfile _campProfile = await _campDAL.GetCampaignProfileDetail(model.id);
+                CampaignProfileDto _campProfile = await _campDAL.GetCampaignProfileDetail(model.id);
                 bool exists = false;
 
                 exists = await _campDAL.CheckCampaignBillingExists(model.id);
@@ -134,7 +160,7 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 result.body = await _campDAL.ChangeCampaignProfileStatus(_campProfile);
                 var x = await _campDAL.ChangeCampaignProfileStatusOperator(_campProfile);
-                var y = await _campDAL.UpdateCampaignMatch(_campProfile);
+                var y = await _campMatchDAL.UpdateCampaignMatch(_campProfile.CampaignProfileId, _campProfile.OperatorId, _campProfile.Status);
 
 
             }
@@ -161,7 +187,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                CampaignProfile _campProfile = await _campDAL.GetCampaignProfileDetail(campaignId);
+                CampaignProfileDto _campProfile = await _campDAL.GetCampaignProfileDetail(campaignId);
 
                 if (_campProfile != null)
                 {
@@ -199,7 +225,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        private static int CheckStartDateOfCampaign(CampaignProfile _campProfile)
+        private static int CheckStartDateOfCampaign(CampaignProfileDto _campProfile)
         {
             int status = 0;
             if (_campProfile.StartDate == null && _campProfile.EndDate == null)
@@ -248,6 +274,51 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
+        public async Task<ReturnResult> GetAdvertiserCamapaignTable()
+        {
+            //var efmvcUser = _httpAccessor.GetUserIdFromJWT();
+            //CurrencySymbol currencySymbol = new CurrencySymbol();
 
+            //var consolidatedStats = await _statsProvider.GetConsolidatedStatsAsync(StatsDetailLevels.Advertiser,
+            //    efmvcUser, _currencyConv);
+
+            //var campaigns = await _campDAL.GetCampaignTableForAdvertiser(efmvcUser, consolidatedStats);// _profileRepository.AsQueryable().Where(c => c.UserId == efmvcUser.UserId)
+            //Type type = campaigns.GetType();
+            //PropertyInfo[] fields = type.GetProperties();
+            //foreach (var field in fields)
+            //{
+            //    string name = field.Name;
+            //    var temp = field.GetValue(obj, null);
+            //    Console.WriteLine(name + "  " + temp);
+            //}
+            //var currencyConv = await _currencyConversion.GetDisplayCurrencyCodeForUserAsync(efmvcUser);
+            //var resultUserMatches = await _statsProvider.GetCampaignUserMatchCountAsync(campaigns.Select(x => x.Campaign.CampaignProfileId).ToArray());
+            
+            //var data = joined.Select(item => new CampaignProfileResult
+            //{
+            //    CampaignName = item.Campaign.CampaignName,
+            //    CampaignProfileId = item.Campaign.CampaignProfileId,
+            //    Status = item.Campaign.Status,
+            //    TotalBudget = item.Summary.Budget,
+            //    totalaveragebid = item.Summary.AvgBid,
+            //    totalspend = item.Summary.Spend,
+            //    finaltotalplays = (int)item.Summary.MoreSixSecPlays,
+            //    advertname = item.Advert?.AdvertName ?? "-",
+            //    AdvertId = item.Advert?.AdvertId ?? 0,
+            //    FundsAvailable = item.Summary.FundsAvailable,
+            //    ClientName = item.Campaign.ClientId == 0 ? "-" : item.Campaign.ClientId == null ? "-" : item.Campaign.Client.Name,
+            //    ClientId = item.Campaign.ClientId,
+            //    IsAdminApproval = item.Campaign.IsAdminApproval,
+            //    CurrencyCode = currencySymbol.GetCurrencySymbolByCurrencyCode(currencyConv.CurrencyCode),
+            //    CountryId = currencyConv.CountryId,
+            //    Reach = (int)item.Summary.Reach,
+            //    CurrencyId = currencyConv.CurrencyId,
+            //    UserMatchedStatus = resultUserMatches.FirstOrDefault(x => x.CampaignProfileId == item.Campaign.CampaignProfileId)?.MatchedUsers > 0 ? 1 : 0,
+            //    NumUsersMatched = resultUserMatches.FirstOrDefault(x => x.CampaignProfileId == item.Campaign.CampaignProfileId)?.MatchedUsers ?? 0,
+            //}).ToList();
+
+            //result.body = data;
+            return result;
+        }
     }
 }

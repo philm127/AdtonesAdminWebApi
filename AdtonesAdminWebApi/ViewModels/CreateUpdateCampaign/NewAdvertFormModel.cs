@@ -19,7 +19,7 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
         public int AdvertCategoryId { get; set; }
 
 
-        public string SmsScript { get; set; }
+        public string Script { get; set; }
 
         public string Numberofadsinabatch { get; set; }
 
@@ -61,6 +61,8 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
         public List<IFormFile> file { get; set; }
 
         public IFormFile MediaFile { get; set; }
+
+        public bool FileUpdate { get; set; } = false;
         public IFormFile ScriptFile { get; set; }
     }
 

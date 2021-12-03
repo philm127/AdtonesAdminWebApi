@@ -1,6 +1,7 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Services.Mailer;
-using AdtonesAdminWebApi.ViewModels;
+//using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.ViewModels.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -10,7 +11,7 @@ namespace AdtonesAdminWebApi.Services
 {
     public interface ICreateInvoicePDF
     {
-        bool CreatePDF(BillingPaymentModel model, int CountryId, int type, string paymentMethod, string currencySymbol1, string fromCurrencyCode, string toCurrencyCode);
+        bool CreatePDF(int CampaignProfileId, int BillingId, int AdvertiserId, string InvoiceNumber, int CountryId, int type, string paymentMethod, string currencySymbol1, string fromCurrencyCode, string toCurrencyCode);
     }
 
 
@@ -40,24 +41,24 @@ namespace AdtonesAdminWebApi.Services
             _mailer = mailer;
         }
 
-        public bool CreatePDF(BillingPaymentModel model, int CountryId, int type, string paymentMethod, string currencySymbol1, string fromCurrencyCode, string toCurrencyCode)
+        public bool CreatePDF(int CampaignProfileId, int BillingId, int AdvertiserId, string InvoiceNumber, int CountryId, int type, string paymentMethod, string currencySymbol1, string fromCurrencyCode, string toCurrencyCode)
         {
             string path = string.Empty;
-            Invoice invoice = new Invoice();
-            InvoiceForPDF billingDetails = new InvoiceForPDF();
+            InvoiceDto invoice = new InvoiceDto();
+            InvoiceForPDFDto billingDetails = new InvoiceForPDFDto();
             try
             {
                 CurrencySymbol currencySymbol = new CurrencySymbol();
                 var currencyCode = "";
                 currencyCode = currencySymbol1;
 
-                billingDetails = _billDAL.GetInvoiceDetailsForPDF(model.BillingId.Value).Result;
-                AdtonesAdminWebApi.ViewModels.Item item1 = new AdtonesAdminWebApi.ViewModels.Item();
+                billingDetails = _billDAL.GetInvoiceDetailsForPDF(BillingId).Result;
+                AdtonesAdminWebApi.ViewModels.DTOs.Item item1 = new AdtonesAdminWebApi.ViewModels.DTOs.Item();
                 item1.Description = billingDetails.CampaignName;
                 item1.Price = billingDetails.FundAmount;
                 item1.Quantity = 1;
                 item1.Organisation = billingDetails.CompanyName;
-                Customer customer = new Customer();
+                CustomerDto customer = new CustomerDto();
                 customer.FullName = billingDetails.FullName;
                 customer.AddressLine1 = billingDetails.AddressLine1;
                 customer.AddressLine2 = billingDetails.AddressLine2;
@@ -67,7 +68,7 @@ namespace AdtonesAdminWebApi.Services
                 customer.PhoneNumber = billingDetails.PhoneNumber;
                 customer.Email = billingDetails.Email;
 
-                invoice = new Invoice(item1);
+                invoice = new InvoiceDto(item1);
                 invoice.InvoiceNumber = billingDetails.InvoiceNumber;
                 invoice.vat = billingDetails.InvoiceTax / 100;
                 invoice.InvoiceTax = billingDetails.InvoiceTax.ToString();
@@ -103,7 +104,7 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                var errorMessage = $"Payment inserted successfully against Campaign: {model.CampaignProfileId} BUT there was an issue PRODUCING the invoice No: {model.InvoiceNumber}";
+                var errorMessage = $"Payment inserted successfully against Campaign: {CampaignProfileId} BUT there was an issue PRODUCING the invoice No: {InvoiceNumber}";
                 _logServ.ErrorMessage = errorMessage + " " + ex.Message.ToString();
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
@@ -122,10 +123,13 @@ namespace AdtonesAdminWebApi.Services
                 var ytr = _httpAccessor.GetRoleIdFromJWT();
                 if (ytr == (int)Enums.UserRole.SalesExec)
                 {
-                    mailAddr = _salesMan.GetSalesExecInvoiceMailDets(model.AdvertiserId).Result;
+                    mailAddr = _salesMan.GetSalesExecInvoiceMailDets(AdvertiserId).Result;
                     if (mailAddr == null || mailAddr.Length < 3)
                         mailAddr = billingDetails.Email;
                 }
+                else
+                    mailAddr = billingDetails.Email;
+
                 mail.SingleTo = mailAddr;
 
                 _mailer.SendBasicEmail(mail);
@@ -138,7 +142,7 @@ namespace AdtonesAdminWebApi.Services
             }
             catch (Exception ex)
             {
-                var errorMessage = $"Payment inserted successfully against Campaign: {model.CampaignProfileId} BUT there was an issue SENDING the invoice No: {model.InvoiceNumber}";
+                var errorMessage = $"Payment inserted successfully against Campaign: {CampaignProfileId} BUT there was an issue SENDING the invoice No: {InvoiceNumber}";
                 _logServ.ErrorMessage = errorMessage + " " + ex.Message.ToString();
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;

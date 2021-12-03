@@ -20,11 +20,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> AddCompanyDetails(CompanyDetails company);
         Task<ReturnResult> AddUser(UserAddFormModel model);
         Task<ReturnResult> AddOperatorAdminUser(UserAddFormModel model);
-        // Task<ReturnResult> UpdateOperatorAdminUser(OperatorAdminFormModel model);
-        Task<ReturnResult> GetOperatorAdmin(int userId);
-
-        Task<ReturnResult> GetUserById(int userId);
         Task<ReturnResult> UpdateUserPermission(IdCollectionViewModel model);
-        Task<ReturnResult> GetClientProfile(int clientId);
     }
 }

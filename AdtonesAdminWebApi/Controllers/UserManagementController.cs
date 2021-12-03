@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using AdtonesAdminWebApi.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using AdtonesAdminWebApi.Services;
+using AdtonesAdminWebApi.DAL.Interfaces;
+using System;
+using Microsoft.AspNetCore.Http;
 
 namespace AdtonesAdminWebApi.Controllers
 {
@@ -18,31 +22,52 @@ namespace AdtonesAdminWebApi.Controllers
         private readonly IPromotionalCampaignService _promotionalService;
         private readonly IUserDashboardService _dashboardService;
         private readonly ISalesManagementService _salesService;
+        private readonly IUserDashboardDAL _dashboardDal;
+        private readonly IUserManagementDAL _userDAL;
+        private readonly ILoggingService _logServ;
+        IHttpContextAccessor _httpAccessor;
+        ReturnResult result = new ReturnResult();
+        const string PageName = "UserManagementController";
 
-        public UserManagementController(IUserManagementService userService,IPromotionalCampaignService promotionalService,
-                                            IUserDashboardService dashboardService, ISalesManagementService salesService)
+        public UserManagementController(IUserManagementService userService,IPromotionalCampaignService promotionalService, IUserDashboardDAL dashboardDal,
+                                            IUserDashboardService dashboardService, ISalesManagementService salesService, 
+                                            IHttpContextAccessor httpAccessor, IUserManagementDAL userDAL)
         {
             _userService = userService;
             _promotionalService = promotionalService;
             _dashboardService = dashboardService;
             _salesService = salesService;
-        }
-
-
-        [HttpGet("v1/GetUserResultTest")]
-        public async Task<IEnumerable<AdvertiserDashboardResult>> GetUserResultTest()
-        {
-            var res = await _dashboardService.LoadAdvertiserDataTable();
-            IEnumerable<AdvertiserDashboardResult> nv;
-            nv = (IEnumerable<AdvertiserDashboardResult>)res.body;
-            return nv;
+            _dashboardDal = dashboardDal;
+            _httpAccessor = httpAccessor;
+            _userDAL = userDAL;
         }
 
 
         [HttpGet("v1/GetAdvertiserTable")]
         public async Task<ReturnResult> GetAdvertiserTable()
         {
-            return await _dashboardService.LoadAdvertiserDataTable();
+            var roleName = _httpAccessor.GetRoleFromJWT();
+            var operatorId = 0;
+
+            if (roleName.ToLower() == "OperatorAdmin".ToLower())
+                operatorId = _httpAccessor.GetOperatorFromJWT();
+
+
+            try
+            {
+                result.body = await _dashboardDal.GetAdvertiserDashboard(operatorId);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertiserTable";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -53,7 +78,21 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/LoadOperatorDataTable")]
         public async Task<ReturnResult> LoadOperatorDataTable()
         {
-            return await _dashboardService.LoadOperatorDataTable();
+            try
+            {
+                result.body = await _dashboardDal.GetOperatorDashboard();
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetOperatorDashboard";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -64,7 +103,21 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/LoadAdminDataTable")]
         public async Task<ReturnResult> LoadAdminDataTable()
         {
-            return await _dashboardService.LoadAdminDataTable();
+            try
+            {
+                result.body = await _dashboardDal.GetAdminDashboard();
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdminDashboard";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -151,7 +204,21 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetUserById")]
         public async Task<ReturnResult> GetUserById(IdCollectionViewModel some)
         {
-            return await _userService.GetUserById(some.userId);
+            try
+            {
+                result.body = await _userDAL.GetUserById(some.userId);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetUserById";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -197,21 +264,63 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetSalesExecDataList")]
         public async Task<ReturnResult> GetSalesExecDataList()
         {
-            return await _dashboardService.LoadSalesExecDataTable();
+            try
+            {
+                result.body = await _dashboardDal.GetSalesExecDashboard();
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadSalesExecDataTable";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
         [HttpGet("v1/GetSalesExecForAdminDataList")]
         public async Task<ReturnResult> GetSalesExecForAdminDataList()
         {
-            return await _dashboardService.LoadSalesExecForAdminDataTable();
+            try
+            {
+                result.body = await _dashboardDal.GetSalesExecForAdminDashboard();
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadSalesExecForAdminDataTable";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
         [HttpGet("v1/GetAdvertiserDataListForSales/{id}")]
         public async Task<ReturnResult> GetAdvertiserDataListForSales(int id)
         {
-            return await _dashboardService.LoadAdvertisersForSales(id);
+            try
+            {
+                result.body = await _dashboardDal.GetAdvertiserDashboardForSales(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertiserDataListForSales";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -226,7 +335,21 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetClientProfile/{id}")]
         public async Task<ReturnResult> GetClientProfile(int id)
         {
-            return await _userService.GetClientProfile(id);
+            try
+            {
+                result.body = await _userDAL.GetClientDetails(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetClientProfile";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
     }
 }

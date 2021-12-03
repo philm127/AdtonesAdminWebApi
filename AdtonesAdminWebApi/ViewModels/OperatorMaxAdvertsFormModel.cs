@@ -17,5 +17,6 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public int OperatorId { get; set; }
         public string OperatorName { get; set; }
+        public int? AdtoneServerOperatorMaxAdvertId { get; set; }
     }
 }

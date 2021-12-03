@@ -82,9 +82,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                             VALUES(@manId,@execId,1,GETDATE(),GETDATE());";
 
 
-        public static string GetOperatorIdFromUserId => @"SELECT OperatorId FROM Users WHERE UserId=@Id";
-
-
         public static string GetAdvertAdminOperator => @"SELECT Email FROM Users WHERE Activated=1 AND RoleId=@RoleId ";
 
 

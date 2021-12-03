@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AdtonesAdminWebApi.ViewModels.DTOs;
 
 namespace AdtonesAdminWebApi.Services
 {
@@ -17,7 +18,7 @@ namespace AdtonesAdminWebApi.Services
         {
             _currencyConv = currencyConv;
         }
-        public Invoice Invoice { get; set; }
+        public InvoiceDto Invoice { get; set; }
         public string CreatePDF(string path, string fromCurrencyCode, string toCurrencyCode)
         {
             string finalpath = path + "/Adtones_invoice_" + Invoice.InvoiceNumber + ".pdf";
@@ -134,7 +135,7 @@ namespace AdtonesAdminWebApi.Services
             PdfContentByte pcb = writer.DirectContent;
             // Get Items from Invoice
 
-            List<Item> itemList = Invoice.ItemList;
+            List<ViewModels.DTOs.Item> itemList = Invoice.ItemList;
             //Item item = itemList[0];
 
             //produce table and set its props, widths are fractions

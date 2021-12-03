@@ -105,6 +105,16 @@ namespace AdtonesAdminWebApi.Controllers
             return await _auditService.GetDashboardSummaryForSalesManager();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("v1/GetDashboardSummaryAdvertiser")]
+        public async Task<ReturnResult> GetDashboardSummaryAdvertiser(int campaignId=0)
+        {
+            return await _auditService.GetDashboardSummaryForAdvertiser(campaignId);
+        }
+
 
         /// <summary>
         /// 

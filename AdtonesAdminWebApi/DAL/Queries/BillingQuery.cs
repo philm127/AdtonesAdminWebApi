@@ -34,18 +34,5 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
         public static string GetCreditPeriod => @"SELECT CreditPeriod FROM CampaignCreditPeriods WHERE CampaignProfileId=@Id";
 
-
-        public static string GetCampaignBillingData => @"SELECT camp.CampaignProfileId,camp.UserId AS AdvertiserId,cred.AssignCredit AS AssignedCredit,
-                                                        cred.AvailableCredit,camp.CountryId,tx.TaxPercantage,camp.TotalBudget AS TotalFundAmount,
-                                                        camp.CurrencyCode,cur.CurrencyId
-                                                        FROM CampaignProfile AS camp
-                                                        INNER JOIN UsersCredit AS cred ON cred.UserId=camp.UserId
-                                                        INNER JOIN CountryTax AS tx ON tx.CountryId=camp.CountryId
-                                                        INNER JOIN Currencies AS cur ON camp.CurrencyCode=cur.CurrencyCode
-                                                        WHERE camp.CampaignProfileId=@Id";
-
-
-
-
     }
 }

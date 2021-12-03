@@ -130,46 +130,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
 
-        public static string LoadUserCreditDataTable => @"SELECT u.Id,u.UserId,usrs.Email,usrs.FullName,usrs.Organisation,u.CreatedDate,bil.CurrencyCode,
-                                                 u.AssignCredit AS Credit,u.AvailableCredit,ISNULL(bil.TotalAmount,0) AS TotalUsed,ISNULL(pay.Amount,0) AS TotalPaid,
-                                                 (ISNULL(bil.TotalAmount,0) - ISNULL(pay.Amount,0)) AS RemainingAmount,ISNULL(ctry.Name,'None') AS CountryName
-                                                 FROM UsersCredit AS u
-                                                 LEFT JOIN 
-                                                 (SELECT UserId,SUM(TotalAmount) AS TotalAmount,CurrencyCode FROM Billing WHERE PaymentMethodId=1 GROUP BY UserId,CurrencyCode) bil
-                                                 ON u.UserId=bil.UserId
-                                                 LEFT JOIN
-                                                 (SELECT UserId,SUM(Amount) AS Amount from UsersCreditPayment GROUP BY UserId) pay
-                                                 ON u.UserId=pay.UserId
-                                                 LEFT JOIN
-                                                 (SELECT UserId,Email,CONCAT(FirstName,' ',LastName) AS FullName,Organisation FROM Users) usrs
-                                                 ON usrs.UserId=u.UserId
-                                                LEFT JOIN Currencies AS ad ON u.CurrencyId=ad.CurrencyId
-                                                LEFT JOIN Country AS ctry ON ctry.Id=ad.CountryId";
-
-
-
-        public static string LoadUserCreditForSalesDataTable => @"SELECT u.Id,u.UserId,usrs.Email,usrs.FullName,usrs.Organisation,u.CreatedDate,bil.CurrencyCode,
-                                                 u.AssignCredit AS Credit,u.AvailableCredit,ISNULL(bil.TotalAmount,0) AS TotalUsed,ISNULL(pay.Amount,0) AS TotalPaid,
-                                                CASE WHEN sexcs.FirstName IS NULL THEN 'UnAllocated' 
-                                                    ELSE CONCAT(sexcs.FirstName,' ',sexcs.LastName) END AS SalesExec,sexcs.UserId AS SUserId,s
-                                                 (ISNULL(bil.TotalAmount,0) - ISNULL(pay.Amount,0)) AS RemainingAmount,ISNULL(ctry.Name,'None') AS CountryName
-                                                 FROM UsersCredit AS u
-                                                 LEFT JOIN 
-                                                 (SELECT UserId,SUM(TotalAmount) AS TotalAmount,CurrencyCode FROM Billing WHERE PaymentMethodId=1 GROUP BY UserId,CurrencyCode) bil
-                                                 ON u.UserId=bil.UserId
-                                                 LEFT JOIN
-                                                 (SELECT UserId,SUM(Amount) AS Amount from UsersCreditPayment GROUP BY UserId) pay
-                                                 ON u.UserId=pay.UserId
-                                                 LEFT JOIN
-                                                 (SELECT UserId,Email,CONCAT(FirstName,' ',LastName) AS FullName,Organisation FROM Users) usrs
-                                                 ON usrs.UserId=u.UserId
-                                                LEFT JOIN Currencies AS ad ON u.CurrencyId=ad.CurrencyId
-                                                LEFT JOIN Country AS ctry ON ctry.Id=ad.CountryId
-                                                LEFT JOIN Advertisers_SalesTeam AS sales ON usrs.UserId=sales.AdvertiserId 
-                                                LEFT JOIN Users AS sexcs ON sexcs.UserId=sales.SalesExecId";
-
-
-
         public static string GetInvoiceToPDF => @"SELECT pay.Description,bil.InvoiceNumber,bil.SettledDate,co.CountryId,ucp.Amount,usr.Email,
                                                     usr.FirstName, usr.LastName
                                                     FROM Billing AS bil 

@@ -43,32 +43,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        /// <summary>
-        /// Gets either a list of Profile Information or a single if passed model Id is not zero
-        /// </summary>
-        /// <param name="model">The id is used to select a single profile</param>
-        /// <returns>Either a List or single ProfileInformationResult model</returns>
-        public async Task<ReturnResult> LoadDataTable()
-        {
-            try
-            {
-
-                result.body = await _profDAL.LoadProfileResultSet();
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "FillProfileMatchInformationResult";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
+        
         /// <summary>
         /// Populates Form for editing
         /// </summary>
@@ -81,7 +56,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var prof = new ProfileMatchInformationFormModel();
                 IEnumerable<ProfileMatchLabelFormModel> label;
                 prof = await _profDAL.GetProfileById(id);
-                label = await _profDAL.GetProfileLabelById(prof.Id);
+                label = await _profDAL.GetListProfileLabelById(prof.Id);
 
                 prof.profileMatchLabelFormModels = label.ToList();
                 result.body = prof;
@@ -208,27 +183,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                 result.result = 0;
                 return result;
             }
-        }
-
-
-        public async Task<ReturnResult> DeleteProfileLabel(int id)
-        {
-            try
-            {
-                var x = await _profDAL.DeleteProfileLabelById(id);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "DeleteProfileLabel";
-                await _logServ.LogError();
-                
-                result.result = 0;
-                return result;
-            }
-            return result;
         }
 
 

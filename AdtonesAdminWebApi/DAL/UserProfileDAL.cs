@@ -1,5 +1,7 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.ViewModels.DTOs.UserProfile;
 using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -22,46 +24,38 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task PrematchProcessForCampaign(int campaignId, string conn)
+       
+
+
+        public async Task<UserProfileDto> GetUserProfileByUserId(int userId)
         {
-            string _connStr = _configuration.GetConnectionString("DefaultConnection");
-            using (var connection = new SqlConnection(conn))
+            string query = @"SELECT UserProfileId, UserId, DOB, Gender, IncomeBracket, WorkingStatus, RelationshipStatus, 
+                            Education, HouseholdStatus, Location, MSISDN, AdtoneServerUserProfileId
+                            FROM UserProfile WHERE UserId=@Id";
+            try
             {
-                await connection.OpenAsync();
-                await connection.ExecuteAsync("CampaignUserMatchSpByCampaignId",
-                                                                    new { CampaignProfileId = campaignId },
-                                                                    commandType: CommandType.StoredProcedure);
+                using (var connection = new SqlConnection(_connStr))
+                {
+                    return await _executers.ExecuteCommand(_connStr,
+                                        conn => conn.QueryFirstOrDefault<UserProfileDto>(query, new { Id = userId }));
+                }
             }
+            catch(Exception ex)
+            {
+                var msg = ex.Message.ToString();
+            }
+            return null;
 
         }
 
-
-        public async Task<int> GetProfileMatchInformationId(int countryId)
+        public async Task<UserProfilePreferenceDto> GetUserProfilePreferenceByUserProfileId(int userId)
         {
-            using (var connection = new SqlConnection(conn))
-            {
-                await connection.OpenAsync();
-                await connection.ExecuteAsync(UserMatchQuery.GetProfileMatchLabels, new { Id = infoId }));
-            }
-
+            string query = @"SELECT * FROM UserProfilePreference WHERE UserProfileId=@Id";
             using (var connection = new SqlConnection(_connStr))
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.QueryFirstOrDefault<int>(UserMatchQuery.GetProfileMatchInformationId,
-                                                                                                                        new { Id = countryId }));
+                                    conn => conn.QueryFirstOrDefault<UserProfilePreferenceDto>(query, new { Id = userId }));
             }
-
-        }
-
-
-        public async Task<IEnumerable<string>> GetProfileMatchLabels(int infoId)
-        {
-            using (var connection = new SqlConnection(_connStr))
-            {
-                return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<string>(UserMatchQuery.GetProfileMatchLabels, new { Id = infoId }));
-            }
-
         }
     }
 }

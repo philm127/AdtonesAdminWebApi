@@ -14,5 +14,8 @@ namespace AdtonesAdminWebApi.ViewModels
         public string CampaignName { get; set; }
         public int CreditPeriod { get; set; }
         public DateTime? CreatedDate { get; set; }
+
+        public int? AdtoneServerCampaignCreditPeriodId { get; set; }
+        public string SalesExec { get; set; }
     }
 }

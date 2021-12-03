@@ -3,9 +3,13 @@ using AdtonesAdminWebApi.DAL.Queries;
 using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
+using AdtonesAdminWebApi.ViewModels.Command;
+using AdtonesAdminWebApi.ViewModels.DTOs;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,12 +22,10 @@ namespace AdtonesAdminWebApi.DAL
 
     public class CampaignDAL : BaseDAL, ICampaignDAL
     {
-        private readonly IAdvertiserFinancialDAL _invDAL;
 
-        public CampaignDAL(IAdvertiserFinancialDAL invDAL, IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, 
+        public CampaignDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, 
                             IHttpContextAccessor httpAccessor) : base(configuration, executers, connService, httpAccessor)
         {
-            _invDAL = invDAL;
         }
 
 
@@ -146,6 +148,35 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetByAdvertiser(int id)
+        {
+            string GetCampaignResultSetForSales = @"SELECT camp.CampaignProfileId,camp.UserId,u.Email,op.OperatorName
+                                                ,camp.ClientId, ISNULL(cl.Name,'-') AS ClientName,CampaignName,camp.CreatedDateTime AS CreatedDate,
+                                                ad.AdvertName,camp.TotalBudget,
+												ro.Spend AS TotalSpend,ro.FundsAvailable, ro.MoreSixSecPlays AS finaltotalplays,ro.AvgBid AS AvgBidValue
+                                                FROM CampaignProfile AS camp LEFT JOIN Users As u ON u.UserId=camp.UserId
+                                                LEFT JOIN Client AS cl ON camp.ClientId=cl.Id
+                                                LEFT JOIN CampaignAdverts AS campAd ON campAd.CampaignProfileId=camp.CampaignProfileId
+												LEFT JOIN Advert AS ad ON ad.AdvertId=campAd.AdvertId
+                                                LEFT JOIN 
+		                                                (SELECT Id,CampaignProfileId,CurrencyCode FROM Billing WHERE Id in
+			                                                (SELECT MAX(Id) FROM Billing GROUP BY CampaignProfileId,CurrencyCode)
+		                                                ) AS bill 
+                                                ON bill.CampaignProfileId=camp.CampaignProfileId
+                                                LEFT JOIN RollupsCampaign AS ro ON ro.CampaignId=camp.CampaignProfileId
+                                                LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
+                                                LEFT JOIN Contacts AS con ON con.UserId=camp.UserId
+                                                LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId 
+                                                WHERE camp.UserId=@Id ORDER BY camp.CampaignProfileId DESC";
+            
+
+            // builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
+
+            return await _executers.ExecuteCommand(_connStr,
+                            conn => conn.Query<CampaignAdminResult>(GetCampaignResultSetForSales, new { Id = id }));
+        }
+
+
         public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetById(int id)
         {
 
@@ -173,26 +204,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-
-        public async Task<CampaignProfile> GetCampaignProfileDetail(int id = 0)
-        {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(CampaignQuery.GetCampaignProfileById);
-            try
-            {
-                builder.AddParameters(new { Id = id, siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
-
-                return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<CampaignProfile>(select.RawSql, select.Parameters));
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-
-        public async Task<CampaignProfileUpdate> GetCampaignProfileDetailUpdate(int campaignId)
+        public async Task<CampaignProfileDto> GetCampaignProfileDetail(int campaignId)
         {
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(CampaignQuery.GetCampaignProfileById);
@@ -201,7 +213,7 @@ namespace AdtonesAdminWebApi.DAL
                 builder.AddParameters(new { Id = campaignId, siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
 
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<CampaignProfileUpdate>(select.RawSql, select.Parameters));
+                                conn => conn.QueryFirstOrDefault<CampaignProfileDto>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -257,7 +269,7 @@ namespace AdtonesAdminWebApi.DAL
 
 
 
-        public async Task<int> ChangeCampaignProfileStatus(CampaignProfile model)
+        public async Task<int> ChangeCampaignProfileStatus(CampaignProfileDto model)
         {
 
             var sb = new StringBuilder();
@@ -281,72 +293,15 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateCampaignCredit(BillingPaymentModel model, string constr)
-        {
-            var campModel = await GetCampaignProfileDetail(model.CampaignProfileId);
-            var available = await _invDAL.GetAvailableCredit(model.AdvertiserId);
-            int x = 0;
-
-            var sb = new StringBuilder();
-            sb.Append(CampaignQuery.UpdateCampaignBilling);
-
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(sb.ToString());
-            try
-            {
-                builder.AddParameters(new { Id = model.CampaignProfileId });
-                builder.AddParameters(new { Status = (int)Enums.CampaignStatus.Play });
-                builder.AddParameters(new { TotalBudget = (campModel.TotalBudget + model.Fundamount) });
-                builder.AddParameters(new { TotalCredit = (campModel.TotalCredit + model.TotalAmount) });
-                builder.AddParameters(new { AvailableCredit = available });
-
-                x = await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
-
-
-                if (constr != null && constr.Length > 10)
-                {
-                    var campId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
-
-                    x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(sb.ToString(), new
-                                    {
-                                        Id = campId,
-                                        Status = (int)Enums.CampaignStatus.Play,
-                                        TotalBudget = (campModel.TotalBudget + model.Fundamount),
-                                        TotalCredit = (campModel.TotalCredit + model.TotalAmount),
-                                        AvailableCredit = available
-                                    }));
-
-                    x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(UserMatchQuery.InsertMatchFinancial, new
-                                    {
-                                        Id = campId,
-                                        Status = (int)Enums.CampaignStatus.Play,
-                                        TotalBudget = (campModel.TotalBudget + model.Fundamount),
-                                        TotalCredit = (campModel.TotalCredit + model.TotalAmount),
-                                        AvailableCredit = available
-                                    }));
-                }
-            }
-            catch
-            {
-                throw;
-            }
-
-            return x;
-        }
-
-
         /// <summary>
         /// Changes status on operators provisioning server
         /// </summary>
         /// <param name="command"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        public async Task<int> ChangeCampaignProfileStatusOperator(CampaignProfile model)
+        public async Task<int> ChangeCampaignProfileStatusOperator(CampaignProfileDto model)
         {
-            var operatorConnectionString = await _connService.GetConnectionStringByOperator((int)model.OperatorId);
+            var operatorConnectionString = await _connService.GetConnectionStringByOperator(model.OperatorId);
 
             var sb = new StringBuilder();
             sb.Append(CampaignQuery.UpdateCampaignProfileStatus);
@@ -366,30 +321,6 @@ namespace AdtonesAdminWebApi.DAL
                     x = await _executers.ExecuteCommand(operatorConnectionString,
                                     conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
                 return x;
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-
-        public async Task<int> UpdateCampaignMatch(CampaignProfile model)
-        {
-            var operatorConnectionString = await _connService.GetConnectionStringByOperator(model.OperatorId);
-
-            var sb = new StringBuilder();
-            sb.Append(CampaignQuery.UpdateCampaignMatchStatus);
-
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(sb.ToString());
-            try
-            {
-                builder.AddParameters(new { Id = model.CampaignProfileId });
-                builder.AddParameters(new { Status = model.Status });
-
-                return await _executers.ExecuteCommand(operatorConnectionString,
-                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
             }
             catch
             {
@@ -441,6 +372,73 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<int> UpdateCampaignCredit(CampaignCreditCommand model, string constr)
+        {
+            var campModel = await GetCampaignCreditDetail(model, _connStr, false);
+            string InsertMatchFinancial = @"UPDATE CampaignProfile SET TotalBudget=@TotalBudget,TotalCredit=@TotalCredit,
+                                             UpdatedDateTime=GETDATE(), Status=@Status, NextStatus=0, AvailableCredit=@AvailableCredit WHERE CampaignProfileId=@Id";
+            int x = 0;
+
+            try
+            {
+                x = await _executers.ExecuteCommand(_connStr,
+                             conn => conn.ExecuteScalar<int>(InsertMatchFinancial, new
+                             {
+                                 Id = model.CampaignProfileId,
+                                 Status = (int)Enums.CampaignStatus.Play,
+                                 TotalBudget = (campModel.TotalBudget + model.TotalBudget),
+                                 TotalCredit = (campModel.TotalCredit + model.TotalCredit),
+                                 AvailableCredit = (campModel.AvailableCredit + model.TotalCredit)
+                             }));
+
+
+
+
+                if (constr != null && constr.Length > 2)
+                {
+                    campModel = await GetCampaignCreditDetail(model, constr, true);
+                    x = await _executers.ExecuteCommand(constr,
+                                    conn => conn.ExecuteScalar<int>(InsertMatchFinancial, new
+                                    {
+                                        Id = campModel.CampaignProfileId,
+                                        Status = (int)Enums.CampaignStatus.Play,
+                                        TotalBudget = (campModel.TotalBudget + model.TotalBudget),
+                                        TotalCredit = (campModel.TotalCredit + model.TotalCredit),
+                                        AvailableCredit = (campModel.AvailableCredit + model.TotalCredit)
+                                    }));
+                }
+            }
+            catch
+            {
+                throw;
+            }
+
+            return x;
+        }
+
+
+        private async Task<CampaignCreditCommand> GetCampaignCreditDetail(CampaignCreditCommand _model, string conn, bool isOperator)
+        {
+            int campId = 0;
+            var newModel = new CampaignCreditCommand();
+            var selectSQL = "SELECT CampaignProfileId, TotalCredit, TotalBudget, AvailableCredit FROM CamapaignProfile WHERE CampaignProfileId = @Id";
+            try
+            {
+                if (isOperator)
+                    campId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(_model.CampaignProfileId, conn);
+                else
+                    campId = _model.CampaignProfileId;
+                newModel = await _executers.ExecuteCommand(conn,
+                                conn => conn.QueryFirstOrDefault<CampaignCreditCommand>(selectSQL, new { Id = campId }));
+            }
+            catch
+            {
+                throw;
+            }
+            return newModel;
+        }
+
+
         public async Task<bool> CheckCampaignNameExists(string campaignName,int userId)
         {
             var builder = new SqlBuilder();
@@ -480,22 +478,75 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateCampaignMatchesforBilling(int id = 0, string constr = null)
+        
+        public async Task<object> GetCampaignTableForAdvertiser(int advertiserID)//, ConsolidatedStatsDao consolidatedStats, int campaignId = 0)
         {
-            int x = 0;
-            try
-            {
+            //var campaign = new List<CampaignProfile>();
+            //var campaignsQuery = @"SELECT cp.*,a.* FROM CampaignProfile cp LEFT JOIN CampaignAdverts AS ca ON cp.CampaignProfileId=ca.CampaignProfileId
+            //                        LEFT JOIN Adverts AS a ON a.AdvertId = ca.AdvertId WHERE cp.UserId=@userId ;";
 
-                var campId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(id, constr);
-                   x =  await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(CampaignQuery.UpdateCampaignMatchFromBilling, new { Id = campId, Status= (int)Enums.CampaignStatus.Play }));
+            //var campAdvQuery = @"SELECT ca.CampaignProfileId,ad.* FROM CampaignAdverts AS a INNER JOIN Advert AS a ON a.AdvertId = ca.AdvertId WHERE CampaignProfileId in @ids ;";
 
-            }
-            catch
-            {
-                throw;
-            }
-            return x;
+            //var sb = new StringBuilder();
+            //var paramToUse = new { userId = advertiserID };
+            //sb.Append(campaignsQuery);
+
+            //if (campaignId > 0)
+            //    sb.Append(" and cp.CampaignProfileId = @campaignId ");
+            //using (var connection = new SqlConnection(_connStr))
+            //{
+            //    await connection.OpenAsync();
+            //    if (campaignId > 0)
+            //    {
+            //        var camp = await connection.QueryAsync<CampaignProfile>(sb.ToString(), new { userId = advertiserID, campaignId = campaignId });
+            //        campaign = camp.ToList();
+            //    }
+            //    else
+            //    {
+            //        var camp = await connection.QueryAsync<CampaignProfile>(sb.ToString(), new { userId = advertiserID });
+            //        campaign = camp.ToList();
+            //    }
+
+            //    int[] Ids = campaign.Select(s => s.CampaignProfileId).ToArray();
+
+            //    var adverts = await connection.QueryAsync<UserAdvertResult>(campAdvQuery, new { ids = new[] { Ids } });
+
+            //    var campaigns = campaign
+            //    .GroupJoin(adverts.AsQueryable(), c => c.CampaignProfileId, a => a.CampaignProfileId, (c, a) => new { Campaign = c, Advert = a })
+            //    .ToList();
+
+            //    var joined = campaigns.GroupJoin(consolidatedStats.Dashboard, s => s.Campaign.CampaignProfileId, c => c.CampaignId,
+            //        (c, s) =>
+            //        new
+            //        {
+            //            Campaign = c.Campaign,
+            //            Summary = s.FirstOrDefault() ??
+            //                      new DashboardSummariesDao
+            //                      {
+            //                          Budget = c.Campaign.TotalBudget,
+            //                          FundsAvailable = c.Campaign.TotalBudget,
+            //                          AvgBid = Convert.ToDecimal(c.Campaign.MaxBid)
+            //                      },
+            //            Advert = c.Advert.FirstOrDefault(),
+
+            //        }).ToList();
+            object bob = new object();
+            return bob;
+
+                
+
+                //var adverts = await connection.QueryAsync<UserAdvertResult>(adQuery, new { ids = new[] { campadsId } });
+
+                //campaign.GroupJoin
+
+                //return campaign;
+
+            
+        }
+
+        private IQueryable<T> Test<T>(IEnumerable<T> x)
+        {
+            return x.AsQueryable();
         }
 
     }

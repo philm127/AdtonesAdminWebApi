@@ -10,7 +10,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     {
         Task<ReturnResult> GetCampaignDashboardSummariesOperatorByCampaign(int campaignId);
         Task<ReturnResult> GetPlayDetailsForOperatorByCampaign(PagingSearchClass paging);
-
+        Task<ReturnResult> GetDashboardSummaryForAdvertiser(int campaignId = 0);
         Task<ReturnResult> GetDashboardSummariesByOperator(int operatorId);
         Task<ReturnResult> GetPromoCampaignDashboardSummary(int campaignId);
         Task<ReturnResult> GetPromoPlayDetails(PagingSearchClass paging);
