@@ -4,6 +4,9 @@ using AdtonesAdminWebApi.ViewModels;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign;
+using AdtonesAdminWebApi.Services;
+using AdtonesAdminWebApi.DAL.Interfaces;
+using System;
 
 namespace AdtonesAdminWebApi.Controllers
 {
@@ -13,17 +16,21 @@ namespace AdtonesAdminWebApi.Controllers
     public class CampaignController : ControllerBase
     {
         private readonly IAdvertService _advertService;
-        private readonly IAdvertCategoryService _advertCategoryService;
         private readonly ICampaignService _campService;
         private readonly IPromotionalCampaignService _promoService;
+        private readonly ILoggingService _logServ;
+        private readonly ICampaignDAL _campDAL;
+        ReturnResult result = new ReturnResult();
+        const string PageName = "CampaignController";
 
-        public CampaignController(IAdvertService advertService, ICampaignService campService,
-            IPromotionalCampaignService promoService, IAdvertCategoryService advertCategoryService)
+        public CampaignController(IAdvertService advertService, ICampaignService campService, ILoggingService logServ,
+            IPromotionalCampaignService promoService, ICampaignDAL campDAL)
         {
             _advertService = advertService;
             _campService = campService;
             _promoService = promoService;
-            _advertCategoryService = advertCategoryService;
+            _logServ = logServ;
+            _campDAL = campDAL;
         }
 
 
@@ -37,7 +44,21 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetCampaignDataTable/{id}")]
         public async Task<ReturnResult> GetCampaignDataTable(int id=0)
         {
-            return await _campService.LoadCampaignDataTable(id);
+            try
+            {
+                result.body = await _campDAL.GetCampaignResultSet(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadCampaignDataTable";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -48,14 +69,42 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetCampaignDataTableForSalesExec/{id}")]
         public async Task<ReturnResult> GetCampaignDataTableForSalesExec(int id = 0)
         {
-            return await _campService.LoadCampaignDataTableSalesExec(id);
+            try
+            {
+                result.body = await _campDAL.GetCampaignResultSetBySalesExec(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadCampaignDataTableSalesExec";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
-        [HttpGet("v1/GetCampaignDataTableForAdvertiser{id}")]
+        [HttpGet("v1/GetCampaignDataTableForAdvertiser/{id}")]
         public async Task<ReturnResult> GetCampaignDataTableForAdvertiser(int id)
         {
-            return await _campService.LoadCampaignDataTableAdvertiser(id);
+            try
+            {
+                result.body = await _campDAL.GetCampaignResultSetByAdvertiser(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadCampaignDataTableAdvertiser";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
         /// <summary>
@@ -65,7 +114,21 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetCampaignDataTableByCampId/{id}")]
         public async Task<ReturnResult> GetCampaignDataTableByCampId(int id)
         {
-            return await _campService.LoadCampaignDataTableById(id);
+            try
+            {
+                result.body = await _campDAL.GetCampaignResultSetById(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadCampaignDataTableById";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -87,7 +150,21 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/AddCampaignCategory")]
         public async Task<ReturnResult> AddCampaignCategory(CampaignCategoryResult model)
         {
-            return await _campService.AddCampaignCategory(model);
+            try
+            {
+                result.body = await _campDAL.InsertCampaignCategory(model);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddAdvertCategory";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 

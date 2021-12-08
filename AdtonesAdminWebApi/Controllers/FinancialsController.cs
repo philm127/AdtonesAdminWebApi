@@ -216,7 +216,21 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPut("v1/UpdateCampaignCreditPeriod")]
         public async Task<ReturnResult> UpdateCampaignCreditPeriod(CampaignCreditPeriodCommand model)
         {
-            return await _billService.UpdateCampaignCreditPeriod(model);
+            try
+            {
+                // Need to do this to get OperatorId
+                result.body = await _billDAL.UpdateCampaignCreditPeriod(model);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateCampaignCreditPeriod";
+                await _logServ.LogError();
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -227,7 +241,22 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/InsertCampaignCreditPeriod")]
         public async Task<ReturnResult> InsertCampaignCreditPeriod(CampaignCreditPeriodCommand model)
         {
-            return await _billService.AddCampaignCreditPeriod(model);
+            try
+            {
+                // Need to do this to get OperatorId
+                result.body = await _billDAL.InsertCampaignCreditPeriod(model);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddCampaignCreditPeriod";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
         ///// <summary>
@@ -250,7 +279,23 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetToPayDetails/{id}")]
         public async Task<ReturnResult> GetToPayDetails(int id)
         {
-            return await _billService.GetToPayDetails(id);
+            try
+            {
+                var details = await _billDAL.GetToPayDetails(id);
+                details.OutstandingAmount = await _billDAL.GetCreditBalanceForInvoicePayment(id);
+                result.body = details;
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetToPayDetails";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 

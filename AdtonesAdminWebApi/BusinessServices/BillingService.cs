@@ -364,33 +364,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        /// <summary>
-        /// Gets the items required to populate the Recieve Payment screen
-        /// </summary>
-        /// <param name="billingId"></param>
-        /// <returns>A body containing AdvertiserCreditPaymentResult</returns>
-        public async Task<ReturnResult> GetToPayDetails(int billingId)
-        {
-            try
-            {
-                var details = await _billDAL.GetToPayDetails(billingId);
-                details.OutstandingAmount = await _billDAL.GetCreditBalanceForInvoicePayment(billingId);
-                result.body = details;
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetToPayDetails";
-                await _logServ.LogError();
-
-                result.result = 0;
-            }
-            return result;
-        }
-
-
         public async Task<ReturnResult> ReceivePayment(AdvertiserCreditFormCommand model)
         {
             model.Status = 1;
@@ -416,51 +389,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             return result;
         }
 
-
-        
-
-
-        public async Task<ReturnResult> UpdateCampaignCreditPeriod(CampaignCreditPeriodCommand model)
-        {
-            try
-            {
-                // Need to do this to get OperatorId
-                result.body = await _billDAL.UpdateCampaignCreditPeriod(model);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "UpdateCampaignCreditPeriod";
-                await _logServ.LogError();
-
-
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> AddCampaignCreditPeriod(CampaignCreditPeriodCommand model)
-        {
-            try
-            {
-                // Need to do this to get OperatorId
-                result.body = await _billDAL.InsertCampaignCreditPeriod(model);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "AddCampaignCreditPeriod";
-                await _logServ.LogError();
-
-                result.result = 0;
-            }
-            return result;
-        }
 
         /// <summary>
         /// 

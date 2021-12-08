@@ -18,5 +18,9 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> AddOperatorMaxAdvert(OperatorMaxAdvertsFormModel model);
         Task<OperatorMaxAdvertsFormModel> GetOperatorMaxAdvertById(int id);
         Task<int> UpdateOperatorMaxAdvert(OperatorMaxAdvertsFormModel model);
+        Task<IEnumerable<OperatorConfigurationResult>> LoadOperatorConfigurationDataTable();
+        Task<OperatorConfigurationResult> GetOperatorConfig(int id);
+        Task<int> AddOperatorConfig(OperatorConfigurationResult model);
+        Task<int> UpdateOperatorConfig(OperatorConfigurationResult model);
     }
 }

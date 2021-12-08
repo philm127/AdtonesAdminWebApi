@@ -46,3 +46,5 @@ git checkout crmProject
 git add -A && git commit -m "changes to man reports"
 git checkout crmProject
 exit
+git checkout -b finishProfPref
+exit

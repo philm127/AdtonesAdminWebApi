@@ -46,96 +46,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             _currencyConversion = currencyConversion;
         }
 
-
-        /// <summary>
-        /// Populate the datatable
-        /// </summary>
-        /// <returns></returns>
-        public async Task<ReturnResult> LoadCampaignDataTable(int id=0)                  
-        {
-            try
-            {
-                    result.body = await _campDAL.GetCampaignResultSet(id);
-                //    var provModel = await _campDAL.GetCampaignResultSetProv(id);
-
-                //PropertyDescriptorCollection props = TypeDescriptor.GetProperties(typeof(CampaignAdminResult));
-                //DataTable dt = new DataTable();
-                //foreach (PropertyDescriptor p in props)
-                //    dt.Columns.Add(p.Name, p.PropertyType);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "LoadCampaignDataTable";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> LoadCampaignDataTableSalesExec(int id = 0)
-        {
-            try
-            {
-                result.body = await _campDAL.GetCampaignResultSetBySalesExec(id);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "LoadCampaignDataTableSalesExec";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-        public async Task<ReturnResult> LoadCampaignDataTableAdvertiser(int id)
-        {
-            try
-            {
-                result.body = await _campDAL.GetCampaignResultSetByAdvertiser(id);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "LoadCampaignDataTableAdvertiser";
-                await _logServ.LogError();
-
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> LoadCampaignDataTableById(int id)
-        {
-            try
-            {
-                result.body = await _campDAL.GetCampaignResultSetById(id);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "LoadCampaignDataTableById";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
         
 
         /// <summary>
@@ -254,26 +164,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> AddCampaignCategory(CampaignCategoryResult model)
-        {
-            try
-            {
-                result.body = await _campDAL.InsertCampaignCategory(model);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "AddAdvertCategory";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
+        
         public async Task<ReturnResult> GetAdvertiserCamapaignTable()
         {
             //var efmvcUser = _httpAccessor.GetUserIdFromJWT();

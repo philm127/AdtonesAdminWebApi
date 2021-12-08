@@ -13,12 +13,10 @@ namespace AdtonesAdminWebApi.Controllers
     public class PromotionalCampaignController : ControllerBase
     {
         private readonly IPromotionalCampaignService _campService;
-        private readonly ICampaignAuditService _auditService;
 
-        public PromotionalCampaignController(IPromotionalCampaignService campService, ICampaignAuditService auditService)
+        public PromotionalCampaignController(IPromotionalCampaignService campService)
         {
             _campService = campService;
-            _auditService = auditService;
         }
 
 

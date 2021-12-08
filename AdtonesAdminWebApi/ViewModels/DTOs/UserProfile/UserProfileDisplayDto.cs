@@ -65,5 +65,6 @@ namespace AdtonesAdminWebApi.ViewModels.DTOs.UserProfile
         public string Mass_AdType { get; set; }
         public string Youth_AdType { get; set; }
         public string DiscerningProfessionals_AdType { get; set; }
+        public int CountryId { get; set; }
     }
 }

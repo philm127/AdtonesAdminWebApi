@@ -40,12 +40,20 @@
 
   <ItemGroup>
     <Compile Remove="BusinessServices\AddNewCampaign.cs" />
+    <Compile Remove="BusinessServices\AdvertCategoryService.cs" />
     <Compile Remove="BusinessServices\AdvertiserCreditService.cs" />
     <Compile Remove="BusinessServices\AdvertiserFinancialService.cs" />
+    <Compile Remove="BusinessServices\CampaignAuditService.cs" />
     <Compile Remove="BusinessServices\CountryTaxService.cs" />
     <Compile Remove="BusinessServices\ExpressoPromotionalUserService.cs" />
+    <Compile Remove="BusinessServices\Interfaces\IAdvertCategoryService.cs" />
     <Compile Remove="BusinessServices\Interfaces\IAdvertiserCreditService.cs" />
     <Compile Remove="BusinessServices\Interfaces\IAdvertiserFinancialService.cs" />
+    <Compile Remove="BusinessServices\Interfaces\ICampaignAuditService.cs" />
+    <Compile Remove="BusinessServices\Interfaces\IOperatorConfigService.cs" />
+    <Compile Remove="BusinessServices\Interfaces\IOperatorService.cs" />
+    <Compile Remove="BusinessServices\OperatorConfigService.cs" />
+    <Compile Remove="BusinessServices\OperatorService.cs" />
     <Compile Remove="BusinessServices\SafaricomPromotionalUserService.cs" />
     <Compile Remove="Controllers\AreaController.cs" />
     <Compile Remove="Controllers\RewardController.cs" />
@@ -165,11 +173,12 @@
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.12" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="5.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="PayPal" Version="1.9.1" />
     <PackageReference Include="Paypal-Base" Version="1.0.0" />
     <PackageReference Include="PayPalCoreSDK" Version="1.7.1" />

@@ -70,6 +70,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             var profileMatchValue = new ProfileMatchRetrivalService();
             var profileDisplay = new UserProfileDisplayDto();
             var demographicDisplay = new UserProfileDemographicsDto();
+            var skizaDisplay = new SkizaProfileDto();
 
             var userid = Convert.ToInt32(id);
 
@@ -83,10 +84,10 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 if (userProfile.UserProfilePreferences != null)
                 {
-
                     //Skiza Profile
                     if (isQuestionnaire)
-                        profileDisplay.SkizaProfileDto = GetSkizaData(_profileMatchInformation, campPreferences);
+                        skizaDisplay = GetSkizaData(_profileMatchInformation, campPreferences);
+                    skizaDisplay.CountryId = countryId;
                     demographicDisplay.Gender_Demographics = GetGenderData(userProfile, campPreferences, _profileMatchInformation);
                     demographicDisplay.Location_Demographics = GetLocationData(userProfile, campPreferences, _profileMatchInformation);
 
@@ -101,6 +102,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     demographicDisplay.Age_Demographics = demographicDisplay.Age;
 
                     profileDisplay.UserProfileDemographicsDto = demographicDisplay;
+                    profileDisplay.SkizaProfileDto = skizaDisplay;
 
                     result.body = profileDisplay;
                     return result;

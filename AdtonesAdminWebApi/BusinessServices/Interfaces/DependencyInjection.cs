@@ -16,16 +16,12 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
             services.AddTransient<IProfileMatchInfoService, ProfileMatchInfoService>();
             services.AddTransient<ICountryAreaService, CountryAreaService>();
             services.AddTransient<IUserDashboardService, UserDashboardService>();
-            services.AddTransient<IOperatorConfigService, OperatorConfigService>();
-            services.AddTransient<IOperatorService, OperatorService>();
             services.AddTransient<ISystemConfigService, SystemConfigService>();
             services.AddTransient<IRewardsService, RewardsService>();
             services.AddTransient<ITicketService, TicketService>();
             services.AddTransient<IAdvertService, AdvertService>();
-            services.AddTransient<IAdvertCategoryService, AdvertCategoryService>();
             services.AddTransient<ICampaignService, CampaignService>();
             services.AddTransient<IUserProfileService, UserProfileService>();
-            services.AddTransient<ICampaignAuditService, CampaignAuditService>();
             services.AddTransient<IPermissionManagementService, PermisionManagementService>();
             services.AddTransient<IUserCreditService, UserCreditService>();
             

@@ -30,46 +30,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> LoadDataTable()
-        {
-            try
-            {
-                result.body = await _caDAL.LoadCountryResultSet();
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "LoadDataTable";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> GetCountry(int Id)
-        {
-            try
-            {
-                result.body = await _caDAL.GetCountryById(Id); 
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetCountry";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
         public async Task<ReturnResult> AddCountry(CountryResult countrymodel)
         {
             try
@@ -159,27 +119,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         #region Area
 
         // Listing Area
-        public async Task<ReturnResult> LoadAreaDataTable()
-        {
-
-            try
-            {
-                result.body = await _caDAL.LoadAreaResultSet();
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "FillAreaResult";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
+        
         public async Task<ReturnResult> AddArea(AreaResult areamodel)
         {
             areamodel.IsActive = true;
@@ -224,90 +164,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetArea(int id)
-        {
-            try
-            {
-                result.body = await _caDAL.GetAreaById(id);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetArea";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> UpdateArea(AreaResult areamodel)
-        {
-            try
-            {
-                var cnt = await _caDAL.UpdateArea(areamodel);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "UpdateArea";
-                await _logServ.LogError();
-                
-                result.result = 0;
-                result.error = areamodel.AreaName + " Record was not updated.";
-                return result;
-            }
-        }
-
-
-        public async Task<ReturnResult> DeleteArea(int id)
-        {
-            try
-            {
-                var x = await _caDAL.DeleteAreaById(id);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "DeleteArea";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
         #endregion
-
-
-        public async Task<ReturnResult> GetMinBid(int countryId)
-        {
-            try
-            {
-                result.body = await _caDAL.GetMinBidByCountry(countryId);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetMinBid";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
 
 
     }

@@ -238,55 +238,59 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<CampaignDashboardChartPREResult> GetCampaignDashboardSummariesAdvertisers(int userId, int campaignId=0)
         {
             var selectQuery = @"SELECT ISNULL(CAST(cp.TotalBudget AS bigint),0) AS Budget, ISNULL(g.TotalPlayedCost,0) AS Spend,
-																	ISNULL(cp.TotalBudget,0) - ISNULL(g.TotalPlayedCost,0) AS FundsAvailable,
-																	ISNULL(g.TotalAvgBid,0) AS AvgBid,CAST(ISNULL(g.TotalSMS,0) AS bigint) AS TotalSMS,
-																	ISNULL(g.TotalSMSCost,0) AS TotalSMSCost,CAST(ISNULL(g.TotalEmail,0) AS bigint) AS TotalEmail,
-																	ISNULL(g.TotalEmailCost,0) AS TotalEmailCost,Cast(ISNULL(p.TotalPlayTracks,0) AS bigint) AS TotalPlays,
-																	Cast(ISNULL(g.TotalPlayTracks,0) AS bigint) AS MoreSixSecPlays,
-																	ISNULL(p.TotalPlayTracks,0) - ISNULL(g.TotalPlayTracks,0) AS FreePlays,
-																	ISNULL(p.AvgPlayLen,0) AS AvgPlayLength,
-																	ISNULL(p.MaxPlayLen,0) AS MaxPlayLength,
-																	ISNULL(r.UniqueListenrs,0) AS Reach,
-																	CAST(ISNULL(p.MaxBid, 0) AS numeric(16,2)) AS MaxBid,
-																	cp.CurrencyCode AS CurrencyCode,ctu.TotalReach
-																	FROM 
-																		(SELECT SUM(ISNULL(TotalBudget,0)) AS TotalBudget,CountryId,CurrencyCode FROM CampaignProfile
-                                                                            WHERE UserId=@userId
-																		GROUP BY CountryId,CurrencyCode) AS cp
-																	INNER JOIN
-																		( SELECT cpi.CountryId,CONVERT(numeric(16,0), SUM(ca.TotalCost)) AS TotalPlayedCost,
-																			CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgBid,
-																			SUM(CASE WHEN ca.SMS IS NOT NULL THEN 1 ELSE 0 END) AS TotalSMS,
-																			CONVERT(numeric(16,0), SUM(ISNULL(ca.SMSCost,0))) AS TotalSMSCost,
-																			SUM(CASE WHEN ca.Email IS NOT NULL THEN 1 ELSE 0 END) AS TotalEmail,
-																			CONVERT(NUMERIC(16,0), SUM(ISNULL(ca.EmailCost,0))) AS TotalEmailCost,
-																			count(*) AS TotalPlayTracks 
-																			FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
-                                                                            WHERE cpi.UserId=@userId
-																			AND ca.PlayLengthTicks >= 6000 AND ca.Proceed = 1
-																			GROUP BY cpi.CountryId
-																		) AS g ON g.CountryId = cp.CountryId
-																	LEFT JOIN 
-																		( SELECT cpi.CountryId, COUNT(DISTINCT ca.UserProfileId) AS UniqueListenrs
-																			FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
-                                                                             WHERE cpi.UserId=@userId
-																			AND ca.PlayLengthTicks >= 6000 AND ca.Proceed = 1
-																			GROUP BY cpi.CountryId
-																		) AS r ON r.CountryId = cp.CountryId
-																	LEFT JOIN 
-																		(  SELECT cpi.CountryId, COUNT(*) AS TotalPlayTracks,AVG(ca.PlayLengthTicks) AS AvgPlayLen,
-																			MAX(ca.PlayLengthTicks) AS MaxPlayLen,MAX(ca.BidValue) AS MaxBid
-																			FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
-                                                                            WHERE cpi.UserId=@userId
-																			AND ca.Proceed = 1
-																			GROUP BY cpi.CountryId
-																		) AS p ON p.CountryId = cp.CountryId
+	                            ISNULL(cp.TotalBudget,0) - ISNULL(g.TotalPlayedCost,0) AS FundsAvailable,
+	                            ISNULL(g.TotalAvgBid,0) AS AvgBid,CAST(ISNULL(g.TotalSMS,0) AS bigint) AS TotalSMS,
+	                            ISNULL(g.TotalSMSCost,0) AS TotalSMSCost,CAST(ISNULL(g.TotalEmail,0) AS bigint) AS TotalEmail,
+	                            ISNULL(g.TotalEmailCost,0) AS TotalEmailCost,Cast(ISNULL(p.TotalPlayTracks,0) AS bigint) AS TotalPlays,
+	                            Cast(ISNULL(g.TotalPlayTracks,0) AS bigint) AS MoreSixSecPlays,
+	                            ISNULL(p.TotalPlayTracks,0) - ISNULL(g.TotalPlayTracks,0) AS FreePlays,
+	                            ISNULL(p.AvgPlayLen,0) AS AvgPlayLength,
+	                            ISNULL(p.MaxPlayLen,0) AS MaxPlayLength,
+	                            ISNULL(r.UniqueListenrs,0) AS Reach,
+	                            CAST(ISNULL(p.MaxBid, 0) AS numeric(16,2)) AS MaxBid,
+	                            cp.CurrencyCode AS CurrencyCode,ctu.TotalReach
+	                            FROM 
+		                            (SELECT SUM(ISNULL(TotalBudget,0)) AS TotalBudget,CountryId,CurrencyCode,UserId,CampaignProfileId FROM CampaignProfile
+                                        WHERE UserId=@userId
+		                            GROUP BY UserId,CampaignProfileId,CountryId,CurrencyCode) AS cp
+	                            INNER JOIN
+		                            ( SELECT cpi.CountryId,CONVERT(numeric(16,0), SUM(ca.TotalCost)) AS TotalPlayedCost,
+			                            CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgBid,
+			                            SUM(CASE WHEN ca.SMS IS NOT NULL THEN 1 ELSE 0 END) AS TotalSMS,
+			                            CONVERT(numeric(16,0), SUM(ISNULL(ca.SMSCost,0))) AS TotalSMSCost,
+			                            SUM(CASE WHEN ca.Email IS NOT NULL THEN 1 ELSE 0 END) AS TotalEmail,
+			                            CONVERT(NUMERIC(16,0), SUM(ISNULL(ca.EmailCost,0))) AS TotalEmailCost,
+			                            count(*) AS TotalPlayTracks,UserId,cpi.CampaignProfileId 
+			                            FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+                                        WHERE cpi.UserId=@userId
+			                            AND ca.PlayLengthTicks >= 6000 AND ca.Proceed = 1
+			                            GROUP BY cpi.CountryId,UserId,cpi.CampaignProfileId
+		                            ) AS g ON g.CountryId = cp.CountryId AND cp.UserId=g.UserId AND cp.CampaignProfileId=g.CampaignProfileId
 
-																	LEFT JOIN
-																		(SELECT COUNT(UserId) AS TotalReach,op.CountryId FROM Users AS u 
-																			INNER JOIN Operators AS op ON u.OperatorId=op.OperatorId 
-																			WHERE VerificationStatus=1 AND Activated=1 GROUP BY op.CountryId) AS ctu
-																	ON cp.CountryId=ctu.CountryId WHERE u.UserId=@userId ";
+	                            LEFT JOIN 
+		                            ( SELECT cpi.CountryId, COUNT(DISTINCT ca.UserProfileId) AS UniqueListenrs
+			                            FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+                                            WHERE cpi.UserId=@userId
+			                            AND ca.Proceed = 1
+			                            GROUP BY cpi.CountryId
+		                            ) AS r ON r.CountryId = cp.CountryId
+	                            LEFT JOIN 
+		                            (  SELECT cpi.CountryId, COUNT(*) AS TotalPlayTracks,AVG(ca.PlayLengthTicks) AS AvgPlayLen,
+			                            MAX(ca.PlayLengthTicks) AS MaxPlayLen,MAX(ca.BidValue) AS MaxBid
+			                            FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+                                        WHERE cpi.UserId=@userId
+			                            AND ca.Proceed = 1
+			                            GROUP BY cpi.CountryId
+		                            ) AS p ON p.CountryId = cp.CountryId
+
+	                            LEFT JOIN
+		                            (SELECT COUNT(UserId) AS TotalReach,op.CountryId FROM Users AS u 
+			                            INNER JOIN Operators AS op ON u.OperatorId=op.OperatorId 
+			                            WHERE VerificationStatus=1 AND Activated=1 GROUP BY op.CountryId) AS ctu
+	                            ON cp.CountryId=ctu.CountryId 
+	                            INNER JOIN Users AS u ON u.UserId = cp.UserId
+	                            WHERE u.UserId=@userId ";
+
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(selectQuery);

@@ -4,6 +4,7 @@ using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace AdtonesAdminWebApi.DAL
     public class OperatorDAL : BaseDAL, IOperatorDAL
     {
 
-        public OperatorDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor) 
+        public OperatorDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor)
             : base(configuration, executers, connService, httpAccessor)
         {
         }
@@ -30,7 +31,7 @@ namespace AdtonesAdminWebApi.DAL
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(OperatorQuery.LoadOperatorDataTable);
-            var values = CheckGeneralFile(sb, builder, pais:"op",ops: "op");
+            var values = CheckGeneralFile(sb, builder, pais: "op", ops: "op");
             sb = values.Item1;
             builder = values.Item2;
             sb.Append(" ORDER BY op.OperatorId DESC;");
@@ -84,14 +85,14 @@ namespace AdtonesAdminWebApi.DAL
             {
                 model.AdtoneServerOperatorId = await _executers.ExecuteCommand(_connStr,
                                                     conn => conn.ExecuteScalar<int>(OperatorQuery.AddNewOperator, new
-                                                                                                    {
-                                                                                                        OperatorName = model.OperatorName.Trim(),
-                                                                                                        CountryId = model.CountryId,
-                                                                                                        EmailCost = model.EmailCost,
-                                                                                                        SmsCost = model.SmsCost,
-                                                                                                        CurrencyId = model.CurrencyId,
-                                                                                                        AdtoneServerOperatorId = model.AdtoneServerOperatorId
-                                                                                                    }));
+                                                    {
+                                                        OperatorName = model.OperatorName.Trim(),
+                                                        CountryId = model.CountryId,
+                                                        EmailCost = model.EmailCost,
+                                                        SmsCost = model.SmsCost,
+                                                        CurrencyId = model.CurrencyId,
+                                                        AdtoneServerOperatorId = model.AdtoneServerOperatorId
+                                                    }));
 
                 //var countryId = 0;
                 //var lst = await _connService.GetConnectionStringsByCountry(model.CountryId);
@@ -226,18 +227,18 @@ namespace AdtonesAdminWebApi.DAL
             builder.AddParameters(new { KeyName = model.KeyName.Trim() });
             builder.AddParameters(new { KeyValue = model.KeyValue });
             builder.AddParameters(new { OperatorId = model.OperatorId });
-            
+
 
             try
             {
                 model.AdtoneServerOperatorMaxAdvertId = await _executers.ExecuteCommand(_connStr,
                                                     conn => conn.ExecuteScalar<int>(OperatorQuery.AddOperatorMaxAdvert, new
-                                                                                {
-                                                                                    KeyName = model.KeyName.Trim(),
-                                                                                    KeyValue = model.KeyValue,
-                                                                                    OperatorId = model.OperatorId,
-                                                                                    AdtoneServerOperatorMaxAdvertId = model.AdtoneServerOperatorMaxAdvertId
-                                                                                }));
+                                                    {
+                                                        KeyName = model.KeyName.Trim(),
+                                                        KeyValue = model.KeyValue,
+                                                        OperatorId = model.OperatorId,
+                                                        AdtoneServerOperatorMaxAdvertId = model.AdtoneServerOperatorMaxAdvertId
+                                                    }));
 
                 var operatorId = 0;
                 var constr = await _connService.GetConnectionStringByOperator(model.OperatorId);
@@ -245,12 +246,12 @@ namespace AdtonesAdminWebApi.DAL
                 operatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
                 x = await _executers.ExecuteCommand(constr,
                                 conn => conn.ExecuteScalar<int>(OperatorQuery.AddOperatorMaxAdvert, new
-                                                                                {
-                                                                                    KeyName = model.KeyName.Trim(),
-                                                                                    KeyValue = model.KeyValue,
-                                                                                    OperatorId = operatorId,
-                                                                                    AdtoneServerOperatorMaxAdvertId = model.AdtoneServerOperatorMaxAdvertId
-                                                                                }));
+                                {
+                                    KeyName = model.KeyName.Trim(),
+                                    KeyValue = model.KeyValue,
+                                    OperatorId = operatorId,
+                                    AdtoneServerOperatorMaxAdvertId = model.AdtoneServerOperatorMaxAdvertId
+                                }));
             }
             catch
             {
@@ -297,18 +298,18 @@ namespace AdtonesAdminWebApi.DAL
             {
                 x = await _executers.ExecuteCommand(_connStr,
                                                                 conn => conn.ExecuteScalar<int>(sb.ToString(), new
-                                                                                                        {
-                                                                                                            OperatorMaxAdvertId = model.OperatorMaxAdvertId,
-                                                                                                            KeyValue = model.KeyValue
-                                                                                                        }));
+                                                                {
+                                                                    OperatorMaxAdvertId = model.OperatorMaxAdvertId,
+                                                                    KeyValue = model.KeyValue
+                                                                }));
 
                 var constr = await _connService.GetConnectionStringByOperator(model.OperatorId);
                 x = await _executers.ExecuteCommand(constr,
                                                             conn => conn.ExecuteScalar<int>(sb2.ToString(), new
-                                                                                                        {
-                                                                                                            OperatorMaxAdvertId = model.OperatorMaxAdvertId,
-                                                                                                            KeyValue = model.KeyValue
-                                                                                                        }));
+                                                            {
+                                                                OperatorMaxAdvertId = model.OperatorMaxAdvertId,
+                                                                KeyValue = model.KeyValue
+                                                            }));
             }
             catch
             {
@@ -319,5 +320,114 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<IEnumerable<OperatorConfigurationResult>> LoadOperatorConfigurationDataTable()
+        {
+            var select_query = @"SELECT OperatorConfigurationId,con.OperatorId,Days,con.IsActive,AddedDate AS CreatedDate,op.OperatorName,c.Name AS CountryName
+                                FROM dbo.OperatorConfigurations AS con INNER JOIN Operators AS op ON op.OperatorId=con.OperatorId
+                                INNER JOIN Country AS c ON c.Id=op.CountryId";
+
+            try
+            {
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await connection.OpenAsync();
+                    return await connection.QueryAsync<OperatorConfigurationResult>(select_query);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<OperatorConfigurationResult> GetOperatorConfig(int id)
+        {
+            var select_query = @"SELECT OperatorConfigurationId,con.OperatorId,Days,con.IsActive,AddedDate,op.OperatorName
+                                FROM dbo.OperatorConfigurations AS con 
+                                INNER JOIN Operators AS op ON op.OperatorId=con.OperatorId
+                                WHERE OperatorConfigurationId=@Id";
+
+            try
+            {
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await connection.OpenAsync();
+                    return await connection.QueryFirstOrDefaultAsync<OperatorConfigurationResult>(select_query, new { Id = id });
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<int> AddOperatorConfig(OperatorConfigurationResult model)
+        {
+            var x = 0;
+            var insert_query = @"INSERT INTO OperatorConfigurations(OperatorId,Days,IsActive,AddedDate,UpdatedDate,AdtoneServerOperatorConfigurationId)
+                                        VALUES(@OperatorId,@Days,@IsActive,GETDATE(),GETDATE(),@AdtoneServerOperatorConfigurationId);
+                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+            try
+            {
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await connection.OpenAsync();
+                    model.AdtoneServerOperatorConfigurationId = await connection.ExecuteScalarAsync<int>(insert_query, model);
+                }
+
+                var constr = await _connService.GetConnectionStringByOperator(model.OperatorId);
+
+
+                using (var connection = new SqlConnection(constr))
+                {
+                    await connection.OpenAsync();
+                    x = await connection.ExecuteScalarAsync<int>(insert_query, model);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            return x;
+        }
+
+
+        public async Task<int> UpdateOperatorConfig(OperatorConfigurationResult model)
+        {
+            var x = 0;
+            var sb = new StringBuilder();
+            var sb2 = new StringBuilder();
+            sb.Append("UPDATE OperatorConfigurations SET Days = @Days,IsActive = @IsActive ");
+            sb2.Append("UPDATE OperatorConfigurations SET Days = @Days,IsActive = @IsActive ");
+
+            sb.Append("WHERE OperatorConfigurationId = @OperatorConfigurationId");
+            sb2.Append("WHERE AdtoneServerOperatorConfigurationId = @OperatorConfigurationId");
+
+
+            try
+            {
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    await connection.OpenAsync();
+                    x = await connection.ExecuteScalarAsync<int>(sb.ToString(), model);
+                }
+
+                var constr = await _connService.GetConnectionStringByOperator(model.OperatorId);
+
+                using (var connection = new SqlConnection(constr))
+                {
+                    await connection.OpenAsync();
+                    x = await connection.ExecuteScalarAsync<int>(sb2.ToString(), model);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            return x;
+        }
     }
 }

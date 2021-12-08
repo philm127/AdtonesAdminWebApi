@@ -150,9 +150,10 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetByAdvertiser(int id)
         {
-            string GetCampaignResultSetForSales = @"SELECT camp.CampaignProfileId,camp.UserId,u.Email,op.OperatorName
+            string selectQuery = @"SELECT camp.CampaignProfileId,camp.UserId,u.Email
                                                 ,camp.ClientId, ISNULL(cl.Name,'-') AS ClientName,CampaignName,camp.CreatedDateTime AS CreatedDate,
-                                                ad.AdvertName,camp.TotalBudget,
+                                                ad.AdvertName,camp.TotalBudget,camp.IsAdminApproval,
+                                                ISNULL(r.UniqueListenrs,0) AS Reach,camp.Status,
 												ro.Spend AS TotalSpend,ro.FundsAvailable, ro.MoreSixSecPlays AS finaltotalplays,ro.AvgBid AS AvgBidValue
                                                 FROM CampaignProfile AS camp LEFT JOIN Users As u ON u.UserId=camp.UserId
                                                 LEFT JOIN Client AS cl ON camp.ClientId=cl.Id
@@ -163,17 +164,24 @@ namespace AdtonesAdminWebApi.DAL
 			                                                (SELECT MAX(Id) FROM Billing GROUP BY CampaignProfileId,CurrencyCode)
 		                                                ) AS bill 
                                                 ON bill.CampaignProfileId=camp.CampaignProfileId
+                                                LEFT JOIN 
+		                                            ( SELECT cpi.CampaignProfileId, COUNT(DISTINCT ca.UserProfileId) AS UniqueListenrs
+			                                            FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
+                                                            WHERE cpi.UserId=@Id
+			                                            AND ca.Proceed = 1
+			                                            GROUP BY cpi.CampaignProfileId
+		                                            ) AS r ON r.CampaignProfileId = camp.CampaignProfileId
                                                 LEFT JOIN RollupsCampaign AS ro ON ro.CampaignId=camp.CampaignProfileId
                                                 LEFT JOIN Operators AS op ON op.CountryId=camp.CountryId
                                                 LEFT JOIN Contacts AS con ON con.UserId=camp.UserId
                                                 LEFT JOIN Country AS ctry ON ctry.Id=camp.CountryId 
-                                                WHERE camp.UserId=@Id ORDER BY camp.CampaignProfileId DESC";
+                                                WHERE camp.Status<>5 AND camp.UserId=@Id ORDER BY camp.CampaignProfileId DESC";
             
 
             // builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
 
             return await _executers.ExecuteCommand(_connStr,
-                            conn => conn.Query<CampaignAdminResult>(GetCampaignResultSetForSales, new { Id = id }));
+                            conn => conn.Query<CampaignAdminResult>(selectQuery, new { Id = id }));
         }
 
 

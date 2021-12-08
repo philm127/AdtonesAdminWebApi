@@ -21,6 +21,7 @@ namespace AdtonesAdminWebApi.Services
         public string LogLevel { get; set; }
         Task LogError();
         Task LogInfo();
+        Task LoggingError(Exception ex, string pageName, string methodCall);
     }
 
 
@@ -78,6 +79,14 @@ namespace AdtonesAdminWebApi.Services
             return webroot;
         }
 
+        public  async Task LoggingError(Exception ex, string pageName, string methodCall)
+        {
+            ErrorMessage = ex.Message.ToString();
+            StackTrace = ex.StackTrace.ToString();
+            PageName = pageName;
+            ProcedureName = methodCall;
+            await LogError();
+        }
 
         public async Task LogError()
         {

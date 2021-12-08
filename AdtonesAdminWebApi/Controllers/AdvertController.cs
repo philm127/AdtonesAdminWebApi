@@ -4,6 +4,9 @@ using AdtonesAdminWebApi.ViewModels;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign;
+using AdtonesAdminWebApi.Services;
+using AdtonesAdminWebApi.DAL.Interfaces;
+using System;
 
 namespace AdtonesAdminWebApi.Controllers
 {
@@ -13,12 +16,19 @@ namespace AdtonesAdminWebApi.Controllers
     public class AdvertController : ControllerBase
     {
         private readonly IAdvertService _advertService;
-        private readonly IAdvertCategoryService _advertCategoryService;
+        private readonly ILoggingService _logServ;
+        private readonly IAdvertDAL _advertDAL;
+        private readonly IAdvertCategoryDAL _adCatDAL;
+        ReturnResult result = new ReturnResult();
+        const string PageName = "AdvertController";
 
-        public AdvertController(IAdvertService advertService, IAdvertCategoryService advertCategoryService)
+        public AdvertController(IAdvertService advertService, ILoggingService logServ,
+                                IAdvertDAL advertDAL, IAdvertCategoryDAL adCatDAL)
         {
             _advertService = advertService;
-            _advertCategoryService = advertCategoryService;
+            _logServ = logServ;
+            _advertDAL = advertDAL;
+            _adCatDAL = adCatDAL;
         }
 
 
@@ -34,27 +44,91 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAdvertList/{id}")]
         public async Task<ReturnResult> GetAdvertList(int id = 0)
         {
-            return await _advertService.GetAdvertDataTable(id);
+            try
+            {
+                result.body = await _advertDAL.GetAdvertResultSet(id);
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertDataTable";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
         }
 
 
         [HttpGet("v1/GetAdvertListForSales/{id}")]
         public async Task<ReturnResult> GetAdvertListForSales(int id = 0)
         {
-            return await _advertService.GetAdvertDataTableForSales(id);
+            try
+            {
+                result.body = await _advertDAL.GetAdvertForSalesResultSet(id);
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertDataTableForSales";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
         }
 
         [HttpGet("v1/GetAdvertListForAdvertiser/{id}")]
         public async Task<ReturnResult> GetAdvertListForAdvertiser(int id)
         {
-            return await _advertService.GetAdvertDataTableForAdvertiser(id);
+            try
+            {
+                result.body = await _advertDAL.GetAdvertForAdvertiserResultSet(id);
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertDataTableForAdvertiser";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
         }
 
 
         [HttpGet("v1/GetAdvertListForAdvertiserSummary/{id}")]
         public async Task<ReturnResult> GetAdvertListForAdvertiserSummary(int id)
         {
-            return await _advertService.GetAdvertDataTableForAdvertiserSummary(id);
+            try
+            {
+                result.body = await _advertDAL.GetAdvertForAdvertiserDashboard(id);
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertDataTableForAdvertiserSummary";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
         }
 
 
@@ -67,7 +141,22 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAdvertListById/{id}")]
         public async Task<ReturnResult> GetAdvertListById(int id = 0)
         {
-            return await _advertService.GetAdvertDataTableById(id);
+            try
+            {
+                result.body = await _advertDAL.GetAdvertResultSetById(id);
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertDataTableById";
+                await _logServ.LogError();
+                result.result = 0;
+                return result;
+            }
         }
 
 
@@ -89,13 +178,40 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAdvertDetailByCampaignId/{id}")]
         public async Task<ReturnResult> GetAdvertDetailByCamapaignId(int id)
         {
-            return await _advertService.GetAdvertDetailsByCampaignId(id);
+            try
+            {
+                var advertId = await _advertDAL.GetAdvertIdByCampid(id);
+                var advert = await _advertService.GetAdvertDetails(advertId);
+                result.body = advert.body;
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertDetailsByCampaignId";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
         }
 
         [HttpPost("v1/CheckIfAdvertNameExists")]
-        public async Task<ReturnResult> CheckIfAdvertNameExists(NewAdvertFormModel advertName)
+        public async Task<ReturnResult> CheckIfAdvertNameExists(NewAdvertFormModel model)
         {
-            return await _advertService.CheckIfAdvertNameExists(advertName);
+            var AdvertNameexists = await _advertDAL.CheckAdvertNameExists(model.AdvertName, model.AdvertiserId);
+
+            if (AdvertNameexists)
+            {
+                result.result = 0;
+                result.error = "The Advert Name already exists";
+                return result;
+            }
+            else
+                return result;
         }
 
 
@@ -134,7 +250,22 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAdvertCategoryList")]
         public async Task<ReturnResult> GetAdvertCategoryList()
         {
-            return await _advertCategoryService.GetAdvertCategoryDataTable();
+            try
+            {
+                result.body = await _adCatDAL.GetAdvertCategoryList();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertCategoryDataTable";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
         }
 
 
@@ -156,7 +287,22 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPut("v1/DeleteAdvertCategory")]
         public async Task<ReturnResult> DeleteAdvertCategory(IdCollectionViewModel model)
         {
-            return await _advertCategoryService.DeleteAdvertCategory(model);
+            try
+            {
+                result.body = await _adCatDAL.RemoveAdvertCategory(model);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "DeleteAdvertCategory";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
         }
 
 
@@ -167,7 +313,22 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPut("v1/UpdateAdvertCategory")]
         public async Task<ReturnResult> UpdateAdvertCategory(AdvertCategoryResult model)
         {
-            return await _advertCategoryService.UpdateAdvertCategory(model);
+            try
+            {
+                result.body = await _adCatDAL.UpdateAdvertCategory(model);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateAdvertCategory";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
         }
 
 
@@ -178,7 +339,22 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAdvertCategoryDetails/{id}")]
         public async Task<ReturnResult> GetAdvertCategoryDetails(int id)
         {
-            return await _advertCategoryService.GetAdvertCategoryDetails(id);
+            try
+            {
+                result.body = await _adCatDAL.GetAdvertCategoryDetails(id);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertCategoryDetails";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
         }
 
 
@@ -189,7 +365,20 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/AddAdvertCategory")]
         public async Task<ReturnResult> AddAdvertCategory(AdvertCategoryResult model)
         {
-            return await _advertCategoryService.AddAdvertCategory(model);
+            try
+            {
+                result.body = await _adCatDAL.InsertAdvertCategory(model);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddAdvertCategory";
+                await _logServ.LogError();
+
+            }
+            return result;
         }
 
 

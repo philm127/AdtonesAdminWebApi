@@ -8,13 +8,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
     public interface ICampaignAuditService
     {
-        Task<ReturnResult> GetCampaignDashboardSummariesOperatorByCampaign(int campaignId);
-        Task<ReturnResult> GetPlayDetailsForOperatorByCampaign(PagingSearchClass paging);
-        Task<ReturnResult> GetDashboardSummaryForAdvertiser(int campaignId = 0);
-        Task<ReturnResult> GetDashboardSummariesByOperator(int operatorId);
-        Task<ReturnResult> GetPromoCampaignDashboardSummary(int campaignId);
-        Task<ReturnResult> GetPromoPlayDetails(PagingSearchClass paging);
-        Task<ReturnResult> GetDashboardSummaryForSalesManager();
-        Task<ReturnResult> GetDashboardSummaryForSalesExec(int userId);
+        CampaignDashboardChartResult GetDashboardSummariesToCovert(CampaignDashboardChartPREResult summaries);
     }
 }

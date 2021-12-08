@@ -370,7 +370,7 @@ WHERE cpi.UserId IN (Select AdvertiserId FROM Advertisers_SalesTeam WHERE IsActi
 		public static string GetPlayDetailsByCampaign => @"SELECT CAST(ISNULL(ca.TotalCost,0) AS NUMERIC(36,2)) AS TotalCost,CAST(ISNULL(ca.BidValue,0) AS NUMERIC(36,2)) AS PlayCost,
 													CAST(ISNULL(ca.EmailCost,0) AS NUMERIC(36,2)) AS EmailCost,CAST(ISNULL(ca.SMSCost,0) AS NUMERIC(36,2)) AS SMSCost,
 													ca.StartTime,ca.EndTime,CAST((ca.PlayLengthTicks / 1000) AS NUMERIC(36,2)) AS PlayLength,ca.Email AS EmailMsg,ca.SMS,
-													up.UserId,cp.CurrencyCode,ad.AdvertName,CampaignAuditId
+													up.UserId,cp.CurrencyCode,ad.AdvertName,CampaignAuditId, cp.CampaignProfileId
 													FROM CampaignProfile AS cp INNER JOIN CampaignAudit AS ca ON ca.CampaignProfileId=cp.CampaignProfileId
 													LEFT JOIN UserProfile AS up ON ca.UserProfileId=up.UserProfileId
 													LEFT JOIN 

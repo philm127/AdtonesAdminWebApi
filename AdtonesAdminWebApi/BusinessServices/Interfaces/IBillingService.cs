@@ -14,9 +14,5 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> SendInvoice(IdCollectionViewModel model);
         Task<ReturnResult> ReceivePayment(AdvertiserCreditFormCommand model);
 
-        
-        Task<ReturnResult> AddCampaignCreditPeriod(CampaignCreditPeriodCommand model);
-        Task<ReturnResult> UpdateCampaignCreditPeriod(CampaignCreditPeriodCommand model);
-        Task<ReturnResult> GetToPayDetails(int billingId);
     }
 }

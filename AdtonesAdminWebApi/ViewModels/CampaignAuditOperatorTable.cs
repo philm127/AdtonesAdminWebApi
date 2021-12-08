@@ -22,6 +22,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public string SMS { get; set; }
         public string MSISDN { get; set; }
         public string DTMFKey { get; set; }
+        public int CampaignProfileId { get; set; }
     }
 
     public class PromoCampaignPlaylist

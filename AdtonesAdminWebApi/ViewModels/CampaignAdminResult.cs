@@ -27,7 +27,7 @@ namespace AdtonesAdminWebApi.ViewModels
         public int Status { get; set; }
         public string rStatus => $"{(Enums.CampaignStatus)Status}";
         public DateTime CreatedDate { get; set; }
-
+        public int Reach { get; set; }
         public int TicketCount { get; set; }
         public bool IsAdminApproval { get; set; }
         public int CountryId { get; set; }

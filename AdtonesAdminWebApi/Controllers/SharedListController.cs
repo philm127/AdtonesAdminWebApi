@@ -3,6 +3,12 @@ using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.ViewModels;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.Services;
+using System;
+using System.Collections.Generic;
+using AdtonesAdminWebApi.Enums;
+using System.Linq;
 
 namespace AdtonesAdminWebApi.Controllers
 {
@@ -12,10 +18,16 @@ namespace AdtonesAdminWebApi.Controllers
     public class SharedListController : ControllerBase
     {
         private readonly ISharedSelectListsService _sharedList;
+        private readonly ILoggingService _logServ;
+        private readonly ISharedSelectListsDAL _sharedDal;
+        ReturnResult result = new ReturnResult();
+        const string PageName = "SharedListController";
 
-        public SharedListController(ISharedSelectListsService sharedList)
+        public SharedListController(ISharedSelectListsService sharedList, ISharedSelectListsDAL sharedDal, ILoggingService logServ)
         {
             _sharedList = sharedList;
+            _sharedDal = sharedDal;
+            _logServ = logServ;
         }
 
 
@@ -26,7 +38,17 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetCountryList")]
         public async Task<ActionResult<ReturnResult>> GetCountryList()
         {
-            return await _sharedList.GetCountryList();
+            try
+            {
+                result.body = await _sharedDal.GetCountry();
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetCountryList");
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -37,7 +59,15 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetRoleList")]
         public ReturnResult GetRoleList()
         {
-            return  _sharedList.GetUserRole();
+            IEnumerable<UserRole> userroleTypes = Enum.GetValues(typeof(UserRole))
+                                                     .Cast<UserRole>();
+            result.body = (from action in userroleTypes
+                           select new SharedSelectListViewModel
+                           {
+                               Text = action.ToString(),
+                               Value = ((int)action).ToString()
+                           }).ToList();
+            return result;
         }
 
 
@@ -59,21 +89,47 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetUserStatusList")]
         public ReturnResult GetUserStatusList()
         {
-            return _sharedList.GetUserStatus();
+            IEnumerable<UserStatus> userTypes = Enum.GetValues(typeof(UserStatus))
+                                                     .Cast<UserStatus>();
+            result.body = (from action in userTypes
+                           select new SharedSelectListViewModel
+                           {
+                               Text = action.ToString(),
+                               Value = ((int)action).ToString()
+                           }).ToList();
+            return result;
         }
 
 
         [HttpGet("v1/GetTicketStatusList")]
         public ReturnResult GetTicketStatusList()
         {
-            return _sharedList.GetTicketStatus();
+            IEnumerable<QuestionStatus> userTypes = Enum.GetValues(typeof(QuestionStatus))
+                                                     .Cast<QuestionStatus>();
+            result.body = (from action in userTypes
+                           select new SharedSelectListViewModel
+                           {
+                               Text = action.ToString(),
+                               Value = ((int)action).ToString()
+                           }).ToList();
+            return result;
         }
 
 
         [HttpGet("v1/GetTicketSubjectList")]
         public async Task<ActionResult<ReturnResult>> GetTicketSubjectList()
         {
-            return await _sharedList.GetTicketSubjectList();
+            try
+            {
+                result.body = await _sharedDal.GetTicketSubjectList();
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetTicketSubjectList");
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -84,14 +140,34 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetClientList/{id}")]
         public async Task<ActionResult<ReturnResult>> GetClientList(int id)
         {
-            return await _sharedList.GetClientList(id);
+            try
+            {
+                result.body = await _sharedDal.GetClientList(id);
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetClientList");
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
         [HttpGet("v1/FillPaymentTypeDropDown")]
         public async Task<ActionResult<ReturnResult>> FillPaymentTypeDropDown()
         {
-            return await _sharedList.FillPaymentTypeDropdown();
+            try
+            {
+                result.body = await _sharedDal.GetPaymentTypeList();
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "FillPaymentTypeDropdown");
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -103,7 +179,18 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetOperatorList/{id}")]
         public async Task<ActionResult<ReturnResult>> GetOperatorList(int id = 0)
         {
-            return await _sharedList.GetOperatorList(id);
+            var countryId = id;
+            try
+            {
+                result.body = await _sharedDal.GetOperators(countryId);
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetOperatorList");
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -116,16 +203,33 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetCurrencyList/{id}")]
         public async Task<ActionResult<ReturnResult>> GetCurrencyList(int id)
         {
-            //_sharedList.CurrentUserId = int.Parse(User.FindFirst("userId")?.Value);
-            // _sharedList.RoleName = User.FindFirst(ClaimTypes.Role)?.Value;
-            return await _sharedList.GetCurrencyList(id);
+            var currencyId = id;
+            try
+            {
+                result.body = await _sharedDal.GetCurrency(currencyId);
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetCurrencyList");
+                result.result = 0;
+            }
+            return result;
         }
 
 
         [HttpGet("v1/FillOrganisationTypeDropDown")]
         public async Task<ActionResult<ReturnResult>> FillOrganisationTypeDropDown()
         {
-            return await _sharedList.GetOrganisationTypeDropDown();
+            try
+            {
+                result.body = await _sharedDal.GetOrganisationTypes();
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetOrganisationTypeDropDown");
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -137,7 +241,17 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/FillAdvertCategoryDropDown/{id}")]
         public async Task<ActionResult<ReturnResult>> FillAdvertCategoryDropDown(int id)
         {
-            return await _sharedList.GetAdvertCategoryDropDown(id);
+            var countryId = id;
+            try
+            {
+                result.body = await _sharedDal.GetAdvertCategory(countryId);
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetAdvertCategoryDropDown");
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -149,7 +263,17 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/FillCampaignCategoryDropDown/{id}")]
         public async Task<ActionResult<ReturnResult>> FillCampaignCategoryDropDown(int id)
         {
-            return await _sharedList.GetCampaignCategoryDropDown(id);
+            var countryId = id;
+            try
+            {
+                result.body = await _sharedDal.GetCampaignCategory(countryId);
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetCampaignCategoryDropDown");
+                result.result = 0;
+            }
+            return result;
         }
 
         /// <summary>
@@ -171,7 +295,16 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAddUserCreditList")]
         public async Task<ActionResult<ReturnResult>> GetAddUserCreditList()
         {
-            return await _sharedList.GetAddCreditUsersList();
+            try
+            {
+                result.body = await _sharedDal.AddCreditUsers();
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetAddCreditUsersList");
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -183,7 +316,16 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetUserCreditList")]
         public async Task<ActionResult<ReturnResult>> GetUserCreditList()
         {
-            return await _sharedList.GetUserCreditList();
+            try
+            {
+                result.body = await _sharedDal.GetCreditUsers();
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetUserCreditList");
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -205,7 +347,16 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/FillUserPaymentDropdown")]
         public async Task<ActionResult<ReturnResult>> FillUserPaymentDropdown()
         {
-            return await _sharedList.FillUserPaymentDropdown();
+            try
+            {
+                result.body = await _sharedDal.GetUserPaymentList(0);
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "FillUserPaymentDropdown");
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -216,7 +367,16 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/FillCampaignDropdown/{id}")]
         public async Task<ActionResult<ReturnResult>> FillCampaignDropdown(int id=0)
         {
-            return await _sharedList.FillCampaignDropdown(id);
+            try
+            {
+                result.body = await _sharedDal.GetCamapignList(id);
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "FillCampaignDropdown");
+                result.result = 0;
+            }
+            return result;
         }
 
 
