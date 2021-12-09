@@ -12,7 +12,8 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                     ELSE CONCAT(@siteAddress,ad.MediaFileLocation) END AS MediaFileLocation,
                                                 CASE WHEN ad.ScriptFileLocation IS NULL THEN ad.ScriptFileLocation 
                                                     ELSE CONCAT(@siteAddress,ad.ScriptFileLocation) END AS ScriptFileLocation,
-                                                ad.SoapToneId,co.Name As CountryName, op.OperatorName,ad.Script,ad.AdvertCategoryId
+                                                ad.SoapToneId,co.Name As CountryName, op.OperatorName,ad.Script,ad.AdvertCategoryId,
+                                                cprof.CampaignName
                                                 FROM Advert AS ad LEFT JOIN Client AS cl ON ad.ClientId=cl.Id
                                                 LEFT JOIN Users AS usr ON usr.UserId=ad.UserId
                                                 LEFT JOIN CampaignAdverts AS cad ON cad.AdvertId=ad.AdvertId

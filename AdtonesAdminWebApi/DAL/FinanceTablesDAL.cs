@@ -51,9 +51,41 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<InvoiceResult>> LoadInvoiceResultSetForSales(int id=0)
         {
+            string getInvoiceForSalesResultSet = @"SELECT bil.Id AS BillingId,bil.InvoiceNumber,bil.PONumber,ISNULL(cl.Name,'-') AS ClientName,
+                                                        camp.CampaignName,bil.PaymentDate AS CreatedDate, camp.CampaignprofileId,
+                                                        ucp.Amount AS InvoiceTotal,(Case WHEN bil.Status=3 THEN 'Fail' ELSE 'Paid' END) AS rStatus,
+                                                        bil.SettledDate,(CASE WHEN bil.PaymentMethodId=1 THEN 'Cheque' ELSE pay.Description END)
+                                                        AS PaymentMethod,bil.CurrencyCode,
+                                                        CASE WHEN sexcs.FirstName IS NULL THEN 'UnAllocated' 
+                                                                    ELSE CONCAT(sexcs.FirstName,' ',sexcs.LastName) END AS SalesExec,
+                                                        bil.Status AS Status,ucp.UserId,sexcs.UserId AS SUserId,
+                                                        CONCAT(usr.FirstName,' ',usr.LastName) AS FullName,
+                                                        CONCAT(@siteAddress,'/Invoice/Adtones_invoice_',bil.InvoiceNumber,'.pdf') AS InvoicePath,
+                                                        usr.Email,ISNULL(usr.Organisation, '-') AS Organisation
+                                                        FROM Billing AS bil
+                                                        LEFT JOIN ( SELECT ucpO.UserId,ucpO.BillingId,SUM(ISNULL(ucpO.Amount,0)) AS Amount,ucpO.CampaignProfileId,
+                                                                    ucpD.Description 
+                                                                    FROM UsersCreditPayment AS ucpO
+                                                                    INNER JOIN
+                                                                        ( SELECT BillingId,ISNULL(Description, '-') AS Description FROM UsersCreditPayment 
+                                                                            WHERE Id IN
+                                                                                (SELECT MAX(Id) FROM UsersCreditPayment GROUP BY BillingId )
+                                                                            ) AS ucpD
+                                                                    ON ucpD.BillingId=ucpO.BillingId
+                                                                    GROUP BY ucpO.UserId,ucpO.BillingId,ucpO.CampaignProfileId,ucpD.Description
+                                                                ) AS ucp 
+                                                        ON ucp.BillingId=bil.Id
+                                                        LEFT JOIN Users AS usr ON ucp.UserId=usr.UserId
+                                                        LEFT JOIN Contacts AS con ON usr.UserId=con.UserId
+                                                        LEFT JOIN Client AS cl ON bil.ClientId=cl.Id
+                                                        LEFT JOIN CampaignProfile camp ON camp.CampaignProfileId=ucp.CampaignProfileId
+                                                        LEFT JOIN PaymentMethod AS pay ON bil.PaymentMethodId=pay.Id                                                       
+                                                        LEFT JOIN Advertisers_SalesTeam AS sales ON camp.UserId=sales.AdvertiserId 
+                                                        LEFT JOIN Users AS sexcs ON sexcs.UserId=sales.SalesExecId 
+                                                        WHERE ucp.Amount >= bil.TotalAmount";
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(FinancialTablesQuery.GetInvoiceForSalesResultSet);
+            sb.Append(getInvoiceForSalesResultSet);
             builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             if (id == 0)
             {
@@ -73,6 +105,37 @@ namespace AdtonesAdminWebApi.DAL
 
                 return await _executers.ExecuteCommand(_connStr,
                                 conn => conn.Query<InvoiceResult>(select.RawSql, select.Parameters));
+        }
+
+
+        public async Task<IEnumerable<InvoiceResult>> LoadInvoiceResultSetForAdvertiser(int id)
+        {
+            string getInvoiceForSalesResultSet = @"SELECT bil.Id AS BillingId,bil.InvoiceNumber,bil.PONumber,ISNULL(cl.Name,'-') AS ClientName,
+                                                        camp.CampaignName,bil.PaymentDate AS CreatedDate, camp.CampaignprofileId,
+                                                        bil.TotalAmount AS InvoiceTotal,(Case WHEN bil.Status=3 THEN 'Fail' WHEN bil.Status=2 THEN 'Credited' ELSE 'Paid' END) AS rStatus,
+                                                        bil.SettledDate,pay.Description AS PaymentMethod,bil.CurrencyCode,
+                                                        bil.Status AS Status,bil.UserId,
+                                                        CONCAT(@siteAddress,'/Invoice/Adtones_invoice_',bil.InvoiceNumber,'.pdf') AS InvoicePath,
+                                                        usr.Email,ISNULL(usr.Organisation, '-') AS Organisation
+                                                        FROM Billing AS bil
+                                                        LEFT JOIN Users AS usr ON bil.UserId=usr.UserId
+                                                        LEFT JOIN Contacts AS con ON usr.UserId=con.UserId
+                                                        LEFT JOIN Client AS cl ON bil.ClientId=cl.Id
+                                                        LEFT JOIN CampaignProfile camp ON camp.CampaignProfileId=bil.CampaignProfileId
+                                                        LEFT JOIN PaymentMethod AS pay ON bil.PaymentMethodId=pay.Id                                                       
+                                                        WHERE usr.UserId=@userid ";
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(getInvoiceForSalesResultSet);
+            builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
+
+            builder.AddParameters(new { userid = id });
+            sb.Append(" ORDER BY bil.Id DESC;");
+            var select = builder.AddTemplate(sb.ToString());
+
+
+            return await _executers.ExecuteCommand(_connStr,
+                            conn => conn.Query<InvoiceResult>(select.RawSql, select.Parameters));
         }
 
 

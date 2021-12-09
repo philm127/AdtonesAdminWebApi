@@ -48,3 +48,7 @@ git checkout crmProject
 exit
 git checkout -b finishProfPref
 exit
+git checkout master
+git merge finishProfPref
+git push
+exit

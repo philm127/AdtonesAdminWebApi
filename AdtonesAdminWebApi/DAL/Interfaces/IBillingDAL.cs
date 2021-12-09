@@ -14,6 +14,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<InvoiceForPDFDto> GetInvoiceDetailsForPDF(int billingId);
         Task<int> GetCreditPeriod(int campaignId);
         Task<BillingPaymentDto> GetCampaignBillingData(int campaignId);
+        Task<BillingPaymentDto> GetAdvertiserBillingData(int userId);
 
         Task<InvoicePDFEmailDto> GetInvoiceToPDF(int billingId, int UsersCreditPaymentID);
         Task<int> InsertPaymentFromUser(AdvertiserCreditFormCommand model);

@@ -29,6 +29,7 @@ namespace AdtonesAdminWebApi.ViewModels
 
         public int PrevStatus { get; set; }
         public int CampaignProfileId { get; set; } = 0;
+        public string CampaignName { get; set; }
         public string rStatus => $"{(Enums.AdvertStatus)Status}";
         public string RejectionReason { get; set; }
         public int UpdatedBy { get; set; }

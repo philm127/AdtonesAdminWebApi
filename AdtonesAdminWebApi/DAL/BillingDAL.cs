@@ -148,6 +148,31 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<BillingPaymentDto> GetAdvertiserBillingData(int userId)
+        {
+            string GetCampaignBillingData = @"SELECT camp.CampaignProfileId,camp.UserId AS AdvertiserId,u.UserId,cred.AssignCredit AS AssignedCredit,
+                                                    cred.AvailableCredit,camp.CountryId,tx.TaxPercantage,camp.TotalBudget AS TotalFundAmount,
+                                                    camp.CurrencyCode,cur.CurrencyId,ISNULL(con.PhoneNumber,con.MobileNumber) AS PhoneNumber,
+                                                    u.Email,u.Outstandingdays
+                                                    FROM CampaignProfile AS camp
+                                                    INNER JOIN Users As u ON u.UserId=camp.UserId
+                                                    INNER JOIN UsersCredit AS cred ON cred.UserId=camp.UserId
+                                                    INNER JOIN CountryTax AS tx ON tx.CountryId=camp.CountryId
+                                                    INNER JOIN Currencies AS cur ON camp.CurrencyCode=cur.CurrencyCode
+                                                    INNER JOIN Contacts con ON con.UserId=u.UserId
+                                                    WHERE camp.UserId=@Id";
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                conn => conn.QueryFirstOrDefault<BillingPaymentDto>(GetCampaignBillingData,
+                                                                                new { Id = userId }));
+            }
+            catch
+            {
+                throw;
+            }
+        }
 
 
         public async Task<InvoicePDFEmailDto> GetInvoiceToPDF(int billingId, int UsersCreditPaymentID)

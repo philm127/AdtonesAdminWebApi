@@ -74,12 +74,23 @@ namespace AdtonesAdminWebApi.Controllers
             }
             catch (Exception ex)
             {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetInvoicListForSales";
-                await _logServ.LogError();
+                await _logServ.LoggingError(ex, PageName, "GetInvoicListForSales");
+                result.result = 0;
+            }
+            return result;
+        }
 
+
+        [HttpGet("v1/GetInvoicListForAdvertiser/{id}")]
+        public async Task<ReturnResult> GetInvoicListForAdvertiser(int id)
+        {
+            try
+            {
+                result.body = await _invDAL.LoadInvoiceResultSetForAdvertiser(id);
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetInvoicListForAdvertiser");
                 result.result = 0;
             }
             return result;
@@ -432,13 +443,30 @@ namespace AdtonesAdminWebApi.Controllers
             }
             catch (Exception ex)
             {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetPaymentData";
+                await _logServ.LoggingError(ex, PageName, "GetPaymentData");
+                result.result = 0;
+                result.body = ex.Message.ToString();
+                return result;
+            }
+            return result;
+        }
 
-                await _logServ.LogError();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>body contains BillingPaymentModel</returns>
+        [HttpGet("v1/GetPaymentDataAdvertiser/{id}")]
+        public async Task<ReturnResult> GetPaymentDataAdvertiser(int id)
+        {
+            try
+            {
+                result.body = await _billDAL.GetAdvertiserBillingData(id);
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetPaymentDataAdvertiser");
                 result.result = 0;
                 result.body = ex.Message.ToString();
                 return result;
