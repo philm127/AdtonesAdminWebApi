@@ -12,7 +12,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     public interface ICampaignDAL
     {
         int[] GetOperatorFromPermissionForProv();
-        Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSet(int id=0);
+        Task<IEnumerable<CampaignAdminResult>> GetAdminOpAdminCampaignResultSet(int id=0);
         Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetProv(int operatorId, int id = 0);
         Task<IEnumerable<CampaignAdminResult>> GetCampaignResultSetById(int id);
         // Task<CampaignProfile> GetCampaignProfileDetail(int id = 0);

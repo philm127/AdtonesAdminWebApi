@@ -367,8 +367,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/AddCredit")]
         public async Task<ReturnResult> AddCredit(AdvertiserCreditFormCommand _creditmodel)
         {
-            var tst = await _creditService.AddUserCredit(_creditmodel);
-            return tst;
+            return await _creditService.AddUserCredit(_creditmodel);
         }
 
 
@@ -413,8 +412,7 @@ namespace AdtonesAdminWebApi.Controllers
         //[HttpPut("v1/UpdateCredit")]
         //public async Task<ReturnResult> UpdateCredit(UsersCreditFormModel model)
         //{
-        //    var tst = await _creditService.UpdateCredit(model);
-        //    return tst;
+        //    return await _creditService.UpdateCredit(model);
         //}
 
 
@@ -424,8 +422,7 @@ namespace AdtonesAdminWebApi.Controllers
         //[Route("v1/GetCreditDetailsUsersList")]
         //public async Task<ReturnResult> GetCreditDetailsUsersList()
         //{
-        //    var tst = await _creditService.GetCreditDetailsUsersList();
-        //    return tst;
+        //    return await _creditService.GetCreditDetailsUsersList();
         //}
 
 
@@ -478,8 +475,7 @@ namespace AdtonesAdminWebApi.Controllers
         [Route("v1/PayWithUserCredit")]
         public async Task<ReturnResult> PayWithUserCredit(UserPaymentCommand model)
         {
-            var tst = await _billService.PaywithUserCredit(model);
-            return tst;
+            return await _billService.PaywithUserCredit(model);
         }
 
     }

@@ -14,7 +14,7 @@ using Microsoft.Extensions.Caching.Memory;
 namespace AdtonesAdminWebApi.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class CampaignAuditController : ControllerBase
     {
@@ -103,11 +103,11 @@ namespace AdtonesAdminWebApi.Controllers
             {
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(30));
-                string key = $"OPERATOR_DASHBOARD_CAMPAIGN_STATS_{id}";
+                string key = $"DASHBOARD_CAMPAIGN_STATS_{id}";
                 var summaries = await _cache.GetOrCreateAsync<CampaignDashboardChartPREResult>(key, cacheEntry =>
                 {
                     cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
-                    return _auditDAL.CampaignDashboardSummariesOperators(id);
+                    return _auditDAL.CampaignDashboardSummary(id);
                 });
 
                 if (summaries != null)
@@ -225,9 +225,10 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        [HttpGet("v1/GetCampDashboardSummarySalesManager")]
-        public async Task<ReturnResult> GetCampDashboardSummarySalesManager()
+        [HttpGet("v1/GetCampDashboardSummarySalesManager/{id}")]
+        public async Task<ReturnResult> GetCampDashboardSummarySalesManager(int id = 0)
         {
+            var campaignId = id;
             try
             {
                 var salesId = _httpAccessor.GetUserIdFromJWT();
@@ -237,7 +238,7 @@ namespace AdtonesAdminWebApi.Controllers
                 var summaries = await _cache.GetOrCreateAsync<CampaignDashboardChartPREResult>(key, cacheEntry =>
                 {
                     cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
-                    return _auditDAL.DashboardSummariesSalesManager(salesId);
+                    return _auditDAL.DashboardSummariesSalesManager(salesId, campaignId);
                 });
 
                 if (summaries != null)

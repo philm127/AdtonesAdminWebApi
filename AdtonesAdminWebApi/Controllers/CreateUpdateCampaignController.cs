@@ -30,24 +30,6 @@ namespace AdtonesAdminWebApi.Controllers
             return await _campService.CheckIfCampaignNameExists(campaignName);
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns>body contains number 1 on success</returns>
-        [HttpPost("v1/CreateCampaignClient")]
-        public async Task<ReturnResult> CreateCampaignClient([FromForm] NewAdvertFormModel model)
-        {
-            // return await _countryService.AddCountry(countrymodel);
-            var tst = model;
-            var tst2 = tst;
-            var model2 = new ReturnResult();
-
-            return model2;
-        }
-
-
         /// <summary>
         /// 
         /// </summary>

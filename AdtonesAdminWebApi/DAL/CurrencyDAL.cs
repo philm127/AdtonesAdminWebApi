@@ -72,7 +72,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<Currency> GetCurrencyUsingCurrencyIdAsync(int? currencyId)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(CurrencyQuery.GetCurrencyByCurrencyId);
+            var select = builder.AddTemplate("SELECT CurrencyId, CurrencyCode,CountryId FROM Currencies WHERE CurrencyId=@currencyId");
             builder.AddParameters(new { currencyId = currencyId.Value });
 
             try
@@ -90,8 +90,10 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<Currency> GetCurrencyUsingCountryIdAsync(int? countryId)
         {
             if (!countryId.HasValue)
-               return await GetCurrencyFromEitherCacheOrDbAsync(CurrencyQuery.GetCurrencyByCurrency, new { CurrencyCode = CurrencyDefaults.DefaultCurrencyCode },0, _countryidToCur);
-            return await GetCurrencyFromEitherCacheOrDbAsync(CurrencyQuery.GetCurrencyByCountry, new { CountryId = countryId.Value }, countryId.Value, _countryidToCur);
+               return await GetCurrencyFromEitherCacheOrDbAsync("SELECT CurrencyId, CurrencyCode,CountryId FROM Currencies WHERE CurrencyCode=@CurrencyCode",
+                                                new { CurrencyCode = CurrencyDefaults.DefaultCurrencyCode },0, _countryidToCur);
+            return await GetCurrencyFromEitherCacheOrDbAsync("SELECT CurrencyId, CurrencyCode,CountryId FROM Currencies WHERE CountryId=@CountryId", 
+                                                                new { CountryId = countryId.Value }, countryId.Value, _countryidToCur);
         }
 
 

@@ -53,10 +53,12 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<UserCreditDetailsDto> GetUserCreditDetail(int id)
         {
-            string UserCreditDetails = @"SELECT uc.Id,uc.UserId,AssignCredit,
+            string UserCreditDetails = @"SELECT uc.Id,uc.UserId,AssignCredit,CONCAT(usr.FirstName,' ',usr.LastName) AS FullName,
                                                     ISNULL(CAST(AvailableCredit AS decimal(18,2)),0) AS AvailableCredit,
                                                     CreatedDate,uc.CurrencyId,c.CountryId 
-                                                    FROM  UsersCredit AS uc LEFT JOIN Currencies AS c ON c.CurrencyId=uc.CurrencyId
+                                                    FROM  UsersCredit AS uc
+                                                    INNER JOIN Users AS usr ON usr.UserId=uc.UserId
+                                                    LEFT JOIN Currencies AS c ON c.CurrencyId=uc.CurrencyId
                                                     WHERE uc.UserId=@Id";
             try
             {
@@ -64,8 +66,9 @@ namespace AdtonesAdminWebApi.DAL
                 return await _executers.ExecuteCommand(_connStr,
                                     conn => conn.QueryFirstOrDefault<UserCreditDetailsDto>(UserCreditDetails, new { Id = id }));
             }
-            catch
+            catch (Exception ex)
             {
+                var msg = ex.Message.ToString();
                 throw;
             }
         }

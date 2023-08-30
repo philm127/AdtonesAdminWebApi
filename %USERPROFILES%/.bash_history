@@ -52,3 +52,7 @@ git checkout master
 git merge finishProfPref
 git push
 exit
+git commit -A -m "Completed Billing Page"
+git commit -a -m "Completed Billing Page"
+git commit -a -m "Completed Billing Page2"
+exit

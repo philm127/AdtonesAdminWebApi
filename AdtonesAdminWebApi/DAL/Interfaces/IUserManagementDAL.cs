@@ -9,12 +9,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface IUserManagementDAL
     {
-        Task<bool> CheckIfUserExists(UserAddFormModel model);
-        Task<bool> CheckIfContactExists(Contacts model);
-        Task<int> AddNewUser(UserAddFormModel model);
-        Task<int> AddNewUserToOperator(UserAddFormModel model);
-        Task<int> AddNewContact(Contacts model);
-        Task<int> AddNewContactToOperator(Contacts model);
+        
         Task<int> UpdateUserStatus(AdvertiserDashboardResult model);
         Task<User> GetUserById(int id);
         Task<User> GetUserByEmail(string email);
@@ -25,8 +20,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> UpdateContact(Contacts model);
         Task<int> UpdateUser(User profile);
         Task<int> UpdateUserPermission(IdCollectionViewModel model);
-        Task<int> DeleteNewUser(int userId);
-        Task<int> InsertManagerToSalesExec(int manId, int execId);
+        
         Task<int> GetOperatorIdByUserId(int userId);
         Task<IEnumerable<string>> GetAdvertOperatorAdmins(int roleId, int operatorId = 0);
         Task<ClientViewModel> GetClientDetails(int clientId);

@@ -8,14 +8,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
     public class BillingQuery
     {
          
-        public static string InsertIntoBilling => @"INSERT INTO Billing(UserId, CampaignProfileId,PaymentMethodId,InvoiceNumber,
-                                                    PONumber,FundAmount,TaxPercantage,TotalAmount,PaymentDate,SettledDate,Status,CurrencyCode,AdtoneServerBillingId)
-                                                    VALUES(@UserId, @CampaignProfileId,@PaymentMethodId,@InvoiceNumber,
-                                                    @PONumber, @Fundamount, @TaxPercantage, @TotalAmount, GETDATE(),@SettledDate,@Status,@CurrencyCode,@AdtoneServerBillingId);
-                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-
-
         public static string GetInvoiceDetailsForPDF => @"SELECT bil.InvoiceNumber, camp.CampaignName,pay.Description AS MethodOfPayment,
                                                         CONCAT(usr.FirstName,' ',usr.LastName) AS FullName,
                                                         bil.PaymentMethodId,bil.CampaignProfileId,comp.CompanyName,comp.Address AS AddressLine1,comp.AdditionalAddress AS AddressLine2,

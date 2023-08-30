@@ -52,8 +52,10 @@
     <Compile Remove="BusinessServices\Interfaces\ICampaignAuditService.cs" />
     <Compile Remove="BusinessServices\Interfaces\IOperatorConfigService.cs" />
     <Compile Remove="BusinessServices\Interfaces\IOperatorService.cs" />
+    <Compile Remove="BusinessServices\Interfaces\IRewardsService.cs" />
     <Compile Remove="BusinessServices\OperatorConfigService.cs" />
     <Compile Remove="BusinessServices\OperatorService.cs" />
+    <Compile Remove="BusinessServices\RewardsService.cs" />
     <Compile Remove="BusinessServices\SafaricomPromotionalUserService.cs" />
     <Compile Remove="Controllers\AreaController.cs" />
     <Compile Remove="Controllers\RewardController.cs" />
@@ -88,17 +90,14 @@
     <Compile Include="DAL\Interfaces\IOperatorDAL.cs" />
     <Compile Include="DAL\Interfaces\ISalesManagementDAL.cs" />
     <Compile Include="DAL\Interfaces\IUserCreditDAL.cs" />
+    <Compile Include="DAL\Interfaces\IUserManagementAddUserDAL.cs" />
     <Compile Include="DAL\Interfaces\IUserProfileDAL.cs" />
     <Compile Include="DAL\OperatorDAL.cs" />
     <Compile Include="DAL\Interfaces\IProfileMatchInfoDAL.cs" />
     <Compile Include="DAL\ProfileMatchInfoDAL.cs" />
     <Compile Include="DAL\Interfaces\IRewardDAL.cs" />
-    <Compile Include="DAL\Queries\BillingQuery.cs" />
-    <Compile Include="DAL\Queries\ClientQuery.cs" />
     <Compile Include="DAL\Queries\CreateUpdateCampaignQuery.cs" />
     <Compile Include="DAL\Queries\OperatorQuery.cs" />
-    <Compile Include="DAL\Queries\ProfileMatchInfoQuery.cs" />
-    <Compile Include="DAL\Queries\SalesManagementQuery.cs" />
     <Compile Include="DAL\RewardDAL.cs" />
     <Compile Include="DAL\BaseDAL.cs" />
     <Compile Include="DAL\Interfaces\IFinanceTablesDAL.cs" />
@@ -109,10 +108,8 @@
     <Compile Include="DAL\PermissionManagementDAL.cs" />
     <Compile Include="DAL\Interfaces\IPromotionalCampaignDAL.cs" />
     <Compile Include="DAL\PomotionalCampaignDAL.cs" />
-    <Compile Include="DAL\Queries\AdvertiserFinancialQuery.cs" />
     <Compile Include="DAL\Queries\FinancialTablesQuery.cs" />
     <Compile Include="DAL\Queries\ManagementReportQuery.cs" />
-    <Compile Include="DAL\Queries\PermissionManagementQuery.cs" />
     <Compile Include="DAL\Queries\PromotionalCampaignQuery.cs" />
     <Compile Include="DAL\Queries\RewardQuery.cs" />
     <Compile Include="DAL\Queries\SharedListQuery.cs" />
@@ -121,8 +118,6 @@
     <Compile Include="DAL\Interfaces\ICampaignAuditDAL.cs" />
     <Compile Include="DAL\Interfaces\ICurrencyDAL.cs" />
     <Compile Include="DAL\Queries\CampaignAuditQuery.cs" />
-    <Compile Include="DAL\Queries\CurrencyQuery.cs" />
-    <Compile Include="DAL\Queries\SoapQuery.cs" />
     <Compile Include="DAL\SalesManagementDAL.cs" />
     <Compile Include="DAL\SoapDAL.cs" />
     <Compile Include="DAL\Interfaces\ISoapDAL.cs" />
@@ -141,10 +136,7 @@
     <Compile Include="DAL\Interfaces\ITicketDAL.cs" />
     <Compile Include="DAL\Interfaces\ISharedSelectListsDAL.cs" />
     <Compile Include="DAL\Interfaces\IUserDashboardDAL.cs" />
-    <Compile Include="DAL\Queries\CampaignQuery.cs" />
     <Compile Include="DAL\Queries\UserManagementQuery.cs" />
-    <Compile Include="DAL\Queries\LoginQuery.cs" />
-    <Compile Include="DAL\Queries\AdvertQuery.cs" />
     <Compile Include="DAL\Queries\CountryAreaQuery.cs" />
     <Compile Include="DAL\Queries\TicketQuery.cs" />
     <Compile Include="DAL\Queries\UserDashboardQuery.cs" />
@@ -154,6 +146,7 @@
     <Compile Include="DAL\TicketDAL.cs" />
     <Compile Include="DAL\UserCreditDAL.cs" />
     <Compile Include="DAL\UserDashboardDAL.cs" />
+    <Compile Include="DAL\UserManagementAddUserDAL.cs" />
     <Compile Include="DAL\UserManagementDAL.cs" />
     <Compile Include="DAL\UserMatchDAL.cs" />
     <Compile Include="DAL\UserProfileDAL.cs" />
@@ -178,7 +171,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="5.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PayPal" Version="1.9.1" />
     <PackageReference Include="Paypal-Base" Version="1.0.0" />
     <PackageReference Include="PayPalCoreSDK" Version="1.7.1" />
@@ -187,6 +180,7 @@
     <PackageReference Include="RestSharp" Version="106.12.0" />
     <PackageReference Include="SSH.NET" Version="2020.0.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    <PackageReference Include="WebApiClient.Extensions.HttpClientFactory" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,6 +11,8 @@ namespace AdtonesAdminWebApi.ViewModels.DTOs
 
         public int UserId { get; set; }
 
+        public string FullName { get; set; }
+
         public int CurrencyId { get; set; }
         public int CountryId { get; set; }
 

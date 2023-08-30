@@ -66,27 +66,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> GetDDSalesExec()
-        {
-            try
-            {
-                result.body = await _salesDAL.GetsalesExecDDList();
-
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetDDSalesExec";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
         public async Task<ReturnResult> UpdateSalesExecAllocation(SalesAdAllocationModel model)
         {
             bool success = true;

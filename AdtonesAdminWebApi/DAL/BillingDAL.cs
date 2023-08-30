@@ -25,11 +25,16 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> AddBillingRecord(UserPaymentCommand command)
         {
+            string insertIntoBilling = @"INSERT INTO Billing(UserId, CampaignProfileId,PaymentMethodId,InvoiceNumber,
+                                                    PONumber,FundAmount,TaxPercantage,TotalAmount,PaymentDate,SettledDate,Status,CurrencyCode,AdtoneServerBillingId)
+                                                    VALUES(@UserId, @CampaignProfileId,@PaymentMethodId,@InvoiceNumber,
+                                                    @PONumber, @Fundamount, @TaxPercantage, @TotalAmount, GETDATE(),@SettledDate,@Status,@CurrencyCode,@AdtoneServerBillingId);
+                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
             int billId = 0;
             try
             {
                 billId = await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(BillingQuery.InsertIntoBilling, new
+                                    conn => conn.ExecuteScalar<int>(insertIntoBilling, new
                                     {
                                         UserId = command.AdvertiserId,
                                         CampaignProfileId = command.CampaignProfileId,
@@ -59,7 +64,7 @@ namespace AdtonesAdminWebApi.DAL
                                                                                                             new { Id = command.AdvertiserId }));
 
                             var x = await _executers.ExecuteCommand(constr,
-                                        conn => conn.ExecuteScalar<int>(BillingQuery.InsertIntoBilling, new
+                                        conn => conn.ExecuteScalar<int>(insertIntoBilling, new
                                         {
                                             UserId = userId,
                                             CampaignProfileId = campId,
@@ -93,11 +98,25 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<InvoiceForPDFDto> GetInvoiceDetailsForPDF(int billingId)
         {
+            string getInvoiceDetailsForPDF = @"SELECT bil.InvoiceNumber, camp.CampaignName,pay.Description AS MethodOfPayment,
+                                                        CONCAT(usr.FirstName,' ',usr.LastName) AS FullName,
+                                                        bil.PaymentMethodId,bil.CampaignProfileId,comp.CompanyName,comp.Address AS AddressLine1,comp.AdditionalAddress AS AddressLine2,
+                                                        comp.Town AS City,comp.PostCode,ct.Name AS InvoiceCountry,ct.ShortName, bil.FundAmount,bil.PONumber,ccred.CreditPeriod, con.PhoneNumber,
+                                                        usr.Email,tx.TaxPercantage AS InvoiceTax
+                                                        FROM Billing AS bil
+                                                        INNER JOIN Users AS usr ON usr.UserId=bil.UserId
+                                                        LEFT JOIN CompanyDetails AS comp ON comp.UserId=usr.UserId
+                                                        LEFT JOIN Contacts AS con ON con.UserId=usr.UserId
+                                                        LEFT JOIN CampaignProfile AS camp ON camp.CampaignProfileId=bil.CampaignProfileId
+                                                        LEFT JOIN CampaignCreditPeriods AS ccred ON ccred.CampaignProfileId=camp.CampaignProfileId
+                                                        LEFT JOIN PaymentMethod AS pay ON pay.Id=bil.PaymentMethodId
+                                                        LEFT JOIN Country AS ct ON ct.Id=comp.CountryId
+                                                        LEFT JOIN CountryTax AS tx ON tx.CountryId=ct.Id
+                                                        WHERE bil.Id=@Id";
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<InvoiceForPDFDto>(BillingQuery.GetInvoiceDetailsForPDF,
-                                                                                new { Id = billingId }));
+                                conn => conn.QueryFirstOrDefault<InvoiceForPDFDto>(getInvoiceDetailsForPDF, new { Id = billingId }));
             }
             catch
             {
@@ -111,7 +130,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<int>(BillingQuery.GetCreditPeriod,
+                                conn => conn.QueryFirstOrDefault<int>("SELECT CreditPeriod FROM CampaignCreditPeriods WHERE CampaignProfileId=@Id",
                                                                                 new { Id = campaignId }));
             }
             catch
@@ -177,11 +196,19 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<InvoicePDFEmailDto> GetInvoiceToPDF(int billingId, int UsersCreditPaymentID)
         {
+            string getInvoiceToPDF = @"SELECT pay.Description,bil.InvoiceNumber,bil.SettledDate,co.CountryId,ucp.Amount,usr.Email,
+                                                    usr.FirstName, usr.LastName
+                                                    FROM Billing AS bil 
+                                                    INNER JOIN PaymentMethod AS pay ON bil.PaymentMethodId=pay.Id
+                                                    INNER JOIN Users AS usr ON bil.UserId=usr.UserId
+                                                    LEFT JOIN CompanyDetails AS co ON usr.UserId=co.UserId
+                                                    LEFT JOIN UsersCreditPayment AS ucp ON ucp.UserId=bil.UserId
+                                                    WHERE bil.Id=@billingId AND ucp.Id=@ucpId;";
 
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<InvoicePDFEmailDto>(AdvertiserFinancialQuery.GetInvoiceToPDF,
+                                conn => conn.QueryFirstOrDefault<InvoicePDFEmailDto>(getInvoiceToPDF,
                                                                                 new { billingId = billingId, ucpId = UsersCreditPaymentID }));
             }
             catch
@@ -193,11 +220,18 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<AdvertiserCreditPaymentDto> GetToPayDetails(int billingId)
         {
+            string getPrePaymentDetails = @"SELECT bil.Id AS billingId,bil.InvoiceNumber,camp.CampaignName,bil.UserId,
+                                                        CONCAT(usr.FirstName,' ',usr.LastName) AS FullName,bil.CampaignProfileId
+                                                        FROM Billing AS bil 
+                                                        INNER JOIN Users AS usr ON bil.UserId=usr.UserId
+                                                        INNER JOIN CampaignProfile AS camp ON bil.CampaignProfileId=camp.CampaignProfileId
+                                                        LEFT JOIN UsersCreditPayment AS ucp ON ucp.UserId=bil.UserId
+                                                        WHERE bil.Id=@billingId;";
 
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<AdvertiserCreditPaymentDto>(AdvertiserFinancialQuery.GetPrePaymentDetails,
+                                conn => conn.QueryFirstOrDefault<AdvertiserCreditPaymentDto>(getPrePaymentDetails,
                                                                                 new { billingId = billingId }));
             }
             catch
@@ -240,11 +274,11 @@ namespace AdtonesAdminWebApi.DAL
         
         public async Task<int> UpdateInvoiceSettledDate(int billingId)
         {
+            string updateInvoiceSettledDate = @"UPDATE Billing SET SettledDate=GETDATE() WHERE Id=@Id";
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(AdvertiserFinancialQuery.UpdateInvoiceSettledDate,
-                                                                                                            new { Id = billingId }));
+                                    conn => conn.ExecuteScalar<int>(updateInvoiceSettledDate, new { Id = billingId }));
 
             }
             catch
@@ -256,14 +290,17 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<CreditPaymentHistoryDto>> GetUserCreditPaymentHistory(int id)
         {
+            string getPaymentHistory = @"SELECT ucp.Id, ucp.Amount, ucp.CreatedDate, bil.InvoiceNumber 
+                                                    FROM UsersCreditPayment AS ucp  LEFT JOIN Billing AS bil ON bil.Id=ucp.BillingId 
+                                                    WHERE ucp.UserId=@userid ORDER BY CreatedDate Desc";
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertiserFinancialQuery.GetPaymentHistory);
+            var select = builder.AddTemplate(getPaymentHistory);
             try
             {
                 builder.AddParameters(new { userid = id });
 
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.Query<CreditPaymentHistoryDto>(select.RawSql, select.Parameters));
+                                    conn => conn.Query<CreditPaymentHistoryDto>(getPaymentHistory, new { userid = id }));
             }
             catch
             {
@@ -298,11 +335,21 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<decimal> GetCreditBalanceForInvoicePayment(int billingId)
         {
+            string getOutstandingBalanceInvoice = @"SELECT ISNULL((bilit.TotalAmount - ISNULL(CAST(payit.Amount AS decimal(18,2)),0)),0) AS OutstandingAmount 
+                                                                FROM
+                                                                    (SELECT ISNULL(CAST(bil.TotalAmount AS decimal(18,2)),0) AS TotalAmount,Id  
+                                                                    FROM Billing AS bil
+                                                                    WHERE bil.Id=@Id) bilit
+                                                                LEFT JOIN
+                                                                    (SELECT SUM(ISNULL(CAST(ucp.Amount AS decimal(18,2)),0)) AS Amount,BillingId  
+                                                                    FROM UsersCreditPayment ucp
+                                                                    WHERE BillingId=@Id
+                                                                    GROUP BY BillingId) payit
+                                                                ON payit.BillingId=bilit.Id";
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.QueryFirstOrDefault<decimal>(AdvertiserFinancialQuery.GetOutstandingBalanceInvoice,
-                                                                                                            new { Id = billingId }));
+                                    conn => conn.QueryFirstOrDefault<decimal>(getOutstandingBalanceInvoice, new { Id = billingId }));
 
             }
             catch

@@ -70,29 +70,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             _campMatchDAL = campMatchDAL;
         }
 
-
-        public async Task<ReturnResult> GetAdvertDetails(int id = 0)
-        {
-            try
-            {
-                result.body = await _advertDAL.GetAdvertDetail(id);
-                return result;
-
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetAdvertDetails";
-                await _logServ.LogError();
-                
-                result.result = 0;
-                return result;
-            }
-        }
-
-
         public async Task<ReturnResult> CreateNewCampaign_Advert(NewAdvertFormModel model)
         {
             int mainOperatorId = model.OperatorId;
@@ -304,6 +281,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             existingAdvert.AdvertName = model.AdvertName;
             existingAdvert.AdvertCategoryId = model.AdvertCategoryId;
             existingAdvert.Brand = model.Brand;
+            existingAdvert.Script = model.Script;
             try
             {
                 if(adverIdFromOp == 0)

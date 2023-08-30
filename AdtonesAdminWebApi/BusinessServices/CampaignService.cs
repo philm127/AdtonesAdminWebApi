@@ -46,6 +46,29 @@ namespace AdtonesAdminWebApi.BusinessServices
             _currencyConversion = currencyConversion;
         }
 
+        public async Task<ReturnResult> GetAdminOpAdminCampaignList(int id)
+        {
+            try
+            {
+                var roleName = _httpAccessor.GetRoleFromJWT();
+                if (roleName == "Admin" || roleName == "OperatorAdmin")
+                    result.body = await _campDAL.GetAdminOpAdminCampaignResultSet(id);
+                else
+                    result.body = null;
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "CampaignService - GetCampaignList";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
+        }
+
         
 
         /// <summary>

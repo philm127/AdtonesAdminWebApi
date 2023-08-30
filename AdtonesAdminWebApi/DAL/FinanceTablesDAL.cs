@@ -26,9 +26,36 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<InvoiceResult>> LoadInvoiceResultSet()
         {
+            string getInvoiceResultSet = @"SELECT bil.Id AS BillingId,bil.InvoiceNumber,bil.PONumber,ISNULL(cl.Name,'-') AS ClientName,
+                                                        camp.CampaignName,bil.PaymentDate AS CreatedDate, camp.CampaignprofileId,
+                                                        ucp.Amount AS InvoiceTotal,(Case WHEN bil.Status=3 THEN 'Fail' ELSE 'Paid' END) AS rStatus,
+                                                        bil.SettledDate,(CASE WHEN bil.PaymentMethodId=1 THEN 'Cheque' ELSE pay.Description END)
+                                                        AS PaymentMethod,bil.CurrencyCode,
+                                                        bil.Status AS Status,ucp.UserId,
+                                                        CONCAT(usr.FirstName,' ',usr.LastName) AS FullName,
+                                                        CONCAT(@siteAddress,'/Invoice/Adtones_invoice_',bil.InvoiceNumber,'.pdf') AS InvoicePath,
+                                                        usr.Email,ISNULL(usr.Organisation, '-') AS Organisation
+                                                        FROM ( SELECT ucpO.UserId,ucpO.BillingId,SUM(ISNULL(ucpO.Amount,0)) AS Amount,ucpO.CampaignProfileId,
+                                                                ucpD.Description 
+                                                                FROM UsersCreditPayment AS ucpO
+                                                                INNER JOIN
+                                                                    ( SELECT BillingId,ISNULL(Description, '-') AS Description FROM UsersCreditPayment 
+                                                                        WHERE Id IN
+                                                                            (SELECT MAX(Id) FROM UsersCreditPayment GROUP BY BillingId )
+                                                                        ) AS ucpD
+                                                                ON ucpD.BillingId=ucpO.BillingId
+                                                                GROUP BY ucpO.UserId,ucpO.BillingId,ucpO.CampaignProfileId,ucpD.Description
+                                                            ) AS ucp 
+                                                        LEFT JOIN Billing AS bil ON ucp.BillingId=bil.Id 
+                                                        LEFT JOIN Client AS cl ON bil.ClientId=cl.Id
+                                                        LEFT JOIN CampaignProfile camp ON camp.CampaignProfileId=ucp.CampaignProfileId
+                                                        LEFT JOIN PaymentMethod AS pay ON bil.PaymentMethodId=pay.Id
+                                                        LEFT JOIN Users AS usr ON ucp.UserId=usr.UserId
+                                                        WHERE ucp.Amount >= bil.TotalAmount ";
+            
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(FinancialTablesQuery.GetInvoiceResultSet);
+            sb.Append(getInvoiceResultSet);
             builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             var values = CheckGeneralFile(sb, builder, pais: "camp");
             sb = values.Item1;
@@ -141,9 +168,37 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<OutstandingInvoiceResult>> LoadOutstandingInvoiceResultSet()
         {
+            string getOutstandingInvoiceResultSet = @"SELECT bil.Id AS BillingId,bil.UserId,bil.CampaignProfileId,bil.InvoiceNumber,
+                                                                bil.TotalAmount AS CreditAmount,ISNULL(ucp.Amount,0) AS PaidAmount,ucp.Description,
+                                                                bil.TotalAmount,bil.PaymentDate AS CreatedDate,ISNULL(cl.Name, '-') AS ClientName,
+                                                                ISNULL(u.Organisation, '-') AS Organisation,u.Email,
+                                                                CONCAT(u.FirstName,' ',u.LastName) AS FullName,(bil.TotalAmount - ISNULL(ucp.Amount,0)) AS OutStandingAmount,
+                                                                CONCAT(@siteAddress,'/Invoice/Adtones_invoice_',bil.InvoiceNumber,'.pdf') AS InvoicePath,
+                                                                CASE WHEN ISNULL(ucp.Amount,0)>0 THEN 1 ELSE 0 END AS Status,cp.CampaignName,bil.CurrencyCode
+                                                                FROM Billing AS bil LEFT JOIN Client AS cl ON cl.Id=bil.ClientId
+                                                                INNER JOIN Users AS u ON bil.UserId=u.UserId
+                                                                LEFT JOIN
+                                                                    ( SELECT ucpO.UserId,ucpO.BillingId,SUM(ISNULL(ucpO.Amount,0)) AS Amount,ucpO.CampaignProfileId,
+                                                                        ucpD.Description 
+                                                                        FROM UsersCreditPayment AS ucpO
+                                                                        INNER JOIN
+                                                                            ( SELECT BillingId,ISNULL(Description, '-') AS Description FROM UsersCreditPayment 
+                                                                                WHERE Id IN
+                                                                                    (SELECT MAX(Id) FROM UsersCreditPayment GROUP BY BillingId )
+                                                                             ) AS ucpD
+                                                                        ON ucpD.BillingId=ucpO.BillingId
+                                                                        GROUP BY ucpO.UserId,ucpO.BillingId,ucpO.CampaignProfileId,ucpD.Description
+                                                                    ) AS ucp
+                                                                ON ucp.BillingId=bil.Id
+                                                                INNER JOIN CampaignProfile AS cp ON cp.CampaignProfileId=bil.CampaignProfileId
+                                                                LEFT JOIN Contacts AS con ON u.UserId=con.UserId
+                                                                WHERE PaymentMethodId=1
+                                                                AND bil.TotalAmount > ISNULL(Amount,0)";
+
+
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(FinancialTablesQuery.GetOutstandingInvoiceResultSet);
+            sb.Append(getOutstandingInvoiceResultSet);
             builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             var values = CheckGeneralFile(sb, builder, pais: "cp",advs:"bil");
             sb = values.Item1;
@@ -166,9 +221,41 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<OutstandingInvoiceResult>> LoadOutstandingInvoiceForSalesResultSet(int id = 0)
         {
+            string getOutstandingInvoiceForSalesResultSet = @"SELECT bil.Id AS BillingId,bil.UserId,bil.CampaignProfileId,bil.InvoiceNumber,
+                                                                bil.TotalAmount AS CreditAmount,ISNULL(ucp.Amount,0) AS PaidAmount,ucp.Description,
+                                                                bil.PaymentDate AS CreatedDate,ISNULL(cl.Name, '-') AS ClientName,
+                                                                ISNULL(u.Organisation, '-') AS Organisation,u.Email,sexcs.UserId AS SUserId,
+                                                                CASE WHEN sexcs.FirstName IS NULL THEN 'UnAllocated' 
+                                                                    ELSE CONCAT(sexcs.FirstName,' ',sexcs.LastName) END AS SalesExec,
+                                                                CONCAT(u.FirstName,'',u.LastName) AS FullName,(bil.TotalAmount - ISNULL(ucp.Amount,0)) AS OutStandingAmount,
+                                                                CONCAT(@siteAddress,'/Invoice/Adtones_invoice_',bil.InvoiceNumber,'.pdf') AS InvoicePath,
+                                                                CASE WHEN ISNULL(ucp.Amount,0)>0 THEN 1 ELSE 0 END AS Status,cp.CampaignName,bil.CurrencyCode
+                                                                FROM Billing AS bil LEFT JOIN Client AS cl ON cl.Id=bil.ClientId
+                                                                INNER JOIN Users AS u ON bil.UserId=u.UserId
+                                                                LEFT JOIN
+                                                                    ( SELECT ucpO.UserId,ucpO.BillingId,SUM(ISNULL(ucpO.Amount,0)) AS Amount,ucpO.CampaignProfileId,
+                                                                        ucpD.Description 
+                                                                        FROM UsersCreditPayment AS ucpO
+                                                                        INNER JOIN
+                                                                            ( SELECT BillingId,ISNULL(Description, '-') AS Description FROM UsersCreditPayment 
+                                                                                WHERE Id IN
+                                                                                    (SELECT MAX(Id) FROM UsersCreditPayment GROUP BY BillingId )
+                                                                             ) AS ucpD
+                                                                        ON ucpD.BillingId=ucpO.BillingId
+                                                                        GROUP BY ucpO.UserId,ucpO.BillingId,ucpO.CampaignProfileId,ucpD.Description
+                                                                    ) AS ucp
+                                                                ON ucp.BillingId=bil.Id
+                                                                INNER JOIN CampaignProfile AS cp ON cp.CampaignProfileId=bil.CampaignProfileId
+                                                               LEFT JOIN Advertisers_SalesTeam AS sales ON u.UserId=sales.AdvertiserId 
+                                                                LEFT JOIN Users AS sexcs ON sexcs.UserId=sales.SalesExecId
+                                                                LEFT JOIN Contacts AS con ON u.UserId=con.UserId
+                                                                WHERE PaymentMethodId=1
+                                                                AND bil.TotalAmount > ISNULL(Amount,0) ";
+
+
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(FinancialTablesQuery.GetOutstandingInvoiceForSalesResultSet);
+            sb.Append(getOutstandingInvoiceForSalesResultSet);
             builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             if (id == 0)
             {

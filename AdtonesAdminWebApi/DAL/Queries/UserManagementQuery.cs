@@ -5,38 +5,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
     public static class UserManagementQuery
     {
 
-        public static string CheckUserExists => @"SELECT COUNT(1) FROM Users WHERE LOWER(Email) = @email;";
-
-        public static string CheckContactExists => @"SELECT COUNT(1) FROM Contacts WHERE MobileNumber=@mobile;";
-
-
-
-        public static string AddNewUser => @"INSERT INTO Users(Email,FirstName,LastName,PasswordHash,DateCreated,Organisation,LastLoginTime,RoleId,
-                                                Activated,VerificationStatus,Outstandingdays,OperatorId,IsMsisdnMatch,IsEmailVerfication,
-                                                PhoneticAlphabet,IsMobileVerfication,OrganisationTypeId,UserMatchTableName,Permissions,LastPasswordChangedDate)
-                                             VALUES(@Email,@FirstName,@LastName,@PasswordHash,GETDATE(),@Organisation,GETDATE(),@RoleId,
-                                                    @Activated,@VerificationStatus,@Outstandingdays,@OperatorId,@IsMsisdnMatch,@IsEmailVerfication,
-                                                    @PhoneticAlphabet,@IsMobileVerfication,@OrganisationTypeId,@UserMatchTableName,@Permissions,GETDATE());
-                                      SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-
-        /// <summary>
-        /// Doesn't have permissions as remote may not have and does have adtone serverid
-        /// </summary>
-        public static string AddNewUserToOperator => @"INSERT INTO Users(Email,FirstName,LastName,PasswordHash,DateCreated,Organisation,LastLoginTime,RoleId,
-                                                Activated,VerificationStatus,Outstandingdays,OperatorId,IsMsisdnMatch,IsEmailVerfication,
-                                                PhoneticAlphabet,IsMobileVerfication,OrganisationTypeId,UserMatchTableName,AdtoneServerUserId,LastPasswordChangedDate)
-                                             VALUES(@Email,@FirstName,@LastName,@PasswordHash,GETDATE(),@Organisation,GETDATE(),@RoleId,
-                                                    @Activated,@VerificationStatus,@Outstandingdays,@OperatorId,@IsMsisdnMatch,@IsEmailVerfication,
-                                                    @PhoneticAlphabet,@IsMobileVerfication,@OrganisationTypeId,@UserMatchTableName,@AdtoneServerUserId,GETDATE());
-                                      SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-
-        public static string AddNewContact => @"INSERT INTO Contacts(UserId,MobileNumber,FixedLine,Email,PhoneNumber,Address,CountryId,CurrencyId,AdtoneServerContactId)
-                                               VALUES(@UserId,@MobileNumber,@FixedLine,@Email,@PhoneNumber,@Address,@CountryId,@CurrencyId,@AdtoneServerContactId);
-                                                SELECT CAST(SCOPE_IDENTITY() AS INT);";
-        
-        
         public static string UpdateUserStatus => @"UPDATE Users SET Activated=@Activated,LastPasswordChangedDate=GETDATE() WHERE ";
                                                                   
         public static string GetUserDetails => @"SELECT UserId,u.OperatorId,Email,FirstName,LastName,DateCreated,Organisation,op.CountryId,
@@ -74,15 +42,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
 
 
         public static string UpdateUserPermissions => @"Update Users SET Permissions=@perm WHERE UserId=@userId";
-
-
-        public static string DeleteAddedUser => @"DELETE FROM Users WHERE UserId=@Id";
-
-        public static string InsertManagerToSalesExec => @"INSERT INTO SalesManager_SalesExec(ManId,ExecId,Active,CreatedDate,UpdatedDate)
-                                                            VALUES(@manId,@execId,1,GETDATE(),GETDATE());";
-
-
-        public static string GetAdvertAdminOperator => @"SELECT Email FROM Users WHERE Activated=1 AND RoleId=@RoleId ";
 
 
     }

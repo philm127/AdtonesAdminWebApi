@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
+using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +15,18 @@ namespace AdtonesAdminWebApi.Controllers
     public class SystemConfigController : ControllerBase
     {
         private ISystemConfigService _configService;
-        private IRewardsService _rewardService;
+        private readonly ILoggingService _logServ;
+        private readonly IRewardDAL _rewardDAL;
+        ReturnResult result = new ReturnResult();
+        const string PageName = "SystemConfigController";
 
-        public SystemConfigController(ISystemConfigService configService, IRewardsService rewardService)
+
+        public SystemConfigController(ISystemConfigService configService, ILoggingService logServ,
+                                IRewardDAL rewardDAL)
         {
             _configService = configService;
-            _rewardService = rewardService;
+            _rewardDAL = rewardDAL;
+            _logServ = logServ;
         }
 
 
@@ -101,7 +110,21 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/LoadRewardsDataTable")]
         public async Task<ReturnResult> LoadRewardsDataTable()
         {
-            return await _rewardService.LoadRewardsDataTable();
+            try
+            {
+                result.body = await _rewardDAL.LoadRewardResultSet();
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "LoadRewardsDataTable";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -113,7 +136,21 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetReward/{id}")]
         public async Task<ReturnResult> GetReward(int id)
         {
-            return await _rewardService.GetReward(id);
+            try
+            {
+                result.body = await _rewardDAL.GetRewardById(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetReward";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -125,7 +162,21 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/AddReward")]
         public async Task<ReturnResult> AddReward(RewardResult model)
         {
-            return await _rewardService.AddReward(model);
+            try
+            {
+                var x = await _rewardDAL.AddReward(model);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "AddReward";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 
@@ -137,13 +188,41 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPut("v1/UpdateReward")]
         public async Task<ReturnResult> UpdateReward(RewardResult model)
         {
-            return await _rewardService.UpdateReward(model);
+            try
+            {
+                var x = await _rewardDAL.UpdateReward(model);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "UpdateReward";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
         [HttpDelete("v1/DeleteReward/{id}")]
         public async Task<ReturnResult> DeleteReward(int id)
         {
-            return await _rewardService.DeleteReward(id);
+            try
+            {
+                var x = await _rewardDAL.DeleteRewardById(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "DeleteReward";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
         #endregion

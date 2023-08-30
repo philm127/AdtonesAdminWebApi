@@ -13,7 +13,6 @@ using System.Linq;
 namespace AdtonesAdminWebApi.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class SharedListController : ControllerBase
     {
@@ -45,6 +44,27 @@ namespace AdtonesAdminWebApi.Controllers
             catch (Exception ex)
             {
                 await _logServ.LoggingError(ex, PageName, "GetCountryList");
+
+                result.result = 0;
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>body contains List SharedSelectListViewModel</returns>
+        [HttpGet("v1/GetCountryListForAdvertiserSignUp")]
+        public async Task<ActionResult<ReturnResult>> GetCountryListForAdvertiserSignUp()
+        {
+            try
+            {
+                result.body = await _sharedDal.GetCountryForAdSignUp();
+            }
+            catch (Exception ex)
+            {
+                await _logServ.LoggingError(ex, PageName, "GetCountryListForAdvertiserSignUp");
 
                 result.result = 0;
             }

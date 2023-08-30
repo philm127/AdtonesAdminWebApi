@@ -44,7 +44,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
                                                         LEFT JOIN Users AS sexcs ON sexcs.UserId=sales.SalesExecId 
                                                         WHERE u.RoleId=3 AND q.Status < 4";
 
-
         public static string GetOperatorLoadTicketTable => @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,q.ClientId,qs.Name AS QuestionSubject,
                                                     ISNULL(CONCAT(u.FirstName,' ',u.LastName), '-') AS UserName,q.Description,
                                                     ISNULL(u.Email, '-') AS Email,ISNULL(QNumber,'-') AS QNumber,

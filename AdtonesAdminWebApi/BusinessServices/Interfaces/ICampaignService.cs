@@ -8,7 +8,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
     public interface ICampaignService
     {
-        
+        Task<ReturnResult> GetAdminOpAdminCampaignList(int id);
         Task<ReturnResult> GetAdvertiserCamapaignTable();
         Task<ReturnResult> UpdateCampaignStatus(IdCollectionViewModel model);
         Task<bool> ChangeCampaignStatus(int campaignId);

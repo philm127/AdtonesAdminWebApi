@@ -27,8 +27,11 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<SoapApiResponseCodes> GetSoapApiResponse(string id)
         {
+            string getSoapApiResponseCodes = @"SELECT Id,ReturnCode,Description FROM SoapApiResponseCodes
+                                                        WHERE ReturnCode=@returnCode;";
+
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(SoapQuery.GetSoapApiResponseCodes);
+            var select = builder.AddTemplate(getSoapApiResponseCodes);
             builder.AddParameters(new { returnCode = id });
             try
             {

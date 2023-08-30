@@ -67,6 +67,8 @@ namespace AdtonesAdminWebApi.ViewModels
         public string PhoneNumber { get; set; }
 
         public string Address { get; set; }
+        public string Town { get; set; }
+        public string PostCode { get; set; }
 
         public int? CurrencyId { get; set; }
 

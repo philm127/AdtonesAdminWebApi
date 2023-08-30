@@ -229,3 +229,18 @@ Page: AdvertService, Procedure: ApproveAd AdvertId=483,ErrorMsg: Entered Approve
 LogLevel: 
  StackTrace  : 
 ------------END-------------------
+-------------------START-------------8/6/2023 4:47:14 PM
+Page: AdvertService, Procedure: ApproveReject - ApproveAd AdvertId=592,ErrorMsg: Entered Approve OR reject 1= pending
+LogLevel: 
+ StackTrace  : 
+------------END-------------------
+-------------------START-------------8/6/2023 4:47:15 PM
+Page: AdvertService, Procedure: ApproveAd AdvertId=592,ErrorMsg: Entered ApproveAd Got campaignAdvert which is AdtonesAdminWebApi.Model.CampaignAdverts
+LogLevel: 
+ StackTrace  : 
+------------END-------------------
+-------------------START-------------8/6/2023 4:47:15 PM
+Page: AdvertService, Procedure: ApproveAd AdvertId=592,ErrorMsg: Entered ApproveAd Ran UpdateStatus got System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Boolean,AdtonesAdminWebApi.BusinessServices.AdvertService+<UpdateStatus>d__31]
+LogLevel: 
+ StackTrace  : 
+------------END-------------------

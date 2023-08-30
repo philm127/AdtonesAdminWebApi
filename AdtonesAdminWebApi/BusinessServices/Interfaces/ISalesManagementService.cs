@@ -9,7 +9,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     public interface ISalesManagementService
     {
         Task<ReturnResult> GetAllocatedAdvertisers(int userId = 0);
-        Task<ReturnResult> GetDDSalesExec();
 
         Task<ReturnResult> UpdateSalesExecAllocation(SalesAdAllocationModel model);
     }

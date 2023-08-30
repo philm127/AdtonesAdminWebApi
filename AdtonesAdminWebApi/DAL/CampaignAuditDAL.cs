@@ -27,6 +27,25 @@ namespace AdtonesAdminWebApi.DAL
             _logServ = logServ;
         }
 
+        public static string getDashboardData = @"SELECT SUM(ISNULL(CAST(cp.TotalBudget AS bigint),0)) AS Budget, 
+                                                    ISNULL(sum(ca.Spend),0) AS Spend,
+                                                    ISNULL(sum(ca.FundsAvailable),0) AS FundsAvailable,
+                                                    AVG(ca.AvgBid) AS AvgBid,
+                                                    CAST(ISNULL(SUM(ca.TotalSMS),0) AS bigint) AS TotalSMS,
+                                                    ISNULL(SUM(ca.TotalSMSCost),0) AS TotalSMSCost,
+                                                    CAST(ISNULL(SUM(ca.TotalEmail),0) AS bigint) AS TotalEmail,
+                                                    ISNULL(SUM(ca.TotalEmailCost),0) AS TotalEmailCost,
+                                                    Cast(ISNULL(SUM(ca.TotalPlays),0) AS bigint) AS TotalPlays,
+                                                    Cast(ISNULL(SUM(ca.MoreSixSecPlays),0) AS bigint) AS MoreSixSecPlays,
+                                                    (ISNULL(SUM(ca.TotalPlays),0) - ISNULL(SUM(ca.MoreSixSecPlays),0)) AS FreePlays,
+                                                    AVG(ISNULL(ca.AvgPlayLength,0))	AS AvgPlayLength,
+                                                    MAX(ISNULL(ca.MaxPlayLength,0)) AS MaxPlayLength,
+                                                    MAX(CAST(ISNULL(ca.MaxBid, 0) AS numeric(16,2))) AS MaxBid,
+                                                    MAX(ISNULL(ca.Reach,0)) AS Reach,
+                                                    'KES' AS CurrencyCode
+	                                                FROM RollupsCampaign AS ca 
+                                                    INNER JOIN CampaignProfile AS cp ON cp.CampaignProfileId=ca.CampaignId ";
+
 
         ///// <summary>
         ///// Get Dashboard by individual campaign
@@ -35,18 +54,7 @@ namespace AdtonesAdminWebApi.DAL
         ///// </summary>
         ///// <param name="campaignId">supplied campaign id to group stats by</param>
         ///// <returns></returns>
-        //public async Task<CampaignDashboardChartPREResult> GetCampaignDashboardSummariesForOperator(int campaignId)
-        //{
-        //    var cacheEntryOptions = new MemoryCacheEntryOptions()
-        //            .SetSlidingExpiration(TimeSpan.FromMinutes(30));
-        //    string key = $"OPERATOR_DASHBOARD_CAMPAIGN_STATS_{campaignId}";
-        //    return await _cache.GetOrCreateAsync<CampaignDashboardChartPREResult>(key, cacheEntry =>
-        //    {
-        //        cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
-        //        return CampaignDashboardSummariesOperators(campaignId);
-        //    });
-        //    // return cacheEntry ?? new List<CampaignDashboardChartPREResult>();
-        //}
+
 
 
         /// <summary>
@@ -55,25 +63,25 @@ namespace AdtonesAdminWebApi.DAL
         /// </summary>
         /// <param name="id">camapign Id</param>
         /// <returns></returns>
-        public async Task<CampaignDashboardChartPREResult> CampaignDashboardSummariesOperators(int campaignId)
+        public async Task<CampaignDashboardChartPREResult> CampaignDashboardSummary(int campaignId)
         {
+
+            var str = getDashboardData;
+            string modifiedStr = str.Replace("SELECT", "").TrimStart();
+
             var sb = new StringBuilder();
-            var builder = new SqlBuilder();
-            sb.Append(CampaignAuditQuery.GetCampaignDashboardSummaries);
-            sb.Append(" cp.CampaignProfileId=@campId ");
-            sb.Append(" GROUP BY u.UserId,cp.CampaignProfileId,a.AdvertId,cp.CampaignName,a.AdvertName,u.FirstName,u.LastName, u.Email, ");
-            // Group By continued
-            sb.Append(" cp.TotalBudget,g.TotalPlayedCost,g.TotalAvgBid,g.TotalSMS,g.TotalSMSCost,g.TotalEmail,g.TotalEmailCost,p.TotalPlayTracks, ");
-            // Group By continued
-            sb.Append(" p.AvgPlayLen,p.MaxPlayLen,r.UniqueListenrs,p.MaxBid,cp.CurrencyCode,ctu.TotalReach ");
-            var select = builder.AddTemplate(sb.ToString());
-            builder.AddParameters(new { campId = campaignId });
+            sb.Append(" SELECT u.Userid,cp.CampaignProfileId,ca.AdvertId,cp.CampaignName,a.AdvertName,");
+            sb.Append(" CONCAT(u.FirstName,' ',u.LastName, ' (', u.Email, ')') AS CampaignHolder,");
+            sb.Append(modifiedStr);
+            sb.Append(" INNER JOIN Users AS u ON cp.UserId=u.UserId ");
+            sb.Append(" INNER JOIN Advert AS a ON a.AdvertId=ca.AdvertId ");
+            sb.Append(" WHERE cp.CampaignProfileId=@campId ");
+            sb.Append(" GROUP BY u.UserId,cp.CampaignProfileId,ca.AdvertId,cp.CampaignName,a.AdvertName,u.FirstName,u.LastName, u.Email ");
+
             try
             {
-
                 return await _executers.ExecuteCommand(_connStr,
-                                 conn => conn.QueryFirstOrDefault<CampaignDashboardChartPREResult>(select.RawSql, select.Parameters, commandTimeout:60));
-
+                                 conn => conn.QueryFirstOrDefault<CampaignDashboardChartPREResult>(sb.ToString(), new { campId = campaignId }, commandTimeout:60));
             }
             catch (Exception ex)
             {
@@ -81,33 +89,12 @@ namespace AdtonesAdminWebApi.DAL
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
                 _logServ.ProcedureName = "CampaignDashboardSummariesOperators";
-                _logServ.LogLevel = select.RawSql;
+                _logServ.LogLevel = sb.ToString();
                 await _logServ.LogError();
                 
                 throw;
             }
         }
-
-
-        ///// <summary>
-        ///// Get Dashboard campaigns grouped by Operator
-        ///// Uses memory caching. If in cache returns that values else calls DashboardSummariesOperators
-        ///// below. The result is then stored in cache.
-        ///// </summary>
-        ///// <param name="operatorId"></param>
-        ///// <returns></returns>
-        //public async Task<CampaignDashboardChartPREResult> GetDashboardSummariesForOperator(int operatorId)
-        //{
-        //    var cacheEntryOptions = new MemoryCacheEntryOptions()
-        //            .SetSlidingExpiration(TimeSpan.FromMinutes(30));
-        //    string key = $"OPERATOR_DASHBOARD_STATS_{operatorId}";
-        //    return await _cache.GetOrCreateAsync<CampaignDashboardChartPREResult>(key, cacheEntry =>
-        //    {
-        //        cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
-        //        return DashboardSummariesOperators(operatorId);
-        //    });
-        //    // return cacheEntry ?? new List<CampaignDashboardChartPREResult>();
-        //}
 
 
         /// <summary>
@@ -118,15 +105,13 @@ namespace AdtonesAdminWebApi.DAL
         /// <returns></returns>
         public async Task<CampaignDashboardChartPREResult> DashboardSummariesOperators(int operatorId)
         {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(CampaignAuditQuery.GetCampaignDashboardSummariesByOperator);
-            builder.AddParameters(new { opId = operatorId });
+            var sb = new StringBuilder();
+            sb.Append(getDashboardData);
+            sb.Append(" WHERE ca.OperatorId=@opId; ");
             try
             {
-
                 return await _executers.ExecuteCommand(_connStr,
-                                 conn => conn.QueryFirstOrDefault<CampaignDashboardChartPREResult>(select.RawSql, select.Parameters));
-
+                                 conn => conn.QueryFirstOrDefault<CampaignDashboardChartPREResult>(sb.ToString(), new { opId = operatorId }));
             }
             catch (Exception ex)
             {
@@ -134,7 +119,7 @@ namespace AdtonesAdminWebApi.DAL
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
                 _logServ.ProcedureName = "DashboardSummariesOperators";
-                _logServ.LogLevel = select.RawSql;
+                _logServ.LogLevel = sb.ToString();
                 await _logServ.LogError();
                 
                 throw;
@@ -170,48 +155,33 @@ namespace AdtonesAdminWebApi.DAL
         /// </summary>
         /// <param name="id">operatorId</param>
         /// <returns></returns>
-        public async Task<CampaignDashboardChartPREResult> DashboardSummariesSalesManager(int salesmanId)
-        {
-            
+        public async Task<CampaignDashboardChartPREResult> DashboardSummariesSalesManager(int salesmanId, int campaignId)
+        {   
             var countryId = await _executers.ExecuteCommand(_connStr,
-                                 conn => conn.QueryFirstOrDefault<int>(CampaignAuditQuery.GetCountryIdByUserId, new { Id = salesmanId }));
-
+                                 conn => conn.QueryFirstOrDefault<int>("SELECT CountryId FROM Contacts WHERE UserId=@Id ", new { Id = salesmanId }));
+            
+            var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(CampaignAuditQuery.GetCampaignDashboardSummariesByCountry);
+            sb.Append(getDashboardData);
+            sb.Append(" WHERE cp.CountryId=@Id ");
+            if (campaignId > 0)
+            {
+                sb.Append(" AND cp.CampaignProfileId=@CampaignId ");
+                builder.AddParameters(new { CampaignId = campaignId });
+            }
+            
+            var select = builder.AddTemplate(sb.ToString());
             builder.AddParameters(new { Id = countryId });
             try
             {
-
                 return await _executers.ExecuteCommand(_connStr,
                                  conn => conn.QueryFirstOrDefault<CampaignDashboardChartPREResult>(select.RawSql, select.Parameters));
-
             }
             catch
             {
                 throw;
             }
         }
-
-
-        ///// <summary>
-        ///// Get Dashboard campaigns grouped by A Sales Executive userid
-        ///// Uses memory caching. If in cache returns that values else calls DashboardSummariesSalesExec
-        ///// below. The result is then stored in cache.
-        ///// </summary>
-        ///// <param name="countryId"></param>
-        ///// <returns></returns>
-        //public async Task<CampaignDashboardChartPREResult> GetDashboardSummariesForSalesExec(int sid)
-        //{
-        //    var cacheEntryOptions = new MemoryCacheEntryOptions()
-        //            .SetSlidingExpiration(TimeSpan.FromMinutes(30));
-        //    string key = $"SALES_EXEC_DASHBOARD_STATS_{sid}";
-        //    return await _cache.GetOrCreateAsync<CampaignDashboardChartPREResult>(key, cacheEntry =>
-        //    {
-        //        cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
-        //        return DashboardSummariesSalesExec(sid);
-        //    });
-        //    // return cacheEntry ?? new List<CampaignDashboardChartPREResult>();
-        //}
 
 
         /// <summary>
@@ -221,11 +191,16 @@ namespace AdtonesAdminWebApi.DAL
         /// <returns></returns>
         public async Task<CampaignDashboardChartPREResult> DashboardSummariesSalesExec(int salesexecId)
         {
+            var sb = new StringBuilder();
+            sb.Append(getDashboardData);
+            sb.Append(" INNER JOIN Advertisers_SalesTeam AS ast ON ast.AdvertiserId=cp.UserId ");
+            sb.Append(" WHERE ast.SalesExecId=@Sid ");
+            sb.Append(" AND ast.IsActive=1; ");
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
                                  conn => conn.QueryFirstOrDefault<CampaignDashboardChartPREResult>(
-                                                        CampaignAuditQuery.GetCampaignDashboardSummariesByExec, new { Sid = salesexecId }));
+                                                                    sb.ToString(), new { Sid = salesexecId }));
             }
             catch
             {
@@ -237,63 +212,11 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<CampaignDashboardChartPREResult> GetCampaignDashboardSummariesAdvertisers(int userId, int campaignId=0)
         {
-            var selectQuery = @"SELECT ISNULL(CAST(cp.TotalBudget AS bigint),0) AS Budget, ISNULL(g.TotalPlayedCost,0) AS Spend,
-	                            ISNULL(cp.TotalBudget,0) - ISNULL(g.TotalPlayedCost,0) AS FundsAvailable,
-	                            ISNULL(g.TotalAvgBid,0) AS AvgBid,CAST(ISNULL(g.TotalSMS,0) AS bigint) AS TotalSMS,
-	                            ISNULL(g.TotalSMSCost,0) AS TotalSMSCost,CAST(ISNULL(g.TotalEmail,0) AS bigint) AS TotalEmail,
-	                            ISNULL(g.TotalEmailCost,0) AS TotalEmailCost,Cast(ISNULL(p.TotalPlayTracks,0) AS bigint) AS TotalPlays,
-	                            Cast(ISNULL(g.TotalPlayTracks,0) AS bigint) AS MoreSixSecPlays,
-	                            ISNULL(p.TotalPlayTracks,0) - ISNULL(g.TotalPlayTracks,0) AS FreePlays,
-	                            ISNULL(p.AvgPlayLen,0) AS AvgPlayLength,
-	                            ISNULL(p.MaxPlayLen,0) AS MaxPlayLength,
-	                            ISNULL(r.UniqueListenrs,0) AS Reach,
-	                            CAST(ISNULL(p.MaxBid, 0) AS numeric(16,2)) AS MaxBid,
-	                            cp.CurrencyCode AS CurrencyCode,ctu.TotalReach
-	                            FROM 
-		                            (SELECT SUM(ISNULL(TotalBudget,0)) AS TotalBudget,CountryId,CurrencyCode,UserId,CampaignProfileId FROM CampaignProfile
-                                        WHERE UserId=@userId
-		                            GROUP BY UserId,CampaignProfileId,CountryId,CurrencyCode) AS cp
-	                            INNER JOIN
-		                            ( SELECT cpi.CountryId,CONVERT(numeric(16,0), SUM(ca.TotalCost)) AS TotalPlayedCost,
-			                            CONVERT(numeric(16,2), AVG(ca.BidValue)) AS TotalAvgBid,
-			                            SUM(CASE WHEN ca.SMS IS NOT NULL THEN 1 ELSE 0 END) AS TotalSMS,
-			                            CONVERT(numeric(16,0), SUM(ISNULL(ca.SMSCost,0))) AS TotalSMSCost,
-			                            SUM(CASE WHEN ca.Email IS NOT NULL THEN 1 ELSE 0 END) AS TotalEmail,
-			                            CONVERT(NUMERIC(16,0), SUM(ISNULL(ca.EmailCost,0))) AS TotalEmailCost,
-			                            count(*) AS TotalPlayTracks,UserId,cpi.CampaignProfileId 
-			                            FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
-                                        WHERE cpi.UserId=@userId
-			                            AND ca.PlayLengthTicks >= 6000 AND ca.Proceed = 1
-			                            GROUP BY cpi.CountryId,UserId,cpi.CampaignProfileId
-		                            ) AS g ON g.CountryId = cp.CountryId AND cp.UserId=g.UserId AND cp.CampaignProfileId=g.CampaignProfileId
-
-	                            LEFT JOIN 
-		                            ( SELECT cpi.CountryId, COUNT(DISTINCT ca.UserProfileId) AS UniqueListenrs
-			                            FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
-                                            WHERE cpi.UserId=@userId
-			                            AND ca.Proceed = 1
-			                            GROUP BY cpi.CountryId
-		                            ) AS r ON r.CountryId = cp.CountryId
-	                            LEFT JOIN 
-		                            (  SELECT cpi.CountryId, COUNT(*) AS TotalPlayTracks,AVG(ca.PlayLengthTicks) AS AvgPlayLen,
-			                            MAX(ca.PlayLengthTicks) AS MaxPlayLen,MAX(ca.BidValue) AS MaxBid
-			                            FROM CampaignAudit AS ca INNER JOIN CampaignProfile AS cpi ON cpi.CampaignProfileId=ca.CampaignProfileId
-                                        WHERE cpi.UserId=@userId
-			                            AND ca.Proceed = 1
-			                            GROUP BY cpi.CountryId
-		                            ) AS p ON p.CountryId = cp.CountryId
-
-	                            LEFT JOIN
-		                            (SELECT COUNT(UserId) AS TotalReach,op.CountryId FROM Users AS u 
-			                            INNER JOIN Operators AS op ON u.OperatorId=op.OperatorId 
-			                            WHERE VerificationStatus=1 AND Activated=1 GROUP BY op.CountryId) AS ctu
-	                            ON cp.CountryId=ctu.CountryId 
-	                            INNER JOIN Users AS u ON u.UserId = cp.UserId
-	                            WHERE u.UserId=@userId ";
-
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(selectQuery);
+            sb.Append(getDashboardData);
+            sb.Append(" WHERE cp.UserId=@userId ");
+
             if (campaignId > 0)
             {
                 sb.Append("  and cp.CampaignProfileId = @campaignId; ");
@@ -309,8 +232,6 @@ namespace AdtonesAdminWebApi.DAL
 
                 return await _executers.ExecuteCommand(_connStr,
                                 conn => conn.QueryFirstOrDefault<CampaignDashboardChartPREResult>(select.RawSql, select.Parameters));
-                //var result = x.AsList<CampaignDashboardChartPREResult>();
-                //return result;
             }
             catch
             {
@@ -326,9 +247,24 @@ namespace AdtonesAdminWebApi.DAL
         /// <returns></returns>
         public async Task<IEnumerable<CampaignAuditOperatorTable>> GetPlayDetailsByCampaignCount(PagingSearchClass param)
         {
+            string getPlayDetailsByCampaign = @"SELECT CAST(ISNULL(ca.TotalCost,0) AS NUMERIC(36,2)) AS TotalCost,CAST(ISNULL(ca.BidValue,0) AS NUMERIC(36,2)) AS PlayCost,
+													CAST(ISNULL(ca.EmailCost,0) AS NUMERIC(36,2)) AS EmailCost,CAST(ISNULL(ca.SMSCost,0) AS NUMERIC(36,2)) AS SMSCost,
+													ca.StartTime,ca.EndTime,CAST((ca.PlayLengthTicks / 1000) AS NUMERIC(36,2)) AS PlayLength,ca.Email AS EmailMsg,ca.SMS,
+													up.UserId,cp.CurrencyCode,ad.AdvertName,CampaignAuditId, cp.CampaignProfileId
+													FROM CampaignProfile AS cp INNER JOIN CampaignAudit AS ca ON ca.CampaignProfileId=cp.CampaignProfileId
+													LEFT JOIN UserProfile AS up ON ca.UserProfileId=up.UserProfileId
+													LEFT JOIN 
+														(SELECT AdvertId,CampaignProfileId FROM CampaignAdverts WHERE AdvertId in
+			                                                (SELECT MAX(AdvertId) FROM CampaignAdverts GROUP BY CampaignProfileId)
+		                                                ) AS cad 
+													ON cad.CampaignProfileId=ca.CampaignProfileId
+													LEFT JOIN Advert AS ad ON ad.AdvertId=cad.AdvertId
+													WHERE cp.Status != 5
+													AND ca.Status='Played'
+													AND cp.CampaignProfileId=@Id ";
 
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(CampaignAuditQuery.GetPlayDetailsByCampaign);
+            var select = builder.AddTemplate(getPlayDetailsByCampaign);
             builder.AddParameters(new { Id = param.elementId });
 
             try
@@ -347,11 +283,27 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<CampaignAuditOperatorTable>> GetPlayDetailsByCampaign(PagingSearchClass param)
         {
+            string getPlayDetailsByCampaign = @"SELECT CAST(ISNULL(ca.TotalCost,0) AS NUMERIC(36,2)) AS TotalCost,CAST(ISNULL(ca.BidValue,0) AS NUMERIC(36,2)) AS PlayCost,
+													CAST(ISNULL(ca.EmailCost,0) AS NUMERIC(36,2)) AS EmailCost,CAST(ISNULL(ca.SMSCost,0) AS NUMERIC(36,2)) AS SMSCost,
+													ca.StartTime,ca.EndTime,CAST((ca.PlayLengthTicks / 1000) AS NUMERIC(36,2)) AS PlayLength,ca.Email AS EmailMsg,ca.SMS,
+													up.UserId,cp.CurrencyCode,ad.AdvertName,CampaignAuditId, cp.CampaignProfileId
+													FROM CampaignProfile AS cp INNER JOIN CampaignAudit AS ca ON ca.CampaignProfileId=cp.CampaignProfileId
+													LEFT JOIN UserProfile AS up ON ca.UserProfileId=up.UserProfileId
+													LEFT JOIN 
+														(SELECT AdvertId,CampaignProfileId FROM CampaignAdverts WHERE AdvertId in
+			                                                (SELECT MAX(AdvertId) FROM CampaignAdverts GROUP BY CampaignProfileId)
+		                                                ) AS cad 
+													ON cad.CampaignProfileId=ca.CampaignProfileId
+													LEFT JOIN Advert AS ad ON ad.AdvertId=cad.AdvertId
+													WHERE cp.Status != 5
+													AND ca.Status='Played'
+													AND cp.CampaignProfileId=@Id ";
+
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             PageSearchModel searchList = null;
 
-            sb.Append(CampaignAuditQuery.GetPlayDetailsByCampaign);
+            sb.Append(getPlayDetailsByCampaign);
 
             try
             {
@@ -462,7 +414,6 @@ namespace AdtonesAdminWebApi.DAL
                 builder.AddParameters(new { PageIndex = param.page });
                 builder.AddParameters(new { PageSize = param.pageSize });
 
-
                 return await _executers.ExecuteCommand(_connStr,
                                     conn => conn.Query<CampaignAuditOperatorTable>(select.RawSql, select.Parameters, commandTimeout: 60));
             }
@@ -473,31 +424,36 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        //public async Task<CampaignDashboardChartResult> GetPromoCampaignDashboardSummaries(int campaignId)
-        //{
-        //    try
-        //    {
-        //        var cacheEntryOptions = new MemoryCacheEntryOptions()
-        //                .SetSlidingExpiration(TimeSpan.FromMinutes(30));
-        //        string key = $"PROMO_DASHBOARD_CAMPAIGN_STATS_{campaignId}";
-        //        return await _cache.GetOrCreateAsync<CampaignDashboardChartResult>(key, cacheEntry =>
-        //        {
-        //            cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
-        //            return CampaignPromoDashboardSummaries(campaignId);
-        //        });
-        //        // return cacheEntry ?? new List<CampaignDashboardChartPREResult>();
-        //    }
-        //    catch
-        //    {
-        //        throw;
-        //    }
-        //}
-
-
         public async Task<CampaignDashboardChartResult> CampaignPromoDashboardSummaries(int campaignId)
         {
+            string getPromoCampaignDashboard = @"SELECT (CAST((ticks.sumplay / audCT.totalPlayCount) as DECIMAL(9,2)) / 1000) AS AveragePlayTime,
+													pc.CampaignName,audCT.totalPlayCount AS TotalPlayed,dist.totalReach AS Reach,op.OperatorName,
+													pa.AdvertName,CONCAT(@siteAddress,pa.AdvertLocation) AS AdvertLocation
+													FROM PromotionalCampaigns AS pc LEFT JOIN PromotionalCampaignAudits AS pca
+													ON pc.ID=pca.PromotionalCampaignId
+													INNER JOIN PromotionalAdverts AS pa
+													ON pa.CampaignID=pca.PromotionalCampaignId
+													LEFT JOIN 
+														(SELECT COUNT(PromotionalCampaignAuditId)  AS totalPlayCount,pca.PromotionalCampaignId 
+															FROM PromotionalCampaignAudits AS pca
+															GROUP BY pca.PromotionalCampaignId) AS audCT
+													ON audCT.PromotionalCampaignId=pc.ID
+													LEFT JOIN
+														(SELECT COUNT(DISTINCT(MSISDN)) AS totalReach, PromotionalCampaignId 
+															FROM PromotionalCampaignAudits
+															WHERE (DTMFKey != '0' AND DTMFKey IS NOT NULL) GROUP BY PromotionalCampaignId) AS dist
+													ON dist.PromotionalCampaignId=pc.ID
+													LEFT JOIN 
+														(SELECT SUM(PlayLengthTicks) AS sumplay, PromotionalCampaignId FROM PromotionalCampaignAudits
+															GROUP BY PromotionalCampaignId) AS ticks
+													ON ticks.PromotionalCampaignId=pc.ID
+													INNER JOIN Operators AS op ON op.OperatorId=pc.OperatorID
+													WHERE pc.ID=@Id
+													GROUP BY ticks.sumplay,pc.CampaignName,audCT.totalPlayCount,dist.totalReach,op.OperatorName,
+													pa.AdvertName,pa.AdvertLocation";
+
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(CampaignAuditQuery.GetPromoCampaignDashboard);
+            var select = builder.AddTemplate(getPromoCampaignDashboard);
             builder.AddParameters(new { Id = campaignId });
             builder.AddParameters(new { siteAddress = _configuration.GetValue<string>("AppSettings:adtonesSiteAddress") });
             try
@@ -515,10 +471,17 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<PromoCampaignPlaylist>> GetPromoPlayDetails(PagingSearchClass param)
         {
+            string getPromoPlayDetails = @"SELECT ROUND(pca.PlayLengthTicks/1000,0) AS PlayLength,pa.AdvertName,
+												pca.PromotionalCampaignAuditId AS AuditId,pca.MSISDN,pca.StartTime,ISNULL(pca.DTMFKey,'-') AS DTMFKey
+												FROM PromotionalCampaignAudits AS pca
+												INNER JOIN PromotionalAdverts AS pa
+												ON pa.CampaignID=pca.PromotionalCampaignId
+												WHERE pca.PromotionalCampaignId=@Id";
+
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             PageSearchModel searchList = null;
-            sb.Append(CampaignAuditQuery.GetPromoPlayDetails);
+            sb.Append(getPromoPlayDetails);
             try
             {
                 if (param.search != null && param.search.Length > 3)

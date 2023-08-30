@@ -185,6 +185,45 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
+        public async Task<IEnumerable<TicketListModel>> GetTicketListForAdvertiser(int id)
+        {
+            string getTicketDatatable = @"SELECT q.Id,ISNULL(q.UserId,0) AS UserId,ISNULL(pay.Name,'-') AS PaymentMethod,
+                                                            ISNULL(CONCAT(u.FirstName,' ',u.LastName), '-') AS UserName,qs.Name AS QuestionSubject,
+                                                            ISNULL(u.Email, '-') AS Email,ISNULL(QNumber,'-') AS QNumber,
+                                                            ISNULL(cl.Name,'-') AS ClientName,q.CampaignProfileId,camp.CampaignName,q.CreatedDate,
+                                                            Title AS QuestionTitle,q.Status,LastResponseDateTime,LastResponseDateTimeByUser,
+                                                            ISNULL(u.Organisation,'-') AS Organisation
+                                                        FROM Question AS q LEFT JOIN Users AS u ON u.UserId=q.UserId
+                                                        LEFT JOIN Contacts AS con ON u.UserId=con.UserId
+                                                        LEFT JOIN Client AS cl ON cl.Id=q.ClientId
+                                                        LEFT JOIN CampaignProfile AS camp ON camp.CampaignProfileId=q.CampaignProfileId
+                                                        LEFT JOIN QuestionSubject AS qs ON qs.SubjectId=q.SubjectId
+                                                        LEFT JOIN Operators AS op ON con.CountryId=op.CountryId
+                                                        LEFT JOIN PaymentMethod AS pay ON pay.Id=q.PaymentMethodId
+                                                        WHERE u.UserId=@userid AND 
+                                                        q.SubjectId NOT IN(3, 4, 10) ";
+            
+            var sb = new StringBuilder();
+            var builder = new SqlBuilder();
+            sb.Append(getTicketDatatable);
+            
+                builder.AddParameters(new { userid = id });
+
+            sb.Append(" ORDER BY q.Id DESC;");
+            var select = builder.AddTemplate(sb.ToString());
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.Query<TicketListModel>(select.RawSql, select.Parameters));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<IEnumerable<TicketListModel>> GetOperatorTicketList(PagingSearchClass param)
         {
             var sb = new StringBuilder();

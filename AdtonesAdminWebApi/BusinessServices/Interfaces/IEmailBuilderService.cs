@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AdtonesAdminWebApi.DAL.Queries
+namespace AdtonesAdminWebApi.BusinessServices.Interfaces
 {
-
-    public static class LoginQuery
+    public interface IEmailBuilderService
     {
-
-
-
     }
 }

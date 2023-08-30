@@ -19,6 +19,22 @@ namespace AdtonesAdminWebApi.DAL
 
     public class AdvertDAL : BaseDAL, IAdvertDAL
     {
+        public static string getAdvertResultSet => @"SELECT ad.AdvertId,ad.UserId,ad.ClientId,ad.AdvertName,ad.Brand,cprof.SmsBody,cprof.EmailBody,
+                                                ISNULL(cl.Name,'-') AS ClientName,ad.OperatorId,cad.CampaignProfileId,ad.UpdatedBy,
+                                                CONCAT(usr.FirstName,' ',usr.LastName) AS UserName, usr.Email,ad.CreatedDateTime AS CreatedDate,
+                                                ad.Script,ad.Status,ad.UploadedToMediaServer,SoapToneCode,
+                                                CASE WHEN ad.MediaFileLocation IS NULL THEN ad.MediaFileLocation 
+                                                    ELSE CONCAT(@siteAddress,ad.MediaFileLocation) END AS MediaFileLocation,
+                                                CASE WHEN ad.ScriptFileLocation IS NULL THEN ad.ScriptFileLocation 
+                                                    ELSE CONCAT(@siteAddress,ad.ScriptFileLocation) END AS ScriptFileLocation,
+                                                ad.SoapToneId,co.Name As CountryName, op.OperatorName,ad.Script,ad.AdvertCategoryId,
+                                                cprof.CampaignName
+                                                FROM Advert AS ad LEFT JOIN Client AS cl ON ad.ClientId=cl.Id
+                                                LEFT JOIN Users AS usr ON usr.UserId=ad.UserId
+                                                LEFT JOIN CampaignAdverts AS cad ON cad.AdvertId=ad.AdvertId
+                                                LEFT JOIN CampaignProfile AS cprof ON cprof.CampaignProfileId=cad.CampaignProfileId
+                                                LEFT JOIN Operators AS op ON op.OperatorId=ad.OperatorId
+                                                LEFT JOIN Country AS co ON co.Id=ad.CountryId ";
 
         public AdvertDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, IHttpContextAccessor httpAccessor)
             : base(configuration, executers, connService, httpAccessor)
@@ -29,7 +45,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(AdvertQuery.GetAdvertResultSet);
+            sb.Append(getAdvertResultSet);
 
             if (_httpAccessor.GetRoleIdFromJWT() == (int)Enums.UserRole.ProfileAdmin)
             {
@@ -64,9 +80,25 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<IEnumerable<UserAdvertResult>> GetAdvertForSalesResultSet(int id = 0)
         {
+            string getAdvertSalesExecResultSet = @"SELECT ad.AdvertId,ad.UserId,ad.ClientId,ad.AdvertName,ad.Brand,cprof.SmsBody,cprof.EmailBody,
+                                                ISNULL(cl.Name,'-') AS ClientName,ad.OperatorId,cad.CampaignProfileId,ad.UpdatedBy,
+                                                CONCAT(usr.FirstName,' ',usr.LastName) AS UserName, usr.Email,ad.CreatedDateTime AS CreatedDate,
+                                                CASE WHEN sexcs.FirstName IS NULL THEN 'UnAllocated' ELSE CONCAT(sexcs.FirstName,' ',sexcs.LastName) END AS SalesExec,
+                                                sexcs.UserId AS SUserId,
+                                                ad.Script,ad.Status,ad.MediaFileLocation,ad.UploadedToMediaServer,SoapToneCode,
+                                                CASE WHEN ad.MediaFileLocation IS NULL THEN ad.MediaFileLocation 
+                                                    ELSE CONCAT(@siteAddress,ad.MediaFileLocation) END AS MediaFile,
+                                                CASE WHEN ad.ScriptFileLocation IS NULL THEN ad.ScriptFileLocation 
+                                                    ELSE CONCAT(@siteAddress,ad.ScriptFileLocation) END AS ScriptFileLocation,ad.SoapToneId
+                                                FROM Advert AS ad LEFT JOIN Client AS cl ON ad.ClientId=cl.Id
+                                                LEFT JOIN Users AS usr ON usr.UserId=ad.UserId
+                                                LEFT JOIN CampaignAdverts AS cad ON cad.AdvertId=ad.AdvertId
+                                                LEFT JOIN CampaignProfile AS cprof ON cprof.CampaignProfileId=cad.CampaignProfileId 
+                                                LEFT JOIN Advertisers_SalesTeam AS sales ON ad.UserId=sales.AdvertiserId 
+                                                LEFT JOIN Users AS sexcs ON sexcs.UserId=sales.SalesExecId ";
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(AdvertQuery.GetAdvertSalesExecResultSet);
+            sb.Append(getAdvertSalesExecResultSet);
 
             if (id > 0)
             {
@@ -147,8 +179,10 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<bool> CheckAdvertNameExists(string advertName, int userId)
         {
+            string checkAdvertNameExists = @"SELECT COUNT(1) FROM Advert WHERE LOWER(AdvertName)=@Id AND UserId=@UserId;";
+
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertQuery.CheckAdvertNameExists);
+            var select = builder.AddTemplate(checkAdvertNameExists);
             builder.AddParameters(new { Id = advertName.ToLower() });
             builder.AddParameters(new { UserId = userId });
 
@@ -174,7 +208,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(AdvertQuery.GetAdvertResultSet);
+            sb.Append(getAdvertResultSet);
 
             if (id > 0)
             {
@@ -201,7 +235,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<UserAdvertResult> GetAdvertDetail(int id = 0)
         {
             var sb = new StringBuilder();
-            sb.Append(AdvertQuery.GetAdvertResultSet);
+            sb.Append(getAdvertResultSet);
             sb.Append(" WHERE ad.AdvertId=@Id");
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sb.ToString());
@@ -403,9 +437,10 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> ChangeAdvertStatus(UserAdvertResult model)
         {
+            string updateAdvertStatus = @"UPDATE Advert SET Status=@Status,UpdatedBy=@UpdatedBy, UpdatedDateTime=GETDATE() WHERE ";
 
             var sb = new StringBuilder();
-            sb.Append(AdvertQuery.UpdateAdvertStatus);
+            sb.Append(updateAdvertStatus);
             sb.Append("AdvertId=@AdvertId;");
 
             var builder = new SqlBuilder();
@@ -435,9 +470,11 @@ namespace AdtonesAdminWebApi.DAL
         /// <returns></returns>
         public async Task<int> ChangeAdvertStatusOperator(UserAdvertResult model, int userId, int adId)
         {
+            string updateAdvertStatus = @"UPDATE Advert SET Status=@Status,UpdatedBy=@UpdatedBy, UpdatedDateTime=GETDATE() WHERE ";
+
             var operatorConnectionString = await _connService.GetConnectionStringByOperator(model.OperatorId);
             var sb = new StringBuilder();
-            sb.Append(AdvertQuery.UpdateAdvertStatus);
+            sb.Append(updateAdvertStatus);
             sb.Append(" AdvertId=@AdvertId;");
 
             var builder = new SqlBuilder();
@@ -460,15 +497,13 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<FtpDetailsModel> GetFtpDetails(int operatorId)
         {
+            string getFtpDetails = @"SELECT OperatorFTPDetailId,Host,Port,UserName,Password,FtpRoot FROM OperatorFTPDetails WHERE OperatorId=@OperatorId";
 
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertQuery.GetFtpDetails);
             try
             {
-                builder.AddParameters(new { OperatorId = operatorId });
 
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.QueryFirstOrDefault<FtpDetailsModel>(select.RawSql, select.Parameters));
+                                    conn => conn.QueryFirstOrDefault<FtpDetailsModel>(getFtpDetails, new { OperatorId = operatorId }));
             }
             catch
             {
@@ -480,7 +515,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<int> UpdateMediaLoaded(UserAdvertResult advert)
         {
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertQuery.UpdateMediaLoaded);
+            var select = builder.AddTemplate("UPDATE Advert SET UploadedToMediaServer = true WHERE AdvertId=@advertId;");
             try
             {
                 builder.AddParameters(new { advertId = advert.AdvertId });
@@ -497,9 +532,11 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> RejectAdvertReason(UserAdvertResult model)
         {
-
+            string rejectAdvertReason = @"INSERT INTO AdvertRejections(UserId,AdvertId,RejectionReason,CreatedDate,AdtoneServerAdvertRejectionId)
+                                                                    VALUES(@UserId,@AdvertId,@RejectionReason,GETDATE(),@AdtoneServerAdvertRejectionId);
+                                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertQuery.RejectAdvertReason);
+            var select = builder.AddTemplate(rejectAdvertReason);
             try
             {
                 builder.AddParameters(new { AdvertId = model.AdvertId });
@@ -519,8 +556,11 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> RejectAdvertReasonOperator(UserAdvertResult model, string connString, int uid, int rejId, int adId)
         {
+            string rejectAdvertReason = @"INSERT INTO AdvertRejections(UserId,AdvertId,RejectionReason,CreatedDate,AdtoneServerAdvertRejectionId)
+                                                                    VALUES(@UserId,@AdvertId,@RejectionReason,GETDATE(),@AdtoneServerAdvertRejectionId);
+                                                                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertQuery.RejectAdvertReason);
+            var select = builder.AddTemplate(rejectAdvertReason);
             try
             {
                 builder.AddParameters(new { AdvertId = adId });
@@ -540,9 +580,10 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> DeleteAdvertRejection(UserAdvertResult model)
         {
+            string deleteRejectAdvertReason = @"DELETE FROM AdvertRejections WHERE AdvertId=@AdvertId;";
 
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertQuery.DeleteRejectAdvertReason);
+            var select = builder.AddTemplate(deleteRejectAdvertReason);
             try
             {
                 builder.AddParameters(new { AdvertId = model.AdvertId });
@@ -558,8 +599,10 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> DeleteRejectAdvertReasonOperator(string connString, int adId)
         {
+            string deleteRejectAdvertReason = @"DELETE FROM AdvertRejections WHERE AdvertId=@AdvertId;";
+
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(AdvertQuery.DeleteRejectAdvertReason);
+            var select = builder.AddTemplate(deleteRejectAdvertReason);
             try
             {
                 builder.AddParameters(new { AdvertId = adId });
@@ -576,18 +619,19 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> UpdateAdvertForBilling(int advertId, string constr)
         {
+            string updateAdvertFromBilling  = @"UPDATE Advert SET UpdatedDateTime=GETDATE(), IsAdminApproval=1, NextStatus=0 WHERE AdvertId=@Id";
             int adId = 0;
             try
             {
                 var x = await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(AdvertQuery.UpdateAdvertFromBilling, new { Id = advertId }));
+                                    conn => conn.ExecuteScalar<int>(updateAdvertFromBilling, new { Id = advertId }));
 
 
                 adId = await _executers.ExecuteCommand(constr,
                                 conn => conn.ExecuteScalar<int>("SELECT AdvertId FROM Advert WHERE AdtoneServerAdvertId=@Id", new { Id = advertId }));
 
                 return await _executers.ExecuteCommand(constr,
-                                conn => conn.ExecuteScalar<int>(AdvertQuery.UpdateAdvertFromBilling, new { Id = adId }));
+                                conn => conn.ExecuteScalar<int>(updateAdvertFromBilling, new { Id = adId }));
             }
             catch
             {
@@ -600,7 +644,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                    conn => conn.ExecuteScalar<int>(AdvertQuery.GetAdvertIdByCampid, new { Id = campaignId }));
+                                    conn => conn.ExecuteScalar<int>("SELECT AdvertId FROM CampaignAdverts WHERE CampaignProfileId=@Id", new { Id = campaignId }));
             }
             catch
             {

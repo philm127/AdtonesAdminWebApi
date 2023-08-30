@@ -8,28 +8,6 @@ namespace AdtonesAdminWebApi.DAL.Queries
     public static class CountryAreaQuery
     {
 
-        public static string LoadCountryDataTable => @"SELECT c.Id,c.Name,c.ShortName,c.CountryCode,c.CreatedDate,c.Status,
-                                                        ISNULL(t.TaxPercantage,0) AS TaxPercentage, min.MinBid 
-                                                        FROM Country AS c INNER JOIN CountryTax AS t ON t.CountryId=c.Id
-                                                        LEFT JOIN CountryMinBid AS min ON min.CountryId=c.Id ";
-
-
-        public static string GetCountry => @"SELECT c.Id,c.Name,ShortName,c.CountryCode,c.CreatedDate,c.Status,
-                                            t.TaxPercantage AS TaxPercentage,TermAndConditionFileName,min.MinBid
-                                            FROM Country AS c INNER JOIN CountryTax AS t ON t.CountryId=c.Id
-                                            LEFT JOIN CountryMinBid AS min ON min.CountryId=c.Id
-                                            WHERE c.Id=@id";
-
-
-        public static string CheckCountryExists => @"SELECT COUNT(1) FROM Country WHERE LOWER(Name) = @name";
-
-
-        public static string AddCountry => @"INSERT INTO Country(UserId,Name,ShortName,CreatedDate,UpdatedDate,Status,
-                                                    TermAndConditionFileName,CountryCode,AdtoneServeCountryId)
-                                            VALUES(@UserId,@Name,@ShortName, GETDATE(), GETDATE(),1, 
-                                                @TermAndConditionFileName, @CountryCode,@AdtoneServeCountryId);
-                                            SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
 
         public static string AddTax => @"INSERT INTO CountryTax(UserId,CountryId,TaxPercantage,CreatedDate,UpdatedDate,Status)
                                             VALUES(@UserId,@CountryId,@TaxPercantage, GETDATE(), GETDATE(),1);";

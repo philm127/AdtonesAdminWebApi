@@ -167,7 +167,22 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetAdvertDetail/{id}")]
         public async Task<ReturnResult> GetAdvertDetail(int id)
         {
-            return await _advertService.GetAdvertDetails(id);
+            try
+            {
+                result.body = await _advertDAL.GetAdvertDetail(id);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAdvertDetail";
+                await _logServ.LogError();
+
+                result.result = 0;
+                return result;
+            }
         }
 
 
@@ -181,8 +196,7 @@ namespace AdtonesAdminWebApi.Controllers
             try
             {
                 var advertId = await _advertDAL.GetAdvertIdByCampid(id);
-                var advert = await _advertService.GetAdvertDetails(advertId);
-                result.body = advert.body;
+                result.body = await _advertDAL.GetAdvertDetail(advertId);
                 return result;
 
             }

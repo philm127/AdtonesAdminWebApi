@@ -19,9 +19,9 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         // Task<CampaignDashboardChartPREResult> GetDashboardSummariesForSalesManager();
         // Task<CampaignDashboardChartPREResult> GetDashboardSummariesForSalesExec(int sid);
 
-        Task<CampaignDashboardChartPREResult> CampaignDashboardSummariesOperators(int campaignId);
+        Task<CampaignDashboardChartPREResult> CampaignDashboardSummary(int campaignId);
         Task<CampaignDashboardChartPREResult> DashboardSummariesOperators(int operatorId);
-        Task<CampaignDashboardChartPREResult> DashboardSummariesSalesManager(int salesmanId);
+        Task<CampaignDashboardChartPREResult> DashboardSummariesSalesManager(int salesmanId, int campaignId);
         Task<CampaignDashboardChartPREResult> DashboardSummariesSalesExec(int salesexecId);
         Task<CampaignDashboardChartResult> CampaignPromoDashboardSummaries(int campaignId);
     }

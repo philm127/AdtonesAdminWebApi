@@ -24,6 +24,8 @@ namespace AdtonesAdminWebApi.Controllers
         private readonly ISalesManagementService _salesService;
         private readonly IUserDashboardDAL _dashboardDal;
         private readonly IUserManagementDAL _userDAL;
+        private readonly IUserManagementAddUserService _userAddService;
+        private readonly ISalesManagementDAL _salesDAL;
         private readonly ILoggingService _logServ;
         IHttpContextAccessor _httpAccessor;
         ReturnResult result = new ReturnResult();
@@ -31,7 +33,8 @@ namespace AdtonesAdminWebApi.Controllers
 
         public UserManagementController(IUserManagementService userService,IPromotionalCampaignService promotionalService, IUserDashboardDAL dashboardDal,
                                             IUserDashboardService dashboardService, ISalesManagementService salesService, 
-                                            IHttpContextAccessor httpAccessor, IUserManagementDAL userDAL)
+                                            IHttpContextAccessor httpAccessor, IUserManagementDAL userDAL, ISalesManagementDAL salesDAL,
+                                            IUserManagementAddUserService userAddService)
         {
             _userService = userService;
             _promotionalService = promotionalService;
@@ -40,6 +43,8 @@ namespace AdtonesAdminWebApi.Controllers
             _dashboardDal = dashboardDal;
             _httpAccessor = httpAccessor;
             _userDAL = userDAL;
+            _salesDAL = salesDAL;
+            _userAddService = userAddService;
         }
 
 
@@ -51,7 +56,6 @@ namespace AdtonesAdminWebApi.Controllers
 
             if (roleName.ToLower() == "OperatorAdmin".ToLower())
                 operatorId = _httpAccessor.GetOperatorFromJWT();
-
 
             try
             {
@@ -174,11 +178,17 @@ namespace AdtonesAdminWebApi.Controllers
             return await _userService.UpdateProfileForm(users);
         }
 
+        [AllowAnonymous]
+        [HttpPost("v1/AddAdvertiser")]
+        public async Task<ReturnResult> AddAdvertiser(UserAddFormModel model)
+        {
+            return await _userAddService.AddUser(model);
+        }
 
         [HttpPost("v1/AddNewUser")]
         public async Task<ReturnResult> AddNewUser(UserAddFormModel model)
         {
-            return await _userService.AddUser(model);
+            return await _userAddService.AddUser(model);
         }
 
 
@@ -250,7 +260,22 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetSalesExecDDList")]
         public async Task<ReturnResult> GetSalesExecDDList()
         {
-            return await _salesService.GetDDSalesExec();
+            try
+            {
+                result.body = await _salesDAL.GetsalesExecDDList();
+
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetSalesExecDDList";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return result;
         }
 
 

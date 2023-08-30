@@ -12,6 +12,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     {
         Task<IEnumerable<TicketListModel>> GetTicketList(int id);
         Task<IEnumerable<TicketListModel>> GetTicketListForSales(int id = 0);
+        Task<IEnumerable<TicketListModel>> GetTicketListForAdvertiser(int id);
         Task<TicketListModel> GetTicketDetails(int id = 0);
         Task<int> UpdateTicketStatus(TicketListModel model);
         Task<IEnumerable<TicketListModel>> GetOperatorTicketList(PagingSearchClass paging);

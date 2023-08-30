@@ -36,20 +36,6 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public ReturnResult FillQuestionStatus(int? userId)
-        {
-            IEnumerable<Enums.TicketStatus> questionstatusTypes = Enum.GetValues(typeof(Enums.TicketStatus))
-                                                     .Cast<Enums.TicketStatus>();
-            result.body = (from action in questionstatusTypes
-                           select new SharedSelectListViewModel
-                           {
-                               Text = action.ToString(),
-                               Value = ((int)action).ToString()
-                           }).ToList();
-            return result;
-        }
-
-
         public async Task<ReturnResult> UpdateTicketStatus(int id,int status)
         {
             var question = new TicketListModel
@@ -86,116 +72,6 @@ namespace AdtonesAdminWebApi.BusinessServices
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
                 _logServ.ProcedureName = "UpdateTicketStatus";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-
-        public async Task<ReturnResult> GetTicketList(int id = 0)
-        {
-            var roleName = _httpAccessor.GetRoleFromJWT();
-
-                //if (roleName.ToLower().Contains("operator"))
-                //    return await GetOperatorTicketList();
-
-                try
-                {
-                    result.body = await _ticketDAL.GetTicketList(id);
-                }
-                catch (Exception ex)
-                {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetTicketList";
-                await _logServ.LogError();
-                
-                    result.result = 0;
-                }
-            
-            return result;
-        }
-
-
-        public async Task<ReturnResult> GetTicketListAsync(PagingSearchClass paging)
-        {
-            var roleName = _httpAccessor.GetRoleFromJWT();
-
-            if (roleName.ToLower().Contains("operator"))
-                return await GetOperatorTicketList(paging);
-
-            try
-            {
-                var res = await _ticketDAL.GetTicketListAsync(paging);
-                result.recordcount = res.Count();
-                result.body = res.Skip(paging.page * paging.pageSize).Take(paging.pageSize);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetTicketListAsync";
-                await _logServ.LogError();
-
-                result.result = 0;
-            }
-
-            return result;
-        }
-
-
-        public async Task<ReturnResult> GetTicketListSales(int id = 0)
-        {
-            try
-            {
-                result.body = await _ticketDAL.GetTicketListForSales(id);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetTicketListSales";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-
-            return result;
-        }
-
-
-        public async Task<ReturnResult> GetTicketDetails(int id = 0)
-        {
-            
-                var ticketList = new TicketListModel();
-            try
-            {
-                ticketList = await _ticketDAL.GetTicketDetails(id);
-                var commentList = await _ticketDAL.GetTicketcomments(id);
-
-                if(ticketList == null)
-                {
-                    result.result = 0;
-                    result.error = "There is no matching record";
-                    return result;
-                }
-
-                ticketList.comments = (IEnumerable<TicketComments>)commentList;
-
-                result.body = ticketList;
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetTicketDetails";
                 await _logServ.LogError();
                 
                 result.result = 0;

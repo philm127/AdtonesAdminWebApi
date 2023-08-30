@@ -29,14 +29,14 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<User> GetLoginUser(User userModel)
         {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(LoginQuery.LoginUser);
-            builder.AddParameters(new { email = userModel.Email.ToLower() });
+            string loginUser = @"SELECT UserId,RoleId,Email,FirstName,LastName,PasswordHash,Activated,OperatorId, 
+                                    Organisation, DateCreated, VerificationStatus,LastPasswordChangedDate,LockOutTime,Permissions
+                                    FROM Users WHERE LOWER(Email)=@email AND Activated !=3;";
             try
             {
 
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.QueryFirstOrDefault<User>(select.RawSql, select.Parameters));
+                                conn => conn.QueryFirstOrDefault<User>(loginUser, new { email = userModel.Email.ToLower() }));
             }
             catch
             {
@@ -47,9 +47,11 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> UpdatePassword(User userModel)
         {
+            string updatePassword = @"UPDATE Users SET PasswordHash=@PasswordHash, LastPasswordChangedDate=GETDATE() WHERE Email=@Email";
+
             int x = 0;
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(LoginQuery.UpdatePassword);
+            var select = builder.AddTemplate(updatePassword);
             builder.AddParameters(new { Email = userModel.Email });
             builder.AddParameters(new { PasswordHash = userModel.PasswordHash });
 
@@ -70,7 +72,7 @@ namespace AdtonesAdminWebApi.DAL
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                             conn => conn.ExecuteScalar<int>(LoginQuery.UpdateLoggedIn, new { Id = userId }));
+                             conn => conn.ExecuteScalar<int>("UPDATE Users SET LastLoginTime=GETDATE() WHERE UserId=@Id", new { Id = userId }));
             }
             catch (Exception ex)
             {
@@ -84,7 +86,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             int x = 0;
             var sb1 = new StringBuilder();
-            sb1.Append(LoginQuery.UpdateLockout);
+            sb1.Append("UPDATE Users SET Activated=@activated, LockOutTime=@lockOutTime WHERE ");
             sb1.Append("UserId=@userId");
             var builder = new SqlBuilder();
             var select = builder.AddTemplate(sb1.ToString());
@@ -106,7 +108,7 @@ namespace AdtonesAdminWebApi.DAL
             {
                 var operatorConnectionString = await _connService.GetConnectionStringByOperator(userModel.OperatorId);
                 var sb2 = new StringBuilder();
-                sb2.Append(LoginQuery.UpdateLockout);
+                sb2.Append("UPDATE Users SET Activated=@activated, LockOutTime=@lockOutTime WHERE ");
                 sb2.Append("AdtoneServerUserId=@userId");
                 var build = new SqlBuilder();
                 var sel = build.AddTemplate(sb2.ToString());

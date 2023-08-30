@@ -23,88 +23,12 @@ namespace AdtonesAdminWebApi.BusinessServices
         }
 
 
-        public async Task<ReturnResult> LoadRewardsDataTable()
-        {
-            
-            try
-            {
+        
 
-                result.body = await _rewardDAL.LoadRewardResultSet();
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "LoadRewardsDataTable";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
+        
 
 
-        public async Task<ReturnResult> GetReward(int id)
-        {
-
-            try
-            {
-                result.body = await _rewardDAL.GetRewardById(id);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "GetReward";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> AddReward(RewardResult model)
-        {
-
-            try
-            {
-                var x = await _rewardDAL.AddReward(model);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "AddReward";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
-
-
-        public async Task<ReturnResult> UpdateReward(RewardResult model)
-        {
-            try
-            {
-                var x = await _rewardDAL.UpdateReward(model);
-            }
-            catch (Exception ex)
-            {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "UpdateReward";
-                await _logServ.LogError();
-                
-                result.result = 0;
-            }
-            return result;
-        }
+        
 
 
         public async Task<ReturnResult> DeleteReward(int id)

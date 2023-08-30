@@ -20,6 +20,7 @@ namespace AdtonesAdminWebApi.DAL
             services.AddTransient<IPromotionalCampaignDAL, PromotionalCampaignDAL>();
             services.AddTransient<ILoginDAL, LoginDAL>();
             services.AddTransient<IUserManagementDAL, UserManagementDAL>();
+            services.AddTransient<IUserManagementAddUserDAL, UserManagementAddUserDAL>();
             services.AddTransient<IUserMatchDAL, UserMatchDAL>();
             services.AddTransient<IUserCreditDAL, UserCreditDAL>();
             services.AddTransient<ICampaignMatchDAL, CampaignMatchDAL>();

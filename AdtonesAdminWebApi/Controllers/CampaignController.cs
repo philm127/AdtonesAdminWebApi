@@ -11,7 +11,7 @@ using System;
 namespace AdtonesAdminWebApi.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class CampaignController : ControllerBase
     {
@@ -41,12 +41,12 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains List CampaignAdminResult</returns>
-        [HttpGet("v1/GetCampaignDataTable/{id}")]
-        public async Task<ReturnResult> GetCampaignDataTable(int id=0)
+        [HttpGet("v1/GetAdminOpAdminCampaignDataTable/{id}")]
+        public async Task<ReturnResult> GetAdminOpAdminCampaignDataTable(int id=0)
         {
             try
             {
-                result.body = await _campDAL.GetCampaignResultSet(id);
+                return await _campService.GetAdminOpAdminCampaignList(id);
             }
             catch (Exception ex)
             {

@@ -11,6 +11,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
     {
         Task<IEnumerable<SharedSelectListViewModel>> GetCurrency(int id = 0);
         Task<IEnumerable<SharedSelectListViewModel>> GetCountry(int id = 0);
+        Task<IEnumerable<SharedSelectListViewModel>> GetCountryForAdSignUp();
         Task<IEnumerable<SharedSelectListViewModel>> GetOperators(int id = 0);
         Task<IEnumerable<SharedSelectListViewModel>> GetCreditUsers(int id = 0);
         Task<IEnumerable<SharedSelectListViewModel>> AddCreditUsers(int id = 0);

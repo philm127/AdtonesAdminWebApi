@@ -29,9 +29,14 @@ namespace AdtonesAdminWebApi.DAL
        
         public async Task<IEnumerable<CountryResult>> LoadCountryResultSet()
         {
+            string loadCountryDataTable = @"SELECT c.Id,c.Name,c.ShortName,c.CountryCode,c.CreatedDate,c.Status,
+                                                        ISNULL(t.TaxPercantage,0) AS TaxPercentage, min.MinBid 
+                                                        FROM Country AS c INNER JOIN CountryTax AS t ON t.CountryId=c.Id
+                                                        LEFT JOIN CountryMinBid AS min ON min.CountryId=c.Id ";
+
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
-            sb.Append(CountryAreaQuery.LoadCountryDataTable);
+            sb.Append(loadCountryDataTable);
             var values = CheckGeneralFile(sb, builder, pais: "t");
             sb = values.Item1;
             builder = values.Item2;
@@ -53,8 +58,14 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<CountryResult> GetCountryById(int id)
         {
+            string getCountry = @"SELECT c.Id,c.Name,ShortName,c.CountryCode,c.CreatedDate,c.Status,
+                                            t.TaxPercantage AS TaxPercentage,TermAndConditionFileName,min.MinBid
+                                            FROM Country AS c INNER JOIN CountryTax AS t ON t.CountryId=c.Id
+                                            LEFT JOIN CountryMinBid AS min ON min.CountryId=c.Id
+                                            WHERE c.Id=@id";
+
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(CountryAreaQuery.GetCountry);
+            var select = builder.AddTemplate(getCountry);
             builder.AddParameters(new { id = id });
 
             try
@@ -71,14 +82,10 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<bool> CheckCountryExists(CountryResult model)
         {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(CountryAreaQuery.CheckCountryExists);
-            builder.AddParameters(new { name = model.Name.Trim().ToLower() });
-
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                             conn => conn.ExecuteScalar<bool>(select.RawSql, select.Parameters));
+                             conn => conn.ExecuteScalar<bool>("SELECT COUNT(1) FROM Country WHERE LOWER(Name) = @name", new { name = model.Name.Trim().ToLower() }));
 
             }
             catch
@@ -90,12 +97,18 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> AddCountry(CountryResult model)
         {
+            string addCountry = @"INSERT INTO Country(UserId,Name,ShortName,CreatedDate,UpdatedDate,Status,
+                                                    TermAndConditionFileName,CountryCode,AdtoneServeCountryId)
+                                            VALUES(@UserId,@Name,@ShortName, GETDATE(), GETDATE(),1, 
+                                                @TermAndConditionFileName, @CountryCode,@AdtoneServeCountryId);
+                                            SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
             int x = 0;
             var ctryId = 0;
             var userId = _httpAccessor.GetUserIdFromJWT();
 
             ctryId = await _executers.ExecuteCommand(_connStr,
-                                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddCountry, new
+                                                conn => conn.ExecuteScalar<int>(addCountry, new
                                                 {
                                                     Name = model.Name.Trim(),
                                                     ShortName = model.ShortName.ToUpper().Trim(),
@@ -124,7 +137,7 @@ namespace AdtonesAdminWebApi.DAL
                     model.UserId = await _connService.GetUserIdFromAdtoneIdByConnString(userId, constr);
 
                     x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddCountry, new
+                                    conn => conn.ExecuteScalar<int>(addCountry, new
                                     {
                                         Name = model.Name.Trim(),
                                         ShortName = model.ShortName.ToUpper().Trim(),

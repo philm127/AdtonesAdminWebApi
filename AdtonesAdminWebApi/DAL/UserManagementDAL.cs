@@ -5,6 +5,8 @@ using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -12,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.EMMA;
 
 namespace AdtonesAdminWebApi.DAL
 {
@@ -35,49 +38,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-
-        public async Task<bool> CheckIfUserExists(UserAddFormModel model)
-        {
-            bool exists = false;
-
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                exists = await _executers.ExecuteCommand(_connStr,
-                         conn => conn.ExecuteScalar<bool>(UserManagementQuery.CheckUserExists, new { email = model.Email.ToLower() }));
-            }
-            return exists;
-        }
-
-
-        public async Task<bool> CheckIfContactExists(Contacts model)
-        {
-            bool exists = false;
-
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                exists = await _executers.ExecuteCommand(_connStr,
-                         conn => conn.ExecuteScalar<bool>(UserManagementQuery.CheckContactExists, new { mobile = model.MobileNumber }));
-            }
-            return exists;
-        }
-
-
-        public async Task<int> AddNewUser(UserAddFormModel model)
-        {
-            int x = 0;
-            try
-            {
-                x = await _executers.ExecuteCommand(_connStr,
-                         conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewUser, model));
-            }
-            catch
-            {
-                throw;
-            }
-
-            return x;
-        }
-
+        
 
         public async Task<int> GetOperatorIdByUserId(int userId)
         {
@@ -97,97 +58,7 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> AddNewUserToOperator(UserAddFormModel model)
-        {
-            int x = 0;
-            try
-            {
-                var conns = new List<string>();
-                if (model.RoleId == (int)Enums.UserRole.Admin || model.RoleId == (int)Enums.UserRole.AdvertAdmin ||
-                    model.RoleId == (int)Enums.UserRole.ProfileAdmin || model.RoleId == (int)Enums.UserRole.UserAdmin 
-                    || model.CountryId == 0)
-                {
-                    conns = await _connService.GetConnectionStrings();
-                    foreach (string constr in conns)
-                    {
-                        if (constr != null && constr.Length > 10)
-                            x = await _executers.ExecuteCommand(constr,
-                                 conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewUserToOperator, model));
-                    }
-                }
-                else if (model.RoleId == (int)Enums.UserRole.Advertiser)
-                {
-                    conns = await _connService.GetConnectionStringsByCountry(model.CountryId);
-                    foreach (string constr in conns)
-                    {
-                        if (constr != null && constr.Length > 10)
-                            x = await _executers.ExecuteCommand(constr,
-                                 conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewUserToOperator, model));
-                    }
-                }
-                else
-                {
-                    var constr = await _connService.GetConnectionStringByOperator(model.OperatorId.Value);
-
-                    if (constr != null && constr.Length > 10)
-                        x = await _executers.ExecuteCommand(constr,
-                             conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewUserToOperator, model));
-                }
-            }
-            catch
-            {
-                throw;
-            }
-
-            return x;
-        }
-
-
-        public async Task<int> AddNewContact(Contacts model)
-        {
-            int x = 0;
-            try
-            {
-                x = await _executers.ExecuteCommand(_connStr,
-                         conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewContact, model));
-            }
-            catch
-            {
-                throw;
-            }
-
-            return x;
-        }
-
-
-        public async Task<int> AddNewContactToOperator(Contacts model)
-        {
-            int x = 0;
-            try
-            {
-                var conns = new List<string>();
-                if (model.RoleId == (int)Enums.UserRole.Admin || model.RoleId == (int)Enums.UserRole.AdvertAdmin ||
-                    model.RoleId == (int)Enums.UserRole.ProfileAdmin || model.RoleId == (int)Enums.UserRole.UserAdmin ||
-                    model.CountryId == null || model.CountryId.Value == 0)
-                    conns = await _connService.GetConnectionStrings();
-                else
-                    conns = await _connService.GetConnectionStringsByCountry(model.CountryId.Value);
-
-
-                foreach (string constr in conns)
-                {
-                    if (constr != null && constr.Length > 10)
-                    x = await _executers.ExecuteCommand(constr,
-                         conn => conn.ExecuteScalar<int>(UserManagementQuery.AddNewContact, model));
-                }
-            }
-            catch
-            {
-                throw;
-            }
-
-            return x;
-        }
+        
 
 
         public async Task<int> UpdateUserStatus(AdvertiserDashboardResult model)
@@ -434,51 +305,12 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        /// <summary>
-        /// If Contact form is not added for instance duplicate mobile number will also remove entry
-        /// in main table. Insert into Operator table is done after so don't need to concern with that
-        /// table
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        public async Task<int> DeleteNewUser(int userId)
-        {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(UserManagementQuery.DeleteAddedUser);
-            builder.AddParameters(new { Id = userId });
-
-            try
-            {
-                return await _executers.ExecuteCommand(_connStr,
-                         conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-
-        public async Task<int> InsertManagerToSalesExec(int manId, int execId)
-        {
-            try
-            {
-                return await _executers.ExecuteCommand(_connStr,
-                     conn => conn.ExecuteScalar<int>(UserManagementQuery.InsertManagerToSalesExec, new { manId = manId, execId = execId }));
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-
         public async Task<IEnumerable<string>> GetAdvertOperatorAdmins(int roleId, int operatorId = 0)
         {
 
             var sb1 = new StringBuilder();
             var builder = new SqlBuilder();
-            sb1.Append(UserManagementQuery.GetAdvertAdminOperator);
+            sb1.Append("SELECT Email FROM Users WHERE Activated=1 AND RoleId=@RoleId ");
 
             builder.AddParameters(new { RoleId = roleId });
             if (operatorId > 0)

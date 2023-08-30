@@ -102,7 +102,7 @@ namespace AdtonesAdminWebApi.Services.Mailer
 
                 using SmtpClient client = new SmtpClient();
                 {
-                    client.Connect(creds.srv, 587, SecureSocketOptions.None);//, SecureSocketOptions.StartTls);// creds.sslSend);
+                    client.Connect(creds.srv, 587, SecureSocketOptions.StartTls);// creds.sslSend);
                     client.Authenticate(creds.usr, creds.pwd);
                     try
                     {

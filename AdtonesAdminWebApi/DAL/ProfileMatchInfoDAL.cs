@@ -180,8 +180,11 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> AddProfileInfoLabel(ProfileMatchLabelFormModel model)
         {
+            string insertProfileInfoLabel = @"INSERT INTO ProfileMatchLabels(ProfileLabel,ProfileMatchInformationId,CreatedDate,UpdatedDate) 
+                                                        VALUES(@ProfileLabel,@ProfileMatchInformationId,GETDATE(),GETDATE());";
+
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(ProfileMatchInfoQuery.InsertProfileInfoLabel);
+            var select = builder.AddTemplate(insertProfileInfoLabel);
             builder.AddParameters(new { ProfileLabel = model.ProfileLabel.Trim() });
             builder.AddParameters(new { ProfileMatchInformationId = model.ProfileMatchInformationId });
 
@@ -199,8 +202,10 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> UpdateProfileInfoLabel(ProfileMatchLabelFormModel model)
         {
+            string updateProfileInfoLabel = @"UPDATE ProfileMatchLabels SET ProfileLabel=@ProfileLabel,
+                                                        UpdatedDate=GETDATE() WHERE Id=@Id";
             var builder = new SqlBuilder();
-            var select = builder.AddTemplate(ProfileMatchInfoQuery.UpdateProfileInfoLabel);
+            var select = builder.AddTemplate(updateProfileInfoLabel);
             builder.AddParameters(new { ProfileLabel = model.ProfileLabel.Trim() });
             builder.AddParameters(new { Id = model.Id });
 
@@ -218,14 +223,11 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> DeleteProfileLabelById(int id)
         {
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(ProfileMatchInfoQuery.DeleteMatchLabel);
-            builder.AddParameters(new { id = id });
 
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+                                conn => conn.ExecuteScalar<int>("DELETE FROM ProfileMatchLabels WHERE Id=@id", new { id = id }));
             }
             catch
             {

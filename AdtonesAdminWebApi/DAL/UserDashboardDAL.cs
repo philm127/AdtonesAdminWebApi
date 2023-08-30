@@ -12,6 +12,8 @@ using System.Text;
 using Microsoft.AspNetCore.Http;
 using AdtonesAdminWebApi.Services;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AdtonesAdminWebApi.DAL
 {
@@ -28,13 +30,14 @@ namespace AdtonesAdminWebApi.DAL
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             
-            if (operatorId > 0)
-            {
-                sb.Append(UserDashboardQuery.OperatorAdvertiserResultQuery);
-                builder.AddParameters(new { operatorId = operatorId });
-            }
-            else
-            {
+            // TODO: If we expand Operators add back comments
+            //if (operatorId > 0)
+            //{
+            //    sb.Append(UserDashboardQuery.OperatorAdvertiserResultQuery);
+            //    builder.AddParameters(new { operatorId = operatorId });
+            //}
+            //else
+            //{
                 var ytr = _httpAccessor.GetRoleIdFromJWT();
                 if (ytr == (int)Enums.UserRole.SalesManager)
                 {
@@ -44,12 +47,13 @@ namespace AdtonesAdminWebApi.DAL
                 {
                     sb.Append(UserDashboardQuery.AdvertiserResultQuery);
                 }
-                sb.Append(" WHERE 1=1 ");
-                var values = CheckGeneralFile(sb, builder, pais: "cont", ops: "op", advs: "item");
-                sb = values.Item1;
-                builder = values.Item2;
-            }
-
+                //sb.Append(" WHERE 1=1 ");
+                //var values = CheckGeneralFile(sb, builder, pais: "cont", ops: "op", advs: "item");
+                //sb = values.Item1;
+                //builder = values.Item2;
+                sb.Append(" AND cont.CountryId=10  ");
+            //}
+            sb.Append(" ORDER BY u.UserId DESC  ");
             var select = builder.AddTemplate(sb.ToString());
 
             try
@@ -179,17 +183,20 @@ namespace AdtonesAdminWebApi.DAL
             var builder = new SqlBuilder();
             if (userId > 0)
             {
-                sb.Append(" WHERE sales.UserId=@Sid ");
+                sb.Append(" AND sales.UserId=@Sid ");
                 builder.AddParameters(new { Sid = userId });
             }
-            var values = CheckGeneralFile(sb, builder, pais: "cont");
 
-            sb = values.Item1;
-            builder = values.Item2;
-            sb.Append(" ORDER BY item.UserId DESC;");
+            // TODO: If we expand Operators add back comments
+            //var values = CheckGeneralFile(sb, builder, pais: "cont");
+
+            //sb = values.Item1;
+            //builder = values.Item2;
+            sb.Append(" AND cont.CountryId=10  ");
+            sb.Append(" ORDER BY u.UserId DESC;");
 
             var select = builder.AddTemplate(sb.ToString());
-
+            
             return await _executers.ExecuteCommand(_connStr,
                                     conn => conn.Query<AdvertiserDashboardResult>(select.RawSql, select.Parameters));
         }

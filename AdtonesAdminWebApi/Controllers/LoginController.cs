@@ -33,8 +33,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/Login")]
         public async Task<ReturnResult> Login(User userForm)
         {
-            var tst = await _userService.Login(userForm);
-            return tst;
+            return await _userService.Login(userForm);
         }
 
 
@@ -47,8 +46,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/ForgotPassword/{email}")]
         public async Task<ReturnResult> ForgotPassword(string email)
         {
-            var tst = await _userService.ForgotPassword(email);
-            return tst;
+            return await _userService.ForgotPassword(email);
         }
 
 
@@ -61,8 +59,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPut("v1/UpdatePassword")]
         public async Task<ReturnResult> UpdatePassword(PasswordModel model)
         {
-            var tst = await _userService.ChangePassword(model);
-            return tst;
+            return await _userService.ChangePassword(model);
         }
 
 
@@ -75,8 +72,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPut("v1/ResetPassword")]
         public async Task<ReturnResult> ResetPassword(PasswordModel model)
         {
-            var tst = await _userService.ResetPassword(model);
-            return tst;
+            return await _userService.ResetPassword(model);
         }
 
 
@@ -89,8 +85,7 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/RefreshAccessToken/{id}")]
         public async Task<ReturnResult> RefreshAccessToken(string id)
         {
-            var tst = await _userService.RefreshAccessToken(id);
-            return tst;
+            return await _userService.RefreshAccessToken(id);
         }
         
 

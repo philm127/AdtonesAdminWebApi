@@ -17,9 +17,6 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
         Task<ReturnResult> UpdateProfileForm(User profile);
         Task<ReturnResult> UpdateCompanyDetails(CompanyDetails company);
         Task<ReturnResult> UpdateUserStatus(AdvertiserDashboardResult result);
-        Task<ReturnResult> AddCompanyDetails(CompanyDetails company);
-        Task<ReturnResult> AddUser(UserAddFormModel model);
-        Task<ReturnResult> AddOperatorAdminUser(UserAddFormModel model);
         Task<ReturnResult> UpdateUserPermission(IdCollectionViewModel model);
     }
 }

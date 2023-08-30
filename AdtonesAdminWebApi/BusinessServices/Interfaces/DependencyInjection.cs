@@ -8,16 +8,15 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
     {
         public static IServiceCollection AddBusinessServices(this IServiceCollection services)
         {
-
             services.AddTransient<ISharedSelectListsService, SharedSelectListsService>();
             services.AddTransient<IUserManagementService, UserManagementService>();
+            services.AddTransient<IUserManagementAddUserService, UserManagementAddUserService>();
             services.AddTransient<IPromotionalCampaignService, PromotionalCampaignService>();
             services.AddTransient<ISalesManagementService, SalesManagementService>();
             services.AddTransient<IProfileMatchInfoService, ProfileMatchInfoService>();
             services.AddTransient<ICountryAreaService, CountryAreaService>();
             services.AddTransient<IUserDashboardService, UserDashboardService>();
             services.AddTransient<ISystemConfigService, SystemConfigService>();
-            services.AddTransient<IRewardsService, RewardsService>();
             services.AddTransient<ITicketService, TicketService>();
             services.AddTransient<IAdvertService, AdvertService>();
             services.AddTransient<ICampaignService, CampaignService>();
@@ -28,6 +27,7 @@ namespace AdtonesAdminWebApi.BusinessServices.Interfaces
             services.AddTransient<ICreateUpdateCampaignService, CreateUpdateCampaignService>();
             services.AddTransient<ICreateCheckSaveProfileModels, CreateCheckSaveProfileModels>();
             services.AddTransient<IBillingService, BillingService>();
+            services.AddTransient<IEmailBuilderService, EmailBuilderService>();
 
             // ManagementReport
             services.AddTransient<IManagementReportService, ManagementReportService>();

@@ -37,7 +37,7 @@ namespace AdtonesAdminWebApi.DAL
         public async Task<string> GetPermissionsByUserId()
         {
             return await _executers.ExecuteCommand(_connStr,
-                             conn => conn.QueryFirstOrDefault<string>(PermissionManagementQuery.GetPermissionById, 
+                             conn => conn.QueryFirstOrDefault<string>("SELECT Permissions FROM Users WHERE UserId=@UserId", 
                                                                                                         new { UserId = _httpAccessor.GetUserIdFromJWT() }));
         }
 
