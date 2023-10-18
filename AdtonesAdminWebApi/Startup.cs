@@ -45,7 +45,6 @@ namespace AdtonesAdminWebApi
             
             services.AddControllers().AddNewtonsoftJson();
             services.AddHttpContextAccessor();
-            services.AddAutoMapper(typeof(Startup));
             services.AddBusinessServices();
             services.AddDAL();
 

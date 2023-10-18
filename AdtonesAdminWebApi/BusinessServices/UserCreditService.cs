@@ -4,7 +4,6 @@ using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using AdtonesAdminWebApi.ViewModels.Command;
 using AdtonesAdminWebApi.ViewModels.DTOs;
-using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;

@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.Extensions.Configuration;
 
 namespace AdtonesAdminWebApi.BusinessServices
@@ -25,14 +24,13 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IPrematchProcess _matchProcess;
         private readonly IUserMatchDAL _matchDAL;
         private readonly ICampaignMatchDAL _campMatchDAL;
-        private readonly IMapper _mapper;
         public readonly IConfiguration _configuration;
         ReturnResult result = new ReturnResult();
 
 
         public CreateCheckSaveProfileModels(IHttpContextAccessor httpAccessor, ICampaignDAL campaignDAL, IPrematchProcess matchProcess,
                                             ICreateUpdateCampaignDAL createDAL, IConnectionStringService connService, ICampaignMatchDAL campMatchDAL,
-                                            IUserMatchDAL matchDAL, IMapper mapper, IConfiguration configuration)
+                                            IUserMatchDAL matchDAL, IConfiguration configuration)
         {
             _httpAccessor = httpAccessor;
             _campaignDAL = campaignDAL;
@@ -41,7 +39,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             _matchProcess = matchProcess;
             _matchDAL = matchDAL;
             _campMatchDAL = campMatchDAL;
-            _mapper = mapper;
             _configuration = configuration;
         }
 

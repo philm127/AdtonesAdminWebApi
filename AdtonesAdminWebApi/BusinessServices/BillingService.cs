@@ -12,7 +12,6 @@ using Microsoft.Extensions.Configuration;
 using System.Globalization;
 using AdtonesAdminWebApi.Services.Mailer;
 using AdtonesAdminWebApi.ViewModels.DTOs;
-using AutoMapper;
 using DocumentFormat.OpenXml.EMMA;
 using System.Collections.Generic;
 
@@ -24,8 +23,6 @@ namespace AdtonesAdminWebApi.BusinessServices
 
 
         private readonly IHttpContextAccessor _httpAccessor;
-
-        private readonly IMapper _mapper;
 
         private readonly ICurrencyDAL _currencyDAL;
         private readonly ICampaignDAL _campDAL;
@@ -48,10 +45,9 @@ namespace AdtonesAdminWebApi.BusinessServices
         public BillingService(ICreateInvoicePDF createPDF, IConfiguration configuration, IGenerateTicketService ticketService,
                                 IHttpContextAccessor httpAccessor, ICurrencyDAL currencyDAL, ICampaignDAL campDAL, ICampaignMatchDAL campMatchDAL,
                                 IBillingDAL billDAL, IAdvertDAL advertDAL, ISendEmailMailer mailer, ISageCreditCardPaymentService cardProcessing,
-                                ICurrencyConversion curConv, IConnectionStringService conService, ILoggingService logServ, IMapper mapper,
+                                ICurrencyConversion curConv, IConnectionStringService conService, ILoggingService logServ,
                                 IUserCreditService creditService, IUserCreditDAL creditDAL)
         {
-            _mapper = mapper;
             _createPDF = createPDF;
             _configuration = configuration;
             _httpAccessor = httpAccessor;
