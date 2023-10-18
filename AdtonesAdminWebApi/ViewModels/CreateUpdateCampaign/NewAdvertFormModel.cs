@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,7 +65,25 @@ namespace AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign
 
         public bool FileUpdate { get; set; } = false;
         public IFormFile ScriptFile { get; set; }
+
+        public NewAdvertFormModel() { }
+
+        public NewAdvertFormModel(NewAdvertFormModel other)
+        {
+            this.AdtoneServerAdvertId = other.AdtoneServerAdvertId;
+            this.Brand = other.Brand;
+            this.AdvertName = other.AdvertName;
+            this.IsAdminApproval = other.IsAdminApproval;
+            this.MediaFile = other.MediaFile;
+            this.MediaFileLocation = other.MediaFileLocation;
+            this.NextStatus = other.NextStatus;
+            this.PhoneticAlphabet = other.PhoneticAlphabet;
+
+            this.ScriptFile = other.ScriptFile;
+            this.ScriptFileLocation = other.ScriptFileLocation;
+            this.Script = other.Script;
+            this.Status = other.Status;
+            this.UploadedToMediaServer = other.UploadedToMediaServer;
+        }
     }
-
-
- }
+}

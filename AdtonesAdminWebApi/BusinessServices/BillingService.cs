@@ -13,6 +13,8 @@ using System.Globalization;
 using AdtonesAdminWebApi.Services.Mailer;
 using AdtonesAdminWebApi.ViewModels.DTOs;
 using AutoMapper;
+using DocumentFormat.OpenXml.EMMA;
+using System.Collections.Generic;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -38,6 +40,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         private readonly IGenerateTicketService _ticketService;
         private readonly ISageCreditCardPaymentService _cardProcessing;
         private readonly IUserCreditService _creditService;
+        private readonly IUserCreditDAL _creditDAL;
         private static Random random = new Random();
         ReturnResult result = new ReturnResult();
         const string PageName = "BillingService";
@@ -46,7 +49,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                                 IHttpContextAccessor httpAccessor, ICurrencyDAL currencyDAL, ICampaignDAL campDAL, ICampaignMatchDAL campMatchDAL,
                                 IBillingDAL billDAL, IAdvertDAL advertDAL, ISendEmailMailer mailer, ISageCreditCardPaymentService cardProcessing,
                                 ICurrencyConversion curConv, IConnectionStringService conService, ILoggingService logServ, IMapper mapper,
-                                IUserCreditService creditService)
+                                IUserCreditService creditService, IUserCreditDAL creditDAL)
         {
             _mapper = mapper;
             _createPDF = createPDF;
@@ -64,6 +67,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             _ticketService = ticketService;
             _cardProcessing = cardProcessing;
             _creditService = creditService;
+            _creditDAL = creditDAL;
         }
 
         #region PayForService
@@ -78,58 +82,119 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// <returns></returns>
         public async Task<ReturnResult> PaywithUserCredit(UserPaymentCommand model)
         {
+            // Available credit is reduced as more credit is used for this
+            model.AvailableCredit = (model.AvailableCredit - model.Fundamount);
 
             try
             {
                 var campaignDetails = await _campDAL.GetCampaignProfileDetail(model.CampaignProfileId);
-                var connString = await _conService.GetConnectionStringsByCountryId(campaignDetails.CountryId.Value);
-                model.UserId = _httpAccessor.GetUserIdFromJWT();
-                var userCredDetails = await _creditService.GetUserCreditDetail(model.AdvertiserId);
-                model.SettledDate = DateTime.Now;
-                var creditPeriod = await _billDAL.GetCreditPeriod(model.CampaignProfileId);
-                if (creditPeriod == 0)
-                    model.SettledDate = model.SettledDate.AddDays(7);
-                else
-                    model.SettledDate = model.SettledDate.AddDays(creditPeriod);
+                var connStringList = await _conService.GetConnectionStringsByCountryId(campaignDetails.CountryId.Value);
 
-                model.InvoiceNumber = "A" + RandomString(6) + DateTime.Now.ToString("yy");
-                model.PaymentMethodId = 1;
-                model.Status = 2;
-                model.AdtoneServerBillingId = null;
-                model.BillingId = await _billDAL.AddBillingRecord(model);
-                if (model.BillingId > 0)
+                model.SettledDate = await SetDettledDate(model.CampaignProfileId);
+                
+                var currencySymbol1 = _curConv.GetCurrencySymbol(campaignDetails.CurrencyCode);
+
+
+                    try
                 {
-                    var campadvertDetails = await _campDAL.GetCampaignAdvertDetailsById(0, model.CampaignProfileId);
-                    var x = await _advertDAL.UpdateAdvertForBilling(campadvertDetails.AdvertId, connString);
-
-                    AdvertiserCreditFormCommand creditForm = _mapper.Map<AdvertiserCreditFormCommand>(userCredDetails);
-                    creditForm.AvailableCredit = userCredDetails.AvailableCredit - Convert.ToDecimal(model.TotalAmount.ToString());
-
-                    //update credit available of user
-                    var creditStatus = await _creditService.AddUserCredit(creditForm);
-
-                    var campaigncreditstatus = UpdateCampaignCampaignMatchCredit(model, connString);
-
-
-                    if (creditStatus.result == 1)
-                    {
-                        result.body = $"Payment received successfully against Campaign: {campaignDetails.CampaignName} with Invoice Number: {model.InvoiceNumber}";
-
-                        var currencySymbol1 = _curConv.GetCurrencySymbol(campaignDetails.CurrencyCode);
-                        var pdfStatus = _createPDF.CreatePDF(model.CampaignProfileId, model.BillingId.Value, model.AdvertiserId, model.InvoiceNumber, model.CountryId, 1, "CreditPayment", currencySymbol1, model.CurrencyCode, model.CurrencyCode);
-                        if (pdfStatus)
-                            return result;
-                        else
-                        {
-                            result.error = "The payments were inserted BUT there was an issue producing the invoice";
-                            result.result = 0;
-                            return result;
-                        }
-                    }
-                    else result.body = "Internal Server error. Please try again.";
-                    result.result = 0;
+                    model = await AddBillingRecord(model, connStringList);
                 }
-                result.body = "Paid with invoice number " + model.InvoiceNumber;
+                catch (Exception ex)
+                {
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = "PayWithUserCredit - AddBillingRecord";
+                    await _logServ.LogError();
+
+                    result.result = 0;
+                    result.body = ex.Message.ToString();
+                    return result;
+                }
+
+                try
+                {
+                    var pdfStatus = await _createPDF.CreatePDF(model.CampaignProfileId, model.BillingId.Value, model.AdvertiserId, model.InvoiceNumber, model.CountryId, 1, "CreditPayment", currencySymbol1, model.CurrencyCode, model.CurrencyCode);
+                    if (!pdfStatus)
+                    {
+                        result.error = "The payments were inserted BUT there was an issue producing the invoice";
+                        result.result = 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = "PayWithUserCredit";
+                    await _logServ.LogError();
+
+                    result.result = 0;
+                    result.body = ex.Message.ToString();
+                    return result;
+                }
+
+
+                try
+                {
+                    //update credit available of user
+                    var creditStatus = await _creditDAL.UpdateUserCredit(model.UserId, model.AvailableCredit);
+                }
+                catch (Exception ex)
+                {
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = "PayWithUserCredit";
+                    await _logServ.LogError();
+
+                    result.result = 0;
+                    result.body = ex.Message.ToString();
+                    return result;
+                }
+
+                    var campadvertDetails = await _campDAL.GetCampaignAdvertDetailsById(0, model.CampaignProfileId);
+                    var x = await _advertDAL.UpdateAdvertForBilling(campadvertDetails.AdvertId, connStringList);
+
+                try
+                {
+                    var creditCampaignUpdate = UpdateCampaignProfileCredit(model, campaignDetails, connStringList);
+                }
+                catch (Exception ex)
+                {
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = "PayWithUserCredit - creditCampaignUpdate";
+                    await _logServ.LogError();
+
+                    result.result = 0;
+                    result.body = ex.Message.ToString();
+                    return result;
+                }
+
+                try
+                {
+                    var creditCampaignMatchUpdate = UpdateCampaignMatchCredit(model, campaignDetails, connStringList);
+                }
+                catch (Exception ex)
+                {
+                    _logServ.ErrorMessage = ex.Message.ToString();
+                    _logServ.StackTrace = ex.StackTrace.ToString();
+                    _logServ.PageName = PageName;
+                    _logServ.ProcedureName = "PayWithUserCredit - creditCampaignMatchUpdate";
+                    await _logServ.LogError();
+
+                    result.result = 0;
+                    result.body = ex.Message.ToString();
+                    return result;
+                }
+
+
+                
+
+
+                result.body = $"Paid with invoice number {{ model.InvoiceNumber }} against Campaign: {{campaignDetails.CampaignName}}";
                 return result;
             }
             catch (Exception ex)
@@ -146,13 +211,54 @@ namespace AdtonesAdminWebApi.BusinessServices
             }
         }
 
-        private async Task<int> UpdateCampaignCampaignMatchCredit(UserPaymentCommand model, string connString)
-        {
-            CampaignCreditCommand campCreditModel = _mapper.Map<CampaignCreditCommand>(model);
 
-            var campaignmatchcreditstatus = await _campMatchDAL.UpdateCampaignMatchCredit(campCreditModel, connString);
-            var campaigncreditstatus = await _campDAL.UpdateCampaignCredit(campCreditModel, connString);
-            return campaigncreditstatus;
+        private async Task<DateTime> SetDettledDate(int campaignId)
+        {
+            var SettledDate = DateTime.Now;
+            var creditPeriod = await _billDAL.GetCreditPeriod(campaignId);
+            if (creditPeriod == 0)
+                SettledDate = SettledDate.AddDays(7);
+            else
+                SettledDate = SettledDate.AddDays(creditPeriod);
+            return SettledDate;
+        }
+
+        private async Task<UserPaymentCommand> AddBillingRecord(UserPaymentCommand model, List<string> connStringList)
+        {
+            model.InvoiceNumber = "A" + RandomString(6) + DateTime.Now.ToString("yy");
+            model.PaymentMethodId = 1;
+            model.Status = 2;
+            model.AdtoneServerBillingId = null;
+            model.BillingId = await _billDAL.AddBillingRecord(model, connStringList);
+            return model;
+        }
+
+        private async Task<int> UpdateCampaignProfileCredit(UserPaymentCommand model,CampaignProfileDto campModel, List<string> connStrings)
+        {
+            CampaignCreditCommand campCreditModel = new CampaignCreditCommand()
+            {
+                AvailableCredit = (decimal)model.AvailableCredit,
+                TotalBudget = (decimal)campModel.TotalBudget + model.Fundamount,
+                CampaignProfileId = campModel.CampaignProfileId,
+                Status = (int)Enums.CampaignStatus.Play,
+                TotalCredit = (decimal)campModel.TotalCredit + model.TotalAmount
+            };
+
+            return await _campDAL.UpdateCampaignCredit(campCreditModel, connStrings);
+        }
+
+        private async Task<int> UpdateCampaignMatchCredit(UserPaymentCommand model, CampaignProfileDto campModel, List<string> connStrings)
+        {
+            CampaignCreditCommand campCreditModel = new CampaignCreditCommand()
+            {
+                AvailableCredit = (decimal)model.AvailableCredit,
+                TotalBudget = (decimal)campModel.TotalBudget + model.Fundamount,
+                CampaignProfileId = campModel.CampaignProfileId,
+                Status = (int)Enums.CampaignStatus.Play,
+                TotalCredit = (decimal)campModel.TotalCredit + model.TotalAmount
+            };
+
+            return await _campMatchDAL.UpdateCampaignMatchCredit(campCreditModel, connStrings);
         }
 
 

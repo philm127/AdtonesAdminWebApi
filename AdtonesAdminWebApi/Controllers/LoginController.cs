@@ -4,11 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.Model;
+using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
+using DocumentFormat.OpenXml.EMMA;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace AdtonesAdminWebApi.Controllers
 {
@@ -17,10 +20,12 @@ namespace AdtonesAdminWebApi.Controllers
     public class LoginController : ControllerBase
     {
         private readonly ILogonService _userService;
+        private readonly ILoggingService _logServ;
 
-        public LoginController(ILogonService userService)
+        public LoginController(ILogonService userService, ILoggingService logServ)
         {
             _userService = userService;
+            _logServ = logServ;
         }
 
 
@@ -33,7 +38,27 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/Login")]
         public async Task<ReturnResult> Login(User userForm)
         {
-            return await _userService.Login(userForm);
+            try
+            {
+                _logServ.ErrorMessage = $"Entered Login";
+                _logServ.StackTrace = "";
+                _logServ.PageName = "LoginController";
+                _logServ.ProcedureName = "Login";
+                await _logServ.LogError();
+                await _logServ.LogInfo();
+                return await _userService.Login(userForm);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = "LoginController";
+                _logServ.ProcedureName = "Login";
+                await _logServ.LogError();
+                var result = new ReturnResult();
+                result.result = 0;
+                return result;
+            }
         }
 
 

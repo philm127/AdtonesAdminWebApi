@@ -135,7 +135,7 @@ namespace AdtonesAdminWebApi.Services
             PdfContentByte pcb = writer.DirectContent;
             // Get Items from Invoice
 
-            List<ViewModels.DTOs.Item> itemList = Invoice.ItemList;
+            List<InvoiceItem> itemList = Invoice.ItemList;
             //Item item = itemList[0];
 
             //produce table and set its props, widths are fractions

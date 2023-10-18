@@ -1,5 +1,6 @@
 ﻿using AdtonesAdminWebApi.BusinessServices.Interfaces;
 using AdtonesAdminWebApi.DAL.Interfaces;
+using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using System;
@@ -63,6 +64,26 @@ namespace AdtonesAdminWebApi.BusinessServices
                 var error = new List<AllocationList>();
                 return error;
             }
+        }
+
+        public async Task<IEnumerable<int>> GetAdvertiserIdsBySalesExecList(int userId)
+        {
+            try
+            {
+                return await _salesDAL.GetAdvertiserIdsBySalesExec(userId);
+
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetAllocatedAdvertisers";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            return null;
         }
 
 
@@ -140,6 +161,14 @@ namespace AdtonesAdminWebApi.BusinessServices
                 return false;
             }
             return true;
+        }
+
+        public async Task<Dictionary<int,SalesExecDetails>> GetSalesExecDictDetails()
+        {
+            var salesList = await _salesDAL.GetSalesExecDetails();
+            List<SalesExecDetails> sales = salesList.ToList();
+            Dictionary<int, SalesExecDetails> salesDict = sales.ToDictionary(s => s.AdvertiserId);
+            return salesDict;
         }
 
     }

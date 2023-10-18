@@ -14,6 +14,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using AdtonesAdminWebApi.ViewModels.DTOs;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Dapper;
+using Microsoft.CodeAnalysis.Editing;
 
 namespace AdtonesAdminWebApi.BusinessServices
 {
@@ -25,6 +28,7 @@ namespace AdtonesAdminWebApi.BusinessServices
         // private readonly ISaveFiles _saveFile;
         ReturnResult result = new ReturnResult();
         private readonly ICurrencyDAL _currencyConversion;
+        private readonly ISalesManagementService _salesService;
         IHttpContextAccessor _httpAccessor;
         private readonly ICampaignDAL _campDAL;
         private readonly ICampaignMatchDAL _campMatchDAL;
@@ -33,7 +37,8 @@ namespace AdtonesAdminWebApi.BusinessServices
 
         public CampaignService(IConfiguration configuration, IConnectionStringService connService, IHttpContextAccessor httpAccessor,
                                 ICampaignDAL campDAL, ILoggingService logServ, ICampaignMatchDAL campMatchDAL,
-                                ICurrencyDAL currencyConversion) //ISaveFiles saveFile)
+                                ICurrencyDAL currencyConversion,
+                                ISalesManagementService salesService) //ISaveFiles saveFile)
 
         {
             _configuration = configuration;
@@ -44,24 +49,21 @@ namespace AdtonesAdminWebApi.BusinessServices
             _campMatchDAL = campMatchDAL;
             _logServ = logServ;
             _currencyConversion = currencyConversion;
+            _salesService = salesService;
         }
 
-        public async Task<ReturnResult> GetAdminOpAdminCampaignList(int id)
+        public async Task<ReturnResult> GetAdminOpAdminCampaignList()
         {
             try
             {
-                var roleName = _httpAccessor.GetRoleFromJWT();
-                if (roleName == "Admin" || roleName == "OperatorAdmin")
-                    result.body = await _campDAL.GetAdminOpAdminCampaignResultSet(id);
-                else
-                    result.body = null;
+                result.body = await _campDAL.GetAdminOpAdminCampaignResultSet();
             }
             catch (Exception ex)
             {
                 _logServ.ErrorMessage = ex.Message.ToString();
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
-                _logServ.ProcedureName = "CampaignService - GetCampaignList";
+                _logServ.ProcedureName = "CampaignService - GetAdminOpAdminCampaignList";
                 await _logServ.LogError();
 
                 result.result = 0;
@@ -69,7 +71,98 @@ namespace AdtonesAdminWebApi.BusinessServices
             return result;
         }
 
-        
+        /// <summary>
+        /// Use the Sals Id to creat an array of Advertiser,(UserId) from to match with
+        /// AdtoneServerUserId on 103
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ReturnResult> GetSalesCampaignList(int id)
+        {
+            IEnumerable<int> adList = null;
+            if (id > 0)
+            {
+                adList = await _salesService.GetAdvertiserIdsBySalesExecList(id);
+            }
+
+            Dictionary<int, SalesExecDetails> salesDict = await _salesService.GetSalesExecDictDetails();
+            List<CampaignAdminResult> campaigns = null;
+            try
+            {
+                var campaignResult = await _campDAL.GetCampaignResultSetBySalesExec(adList);
+                campaigns = campaignResult.ToList();
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetsalesCampaignList";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+
+            var campaignSalesData = new List<CampaignAdminResult>();
+
+            foreach (var campaign in campaigns)
+            {
+                if (salesDict.ContainsKey(campaign.AdtoneServerUserId))
+                {
+                    SalesExecDetails salesData = salesDict[campaign.AdtoneServerUserId];
+                    campaign.sUserId = salesData.UserId;
+                    campaign.SalesExec = salesData.FullName;
+                }
+                else
+                    campaign.SalesExec = "UnAllocated";
+
+
+                campaignSalesData.Add(campaign);
+            }
+
+            result.body = campaignSalesData;
+
+
+            return result;
+        }
+
+
+        public async Task<ReturnResult> GetCampaignById(int id)
+        {
+            CampaignAdminResult campaign = new CampaignAdminResult();
+            try
+            {
+                campaign = await _campDAL.GetCampaignResultSetById(id);
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetCampaignById";
+                await _logServ.LogError();
+
+                result.result = 0;
+            }
+            var roleId = _httpAccessor.GetRoleIdFromJWT();
+            if (roleId == (int)Enums.UserRole.SalesManager)
+            {
+                Dictionary<int, SalesExecDetails> salesDict = await _salesService.GetSalesExecDictDetails();
+
+                if (salesDict.ContainsKey(campaign.AdtoneServerUserId))
+                {
+                    SalesExecDetails salesData = salesDict[campaign.AdtoneServerUserId];
+                    campaign.sUserId = salesData.UserId;
+                    campaign.SalesExec = salesData.FullName;
+                }
+                else
+                    campaign.SalesExec = "UnAllocated";
+            }
+            List<CampaignAdminResult> campaignMatch = new List<CampaignAdminResult>();
+            campaignMatch.Add(campaign);
+            result.body = campaignMatch;
+            return result;
+        }
 
         /// <summary>
         /// Changed for the actual campaign directly
@@ -80,31 +173,10 @@ namespace AdtonesAdminWebApi.BusinessServices
         {
             try
             {
-                // Need to do this to get OperatorId
-                CampaignProfileDto _campProfile = await _campDAL.GetCampaignProfileDetail(model.id);
-                bool exists = false;
-
-                exists = await _campDAL.CheckCampaignBillingExists(model.id);
-
-                if (!exists)
-                    _campProfile.Status = (int)Enums.CampaignStatus.InsufficientFunds;
-                else
-                    _campProfile.Status = model.status;
-
-                result.body = await _campDAL.ChangeCampaignProfileStatus(_campProfile);
-                var x = await _campDAL.ChangeCampaignProfileStatusOperator(_campProfile);
-                var y = await _campMatchDAL.UpdateCampaignMatch(_campProfile.CampaignProfileId, _campProfile.OperatorId, _campProfile.Status);
-
-
+                result.body = await ChangeUpdateStatus(model);
             }
             catch (Exception ex)
             {
-                _logServ.ErrorMessage = ex.Message.ToString();
-                _logServ.StackTrace = ex.StackTrace.ToString();
-                _logServ.PageName = PageName;
-                _logServ.ProcedureName = "UpdateStatus";
-                await _logServ.LogError();
-                
                 result.result = 0;
             }
             return result;
@@ -116,50 +188,68 @@ namespace AdtonesAdminWebApi.BusinessServices
         /// </summary>
         /// <param name="campaignId"></param>
         /// <returns>True or False</returns>
-        public async Task<bool> ChangeCampaignStatus(int campaignId)
+        public async Task<bool> ChangeCampaignStatus(IdCollectionViewModel model)
         {
             try
             {
-                CampaignProfileDto _campProfile = await _campDAL.GetCampaignProfileDetail(campaignId);
+                var result = await ChangeUpdateStatus(model);
 
-                if (_campProfile != null)
+                    return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+
+        private async Task<int> ChangeUpdateStatus(IdCollectionViewModel model)
+        {
+
+            try
+            {
+                bool exists = false;
+                var status = 0;
+                var operatorId = (int)Enums.OperatorTableId.Safaricom;
+
+                exists = await _campDAL.CheckCampaignBillingExists(model.id);
+                if (!exists)
                 {
-                    bool exists = false;
-
-                    exists = await _campDAL.CheckCampaignBillingExists(campaignId);
+                    status = (int)Enums.CampaignStatus.InsufficientFunds;
+                }
+                else if (model.status == 0)
+                {
                     var roleId = _httpAccessor.GetRoleIdFromJWT();
                     if (exists || roleId == (int)Enums.UserRole.ProfileAdmin)
                     {
-                        _campProfile.Status = CheckStartDateOfCampaign(_campProfile);
-
+                        status = await CheckStartDateOfCampaign(model.id);
                     }
-                    else
-                    {
-                        _campProfile.Status = (int)Enums.CampaignStatus.InsufficientFunds;
-                    }
-
-                    var y = await _campDAL.ChangeCampaignProfileStatus( _campProfile);
-                    var x = await _campDAL.ChangeCampaignProfileStatusOperator( _campProfile);
-
-                    return true;
                 }
+                else
+                    status = model.status;
+
+                var res = await _campDAL.ChangeCampaignProfileStatus(model.id, status);
+                var x = await _campDAL.ChangeCampaignProfileStatusOperator(model.id, model.status, operatorId);
+                if (model.status > 0)
+                {
+                    var y = await _campMatchDAL.UpdateCampaignMatch(model.id, operatorId, model.status);
+                }
+                return res;
             }
             catch (Exception ex)
             {
                 _logServ.ErrorMessage = ex.Message.ToString();
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
-                _logServ.ProcedureName = "ChangeCampaignStatus";
+                _logServ.ProcedureName = $"ChangeUpdateStatus - CampId:{model.id}";
                 await _logServ.LogError();
-                
-                return false;
+                return 0;
             }
-            return true;
         }
 
-
-        private static int CheckStartDateOfCampaign(CampaignProfileDto _campProfile)
+        private async Task<int> CheckStartDateOfCampaign(int campaignId)
         {
+            var _campProfile = await _campDAL.GetCampaignProfileDetail(campaignId);
             int status = 0;
             if (_campProfile.StartDate == null && _campProfile.EndDate == null)
             {

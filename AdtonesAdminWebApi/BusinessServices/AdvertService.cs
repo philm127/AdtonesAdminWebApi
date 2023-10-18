@@ -160,6 +160,12 @@ namespace AdtonesAdminWebApi.BusinessServices
             try
             {
                 var newModel = await _advertDAL.CreateNewAdvert(model);
+                if(newModel == null)
+                {
+                    result.result = 0;
+                    result.error = "There was an issue creating the advert";
+                    return result;
+                }
                 model.OperatorId = mainOperatorId;
 
                 CampaignAdvertFormModel _campaignAdvert = new CampaignAdvertFormModel();
@@ -253,6 +259,8 @@ namespace AdtonesAdminWebApi.BusinessServices
                 model.FileUpdate = true;
                 existingAdvert.FileUpdate = true;
                 existingAdvert.MediaFileLocation = await CreateMediaFile(mediaFile, model.AdvertiserId, model.OperatorId);
+                existingAdvert.UploadedToMediaServer = false;
+                existingAdvert.Status = (int)Enums.AdvertStatus.Waitingforapproval;
             }
 
             #endregion
@@ -272,11 +280,7 @@ namespace AdtonesAdminWebApi.BusinessServices
             {
                  existingAdvert.ClientId = null;
             }
-            if (model.FileUpdate) 
-            {
-                existingAdvert.UploadedToMediaServer = false;
-                existingAdvert.Status = (int)Enums.AdvertStatus.Waitingforapproval;
-            }
+
             existingAdvert.UpdatedBy = _httpAccessor.GetUserIdFromJWT();
             existingAdvert.AdvertName = model.AdvertName;
             existingAdvert.AdvertCategoryId = model.AdvertCategoryId;
@@ -373,11 +377,11 @@ namespace AdtonesAdminWebApi.BusinessServices
             string outputFormat = "wav";
 
             var audioFormatExtension = "." + outputFormat;
-            //
+
             string actualDirectoryName = "Media";
             string directoryName = Path.Combine(actualDirectoryName, advertiserId.ToString());
             string newfile;
-            //
+
             if (extension != audioFormatExtension)
             {
                 string tempDirectoryName = @"Media\Temp\";
@@ -554,8 +558,9 @@ namespace AdtonesAdminWebApi.BusinessServices
 
                 if (adModel.PrevStatus == 4 && campaignAdvert != null)
                 {
+                    var idModel = new IdCollectionViewModel() { id = campaignAdvert.CampaignProfileId };
                     // Goes off to Campaign Service to change campaign and returns a bool
-                    var camstatus = _campService.ChangeCampaignStatus(campaignAdvert.CampaignProfileId);
+                    var camstatus = _campService.ChangeCampaignStatus(idModel);
                 }
 
 

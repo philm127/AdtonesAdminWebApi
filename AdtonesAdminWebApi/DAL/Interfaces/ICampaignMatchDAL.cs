@@ -19,6 +19,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> UpdateMatchCampaignQuestionnaire(CreateOrUpdateCampaignProfileSkizaCommand model, string constr);
         Task<int> UpdateMatchCampaignAdvert(CreateOrUpdateCampaignProfileAdvertCommand model, string constr);
         Task<int> UpdateCampaignMatch(int campaignProfileId, int operatorId, int status);
-        Task<int> UpdateCampaignMatchCredit(CampaignCreditCommand model, string constr);
+        Task<int> UpdateCampaignMatchCredit(CampaignCreditCommand model, List<string> constr);
     }
 }

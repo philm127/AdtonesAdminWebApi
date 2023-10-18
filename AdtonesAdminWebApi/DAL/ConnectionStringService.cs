@@ -62,31 +62,17 @@ namespace AdtonesAdminWebApi.DAL
             }
         }
 
-        public async Task<List<string>> GetConnectionStringsByCountry(int Id)
+
+        public async Task<List<string>> GetConnectionStringsByCountryId(int Id)
         {
-
-            StringBuilder sb = new StringBuilder("SELECT ConnectionString FROM CountryConnectionStrings WHERE CountryId=@Id");
-
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-            {
-                await connection.OpenAsync();
-
-                var lst = await connection.QueryAsync<string>(sb.ToString(), new { Id = Id });
-                return lst.ToList();
-            }
-        }
-
-
-        public async Task<string> GetConnectionStringsByCountryId(int Id)
-        {
-
             var sb = "SELECT ConnectionString FROM CountryConnectionStrings WHERE CountryId=@Id";
 
             using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
                 await connection.OpenAsync();
 
-                return await connection.QueryFirstOrDefaultAsync<string>(sb, new { Id = Id });
+                var lst = await connection.QueryAsync<string>(sb, new { Id = Id });
+                return lst.ToList();
             }
         }
 
@@ -94,7 +80,6 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<List<string>> GetConnectionStringsByUserId(int id)
         {
-
             string select_query = @"SELECT ConnectionString FROM CountryConnectionStrings AS conn 
                                         INNER JOIN Contacts AS ct ON ct.CountryId=conn.CountryId WHERE ct.UserId=@userId";
 

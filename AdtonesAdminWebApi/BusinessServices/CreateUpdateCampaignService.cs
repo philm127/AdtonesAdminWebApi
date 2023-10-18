@@ -151,8 +151,6 @@ namespace AdtonesAdminWebApi.BusinessServices
             CampaignProfileDto model = await _campaignDAL.GetCampaignProfileDetail(campaignId);
             if (model.NumberInBatch == 0) model.NumberInBatch = 1;
 
-            CampaignProfileFormModel map = new CampaignProfileFormModel();
-
             result.body = model;
 
             return result;

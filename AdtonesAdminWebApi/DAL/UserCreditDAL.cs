@@ -18,15 +18,15 @@ namespace AdtonesAdminWebApi.DAL
             : base(configuration, executers, connService, httpAccessor)
         { }
 
-        public async Task<int> UpdateUserCredit(AdvertiserCreditFormCommand _creditmodel)
+        public async Task<int> UpdateUserCredit(int id, decimal amt)
         {
-            string UpdateUserCredit = @"UPDATE UsersCredit SET AssignCredit=@AssignCredit, AvailableCredit=@AvailableCredit, UpdatedDate=GETDATE()
-                                                WHERE Id = @Id";
+            string UpdateUserCredit = @"UPDATE UsersCredit SET AvailableCredit=@AvailableCredit, UpdatedDate=GETDATE()
+                                                WHERE UserId = @Id";
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
                              conn => conn.ExecuteScalar<int>(UpdateUserCredit,
-                             new { Id = _creditmodel.Id, AssignCredit = _creditmodel.AssignCredit, AvailableCredit = _creditmodel.AvailableCredit }));
+                             new { Id = id, AvailableCredit = amt }));
             }
             catch
             {

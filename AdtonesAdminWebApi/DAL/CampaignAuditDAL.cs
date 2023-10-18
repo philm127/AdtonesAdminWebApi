@@ -1,14 +1,17 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
+using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,31 +23,33 @@ namespace AdtonesAdminWebApi.DAL
         private readonly ILoggingService _logServ;
         const string PageName = "CampaignAuditDAL";
 
-        public CampaignAuditDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService, 
+        public CampaignAuditDAL(IConfiguration configuration, IExecutionCommand executers, IConnectionStringService connService,
                                 IHttpContextAccessor httpAccessor, ILoggingService logServ,
                                 IMemoryCache cache) : base(configuration, executers, connService, httpAccessor)
         {
             _logServ = logServ;
         }
 
-        public static string getDashboardData = @"SELECT SUM(ISNULL(CAST(cp.TotalBudget AS bigint),0)) AS Budget, 
-                                                    ISNULL(sum(ca.Spend),0) AS Spend,
-                                                    ISNULL(sum(ca.FundsAvailable),0) AS FundsAvailable,
+        public static string getDashboardData = @"SELECT SUM(CAST(ISNULL(ca.Budget,0) AS bigint)) AS Budget, 
+                                                    sum(ISNULL(ca.Spend,0)) AS Spend,
+                                                    sum(ISNULL(ca.FundsAvailable,0)) AS FundsAvailable,
                                                     AVG(ca.AvgBid) AS AvgBid,
-                                                    CAST(ISNULL(SUM(ca.TotalSMS),0) AS bigint) AS TotalSMS,
-                                                    ISNULL(SUM(ca.TotalSMSCost),0) AS TotalSMSCost,
+                                                    CAST(SUM(ISNULL(ca.TotalSMS,0)) AS bigint) AS TotalSMS,
+                                                    SUM(ISNULL(ca.TotalSMSCost,0)) AS TotalSMSCost,
                                                     CAST(ISNULL(SUM(ca.TotalEmail),0) AS bigint) AS TotalEmail,
-                                                    ISNULL(SUM(ca.TotalEmailCost),0) AS TotalEmailCost,
-                                                    Cast(ISNULL(SUM(ca.TotalPlays),0) AS bigint) AS TotalPlays,
-                                                    Cast(ISNULL(SUM(ca.MoreSixSecPlays),0) AS bigint) AS MoreSixSecPlays,
-                                                    (ISNULL(SUM(ca.TotalPlays),0) - ISNULL(SUM(ca.MoreSixSecPlays),0)) AS FreePlays,
+                                                    SUM(ISNULL(ca.TotalEmailCost,0)) AS TotalEmailCost,
+                                                    Cast(SUM(ISNULL(ca.TotalPlays,0)) AS bigint) AS TotalPlays,
+                                                    Cast(SUM(ISNULL(ca.MoreSixSecPlays,0)) AS bigint) AS MoreSixSecPlays,
+                                                    (SUM(ISNULL(ca.TotalPlays,0)) - SUM(ISNULL(ca.MoreSixSecPlays,0))) AS FreePlays,
                                                     AVG(ISNULL(ca.AvgPlayLength,0))	AS AvgPlayLength,
                                                     MAX(ISNULL(ca.MaxPlayLength,0)) AS MaxPlayLength,
                                                     MAX(CAST(ISNULL(ca.MaxBid, 0) AS numeric(16,2))) AS MaxBid,
                                                     MAX(ISNULL(ca.Reach,0)) AS Reach,
-                                                    'KES' AS CurrencyCode
-	                                                FROM RollupsCampaign AS ca 
-                                                    INNER JOIN CampaignProfile AS cp ON cp.CampaignProfileId=ca.CampaignId ";
+                                                    'KES' AS CurrencyCode,
+                                                    0 AS TotalReach
+	                                                FROM [Arthar].[dbo].[CampaignProfile] AS cp 
+                                                    LEFT JOIN [ManR].[dbo].[RollupsCampaign] AS ca ON cp.CampaignProfileId=ca.CampaignId
+                                                    LEFT JOIN [ManR].[dbo].[CampaignReach] AS cr ON cr.CampaignId=cp.CampaignProfileId";
 
 
         ///// <summary>
@@ -67,21 +72,26 @@ namespace AdtonesAdminWebApi.DAL
         {
 
             var str = getDashboardData;
-            string modifiedStr = str.Replace("SELECT", "").TrimStart();
+            int pos = str.IndexOf("SELECT");
+            if (pos != -1)
+            {
+                str = str.Remove(pos, "SELECT".Length).Insert(pos, "");
+            }
+            string modifiedStr = str.TrimStart();
 
             var sb = new StringBuilder();
             sb.Append(" SELECT u.Userid,cp.CampaignProfileId,ca.AdvertId,cp.CampaignName,a.AdvertName,");
             sb.Append(" CONCAT(u.FirstName,' ',u.LastName, ' (', u.Email, ')') AS CampaignHolder,");
             sb.Append(modifiedStr);
-            sb.Append(" INNER JOIN Users AS u ON cp.UserId=u.UserId ");
-            sb.Append(" INNER JOIN Advert AS a ON a.AdvertId=ca.AdvertId ");
+            sb.Append(" INNER JOIN [Arthar].[dbo].[Users] AS u ON cp.UserId=u.UserId ");
+            sb.Append(" INNER JOIN [Arthar].[dbo].[Advert] AS a ON a.AdvertId=ca.AdvertId ");
             sb.Append(" WHERE cp.CampaignProfileId=@campId ");
             sb.Append(" GROUP BY u.UserId,cp.CampaignProfileId,ca.AdvertId,cp.CampaignName,a.AdvertName,u.FirstName,u.LastName, u.Email ");
-
+            var strTst = sb.ToString();
             try
             {
                 return await _executers.ExecuteCommand(_connStr,
-                                 conn => conn.QueryFirstOrDefault<CampaignDashboardChartPREResult>(sb.ToString(), new { campId = campaignId }, commandTimeout:60));
+                                 conn => conn.QueryFirstOrDefault<CampaignDashboardChartPREResult>(sb.ToString(), new { campId = campaignId }, commandTimeout: 60));
             }
             catch (Exception ex)
             {
@@ -91,7 +101,7 @@ namespace AdtonesAdminWebApi.DAL
                 _logServ.ProcedureName = "CampaignDashboardSummariesOperators";
                 _logServ.LogLevel = sb.ToString();
                 await _logServ.LogError();
-                
+
                 throw;
             }
         }
@@ -121,7 +131,7 @@ namespace AdtonesAdminWebApi.DAL
                 _logServ.ProcedureName = "DashboardSummariesOperators";
                 _logServ.LogLevel = sb.ToString();
                 await _logServ.LogError();
-                
+
                 throw;
             }
         }
@@ -156,10 +166,10 @@ namespace AdtonesAdminWebApi.DAL
         /// <param name="id">operatorId</param>
         /// <returns></returns>
         public async Task<CampaignDashboardChartPREResult> DashboardSummariesSalesManager(int salesmanId, int campaignId)
-        {   
+        {
             var countryId = await _executers.ExecuteCommand(_connStr,
                                  conn => conn.QueryFirstOrDefault<int>("SELECT CountryId FROM Contacts WHERE UserId=@Id ", new { Id = salesmanId }));
-            
+
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
             sb.Append(getDashboardData);
@@ -169,7 +179,7 @@ namespace AdtonesAdminWebApi.DAL
                 sb.Append(" AND cp.CampaignProfileId=@CampaignId ");
                 builder.AddParameters(new { CampaignId = campaignId });
             }
-            
+
             var select = builder.AddTemplate(sb.ToString());
             builder.AddParameters(new { Id = countryId });
             try
@@ -210,7 +220,7 @@ namespace AdtonesAdminWebApi.DAL
 
 
 
-        public async Task<CampaignDashboardChartPREResult> GetCampaignDashboardSummariesAdvertisers(int userId, int campaignId=0)
+        public async Task<CampaignDashboardChartPREResult> GetCampaignDashboardSummariesAdvertisers(int userId, int campaignId = 0)
         {
             var sb = new StringBuilder();
             var builder = new SqlBuilder();
@@ -219,12 +229,12 @@ namespace AdtonesAdminWebApi.DAL
 
             if (campaignId > 0)
             {
-                sb.Append("  and cp.CampaignProfileId = @campaignId; ");
+                sb.Append("  and cp.CampaignProfileId = @campId; ");
                 builder.AddParameters(new { campId = campaignId });
             }
-            
+
             var select = builder.AddTemplate(sb.ToString());
-            
+
             builder.AddParameters(new { userId = userId });
 
             try
@@ -574,6 +584,42 @@ namespace AdtonesAdminWebApi.DAL
             }
             catch
             {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<DailyReportResponse>> GetDailyReportDetails(DailyReportCommand model)
+        {
+            var operatorId = 1;// _httpAccessor.GetUserIdFromJWT();
+            var connStr = await _connService.GetConnectionStringByOperator(operatorId);
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connStr))
+                {
+                    connection.Open();
+
+                    var parameters = new DynamicParameters();
+                    parameters.Add("@DateFrom", model.DateFrom);
+                    parameters.Add("@DateTo", model.DateTo);
+
+                    return await connection.QueryAsync<DailyReportResponse>(
+                        "sp_basic_stats_by_timeframe",
+                        parameters,
+                        commandType: System.Data.CommandType.StoredProcedure,
+                        commandTimeout: 180
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetDailyReportDetails";
+                _logServ.LogLevel = JsonConvert.SerializeObject(model);
+                await _logServ.LogError();
+
                 throw;
             }
         }

@@ -38,7 +38,8 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpPost("v1/CreateNewCampaign")]
         public async Task<ReturnResult> CreateNewCampaign(NewCampaignProfileFormModel model)
         {
-            return await _campService.CreateNewCampaign(model);
+            var msg = await _campService.CreateNewCampaign(model);
+            return msg;
         }
 
 

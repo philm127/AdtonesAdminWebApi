@@ -23,7 +23,7 @@ namespace AdtonesAdminWebApi.DAL
         { }
 
 
-        public async Task<int> AddBillingRecord(UserPaymentCommand command)
+        public async Task<int> AddBillingRecord(UserPaymentCommand command, List<string> connStringList)
         {
             string insertIntoBilling = @"INSERT INTO Billing(UserId, CampaignProfileId,PaymentMethodId,InvoiceNumber,
                                                     PONumber,FundAmount,TaxPercantage,TotalAmount,PaymentDate,SettledDate,Status,CurrencyCode,AdtoneServerBillingId)
@@ -49,49 +49,53 @@ namespace AdtonesAdminWebApi.DAL
                                         CurrencyCode = command.CurrencyCode,
                                         AdtoneServerBillingId = command.AdtoneServerBillingId
                                     }));
-
-                var strLst = await _connService.GetConnectionStringsByUserId(command.AdvertiserId);
-                if (strLst != null && strLst.Count > 0)
-                {
-                    try
-                    {
-                        foreach (var constr in strLst)
-                        {
-                            var campId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(command.CampaignProfileId, constr);
-
-                            var userId = await _executers.ExecuteCommand(constr,
-                                                                        conn => conn.ExecuteScalar<int>("SELECT UserId FROM Users WHERE AdtoneServerUserId=@Id",
-                                                                                                            new { Id = command.AdvertiserId }));
-
-                            var x = await _executers.ExecuteCommand(constr,
-                                        conn => conn.ExecuteScalar<int>(insertIntoBilling, new
-                                        {
-                                            UserId = userId,
-                                            CampaignProfileId = campId,
-                                            PaymentMethodId = command.PaymentMethodId,
-                                            Status = command.Status,
-                                            InvoiceNumber = command.InvoiceNumber,
-                                            PONumber = command.PONumber,
-                                            Fundamount = command.Fundamount,
-                                            TaxPercantage = command.TaxPercantage,
-                                            TotalAmount = command.TotalAmount,
-                                            SettledDate = command.SettledDate,
-                                            CurrencyCode = command.CurrencyCode,
-                                            AdtoneServerBillingId = billId
-                                        }));
-                        }
-                    }
-                    catch
-                    {
-                        throw;
-                    }
-                }
             }
             catch
             {
                 throw;
             }
 
+            if (connStringList != null && connStringList.Count > 0)
+            {
+                try
+                {
+                    foreach (var constr in connStringList)
+                    {
+                        var campId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(command.CampaignProfileId, constr);
+
+                        var userId = await _executers.ExecuteCommand(constr,
+                                                                    conn => conn.ExecuteScalar<int>("SELECT UserId FROM Users WHERE AdtoneServerUserId=@Id",
+                                                                                                        new { Id = command.AdvertiserId }));
+
+                        var x = await _executers.ExecuteCommand(constr,
+                                    conn => conn.ExecuteScalar<int>(insertIntoBilling, new
+                                    {
+                                        UserId = userId,
+                                        CampaignProfileId = campId,
+                                        PaymentMethodId = command.PaymentMethodId,
+                                        Status = command.Status,
+                                        InvoiceNumber = command.InvoiceNumber,
+                                        PONumber = command.PONumber,
+                                        Fundamount = command.Fundamount,
+                                        TaxPercantage = command.TaxPercantage,
+                                        TotalAmount = command.TotalAmount,
+                                        SettledDate = command.SettledDate,
+                                        CurrencyCode = command.CurrencyCode,
+                                        AdtoneServerBillingId = billId
+                                    }));
+                    }
+                }
+                catch
+                {
+                    await _executers.ExecuteCommand(_connStr,
+                        conn => conn.Execute("DELETE FROM Billing WHERE Id=@Id", new
+                        {
+                            Id = billId
+                        }));
+                    billId = 0;
+                    throw;
+                }
+            }
             return billId;
         }
 
@@ -390,7 +394,7 @@ namespace AdtonesAdminWebApi.DAL
                     model.AdtoneServerCampaignCreditPeriodId = await _executers.ExecuteCommand(_connStr,
                                 conn => conn.ExecuteScalar<int>(InsertCampaignCredit, model));
 
-                    var lst = await _connService.GetConnectionStringsByCountry(countryId);
+                    var lst = await _connService.GetConnectionStringsByCountryId(countryId);
                     List<string> conns = lst.ToList();
 
                     foreach (string constr in conns)
@@ -432,7 +436,7 @@ namespace AdtonesAdminWebApi.DAL
                     foreach (var countryId in campaignCountryId)
                     {
 
-                    var lst = await _connService.GetConnectionStringsByCountry(countryId);
+                    var lst = await _connService.GetConnectionStringsByCountryId(countryId);
                     List<string> conns = lst.ToList();
 
                     foreach (string constr in conns)

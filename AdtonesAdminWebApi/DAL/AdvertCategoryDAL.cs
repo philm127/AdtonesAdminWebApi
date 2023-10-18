@@ -59,7 +59,7 @@ namespace AdtonesAdminWebApi.DAL
                                     conn => conn.ExecuteScalar<int>(DeleteAdvertCategory + " AdvertCategoryId=@Id;",
                                                                                                                     new { Id = model.id }));
 
-                var lst = await _connService.GetConnectionStringsByCountry(model.countryId);
+                var lst = await _connService.GetConnectionStringsByCountryId(model.countryId);
                 List<string> conns = lst.ToList();
 
                 foreach (string constr in conns)
@@ -94,7 +94,7 @@ namespace AdtonesAdminWebApi.DAL
                                         name = model.CategoryName
                                     }));
 
-                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.GetValueOrDefault());
+                var lst = await _connService.GetConnectionStringsByCountryId(model.CountryId.GetValueOrDefault());
                 List<string> conns = lst.ToList();
                 sb1.Append(UpdateAdvertCategory);
                 sb1.Append(" AdtoneServerAdvertCategoryId=@Id;");
@@ -170,7 +170,7 @@ namespace AdtonesAdminWebApi.DAL
                 builder2.AddParameters(new { Id = model.AdtoneServerAdvertCategoryId });
 
 
-                var lst = await _connService.GetConnectionStringsByCountry(model.CountryId.GetValueOrDefault());
+                var lst = await _connService.GetConnectionStringsByCountryId(model.CountryId.GetValueOrDefault());
                 List<string> conns = lst.ToList();
 
                 foreach (string constr in conns)

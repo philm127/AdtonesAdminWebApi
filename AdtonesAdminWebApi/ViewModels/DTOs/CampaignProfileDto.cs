@@ -25,6 +25,9 @@ namespace AdtonesAdminWebApi.ViewModels.DTOs
 
 
         public float MaxDailyBudget { get; set; }
+        public float MaxWeeklyBudget { get; set; }
+        public float MaxMonthBudget { get; set; }
+        public float MaxHourlyBudget { get; set; }
 
 
         public float MaxBid { get; set; }
@@ -104,8 +107,8 @@ namespace AdtonesAdminWebApi.ViewModels.DTOs
 
         public DateTime UpdatedDateTime { get; set; }
 
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         public int finaltotalplays { get; set; }
 

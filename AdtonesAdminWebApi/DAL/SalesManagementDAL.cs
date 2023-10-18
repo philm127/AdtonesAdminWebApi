@@ -1,5 +1,6 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.DAL.Queries;
+using AdtonesAdminWebApi.Model;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.ViewModels;
 using Dapper;
@@ -78,6 +79,24 @@ namespace AdtonesAdminWebApi.DAL
                     connection.Open();
                     return await connection.QueryAsync<SharedSelectListViewModel>(getSalesExecDDList, new { Id = ytr });
                 }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<int>> GetAdvertiserIdsBySalesExec(int userId)
+        {
+
+            string getQuery = @"SELECT AdvertiserId FROM Advertisers_SalesTeam
+                                          WHERE SalesExecId=@Id";
+
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                   conn => conn.Query<int>(getQuery, new { Id = userId }));
             }
             catch
             {
@@ -204,6 +223,25 @@ namespace AdtonesAdminWebApi.DAL
             {
                 return await _executers.ExecuteCommand(_connStr,
                              conn => conn.ExecuteScalar<string>(getSalesExecInvDets, new { Id = advertiserId }));
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IEnumerable<SalesExecDetails>> GetSalesExecDetails()
+        {
+            string getSalesExec = @"SELECT s.UserId AS UserId,CONCAT(s.FirstName,' ',s.LastName) AS FullName,adsal.AdvertiserId
+                                                FROM Users AS s
+                                                   INNER JOIN Advertisers_SalesTeam as adsal ON adsal.SalesExecId=s.UserId
+                                                    WHERE adsal.IsActive=1;";
+            try
+            {
+                return await _executers.ExecuteCommand(_connStr,
+                                    conn => conn.Query<SalesExecDetails>(getSalesExec));
 
             }
             catch

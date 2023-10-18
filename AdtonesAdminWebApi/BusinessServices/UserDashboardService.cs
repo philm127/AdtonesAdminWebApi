@@ -58,7 +58,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                 else if(searchList != null && searchList.country != null)
                 {
                     var conn = await _conService.GetConnectionStringsByCountryId(int.Parse(searchList.country));
-                    var dataRes = await _dashboardDal.GetSubscriberDashboard(paging, conn);
+                    var dataRes = await _dashboardDal.GetSubscriberDashboard(paging, conn.FirstOrDefault());
                     subData = dataRes.ToList();
                 }
                 else

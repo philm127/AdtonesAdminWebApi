@@ -10,7 +10,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
 {
     public interface IBillingDAL
     {
-        Task<int> AddBillingRecord(UserPaymentCommand command);
+        Task<int> AddBillingRecord(UserPaymentCommand command, List<string> connStringList);
         Task<InvoiceForPDFDto> GetInvoiceDetailsForPDF(int billingId);
         Task<int> GetCreditPeriod(int campaignId);
         Task<BillingPaymentDto> GetCampaignBillingData(int campaignId);

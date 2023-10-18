@@ -9,10 +9,7 @@ namespace AdtonesAdminWebApi.DAL.Queries
     {
 
 
-        public static string AddTax => @"INSERT INTO CountryTax(UserId,CountryId,TaxPercantage,CreatedDate,UpdatedDate,Status)
-                                            VALUES(@UserId,@CountryId,@TaxPercantage, GETDATE(), GETDATE(),1);";
-
-
+        
         public static string AddMinBid => @"INSERT INTO CountryMinBid(CountryId,MinBid,CreatedDate,UpdatedDate)
                                                 VALUES(@CountryId,@MinBid,GETDATE(),GETDATE())";
 

@@ -10,6 +10,8 @@ using AdtonesAdminWebApi.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using AdtonesAdminWebApi.Model;
+using System.Collections.Generic;
 
 namespace AdtonesAdminWebApi.Controllers
 {
@@ -137,19 +139,16 @@ namespace AdtonesAdminWebApi.Controllers
         [HttpGet("v1/GetPromoDashboardSummary/{id}")]
         public async Task<ReturnResult> GetPromoDashboardSummary(int id = 0)
         {
-            var campaignId = id;
+            string cacheKey = $"PROMO_DASHBOARD_CAMPAIGN_STATS_{id}";
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(30));
             try
             {
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetSlidingExpiration(TimeSpan.FromMinutes(30));
-                string key = $"PROMO_DASHBOARD_CAMPAIGN_STATS_{campaignId}";
-                result.body = await _cache.GetOrCreateAsync<CampaignDashboardChartResult>(key, cacheEntry =>
+                result.body = await _cache.GetOrCreateAsync<CampaignDashboardChartResult>(cacheKey, cacheEntry =>
                 {
                     cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
-                    return _auditDAL.CampaignPromoDashboardSummaries(campaignId);
+                    return _auditDAL.CampaignPromoDashboardSummaries(id);
                 });
-
-                return result;
             }
             catch (Exception ex)
             {
@@ -160,15 +159,16 @@ namespace AdtonesAdminWebApi.Controllers
                 await _logServ.LogError();
 
                 result.result = 0;
-                return result;
             }
+            return result;
         }
 
 
         /// <summary>
-        /// 
+        /// Fetch play details for operator by campaign with pagination.
         /// </summary>
-        /// <returns>body contains List CampaignAdminResult</returns>
+        /// <param name="paging">Pagination and search parameters.</param>
+        /// <returns>Body contains List of CampaignAdminResult.</returns>
         [HttpPut("v1/GetPlayDetailsForOperatorByCampaign")]
         public async Task<ReturnResult> GetPlayDetailsForOperatorByCampaign(PagingSearchClass paging)
         {
@@ -224,6 +224,33 @@ namespace AdtonesAdminWebApi.Controllers
         /// <summary>
         /// 
         /// </summary>
+        /// <returns>body contains List DailyReportResult</returns>
+        [HttpPut("v1/GetDailyReport")]
+        public async Task<ReturnResult> GetDailyReport(DailyReportCommand model)
+        {
+            try
+            {
+                result.body = await _auditDAL.GetDailyReportDetails(model);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logServ.ErrorMessage = ex.Message.ToString();
+                _logServ.StackTrace = ex.StackTrace.ToString();
+                _logServ.PageName = PageName;
+                _logServ.ProcedureName = "GetDailyReport";
+                await _logServ.LogError();
+
+                result.result = 0;
+                result.body = new List<DailyReportResponse>();
+                return result;
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         [HttpGet("v1/GetCampDashboardSummarySalesManager/{id}")]
         public async Task<ReturnResult> GetCampDashboardSummarySalesManager(int id = 0)
@@ -264,7 +291,7 @@ namespace AdtonesAdminWebApi.Controllers
         /// id refers to campaignID
         /// </summary>
         /// <returns></returns>
-        [HttpGet("v1/GetDashboardSummaryAdvertiser/{id}")]
+        [HttpGet("v1/GetDashboardSummaryAdvertiser")]
         public async Task<ReturnResult> GetDashboardSummaryAdvertiser(int id=0)
         {
             var campaignId = id;
@@ -274,13 +301,10 @@ namespace AdtonesAdminWebApi.Controllers
                 var advertiserId = _httpAccessor.GetUserIdFromJWT();
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                         .SetSlidingExpiration(TimeSpan.FromMinutes(30));
-                if (campaignId == 0)
-                    key = $"ADVERTISER_DASHBOARD_STATS_{advertiserId}";
-                else
-                    key = $"ADVERTISER_DASHBOARD_STATS_{campaignId}";
+                key = $"ADVERTISER_DASHBOARD_STATS_{advertiserId}";
                 var summaries = await _cache.GetOrCreateAsync<CampaignDashboardChartPREResult>(key, cacheEntry =>
                 {
-                    cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(30);
+                    cacheEntry.SlidingExpiration = TimeSpan.FromMinutes(20);
                     return _auditDAL.GetCampaignDashboardSummariesAdvertisers(advertiserId, campaignId);
                 });
 
@@ -358,9 +382,12 @@ namespace AdtonesAdminWebApi.Controllers
                         MaxPlayLength = summaries.MaxPlayLength,
                         TotalReach = (int)summaries.TotalReach,
                         Reach = (int)summaries.Reach,
-                        CurrencyCode = summaries.CurrencyCode
-                        //MaxPlayLengthPercantage = totalPlays == 0 ? 0 : Math.Round((double)summaries.TotalValuablePlays / totalPlays, 2),
-                    };
+                        CurrencyCode = summaries.CurrencyCode,
+                        CampaignHolder = summaries.CampaignHolder,
+                        TotalSMS = summaries.TotalSMS,
+                        TotalSMSCost = summaries.TotalSMSCost
+        //MaxPlayLengthPercantage = totalPlays == 0 ? 0 : Math.Round((double)summaries.TotalValuablePlays / totalPlays, 2),
+    };
 
                     return _CampaignDashboardChartResult;
                 }
@@ -380,6 +407,8 @@ namespace AdtonesAdminWebApi.Controllers
                 return null;
             }
         }
+
+        
 
 
     }

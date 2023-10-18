@@ -8,6 +8,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Http;
 
 namespace AdtonesAdminWebApi.DAL
 {
@@ -20,26 +22,22 @@ namespace AdtonesAdminWebApi.DAL
         public const string DefaultCurrencyCode = "USD";
     }
 
-    public class CurrencyDAL : ICurrencyDAL
+    public class CurrencyDAL : BaseDAL, ICurrencyDAL
     {
 
         private readonly Dictionary<int, Currency> _countryidToCur = new Dictionary<int, Currency>();
         private readonly Dictionary<int, Currency> _curIdToCur = new Dictionary<int, Currency>();
         private readonly Dictionary<int, Currency> _userIdToCur = new Dictionary<int, Currency>();
         private readonly IUserManagementDAL _userDAL;
-        private readonly IExecutionCommand _executers;
-        private readonly IConfiguration _configuration;
-        private readonly string _connStr;
         private IMemoryCache cache;
         public string _dbQuery { get; private set; }
 
         public CurrencyDAL(IUserManagementDAL userDAL, IExecutionCommand executers,
-                            IConfiguration configuration, IMemoryCache cache)
+                            IConfiguration configuration, IMemoryCache cache, IConnectionStringService connService,
+                            IHttpContextAccessor httpAccessor)
+                            : base(configuration, executers, connService, httpAccessor)
         {
             _userDAL = userDAL;
-            _executers = executers;
-            _configuration = configuration;
-            _connStr = _configuration.GetConnectionString("DefaultConnection");
             this.cache = cache;
         }
 

@@ -331,31 +331,29 @@ namespace AdtonesAdminWebApi.DAL
         #endregion
 
 
-        public async Task<int> UpdateCampaignMatchCredit(CampaignCreditCommand model, string constr)
+        public async Task<int> UpdateCampaignMatchCredit(CampaignCreditCommand model, List<string> conStrList)
         {
-            var campModel = await GetCampaignMatchDetail(model, constr);
-            string InsertMatchFinancial = @"UPDATE CampaignMatches SET TotalBudget=@TotalBudget,TotalCredit=@TotalCredit,
-                                             UpdatedDateTime=GETDATE(), Status=@Status, NextStatus=0, AvailableCredit=@AvailableCredit WHERE MSCampaignProfileId=@Id";
+            string updateMatchFinancial = @"UPDATE CampaignMatches SET TotalBudget=@TotalBudget,TotalCredit=@TotalCredit,
+                                             UpdatedDateTime=GETDATE(), Status=@Status, NextStatus=0, AvailableCredit=@AvailableCredit 
+                                            WHERE MSCampaignProfileId=@Id";
             int x = 0;
-
-            var sb = new StringBuilder();
-            sb.Append(InsertMatchFinancial);
-
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(sb.ToString());
             try
             {
-                if (constr != null && constr.Length > 2)
+                foreach (var constr in conStrList)
                 {
-                    x = await _executers.ExecuteCommand(constr,
-                                    conn => conn.ExecuteScalar<int>(sb.ToString(), new
-                                    {
-                                        Id = campModel.MSCampaignProfileId,
-                                        Status = (int)Enums.CampaignStatus.Play,
-                                        TotalBudget = (campModel.TotalBudget + model.TotalBudget),
-                                        TotalCredit = (campModel.TotalCredit + model.TotalCredit),
-                                        AvailableCredit = (campModel.AvailableCredit + model.TotalCredit)
-                                    }));
+                    if (constr != null && constr.Length > 2)
+                    {
+                        var campId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(model.CampaignProfileId, constr);
+                        x = await _executers.ExecuteCommand(constr,
+                                        conn => conn.ExecuteScalar<int>(updateMatchFinancial, new
+                                        {
+                                            Id = campId,
+                                            Status = model.Status,
+                                            TotalBudget = model.TotalBudget,
+                                            TotalCredit = model.TotalCredit,
+                                            AvailableCredit = model.AvailableCredit
+                                        }));
+                    }
                 }
             }
             catch
@@ -366,41 +364,18 @@ namespace AdtonesAdminWebApi.DAL
             return x;
         }
 
-        private async Task<CampaignCreditCommand> GetCampaignMatchDetail(CampaignCreditCommand _model, string conn)
-        {
-            var newModel = new CampaignCreditCommand();
-            var selectSQL = "SELECT MSCampaignProfileId, TotalCredit, TotalBudget, AvailableCredit FROM CamapaignMatches WHERE MSCampaignProfileId = @Id";
-            try
-            {
-                var campId = await _connService.GetCampaignProfileIdFromAdtoneIdByConnString(_model.CampaignProfileId, conn);
-                newModel = await _executers.ExecuteCommand(conn,
-                                conn => conn.QueryFirstOrDefault<CampaignCreditCommand>(selectSQL, new { Id = campId }));
-            }
-            catch
-            {
-                throw;
-            }
-            return newModel;
-        }
-
 
         public async Task<int> UpdateCampaignMatch(int campaignProfileId, int operatorId, int status)
         {
             var operatorConnectionString = await _connService.GetConnectionStringByOperator(operatorId);
 
-            var sb = new StringBuilder();
-            sb.Append("UPDATE CampaignMatches SET Status=@Status WHERE MSCampaignProfileId=@Id");
-
-            var builder = new SqlBuilder();
-            var select = builder.AddTemplate(sb.ToString());
+            var sb = "UPDATE CampaignMatches SET Status=@Status WHERE MSCampaignProfileId=@Id";
             try
             {
-                var campId = _connService.GetCampaignProfileIdFromAdtoneId(campaignProfileId, operatorId);
-                builder.AddParameters(new { Id = campId });
-                builder.AddParameters(new { Status = status });
+                var campId = await _connService.GetCampaignProfileIdFromAdtoneId(campaignProfileId, operatorId);
 
                 return await _executers.ExecuteCommand(operatorConnectionString,
-                                    conn => conn.ExecuteScalar<int>(select.RawSql, select.Parameters));
+                                    conn => conn.ExecuteScalar<int>(sb, new { Id = campId, Status = status } ));
             }
             catch
             {

@@ -1,4 +1,5 @@
-﻿using AdtonesAdminWebApi.ViewModels;
+﻿using AdtonesAdminWebApi.Model;
+using AdtonesAdminWebApi.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,5 +25,6 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<CampaignDashboardChartPREResult> DashboardSummariesSalesManager(int salesmanId, int campaignId);
         Task<CampaignDashboardChartPREResult> DashboardSummariesSalesExec(int salesexecId);
         Task<CampaignDashboardChartResult> CampaignPromoDashboardSummaries(int campaignId);
+        Task<IEnumerable<DailyReportResponse>> GetDailyReportDetails(DailyReportCommand model);
     }
 }

@@ -18,6 +18,7 @@ namespace AdtonesAdminWebApi.DAL
     {
         public readonly IConfiguration _configuration;
         public readonly string _connStr;
+        public readonly string _reportingConnStr;
         public readonly IExecutionCommand _executers;
         public readonly IConnectionStringService _connService;
         public readonly IHttpContextAccessor _httpAccessor;
@@ -26,6 +27,7 @@ namespace AdtonesAdminWebApi.DAL
         {
             _configuration = configuration;
             _connStr = _configuration.GetConnectionString("DefaultConnection");
+            _reportingConnStr = _configuration.GetConnectionString("ReportingConnection");
             _executers = executers;
             _connService = connService;
             _httpAccessor = httpAccessor;

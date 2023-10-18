@@ -126,7 +126,7 @@ namespace AdtonesAdminWebApi.DAL
                 }
                 else if (model.RoleId == (int)Enums.UserRole.Advertiser)
                 {
-                    conns = await _connService.GetConnectionStringsByCountry(model.CountryId);
+                    conns = await _connService.GetConnectionStringsByCountryId(model.CountryId);
                 }
                 else
                 {
@@ -183,7 +183,7 @@ namespace AdtonesAdminWebApi.DAL
                     model.CountryId == null || model.CountryId.Value == 0)
                     conns = await _connService.GetConnectionStrings();
                 else
-                    conns = await _connService.GetConnectionStringsByCountry(model.CountryId.Value);
+                    conns = await _connService.GetConnectionStringsByCountryId(model.CountryId.Value);
 
 
                 foreach (string constr in conns)

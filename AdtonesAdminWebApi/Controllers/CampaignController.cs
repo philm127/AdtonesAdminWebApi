@@ -7,6 +7,7 @@ using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign;
 using AdtonesAdminWebApi.Services;
 using AdtonesAdminWebApi.DAL.Interfaces;
 using System;
+using DocumentFormat.OpenXml.EMMA;
 
 namespace AdtonesAdminWebApi.Controllers
 {
@@ -41,12 +42,12 @@ namespace AdtonesAdminWebApi.Controllers
         /// 
         /// </summary>
         /// <returns>body contains List CampaignAdminResult</returns>
-        [HttpGet("v1/GetAdminOpAdminCampaignDataTable/{id}")]
-        public async Task<ReturnResult> GetAdminOpAdminCampaignDataTable(int id=0)
+        [HttpGet("v1/GetAdminOpAdminCampaignDataTable")]
+        public async Task<ReturnResult> GetAdminOpAdminCampaignDataTable()
         {
             try
             {
-                return await _campService.GetAdminOpAdminCampaignList(id);
+                return await _campService.GetAdminOpAdminCampaignList();
             }
             catch (Exception ex)
             {
@@ -71,7 +72,7 @@ namespace AdtonesAdminWebApi.Controllers
         {
             try
             {
-                result.body = await _campDAL.GetCampaignResultSetBySalesExec(id);
+                return await _campService.GetSalesCampaignList(id);
             }
             catch (Exception ex)
             {
@@ -116,14 +117,14 @@ namespace AdtonesAdminWebApi.Controllers
         {
             try
             {
-                result.body = await _campDAL.GetCampaignResultSetById(id);
+                return await _campService.GetCampaignById(id);
             }
             catch (Exception ex)
             {
                 _logServ.ErrorMessage = ex.Message.ToString();
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
-                _logServ.ProcedureName = "LoadCampaignDataTableById";
+                _logServ.ProcedureName = "GetCampaignDataTableByCampId";
                 await _logServ.LogError();
 
                 result.result = 0;

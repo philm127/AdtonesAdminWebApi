@@ -15,8 +15,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> GetCampaignProfileIdFromAdtoneIdByConn(int Id, string conn);
         Task<int> GetCampaignProfileIdFromAdtoneIdByConnString(int Id, string conn);
         Task<int> GetAdvertIdFromAdtoneId(int Id, int operatorId);
-        Task<List<string>> GetConnectionStringsByCountry(int Id);
-        Task<string> GetConnectionStringsByCountryId(int Id);
+        Task<List<string>> GetConnectionStringsByCountryId(int Id);
 
         Task<List<string>> GetConnectionStringsByUserId(int id);
         Task<int> GetOperatorIdFromAdtoneId(int operatorId);

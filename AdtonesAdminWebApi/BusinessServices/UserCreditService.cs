@@ -16,24 +16,17 @@ namespace AdtonesAdminWebApi.BusinessServices
 {
     public class UserCreditService : IUserCreditService
     {
-        private readonly IHttpContextAccessor _httpAccessor;
-
-        private readonly IMapper _mapper;
-
-        private readonly ICurrencyDAL _currencyDAL;
-        private readonly ICampaignDAL _campDAL;
-        private readonly ICampaignMatchDAL _campMatchDAL;
         private readonly IBillingDAL _billDAL;
-        private readonly IConfiguration _configuration;
-        private readonly ICurrencyConversion _curConv;
         private readonly ILoggingService _logServ;
         private readonly IUserCreditDAL _creditDAL;
         private static Random random = new Random();
         ReturnResult result = new ReturnResult();
         const string PageName = "UserCreditService";
-        public UserCreditService(IBillingDAL billDAL)
+        public UserCreditService(ILoggingService logServ, IBillingDAL billDAL, IUserCreditDAL creditDAL)
         {
             _billDAL = billDAL;
+            _creditDAL = creditDAL;
+            _logServ = logServ;
         }
 
         /// <summary>
@@ -57,7 +50,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                     model.Id = creditDetails.Id;
                     model.AssignCredit = creditDetails.AssignCredit;
                     model.AvailableCredit = available;
-                    x = await _creditDAL.UpdateUserCredit(model);
+                    x = await _creditDAL.UpdateUserCredit(model.Id, available);
                 }
                 else
                 {
@@ -107,7 +100,7 @@ namespace AdtonesAdminWebApi.BusinessServices
                         model.AvailableCredit = model.AssignCredit;
                     else
                         model.AvailableCredit = availableCredit;
-                    x = await _creditDAL.UpdateUserCredit(model);
+                    x = await _creditDAL.UpdateUserCredit(model.UserId, availableCredit);
                 }
                 else
                 {

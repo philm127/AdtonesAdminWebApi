@@ -17,7 +17,7 @@ namespace AdtonesAdminWebApi.ViewModels.DTOs
         public decimal Amount { get; set; }
     }
 
-    public class Item
+    public class InvoiceItem
     {
         public string Description { get; set; }
         public decimal Price { get; set; }
@@ -36,8 +36,8 @@ namespace AdtonesAdminWebApi.ViewModels.DTOs
     {
         public CustomerDto Customer { get; set; }
         public int Items { get; set; }
-        public Item Item1 { get; set; }
-        public List<Item> ItemList { get; set; }
+        public InvoiceItem Item1 { get; set; }
+        public List<InvoiceItem> ItemList { get; set; }
 
         //private set
         public DateTime Date { get; private set; }
@@ -65,10 +65,10 @@ namespace AdtonesAdminWebApi.ViewModels.DTOs
 
         }
 
-        public InvoiceDto(Item Item1)
+        public InvoiceDto(InvoiceItem Item1)
             : this()
         {
-            ItemList = new List<Item>();
+            ItemList = new List<InvoiceItem>();
             ItemList.Add(Item1);
         }
 

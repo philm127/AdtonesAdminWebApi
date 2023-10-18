@@ -7,6 +7,7 @@ using AdtonesAdminWebApi.ViewModels.CreateUpdateCampaign.ProfileModels;
 using AdtonesAdminWebApi.ViewModels.DTOs;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,9 +86,9 @@ namespace AdtonesAdminWebApi.DAL
                                                 CONCAT(usr.FirstName,' ',usr.LastName) AS UserName, usr.Email,ad.CreatedDateTime AS CreatedDate,
                                                 CASE WHEN sexcs.FirstName IS NULL THEN 'UnAllocated' ELSE CONCAT(sexcs.FirstName,' ',sexcs.LastName) END AS SalesExec,
                                                 sexcs.UserId AS SUserId,
-                                                ad.Script,ad.Status,ad.MediaFileLocation,ad.UploadedToMediaServer,SoapToneCode,
+                                                ad.Script,ad.Status,ad.UploadedToMediaServer,SoapToneCode,
                                                 CASE WHEN ad.MediaFileLocation IS NULL THEN ad.MediaFileLocation 
-                                                    ELSE CONCAT(@siteAddress,ad.MediaFileLocation) END AS MediaFile,
+                                                    ELSE CONCAT(@siteAddress,ad.MediaFileLocation) END AS MediaFileLocation,
                                                 CASE WHEN ad.ScriptFileLocation IS NULL THEN ad.ScriptFileLocation 
                                                     ELSE CONCAT(@siteAddress,ad.ScriptFileLocation) END AS ScriptFileLocation,ad.SoapToneId
                                                 FROM Advert AS ad LEFT JOIN Client AS cl ON ad.ClientId=cl.Id
@@ -132,9 +133,9 @@ namespace AdtonesAdminWebApi.DAL
             string GetAdvertSalesExecResultSet = @"SELECT ad.AdvertId,ad.UserId,ad.ClientId,ad.AdvertName,ad.Brand,
                                                 ISNULL(cl.Name,'-') AS ClientName,ad.OperatorId,cad.CampaignProfileId,ad.UpdatedBy,
                                                 ad.CreatedDateTime AS CreatedDate,cprof.CampaignName,
-                                                ad.Script,ad.Status,ad.MediaFileLocation,cprof.CountryId,
+                                                ad.Script,ad.Status,cprof.CountryId,
                                                 CASE WHEN ad.MediaFileLocation IS NULL THEN ad.MediaFileLocation 
-                                                    ELSE CONCAT(@siteAddress,ad.MediaFileLocation) END AS MediaFile,
+                                                    ELSE CONCAT(@siteAddress,ad.MediaFileLocation) END AS MediaFileLocation,
                                                 ro.MoreSixSecPlays AS TotalPlays,CAST(ro.AvgBid AS NUMERIC(36,2)) AS AverageBid
                                                 FROM Advert AS ad LEFT JOIN Client AS cl ON ad.ClientId=cl.Id
                                                 LEFT JOIN Users AS usr ON usr.UserId=ad.UserId
@@ -276,24 +277,32 @@ namespace AdtonesAdminWebApi.DAL
                                                     @IsAdminApproval,@AdvertCategoryId,@CountryId,@PhoneticAlphabet,@NextStatus,@CampaignProfileId,
                                                     @AdtoneServerAdvertId,@UpdatedBy,@OperatorId);
                                                             SELECT CAST(SCOPE_IDENTITY() AS INT);";
-            try
+            using (var connection = new SqlConnection(_connStr))
             {
+                await connection.OpenAsync();
 
-                model.AdtoneServerAdvertId = await _executers.ExecuteCommand(_connStr,
-                                conn => conn.ExecuteScalar<int>(InsertNewCampaignAdvert, model));
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        model.AdtoneServerAdvertId = await connection.ExecuteScalarAsync<int>(InsertNewCampaignAdvert, model, transaction);
+                        var result = await CreateNewOperatorAdvert(model);
 
-                try
-                {
-                    return await CreateNewOperatorAdvert(model);
+                        if (result == null)
+                        {
+                            transaction.Rollback();
+                            return null;
+                        }
+
+                        transaction.Commit();
+                        return result;
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
                 }
-                catch
-                {
-                    throw;
-                }
-            }
-            catch
-            {
-                throw;
             }
         }
 
@@ -320,7 +329,6 @@ namespace AdtonesAdminWebApi.DAL
             newModel.CampaignProfileId = model.CampaignProfileId;
             newModel.ClientId = model.ClientId;
             newModel.CountryId = model.CountryId;
-            newModel.file = model.file;
             newModel.IsAdminApproval = model.IsAdminApproval;
             newModel.MediaFile = model.MediaFile;
             newModel.MediaFileLocation = model.MediaFileLocation;
@@ -335,31 +343,45 @@ namespace AdtonesAdminWebApi.DAL
             newModel.UpdatedBy = model.UpdatedBy;
             newModel.UploadedToMediaServer = model.UploadedToMediaServer;
 
-            try
-            {
+
 
                     var conn = await _connService.GetConnectionStringByOperator(model.OperatorId);
-                    if (conn != null && conn.Length > 10)
+                if (conn != null && conn.Length > 10)
+                {
+
+                    newModel.AdvertiserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.AdvertiserId, conn);
+                    newModel.UpdatedBy = await _connService.GetUserIdFromAdtoneIdByConnString(model.UpdatedBy, conn);
+                    newModel.OperatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
+                    newModel.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(model.CampaignProfileId, conn);
+                    if (model.ClientId != null)
+                        newModel.ClientId = await _connService.GetClientIdFromAdtoneIdByConnString(model.ClientId.Value, conn);
+
+
+                    newModel.AdvertCategoryId = await _executers.ExecuteCommand(conn,
+                            conn => conn.ExecuteScalar<int>("SELECT AdvertCategoryId FROM AdvertCategories WHERE AdtoneServerAdvertCategoryId=@Id", new { Id = model.AdvertCategoryId }));
+
+                using (var connection = new SqlConnection(conn))
+                {
+                    await connection.OpenAsync();
+
+                    using (var transaction = connection.BeginTransaction())
                     {
-
-                        newModel.AdvertiserId = await _connService.GetUserIdFromAdtoneIdByConnString(model.AdvertiserId, conn);
-                        newModel.UpdatedBy = await _connService.GetUserIdFromAdtoneIdByConnString(model.UpdatedBy, conn);
-                        newModel.OperatorId = await _connService.GetOperatorIdFromAdtoneId(model.OperatorId);
-                        newModel.CampaignProfileId = await _connService.GetCampaignProfileIdFromAdtoneIdByConn(model.CampaignProfileId, conn);
-                        if (model.ClientId != null)
-                            newModel.ClientId = await _connService.GetClientIdFromAdtoneIdByConnString(model.ClientId.Value, conn);
-
-
-                        newModel.AdvertCategoryId = await _executers.ExecuteCommand(conn,
-                                conn => conn.ExecuteScalar<int>("SELECT AdvertCategoryId FROM AdvertCategories WHERE AdtoneServerAdvertCategoryId=@Id", new { Id = model.AdvertCategoryId }));
-
-                        newModel.AdvertId = await _executers.ExecuteCommand(conn,
-                                conn => conn.ExecuteScalar<int>(InsertNewCampaignAdvert, newModel));
+                        try
+                        {
+                            newModel.AdvertId = await connection.ExecuteScalarAsync<int>(InsertNewCampaignAdvert, newModel, transaction);
+                            transaction.Commit();
+                        }
+                        catch
+                        {
+                            transaction.Rollback();
+                            return null;
+                        }
                     }
+                }
             }
-            catch
+            else
             {
-                throw;
+                return null;
             }
 
             return newModel;
@@ -617,26 +639,30 @@ namespace AdtonesAdminWebApi.DAL
         }
 
 
-        public async Task<int> UpdateAdvertForBilling(int advertId, string constr)
+        public async Task<int> UpdateAdvertForBilling(int advertId, List<string> conStrList)
         {
             string updateAdvertFromBilling  = @"UPDATE Advert SET UpdatedDateTime=GETDATE(), IsAdminApproval=1, NextStatus=0 WHERE AdvertId=@Id";
             int adId = 0;
+            var x = 0;
             try
             {
-                var x = await _executers.ExecuteCommand(_connStr,
+                x = await _executers.ExecuteCommand(_connStr,
                                     conn => conn.ExecuteScalar<int>(updateAdvertFromBilling, new { Id = advertId }));
 
+                foreach (var constr in conStrList)
+                {
+                    adId = await _executers.ExecuteCommand(constr,
+                                    conn => conn.ExecuteScalar<int>("SELECT AdvertId FROM Advert WHERE AdtoneServerAdvertId=@Id", new { Id = advertId }));
 
-                adId = await _executers.ExecuteCommand(constr,
-                                conn => conn.ExecuteScalar<int>("SELECT AdvertId FROM Advert WHERE AdtoneServerAdvertId=@Id", new { Id = advertId }));
-
-                return await _executers.ExecuteCommand(constr,
-                                conn => conn.ExecuteScalar<int>(updateAdvertFromBilling, new { Id = adId }));
+                    x = await _executers.ExecuteCommand(constr,
+                                    conn => conn.ExecuteScalar<int>(updateAdvertFromBilling, new { Id = adId }));
+                }
             }
             catch
             {
                 throw;
             }
+            return x;
         }
 
         public async Task<int> GetAdvertIdByCampid(int campaignId)

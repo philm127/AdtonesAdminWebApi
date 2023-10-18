@@ -97,11 +97,18 @@ namespace AdtonesAdminWebApi.DAL
 
         public async Task<int> AddCountry(CountryResult model)
         {
+            var sb = new StringBuilder();
+
             string addCountry = @"INSERT INTO Country(UserId,Name,ShortName,CreatedDate,UpdatedDate,Status,
                                                     TermAndConditionFileName,CountryCode,AdtoneServeCountryId)
                                             VALUES(@UserId,@Name,@ShortName, GETDATE(), GETDATE(),1, 
                                                 @TermAndConditionFileName, @CountryCode,@AdtoneServeCountryId);
                                             SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+            string addTax = @"INSERT INTO CountryTax(UserId,CountryId,TaxPercantage,CreatedDate,UpdatedDate,Status)
+                                            VALUES(@UserId,@CountryId,@TaxPercantage, GETDATE(), GETDATE(),1);";
+
+
 
             int x = 0;
             var ctryId = 0;
@@ -119,7 +126,7 @@ namespace AdtonesAdminWebApi.DAL
                                                 }));
 
             var y = await _executers.ExecuteCommand(_connStr,
-                                                conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddTax, new
+                                                conn => conn.ExecuteScalar<int>(addTax, new
                                                 {
                                                     UserId = userId,
                                                     CountryId = ctryId,
@@ -130,6 +137,10 @@ namespace AdtonesAdminWebApi.DAL
             var lst = await _connService.GetConnectionStrings();
             List<string> conns = lst.ToList();
 
+            sb.Append("SET IDENTITY_INSERT Country ON;");
+            sb.Append(addCountry);
+            sb.Append("SET IDENTITY_INSERT Country OFF;");
+
             foreach (string constr in conns)
             {
                 if (constr != null && constr.Length > 10)
@@ -139,6 +150,7 @@ namespace AdtonesAdminWebApi.DAL
                     x = await _executers.ExecuteCommand(constr,
                                     conn => conn.ExecuteScalar<int>(addCountry, new
                                     {
+                                        Id = ctryId,
                                         Name = model.Name.Trim(),
                                         ShortName = model.ShortName.ToUpper().Trim(),
                                         TermAndConditionFileName = model.TermAndConditionFileName,
@@ -187,13 +199,10 @@ namespace AdtonesAdminWebApi.DAL
         {
             int x = 0;
 
-            
-                    var ctryId = await _connService.GetCountryIdFromAdtoneId(countryId, constr);
-
                     x = await _executers.ExecuteCommand(constr,
                                                 conn => conn.ExecuteScalar<int>(CountryAreaQuery.AddMinBid, new
                                                 {
-                                                    CountryId = ctryId,
+                                                    CountryId = countryId,
                                                     MinBid = minbid
                                                 }));
 
@@ -233,12 +242,10 @@ namespace AdtonesAdminWebApi.DAL
             {
                 if (constr != null && constr.Length > 10)
                 {
-                    var countryId2 = await _connService.GetCountryIdFromAdtoneId(countryId, constr);
-
                     using (var connection = new SqlConnection(constr))
                     {
                         await connection.OpenAsync();
-                        ctryId = await connection.QueryFirstOrDefaultAsync<int>(select_query, new { Id = countryId2 });
+                        ctryId = await connection.QueryFirstOrDefaultAsync<int>(select_query, new { Id = countryId });
                     }
                     if (ctryId == 0)
                         x = await AddMinBidCountryByProv(countryId, minbid,constr);
@@ -293,7 +300,6 @@ namespace AdtonesAdminWebApi.DAL
                 if (constr != null && constr.Length > 10)
                 {
                     model.UserId = await _connService.GetUserIdFromAdtoneIdByConnString(userId, constr);
-                    countryId = await _connService.GetCountryIdFromAdtoneId(model.Id, constr);
 
                     x = await _executers.ExecuteCommand(constr,
                                     conn => conn.ExecuteScalar<int>(CountryAreaQuery.UpdateCountry, new
@@ -303,7 +309,7 @@ namespace AdtonesAdminWebApi.DAL
                                         TermAndConditionFileName = model.TermAndConditionFileName,
                                         CountryCode = model.CountryCode.Trim(),
                                         UserId = model.UserId,
-                                        Id = countryId
+                                        Id = model.Id
                                     }));
                 }
             }

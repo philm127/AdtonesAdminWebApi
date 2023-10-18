@@ -38,5 +38,9 @@ namespace AdtonesAdminWebApi.ViewModels
         public string CountryName { get; set; }
         public string CurrencyCode { get; set; }
 
+        public int AdtoneServerUserId { get; set; }
+        public int AdtoneServerCampaignProfileId { get; set; }
+        public int AdtoneServerAdvertId { get; set; }
+
     }
 }

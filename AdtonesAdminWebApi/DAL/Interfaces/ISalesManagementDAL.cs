@@ -1,4 +1,5 @@
-﻿using AdtonesAdminWebApi.ViewModels;
+﻿using AdtonesAdminWebApi.Model;
+using AdtonesAdminWebApi.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,7 @@ namespace AdtonesAdminWebApi.DAL.Interfaces
         Task<int> UpdateUserForSP(int sp, int ad);
         Task<int> InsertNewAdvertiserToSalesExec(int sp, int ad, bool mail);
         Task<string> GetSalesExecInvoiceMailDets(int advertiserId);
+        Task<IEnumerable<int>> GetAdvertiserIdsBySalesExec(int userId);
+        Task<IEnumerable<SalesExecDetails>> GetSalesExecDetails();
     }
 }

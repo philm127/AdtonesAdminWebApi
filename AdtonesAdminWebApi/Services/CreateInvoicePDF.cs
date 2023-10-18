@@ -1,17 +1,17 @@
 ﻿using AdtonesAdminWebApi.DAL.Interfaces;
 using AdtonesAdminWebApi.Services.Mailer;
-//using AdtonesAdminWebApi.ViewModels;
 using AdtonesAdminWebApi.ViewModels.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AdtonesAdminWebApi.Services
 {
     public interface ICreateInvoicePDF
     {
-        bool CreatePDF(int CampaignProfileId, int BillingId, int AdvertiserId, string InvoiceNumber, int CountryId, int type, string paymentMethod, string currencySymbol1, string fromCurrencyCode, string toCurrencyCode);
+        Task<bool> CreatePDF(int CampaignProfileId, int BillingId, int AdvertiserId, string InvoiceNumber, int CountryId, int type, string paymentMethod, string currencySymbol1, string fromCurrencyCode, string toCurrencyCode);
     }
 
 
@@ -41,7 +41,8 @@ namespace AdtonesAdminWebApi.Services
             _mailer = mailer;
         }
 
-        public bool CreatePDF(int CampaignProfileId, int BillingId, int AdvertiserId, string InvoiceNumber, int CountryId, int type, string paymentMethod, string currencySymbol1, string fromCurrencyCode, string toCurrencyCode)
+
+        public async Task<bool> CreatePDF(int CampaignProfileId, int BillingId, int AdvertiserId, string InvoiceNumber, int CountryId, int type, string paymentMethod, string currencySymbol1, string fromCurrencyCode, string toCurrencyCode)
         {
             string path = string.Empty;
             InvoiceDto invoice = new InvoiceDto();
@@ -52,8 +53,9 @@ namespace AdtonesAdminWebApi.Services
                 var currencyCode = "";
                 currencyCode = currencySymbol1;
 
-                billingDetails = _billDAL.GetInvoiceDetailsForPDF(BillingId).Result;
-                AdtonesAdminWebApi.ViewModels.DTOs.Item item1 = new AdtonesAdminWebApi.ViewModels.DTOs.Item();
+                billingDetails = await _billDAL.GetInvoiceDetailsForPDF(BillingId);
+                InvoiceItem item1 = new InvoiceItem();
+
                 item1.Description = billingDetails.CampaignName;
                 item1.Price = billingDetails.FundAmount;
                 item1.Quantity = 1;
@@ -109,7 +111,7 @@ namespace AdtonesAdminWebApi.Services
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
                 _logServ.ProcedureName = "CreatePDF";
-                _logServ.LogError();
+                await _logServ.LogError();
                 return false;
             }
             try
@@ -132,7 +134,7 @@ namespace AdtonesAdminWebApi.Services
 
                 mail.SingleTo = mailAddr;
 
-                _mailer.SendBasicEmail(mail);
+                await _mailer.SendBasicEmail(mail);
                 //string[] attachment = new string[1];
                 //attachment[0] = path;
                 //sendemailtoclient(userdetails.Email, userdetails.FirstName, userdetails.LastName, 
@@ -147,7 +149,7 @@ namespace AdtonesAdminWebApi.Services
                 _logServ.StackTrace = ex.StackTrace.ToString();
                 _logServ.PageName = PageName;
                 _logServ.ProcedureName = "CreatePDF";
-                _logServ.LogError();
+                await _logServ.LogError();
                 return false;
             }
         }
